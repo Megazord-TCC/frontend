@@ -1,0 +1,95 @@
+<div class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+      <span class="logo-icon">🏢</span>
+      <span class="logo-text">PORTPLACE</span>
+    </div>
+    <button class="close-btn" (click)="closeSidebar()">
+      <i class="icon-x">✕</i>
+    </button>
+  </div>
+
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li class="nav-item">
+        <button
+          class="nav-link"
+          [class.active]="isActive('/home')"
+          (click)="navigate('/home')">
+          <span class="nav-icon">🏠</span>
+          <span class="nav-text">Início</span>
+        </button>
+      </li>
+
+      <li class="nav-item">
+        <button
+          class="nav-link"
+          [class.active]="isActive('/dashboard')"
+          (click)="navigate('/dashboard')">
+          <span class="nav-icon">📊</span>
+          <span class="nav-text">Dashboard</span>
+        </button>
+      </li>
+
+      <li class="nav-item">
+        <button
+          class="nav-link"
+          [class.active]="isActive('/portfolios')"
+          (click)="navigate('/portfolios')">
+          <span class="nav-icon">📁</span>
+          <span class="nav-text">Portfólios</span>
+        </button>
+      </li>
+
+      <li class="nav-item">
+        <button
+          class="nav-link"
+          [class.active]="isActive('/projects')"
+          (click)="navigate('/projects')">
+          <span class="nav-icon">📋</span>
+          <span class="nav-text">Projetos</span>
+        </button>
+      </li>
+
+      <li class="nav-item">
+        <button
+          class="nav-link"
+          [class.active]="isActive('/strategies')"
+          (click)="navigate('/strategies')">
+          <span class="nav-icon">🎯</span>
+          <span class="nav-text">Estratégias</span>
+        </button>
+      </li>
+
+      <li class="nav-item">
+        <button
+          class="nav-link"
+          [class.active]="isActive('/resources')"
+          (click)="navigate('/resources')">
+          <span class="nav-icon">👥</span>
+          <span class="nav-text">Recursos</span>
+        </button>
+      </li>
+
+      <li class="nav-item">
+        <button
+          class="nav-link"
+          [class.active]="isActive('/users')"
+          (click)="navigate('/users')">
+          <span class="nav-icon">👤</span>
+          <span class="nav-text">Usuários</span>
+        </button>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <span class="user-name">Rodrigo Lorenzo Torres</span>
+      <div class="user-actions">
+        <button class="user-btn pmo-btn">PMO</button>
+        <button class="user-btn logout-btn" (click)="logout()">Sair</button>
+      </div>
+    </div>
+  </div>
+</div>
