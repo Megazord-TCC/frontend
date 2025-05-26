@@ -16,6 +16,7 @@ steps:
 - script: |
     npm install -g npm@latest
     npm install -g @angular/cli
+    npm install 
   displayName: 'Install npm and Angular CLI'
 
 
@@ -25,6 +26,6 @@ steps:
 
 - script: |
     npm ci
-    ng build --configuration=production
+    npm run build
   displayName: 'npm install and build'
   workingDirectory: '$(Build.SourcesDirectory)
