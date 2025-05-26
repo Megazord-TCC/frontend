@@ -7,10 +7,12 @@ import { StrategiesPageComponent } from './pages/strategies-page/strategies-page
 import { ResourcesPageComponent } from './pages/resources-page/resources-page.component';
 import { UsersPageComponent } from './pages/users-page/users-page.component';
 import { NgModule } from '@angular/core';
+import { LoginComponent } from './pages/login/login.component';
 
 export const routes: Routes = [
-  //{ path: '', redirectTo: '/inicio', pathMatch: 'full' },
-  { path: '', component: HomeComponent },
+
+  { path: '', component: LoginComponent },
+  { path: 'inicio', component: HomeComponent },
   { path: 'dashboard', component: DashboardComponent },
   { path: 'portfolios', component: PortfoliosComponent },
   { path: 'portfolio/:id', component: PortfoliosComponent },

@@ -21,7 +21,7 @@ stages:
     - task: Docker@2
       inputs:
         containerRegistry: 'DockerConnection'
-        repository: 'front-end/portplace'
+        repository: 'portplace'
         command: 'buildAndPush'
         tags: '$(Build.BuildId)'
         Dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
