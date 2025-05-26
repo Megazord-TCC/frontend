@@ -27,4 +27,4 @@ steps:
     npm ci
     ng build --configuration=production
   displayName: 'npm install and build'
-  workingDirectory: '$(Build.SourcesDirectory)
+ 
