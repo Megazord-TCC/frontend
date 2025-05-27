@@ -4,6 +4,7 @@ import { CardComponent } from '../../components/card/card.component';
 import { FormsModule } from '@angular/forms';
 import { BadgeComponent } from '../../components/badge/badge.component';
 import { ProgressComponent } from '../../components/progress/progress.component';
+import { SidebarComponent } from '../../components/sidebar/sidebar.component';
 
 interface MetricCard {
   title: string;
@@ -31,7 +32,8 @@ interface Risk {
     CardComponent,
     FormsModule,
     ProgressComponent,
-    BadgeComponent
+    BadgeComponent,
+    SidebarComponent
   ],
 })
 export class DashboardComponent implements OnInit {

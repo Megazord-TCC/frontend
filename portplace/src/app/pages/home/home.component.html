@@ -8,52 +8,15 @@
     </div>
 
     <div class="navigation-grid">
-      <div class="nav-card" (click)="navigateTo('/dashboard')">
+      <div *ngFor="let card of navigationCards"
+           class="nav-card"
+           (click)="navigateTo(card.route)"
+           [style.--icon-color]="card.color">
         <div class="card-icon">
-          <i class="icon-dashboard">📊</i>
+          <img [src]="card.icon" [alt]="card.title + ' icon'" class="svg-icon">
         </div>
-        <h3>Dashboard</h3>
-        <p>Monitore portfólios em andamento com controle de práticos</p>
-      </div>
-
-      <div class="nav-card" (click)="navigateTo('/portfolios')">
-        <div class="card-icon">
-          <i class="icon-portfolios">📁</i>
-        </div>
-        <h3>Portfólios</h3>
-        <p>Gerencie e cadastre seus portfólios, seus riscos, comunicações e responsáveis</p>
-      </div>
-
-      <div class="nav-card" (click)="navigateTo('/projects')">
-        <div class="card-icon">
-          <i class="icon-projects">📋</i>
-        </div>
-        <h3>Projetos</h3>
-        <p>Gerencie e cadastre seus projetos</p>
-      </div>
-
-      <div class="nav-card" (click)="navigateTo('/strategies')">
-        <div class="card-icon">
-          <i class="icon-strategies">🎯</i>
-        </div>
-        <h3>Estratégias</h3>
-        <p>Gerencie e cadastre as estratégias para avaliar projetos e os vínculos a portfólios</p>
-      </div>
-
-      <div class="nav-card" (click)="navigateTo('/resources')">
-        <div class="card-icon">
-          <i class="icon-resources">👥</i>
-        </div>
-        <h3>Recursos</h3>
-        <p>Gerencie cargos, pessoas e alocações de recursos humanos</p>
-      </div>
-
-      <div class="nav-card" (click)="navigateTo('/users')">
-        <div class="card-icon">
-          <i class="icon-users">👤</i>
-        </div>
-        <h3>Usuários</h3>
-        <p>Gerencie o cadastro dos usuários do sistema</p>
+        <h3>{{ card.title }}</h3>
+        <p>{{ card.description }}</p>
       </div>
     </div>
   </div>
