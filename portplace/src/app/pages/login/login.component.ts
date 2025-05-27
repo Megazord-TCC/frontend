@@ -17,7 +17,7 @@ export class LoginComponent {
 
   onLogin(): void {
     if (this.email && this.password) {
-      this.router.navigate(['/dashboard']);
+      this.router.navigate(['/inicio']);
     }
   }
 }

@@ -24,49 +24,55 @@ import { SidebarComponent } from '../../components/sidebar/sidebar.component';
 export class HomeComponent {
   constructor(public router: Router) {}
 
-  public navigationCards = [
+   navigationCards = [
     {
       id: 'dashboard',
       title: 'Dashboard',
-      description: 'Monitore portfólios em andamento com métricas de qualidade.',
-      icon: ChartColumn,
+      description: 'Monitore portfólios em andamento com controle de práticos',
+      icon: 'assets/icon/dashboard_icon.svg',
       route: '/dashboard',
+      color: '#3b82f6'
     },
     {
       id: 'portfolios',
       title: 'Portfólios',
-      description: 'Gerencie e administre seus portfólios com configuração e dependências.',
-      icon: Target,
+      description: 'Gerencie e cadastre seus portfólios, seus riscos, comunicações e responsáveis',
+      icon: 'assets/icon/hub_portfolios_icon.svg',
       route: '/portfolios',
+      color: '#8b5cf6'
     },
     {
-      id: 'projetos',
+      id: 'projects',
       title: 'Projetos',
-      description: 'Gerencie e administre seus projetos.',
-      icon: FolderOpen,
-      route: '/projetos',
+      description: 'Gerencie e cadastre seus projetos',
+      icon: 'assets/icon/assignment_projetos_icon.svg',
+      route: '/projects',
+      color: '#10b981'
     },
     {
-      id: 'estrategias',
+      id: 'strategies',
       title: 'Estratégias',
-      description: 'Gerencie e configure as estratégias para projetos e portfólios.',
-      icon: TrendingUp,
-      route: '/estrategias',
+      description: 'Gerencie e cadastre as estratégias para avaliar projetos e os vínculos a portfólios',
+      icon: 'assets/icon/estrategia_icon.svg',
+      route: '/strategies',
+      color: '#f59e0b'
     },
     {
-      id: 'recursos',
+      id: 'resources',
       title: 'Recursos',
-      description: 'Gerencie recursos para execução de recursos humanos.',
-      icon: Package,
-      route: '/recursos',
+      description: 'Gerencie cargos, pessoas e alocações de recursos humanos',
+      icon: 'assets/icon/recursos_icon.svg',
+      route: '/resources',
+      color: '#ef4444'
     },
     {
-      id: 'usuarios',
+      id: 'users',
       title: 'Usuários',
-      description: 'Gerencie o cadastro dos usuários do sistema.',
-      icon: Users,
-      route: '/usuarios',
-    },
+      description: 'Gerencie o cadastro dos usuários do sistema',
+      icon: 'assets/icon/usuarios_icon.svg',
+      route: '/users',
+      color: '#6b7280'
+    }
   ];
 
   public sidebarItems = [
