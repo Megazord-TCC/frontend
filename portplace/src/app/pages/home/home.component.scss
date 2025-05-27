@@ -85,6 +85,17 @@ $transition: all 0.2s ease;
     transform: translateY(-2px);
     box-shadow: $shadow-hover;
     border-color: darken($border-color, 10%);
+    background-color: #f8fafc;
+    color: #3B82F6;
+
+    img {
+      filter: brightness(0) saturate(100%)
+              invert(44%) sepia(98%) saturate(1237%)
+              hue-rotate(202deg) brightness(97%) contrast(87%);
+    }
+    h3, p {
+      color: #3B82F6;
+    }
   }
 
   &:active {
