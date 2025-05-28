@@ -1,0 +1,11 @@
+.svg-icon-wrapper {
+  display: inline-flex;
+  color: inherit;  /* Herda a cor do elemento pai */
+
+  ::ng-deep svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;  /* Usa a cor atual do contexto */
+    transition: fill 0.2s ease;
+  }
+}

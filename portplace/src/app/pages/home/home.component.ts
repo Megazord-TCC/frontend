@@ -12,12 +12,13 @@ import {
 } from 'lucide-angular';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { SidebarComponent } from '../../components/sidebar/sidebar.component';
+import { SvgIconComponent } from '../../components/svg-icon/svg-icon.component';
+
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule,SidebarComponent],
+  imports: [CommonModule,SvgIconComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -29,7 +30,7 @@ export class HomeComponent {
       id: 'dashboard',
       title: 'Dashboard',
       description: 'Monitore portfólios em andamento com controle de práticos',
-      icon: 'assets/icon/dashboard_icon.svg',
+      icon: 'assets/icon/dashboard_vetor.svg',
       route: '/dashboard',
       color: '#3b82f6'
     },
@@ -37,7 +38,7 @@ export class HomeComponent {
       id: 'portfolios',
       title: 'Portfólios',
       description: 'Gerencie e cadastre seus portfólios, seus riscos, comunicações e responsáveis',
-      icon: 'assets/icon/hub_portfolios_icon.svg',
+      icon: 'assets/icon/hub_portfolios_vetor.svg',
       route: '/portfolios',
       color: '#8b5cf6'
     },
@@ -45,7 +46,7 @@ export class HomeComponent {
       id: 'projects',
       title: 'Projetos',
       description: 'Gerencie e cadastre seus projetos',
-      icon: 'assets/icon/assignment_projetos_icon.svg',
+      icon: 'assets/icon/assignment_projetos_vetor.svg',
       route: '/projects',
       color: '#10b981'
     },
@@ -53,7 +54,7 @@ export class HomeComponent {
       id: 'strategies',
       title: 'Estratégias',
       description: 'Gerencie e cadastre as estratégias para avaliar projetos e os vínculos a portfólios',
-      icon: 'assets/icon/estrategia_icon.svg',
+      icon: 'assets/icon/estrategia_vetor.svg',
       route: '/strategies',
       color: '#f59e0b'
     },
@@ -61,7 +62,7 @@ export class HomeComponent {
       id: 'resources',
       title: 'Recursos',
       description: 'Gerencie cargos, pessoas e alocações de recursos humanos',
-      icon: 'assets/icon/recursos_icon.svg',
+      icon: 'assets/icon/recursos_vetor.svg',
       route: '/resources',
       color: '#ef4444'
     },
@@ -69,7 +70,7 @@ export class HomeComponent {
       id: 'users',
       title: 'Usuários',
       description: 'Gerencie o cadastro dos usuários do sistema',
-      icon: 'assets/icon/usuarios_icon.svg',
+      icon: 'assets/icon/usuarios_vetor.svg',
       route: '/users',
       color: '#6b7280'
     }

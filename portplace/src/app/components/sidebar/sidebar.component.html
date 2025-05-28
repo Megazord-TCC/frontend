@@ -2,7 +2,11 @@
   <div class="sidebar-header">
     <div class="logo">
       <div class="logo-container">
-        <img src="assets/icon/logo.svg" class="logo-icon">
+        <app-svg-icon
+          class="logo-icon"
+          [path]="'assets/icon/logo_vetor.svg'"
+          [size]="24">
+        </app-svg-icon>
         <h1 class="logo-text" >PORTPLACE</h1>
       </div>
       <p>Visão clara. Ação alinhada.</p>
@@ -19,9 +23,11 @@
           class="nav-link"
           [class.active]="isActive(item.route)"
           (click)="navigate(item.route)">
-          <span class="nav-icon">
-            <img [src]="item.icon" [alt]="item.label + ' icon'" width="16" height="16">
-          </span>
+          <app-svg-icon
+            class="nav-icon"
+            [path]="item.icon"
+            [size]="24">
+          </app-svg-icon>
           <span class="nav-text">{{ item.label }}</span>
         </button>
       </li>
