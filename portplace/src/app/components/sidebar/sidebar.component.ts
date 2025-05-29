@@ -25,10 +25,10 @@ export class SidebarComponent {
     { id: 'inicio', label: 'Início', icon: 'assets/icon/home_vetor.svg', route: '/inicio' },
     { id: 'dashboard', label: 'Dashboard', icon: 'assets/icon/dashboard_vetor.svg', route: '/dashboard' },
     { id: 'portfolios', label: 'Portfólios', icon: 'assets/icon/hub_portfolios_vetor.svg', route: '/portfolios' },
-    { id: 'projects', label: 'Projetos', icon: 'assets/icon/assignment_projetos_vetor.svg', route: '/projects' },
-    { id: 'strategies', label: 'Estratégias', icon: 'assets/icon/estrategia_vetor.svg', route: '/strategies' },
-    { id: 'resources', label: 'Recursos', icon: 'assets/icon/recursos_vetor.svg', route: '/resources' },
-    { id: 'users', label: 'Usuários', icon: 'assets/icon/usuarios_vetor.svg', route: '/users' }
+    { id: 'projects', label: 'Projetos', icon: 'assets/icon/assignment_projetos_vetor.svg', route: '/projetos' },
+    { id: 'strategies', label: 'Estratégias', icon: 'assets/icon/estrategia_vetor.svg', route: '/estrategias' },
+    { id: 'resources', label: 'Recursos', icon: 'assets/icon/recursos_vetor.svg', route: '/recursos' },
+    { id: 'users', label: 'Usuários', icon: 'assets/icon/usuarios_vetor.svg', route: '/usuarios' }
   ];
 
   constructor(private router: Router) {}

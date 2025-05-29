@@ -47,7 +47,7 @@ export class HomeComponent {
       title: 'Projetos',
       description: 'Gerencie e cadastre seus projetos',
       icon: 'assets/icon/assignment_projetos_vetor.svg',
-      route: '/projects',
+      route: '/projetos',
       color: '#10b981'
     },
     {
@@ -55,7 +55,7 @@ export class HomeComponent {
       title: 'Estratégias',
       description: 'Gerencie e cadastre as estratégias para avaliar projetos e os vínculos a portfólios',
       icon: 'assets/icon/estrategia_vetor.svg',
-      route: '/strategies',
+      route: '/estrategias',
       color: '#f59e0b'
     },
     {
@@ -63,7 +63,7 @@ export class HomeComponent {
       title: 'Recursos',
       description: 'Gerencie cargos, pessoas e alocações de recursos humanos',
       icon: 'assets/icon/recursos_vetor.svg',
-      route: '/resources',
+      route: '/recursos',
       color: '#ef4444'
     },
     {
@@ -71,7 +71,7 @@ export class HomeComponent {
       title: 'Usuários',
       description: 'Gerencie o cadastro dos usuários do sistema',
       icon: 'assets/icon/usuarios_vetor.svg',
-      route: '/users',
+      route: '/usuarios',
       color: '#6b7280'
     }
   ];

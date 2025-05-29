@@ -6,14 +6,15 @@ $text-secondary: #64748b;
 $border-color: #e2e8f0;
 $primary-color: #1e293b;
 $blue-color: #3b82f6;
+$danger-color: #ef4444;
 
-.strategies-layout {
+.strategy-detail-layout {
   display: flex;
   min-height: 100vh;
   background-color: $background-color;
 }
 
-.strategies-content {
+.strategy-detail-content {
   flex: 1;
   padding: 32px;
 
@@ -35,69 +36,76 @@ $blue-color: #3b82f6;
     color: $text-secondary;
   }
 
+  .breadcrumb-link {
+    color: $blue-color;
+    cursor: pointer;
+    text-decoration: underline;
+
+    &:hover {
+      color: darken($blue-color, 10%);
+    }
+  }
+
   .current {
     color: $text-primary;
   }
 }
 
-.page-header {
+.strategy-header {
   margin-bottom: 24px;
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .back-btn {
+    background: none;
+    border: none;
+    color: $text-secondary;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #f1f5f9;
+    }
+  }
 
   h1 {
     font-size: 24px;
     font-weight: 600;
     color: $text-primary;
-    margin: 0 0 8px 0;
+    margin: 0;
   }
 
-  p {
+  .strategy-description {
+    color: $text-secondary;
+    margin-bottom: 16px;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .last-update {
+    font-size: 12px;
     color: $text-secondary;
     margin: 0;
-    line-height: 1.5;
   }
 }
 
-.filters-section {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
-  gap: 16px;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: stretch;
-  }
-}
-
-.filters-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-
-  @media (max-width: 768px) {
-    justify-content: center;
-  }
-}
-
-.filter-label {
+.btn-outline {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: $text-secondary;
-  font-size: 14px;
-}
-
-.filter-buttons {
-  display: flex;
-  gap: 8px;
-}
-
-.filter-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
+  padding: 8px 16px;
   border: 1px solid $border-color;
   border-radius: 6px;
   background: white;
@@ -110,34 +118,145 @@ $blue-color: #3b82f6;
     background-color: #f8fafc;
   }
 
-  &.active {
-    background-color: $blue-color;
-    color: white;
-    border-color: $blue-color;
+  &.btn-danger {
+    color: $danger-color;
+    border-color: $danger-color;
 
-    .filter-indicator {
-      background-color: white;
+    &:hover {
+      background-color: #fef2f2;
     }
   }
 }
 
-.filter-indicator {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+.tabs-container {
+  margin-bottom: 24px;
+}
 
-  &.blue {
-    background-color: $blue-color;
+.tabs-list {
+  display: flex;
+  background-color: #f1f5f9;
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+}
+
+.tab-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: $text-secondary;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  justify-content: center;
+  white-space: nowrap;
+
+  &:hover {
+    color: $text-primary;
+  }
+
+  &.active {
+    background-color: white;
+    color: $text-primary;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .tab-number {
+    font-weight: 600;
   }
 }
 
-.actions-right {
+.tab-panel {
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 16px;
+  }
+
+  .tab-description {
+    color: $text-secondary;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+}
+
+.objectives-filters {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  .filter-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: $text-secondary;
+    font-size: 14px;
+  }
+
+  .filter-buttons {
+    display: flex;
+    gap: 8px;
+  }
+
+  .filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    background: white;
+    color: $text-secondary;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background-color: #f8fafc;
+    }
+
+    &.active {
+      background-color: $blue-color;
+      color: white;
+      border-color: $blue-color;
+
+      .filter-indicator {
+        background-color: white;
+      }
+    }
+  }
+
+  .filter-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+
+    &.blue {
+      background-color: $blue-color;
+    }
+  }
+}
+
+.objectives-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 16px;
 
   @media (max-width: 768px) {
-    justify-content: center;
+    flex-direction: column;
+    align-items: stretch;
   }
 }
 
@@ -198,7 +317,7 @@ $blue-color: #3b82f6;
   overflow-x: auto;
 }
 
-.strategies-table {
+.objectives-table {
   width: 100%;
   border-collapse: collapse;
 
@@ -224,7 +343,6 @@ $blue-color: #3b82f6;
 
   .table-row {
     border-bottom: 1px solid $border-color;
-    cursor: pointer;
     transition: background-color 0.2s;
 
     &:hover {
@@ -232,16 +350,16 @@ $blue-color: #3b82f6;
     }
   }
 
-  .strategy-link {
+  .objective-link {
     background: none;
     border: none;
-    color: $text-primary;
-    font-weight: 500;
+    color: $blue-color;
+    text-decoration: underline;
     cursor: pointer;
-    text-decoration: none;
+    font-size: 14px;
 
     &:hover {
-      color: $blue-color;
+      color: darken($blue-color, 10%);
     }
   }
 
@@ -297,4 +415,10 @@ $blue-color: #3b82f6;
     opacity: 0.5;
     cursor: not-allowed;
   }
+}
+
+.empty-state {
+  padding: 64px 32px;
+  text-align: center;
+  color: $text-secondary;
 }
