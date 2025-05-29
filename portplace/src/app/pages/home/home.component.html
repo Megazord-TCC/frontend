@@ -1,5 +1,4 @@
  <div class="home-layout">
-  <app-sidebar></app-sidebar>
 
   <div class="home-content">
     <div class="home-header">
@@ -12,9 +11,11 @@
            class="nav-card"
            (click)="navigateTo(card.route)"
            [style.--icon-color]="card.color">
-        <div class="card-icon">
-          <img [src]="card.icon" [alt]="card.title + ' icon'" class="svg-icon">
-        </div>
+        <app-svg-icon
+          class="nav-icon"
+          [path]="card.icon"
+          [size]="24">
+        </app-svg-icon>
         <h3>{{ card.title }}</h3>
         <p>{{ card.description }}</p>
       </div>

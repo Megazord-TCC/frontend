@@ -1,0 +1,211 @@
+<div class="strategy-detail-layout">
+
+  <div class="strategy-detail-content">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <span>Início</span>
+      <span class="separator">></span>
+      <span (click)="goBack()" class="breadcrumb-link">Estratégias</span>
+      <span class="separator">></span>
+      <span class="current">{{strategy?.name}}</span>
+    </div>
+
+    <!-- Header -->
+    <div class="strategy-header">
+      <div class="header-top">
+        <button class="back-btn" (click)="goBack()">
+          <i class="icon-arrow-left">←</i>
+        </button>
+        <h1>{{strategy?.name}}</h1>
+        <app-badge color="green">{{strategy?.status}}</app-badge>
+      </div>
+      <p class="strategy-description">{{strategy?.description}}</p>
+      <div class="header-actions">
+        <button class="btn-outline">
+          <i class="icon-edit">✏️</i>
+          Editar
+        </button>
+        <button class="btn-outline">
+          <i class="icon-cancel">⏸️</i>
+          Cancelar
+        </button>
+        <button class="btn-outline btn-danger">
+          <i class="icon-trash">🗑️</i>
+          Excluir
+        </button>
+      </div>
+      <p class="last-update">{{strategy?.lastUpdate}}</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-container">
+      <div class="tabs-list">
+        <button
+          class="tab-trigger"
+          [class.active]="activeTab === 'objetivos'"
+          (click)="onTabChange('objetivos')">
+          <span class="tab-number">1.</span>
+          Objetivos
+        </button>
+        <button
+          class="tab-trigger"
+          [class.active]="activeTab === 'criterios'"
+          (click)="onTabChange('criterios')">
+          <span class="tab-number">2.</span>
+          Grupos de critérios
+        </button>
+        <button
+          class="tab-trigger"
+          [class.active]="activeTab === 'avaliacoes'"
+          (click)="onTabChange('avaliacoes')">
+          <span class="tab-number">3.</span>
+          Grupos de avaliações
+        </button>
+        <button
+          class="tab-trigger"
+          [class.active]="activeTab === 'cenarios'"
+          (click)="onTabChange('cenarios')">
+          <span class="tab-number">4.</span>
+          Cenários
+        </button>
+        <button
+          class="tab-trigger"
+          [class.active]="activeTab === 'portfolios'"
+          (click)="onTabChange('portfolios')">
+          <span class="tab-number">5.</span>
+          Portfólios e projetos
+        </button>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <!-- Objetivos Tab -->
+        <div *ngIf="activeTab === 'objetivos'" class="tab-panel">
+          <h3>Objetivos estratégicos</h3>
+          <p class="tab-description">
+            Cadastre os objetivos desta estratégia, os quais são utilizados como base para os critérios de avaliação.
+            Somente uma estratégia pode estar ativa, a qual tem efeito apenas para fins de organização.
+          </p>
+
+          <!-- Filters -->
+          <div class="objectives-filters">
+            <div class="filter-label">
+              <i class="icon-filter">🔽</i>
+              <span>Filtros:</span>
+            </div>
+            <div class="filter-buttons">
+              <button
+                class="filter-btn"
+                [class.active]="objectiveFilter === 'ativado'"
+                (click)="onObjectiveFilterChange('ativado')">
+                <div class="filter-indicator blue"></div>
+                Ativado
+              </button>
+              <button
+                class="filter-btn"
+                [class.active]="objectiveFilter === 'cancelado'"
+                (click)="onObjectiveFilterChange('cancelado')">
+                <div class="filter-indicator blue"></div>
+                Cancelado
+              </button>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="objectives-actions">
+            <button class="btn-primary" (click)="openObjectiveModal()">
+              <i class="icon-plus">+</i>
+              Cadastrar
+            </button>
+            <div class="search-container">
+              <i class="icon-search">🔍</i>
+              <input
+                type="text"
+                placeholder="Buscar pelo nome do objetivo"
+                [(ngModel)]="objectiveSearchTerm"
+                (input)="onObjectiveSearchChange()">
+            </div>
+          </div>
+
+          <!-- Objectives Table -->
+          <app-card class="table-card">
+            <div class="table-container">
+              <table class="objectives-table">
+                <thead>
+                  <tr>
+                    <th>
+                      <div class="header-cell">
+                        Nome do objetivo
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+                    <th>
+                      <div class="header-cell">
+                        Critérios vinculados
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+                    <th>
+                      <div class="header-cell">
+                        Portfólios ativos vinculados
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+                    <th>
+                      <div class="header-cell">
+                        Projetos ativos vinculados
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+                    <th>
+                      <div class="header-cell">
+                        Status
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let objective of filteredObjectives" class="table-row">
+                    <td>
+                      <button class="objective-link" (click)="openObjectiveModal(objective)">
+                        {{objective.name}}
+                      </button>
+                    </td>
+                    <td>{{objective.linkedCriteria}}</td>
+                    <td>{{objective.activePortfolios}}</td>
+                    <td>{{objective.activeProjects}}</td>
+                    <td>
+                      <app-badge [color]="objective.statusColor">{{objective.status}}</app-badge>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </app-card>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <p class="pagination-info">Mostrando 1 a 2 de 2 registros</p>
+            <div class="pagination-controls">
+              <button class="pagination-btn" disabled>
+                <i class="icon-chevron-left">‹</i>
+              </button>
+              <button class="pagination-btn active">1</button>
+              <button class="pagination-btn" disabled>
+                <i class="icon-chevron-right">›</i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Other Tabs -->
+        <div *ngIf="activeTab !== 'objetivos'" class="tab-panel">
+          <div class="empty-state">
+            <p>Conteúdo da aba {{getTabName(activeTab)}} em desenvolvimento.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

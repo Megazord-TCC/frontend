@@ -8,6 +8,7 @@ import { ResourcesPageComponent } from './pages/resources-page/resources-page.co
 import { UsersPageComponent } from './pages/users-page/users-page.component';
 import { NgModule } from '@angular/core';
 import { LoginComponent } from './pages/login/login.component';
+import { StrategyDetailPageComponent } from './pages/strategy-detail-page/strategy-detail-page.component';
 
 export const routes: Routes = [
 
@@ -20,6 +21,7 @@ export const routes: Routes = [
   { path: 'estrategias', component: StrategiesPageComponent },
   { path: 'recursos', component: ResourcesPageComponent },
   { path: 'usuarios', component: UsersPageComponent },
+  { path: 'estrategias/:id', component: StrategyDetailPageComponent }
 ];
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
