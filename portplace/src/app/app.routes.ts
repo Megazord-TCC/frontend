@@ -9,6 +9,8 @@ import { UsersPageComponent } from './pages/users-page/users-page.component';
 import { NgModule } from '@angular/core';
 import { LoginComponent } from './pages/login/login.component';
 import { StrategyDetailPageComponent } from './pages/strategy-detail-page/strategy-detail-page.component';
+import { PortfolioDetailComponent } from './pages/portfolios/portfoliodetail/portfoliodetail.component';
+import { ProjectDetailpageComponent } from './pages/projectspage/project-detailpage/project-detailpage.component';
 
 export const routes: Routes = [
 
@@ -16,8 +18,9 @@ export const routes: Routes = [
   { path: 'inicio', component: HomeComponent },
   { path: 'dashboard', component: DashboardComponent },
   { path: 'portfolios', component: PortfoliosComponent },
-  { path: 'portfolio/:id', component: PortfoliosComponent },
+  { path: 'portfolio/:id', component: PortfolioDetailComponent },
   { path: 'projetos', component: ProjectsComponent },
+  { path: 'projeto/:id', component: ProjectDetailpageComponent },
   { path: 'estrategias', component: StrategiesPageComponent },
   { path: 'recursos', component: ResourcesPageComponent },
   { path: 'usuarios', component: UsersPageComponent },

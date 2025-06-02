@@ -2,14 +2,14 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { EditPortfolioModalComponent } from '../../components/edit-portfolio-modal/edit-portfolio-modal.component';
-import { RiskModalComponent } from '../../components/risk-modal/risk-modal.component';
-import { BadgeComponent } from '../../components/badge/badge.component';
-import { CardComponent } from '../../components/card/card.component';
+import { EditPortfolioModalComponent } from '../../../components/edit-portfolio-modal/edit-portfolio-modal.component';
+import { RiskModalComponent } from '../../../components/risk-modal/risk-modal.component';
+import { BadgeComponent } from '../../../components/badge/badge.component';
+import { CardComponent } from '../../../components/card/card.component';
 
 interface Portfolio {
   id: number;
-  name: string;
+  name?: string;
   description: string;
   status: string;
   lastUpdate: string;
@@ -39,7 +39,7 @@ interface Risk {
 @Component({
   selector: 'app-portfolio-detail',
   templateUrl: './portfoliodetail.component.html',
-  styleUrls: ['./portfoliodetail.component.css'],
+  styleUrls: ['./portfoliodetail.component.scss'],
   imports: [CommonModule,
     FormsModule,
     EditPortfolioModalComponent,
