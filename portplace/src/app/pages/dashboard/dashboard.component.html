@@ -48,8 +48,12 @@
     <!-- Expandable Sections -->
     <app-card class="expandable-section">
       <button class="section-header" (click)="toggleSection('progress')">
-        <div class="section-title">
-          <i class="chevron-icon" [class.expanded]="isSectionExpanded('progress')"></i>
+        <div class="section-title" [class.expanded]="isSectionExpanded('progress')">
+          <app-svg-icon
+            class="nav-icon"
+            [path]="isSectionExpanded('progress') ? 'assets/icon/setaBaixo_vetor.svg' : 'assets/icon/seta_vetor.svg'"
+            [size]="14">
+          </app-svg-icon>
           <span>Progresso do portfólio (50%)</span>
         </div>
       </button>
@@ -72,8 +76,12 @@
     <!-- Risk Tracking -->
     <app-card class="expandable-section">
       <button class="section-header" (click)="toggleSection('risks')">
-        <div class="section-title">
-          <i class="chevron-icon" [class.expanded]="isSectionExpanded('risks')"></i>
+        <div class="section-title" [class.expanded]="isSectionExpanded('risks')">
+          <app-svg-icon
+            class="nav-icon"
+            [path]="isSectionExpanded('risks') ? 'assets/icon/setaBaixo_vetor.svg' : 'assets/icon/seta_vetor.svg'"
+            [size]="14">
+          </app-svg-icon>
           <span>Acompanhamento dos 3 maiores riscos</span>
           <app-badge class="risk-badge">4 ocorrências</app-badge>
         </div>
@@ -111,15 +119,23 @@
     <!-- Objectives -->
     <app-card class="expandable-section">
       <button class="section-header" (click)="toggleSection('objectives')">
-        <div class="section-title">
-          <i class="chevron-icon" [class.expanded]="isSectionExpanded('objectives')"></i>
+        <div class="section-title" [class.expanded]="isSectionExpanded('objectives')">
+          <app-svg-icon
+            class="nav-icon"
+            [path]="isSectionExpanded('objectives') ? 'assets/icon/setaBaixo_vetor.svg' : 'assets/icon/seta_vetor.svg'"
+            [size]="14">
+          </app-svg-icon>
           <span>Objetivos</span>
         </div>
       </button>
       <div class="section-content" *ngIf="isSectionExpanded('objectives')">
         <div class="objectives-list">
           <div class="objective-item" *ngFor="let objective of objectives">
-            <div class="objective-checkbox"></div>
+            <app-svg-icon
+              class="nav-icon"
+              [path]="'assets/icon/p_vetor.svg'"
+              [size]="18">
+            </app-svg-icon>
             <div class="objective-info">
               <p class="objective-name">{{objective.name}}</p>
               <p class="objective-description">{{objective.description}}</p>

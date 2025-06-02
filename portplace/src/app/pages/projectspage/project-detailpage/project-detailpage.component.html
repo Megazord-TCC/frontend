@@ -1,0 +1,213 @@
+<div class="project-detail-layout">
+
+  <div class="project-detail-content">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <span>Início</span>
+      <span class="separator">></span>
+      <span (click)="goBack()" class="breadcrumb-link">Projetos</span>
+      <span class="separator">></span>
+      <span class="current">Projeto: {{project?.name}}</span>
+    </div>
+
+    <!-- Header -->
+    <div class="project-header">
+      <div class="header-top">
+        <button class="back-btn" (click)="goBack()">
+
+          <app-svg-icon
+            class="nav-icon"
+            [path]="'assets/icon/voltar_vetor.svg'"
+            [size]="18">
+          </app-svg-icon>
+        </button>
+        <h1>{{project?.name}}</h1>
+        <app-badge [color]="project?.statusColor">{{project?.status}}</app-badge>
+      </div>
+      <p class="project-description">{{project?.description}}</p>
+
+      <div class="project-dates">
+        <span>Início planejado: {{project?.startDate}}</span>
+        <span>Fim planejado: {{project?.endDate}}</span>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn-outline">
+
+          <app-svg-icon
+            class="nav-icon"
+            [path]="'assets/icon/editar_vetor.svg'"
+            [size]="18">
+          </app-svg-icon>
+          Editar dados básicos
+        </button>
+        <button class="btn-outline btn-danger">
+          <app-svg-icon
+            class="nav-icon"
+            [path]="'assets/icon/excluir_vetor.svg'"
+            [size]="18">
+          </app-svg-icon>
+          Excluir
+        </button>
+      </div>
+      <p class="last-update">{{project?.lastUpdate}}</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-container">
+      <div class="tabs-list">
+        <button
+          class="tab-trigger"
+          [class.active]="activeTab === 'indicadores'"
+          (click)="onTabChange('indicadores')">
+          <app-svg-icon
+            class="nav-icon"
+            [path]="'assets/icon/indicadores_vetor.svg'"
+            [size]="18">
+          </app-svg-icon>
+          Indicadores
+        </button>
+        <button
+          class="tab-trigger"
+          [class.active]="activeTab === 'vinculo'"
+          (click)="onTabChange('vinculo')">
+          <app-svg-icon
+            class="nav-icon"
+            [path]="'assets/icon/estrategia_vetor.svg'"
+            [size]="18">
+          </app-svg-icon>
+          Vínculo estratégico
+        </button>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <!-- Indicadores Tab -->
+        <div *ngIf="activeTab === 'indicadores'" class="tab-panel">
+          <h3>Indicadores</h3>
+          <p class="tab-description">
+            Atualize os indicadores do projeto com os valores mais recentes.
+          </p>
+
+          <div class="indicators-grid">
+            <div *ngFor="let indicator of indicators" class="indicator-item">
+              <label>{{indicator.label}}</label>
+              <div class="indicator-input-group">
+                <input
+                  type="text"
+                  [(ngModel)]="indicator.value"
+                  class="indicator-input">
+                <button class="save-btn" (click)="saveIndicator(indicator)">
+
+                  <app-svg-icon
+                    class="nav-icon"
+                    [path]="'assets/icon/salvar_vetor.svg'"
+                    [size]="18">
+                  </app-svg-icon>
+                  Salvar
+                </button>
+              </div>
+              <p class="last-update-text">{{indicator.lastUpdate}}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vínculo Estratégico Tab -->
+        <div *ngIf="activeTab === 'vinculo'" class="tab-panel">
+          <h3>Vínculo estratégico</h3>
+          <p class="tab-description">
+            Confira as entidades estratégicas vinculadas a este projeto.
+          </p>
+
+          <!-- Strategic Links -->
+          <div class="strategic-links">
+            <div class="link-item">
+
+              <app-svg-icon
+                class="nav-icon"
+                [path]="'assets/icon/hub_portfolios_vetor.svg'"
+                [size]="24">
+              </app-svg-icon>
+              <div class="link-info">
+                <span class="link-title">Portfólio 1</span>
+                <span class="link-subtitle">Portfólio</span>
+              </div>
+            </div>
+
+            <div class="link-item">
+              <app-svg-icon
+                class="nav-icon"
+                [path]="'assets/icon/estrategia_vetor.svg'"
+                [size]="24">
+              </app-svg-icon>
+              <div class="link-info">
+                <span class="link-title">Estratégia 1</span>
+                <span class="link-subtitle">Estratégia</span>
+              </div>
+            </div>
+
+            <div class="link-item">
+              <app-svg-icon
+                class="nav-icon"
+                [path]="'assets/icon/estrategia_vetor.svg'"
+                [size]="24">
+              </app-svg-icon>
+              <div class="link-info">
+                <span class="link-title">700/1000</span>
+                <span class="link-subtitle">Valor estratégico</span>
+              </div>
+            </div>
+
+            <div class="link-item">
+              <app-svg-icon
+                class="nav-icon"
+                [path]="'assets/icon/prioridade_vetor.svg'"
+                [size]="24">
+              </app-svg-icon>
+              <div class="link-info">
+                <span class="link-title">1°/15</span>
+                <span class="link-subtitle">Prioridade no portfólio</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Objectives -->
+          <div class="objectives-section">
+            <h4>Objetivos</h4>
+            <div class="objectives-list">
+              <div *ngFor="let objective of objectives" class="objective-item">
+                <app-svg-icon
+                  class="nav-icon"
+                  [path]="'assets/icon/p_vetor.svg'"
+                  [size]="18">
+                </app-svg-icon>
+                <span>{{objective.name}}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Evaluations -->
+          <div class="evaluations-section">
+            <h4>Avaliações</h4>
+            <div class="evaluation-result">
+              <span class="result-label">Resultado:</span>
+              <span class="result-value">700</span>
+            </div>
+            <div class="evaluations-list">
+              <div *ngFor="let evaluation of evaluations" class="evaluation-item">
+                <app-svg-icon
+                  class="nav-icon"
+                  [path]="'assets/icon/metrica_vetor.svg'"
+                  [size]="18">
+                </app-svg-icon>
+                <span class="evaluation-text">
+                  {{evaluation.name}} (peso {{evaluation.weight}}%): {{evaluation.value}}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

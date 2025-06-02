@@ -1,6 +1,176 @@
-<div class="projects-container">
-  <div class="page-header">
-    <h1>Projetos</h1>
-    <p>Página de gerenciamento de projetos em desenvolvimento.</p>
+<div class="projects-layout">
+
+  <div class="projects-content">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <span>Início</span>
+      <span class="separator">></span>
+      <span class="current">Projetos</span>
+    </div>
+
+    <!-- Header -->
+    <div class="page-header">
+      <h1>Projetos</h1>
+      <p>Gerencie os projetos da organização.</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+      <div class="filters-left">
+        <div class="filter-label">
+          <app-svg-icon
+            class="nav-icon"
+            [path]="'assets/icon/filter_vetor.svg'"
+            [size]="18">
+          </app-svg-icon>
+          <span>Filtros:</span>
+        </div>
+        <div class="filter-buttons">
+          <button
+            class="filter-btn"
+            [class.active]="activeFilter === 'em-analise'"
+            (click)="onFilterChange('em-analise')">
+            <div class="filter-indicator blue"></div>
+            Em análise
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="activeFilter === 'em-andamento'"
+            (click)="onFilterChange('em-andamento')">
+            <div class="filter-indicator blue"></div>
+            Em andamento
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="activeFilter === 'finalizado'"
+            (click)="onFilterChange('finalizado')">
+            <div class="filter-indicator blue"></div>
+            Finalizado
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="activeFilter === 'cancelado'"
+            (click)="onFilterChange('cancelado')">
+            <div class="filter-indicator blue"></div>
+            Cancelado
+          </button>
+        </div>
+      </div>
+
+      <div class="actions-right">
+        <button class="btn-primary" (click)="openCreateModal()">
+          <i class="icon-plus">+</i>
+          Cadastrar
+        </button>
+        <div class="search-container">
+
+          <app-svg-icon
+            class="nav-icon"
+            [path]="'assets/icon/search_vetor.svg'"
+            [size]="18">
+          </app-svg-icon>
+          <input
+            type="text"
+            placeholder="Buscar pelo nome do projeto"
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()">
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <app-card class="table-card">
+      <div class="table-container">
+        <table class="projects-table">
+          <thead>
+            <tr>
+              <th>
+                <div class="header-cell">
+                  Nome do projeto
+                </div>
+              </th>
+              <th>
+                <div class="header-cell">
+                  Portfólio
+                </div>
+              </th>
+              <th>
+                <div class="header-cell">
+                  Orçamento
+                </div>
+              </th>
+              <th>
+                <div class="header-cell">
+                  EV
+                  <app-svg-icon
+                    class="nav-icon"
+                    [path]="'assets/icon/sort-alt.svg'"
+                    [size]="18">
+                  </app-svg-icon>
+                </div>
+              </th>
+              <th>
+                <div class="header-cell">
+                  PV
+                  <app-svg-icon
+                    class="nav-icon"
+                    [path]="'assets/icon/sort-alt.svg'"
+                    [size]="18">
+                  </app-svg-icon>
+                </div>
+              </th>
+              <th>
+                <div class="header-cell">
+                  Início planejado
+                  <app-svg-icon
+                    class="nav-icon"
+                    [path]="'assets/icon/sort-alt.svg'"
+                    [size]="18">
+                  </app-svg-icon>
+                </div>
+              </th>
+              <th>
+                <div class="header-cell">
+                  Fim planejado
+                  <app-svg-icon
+                    class="nav-icon"
+                    [path]="'assets/icon/sort-alt.svg'"
+                    [size]="18">
+                  </app-svg-icon>
+                </div>
+              </th>
+              <th>
+                <div class="header-cell">
+                  Status
+                  <app-svg-icon
+                    class="nav-icon"
+                    [path]="'assets/icon/sort-alt.svg'"
+                    [size]="18">
+                  </app-svg-icon>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let project of filteredProjects"
+                class="table-row"
+                (click)="onProjectClick(project.id)">
+              <td>
+                <button class="project-link">{{project.name}}</button>
+              </td>
+              <td>{{project.portfolio}}</td>
+              <td>{{project.budget}}</td>
+              <td>{{project.ev}}</td>
+              <td>{{project.pv}}</td>
+              <td>{{project.startDate}}</td>
+              <td>{{project.endDate}}</td>
+              <td>
+                <app-badge [color]="project.statusColor">{{ getStatusLabel(project.status) }}</app-badge>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </app-card>
   </div>
 </div>
