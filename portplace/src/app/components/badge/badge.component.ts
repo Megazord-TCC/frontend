@@ -7,7 +7,7 @@ import { Component, Input } from '@angular/core';
   styleUrl: './badge.component.scss'
 })
 export class BadgeComponent {
-  @Input() color: 'gray' | 'green' | 'blue' | 'red' | 'yellow' = 'blue';
+  @Input() color?: string;
 
   getBadgeClasses(): string {
     return `badge badge-${this.color}`;

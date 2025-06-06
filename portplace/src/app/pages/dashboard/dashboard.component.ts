@@ -95,7 +95,7 @@ export class DashboardComponent implements OnInit {
     } else {
       this.expandedSections.push(section);
     }
-    
+
   }
 
   isSectionExpanded(section: string): boolean {

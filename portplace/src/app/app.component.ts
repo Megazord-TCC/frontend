@@ -3,10 +3,11 @@ import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Router } from '@angular/router';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, CommonModule,SidebarComponent],
+  imports: [RouterOutlet, CommonModule,SidebarComponent ,HttpClientModule],
   template: `
      <div class="app-container">
       <app-sidebar

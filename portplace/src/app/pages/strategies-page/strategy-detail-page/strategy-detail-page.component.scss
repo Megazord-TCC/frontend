@@ -1,0 +1,489 @@
+.strategy-detail-layout {
+  display: flex;
+  height: 100vh;
+  background-color: #f8fafc;
+}
+
+.strategy-detail-content {
+  flex: 1;
+  overflow: auto;
+  padding: 2rem;
+}
+
+// Breadcrumb
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  color: #64748b;
+
+  .breadcrumb-link {
+    color: #3b82f6;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .separator {
+    color: #9ca3af;
+  }
+
+  .current {
+    color: #1e293b;
+    font-weight: 500;
+  }
+}
+
+// Strategy Header
+.strategy-header {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    .back-btn {
+      background: none;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      padding: 0.5rem;
+      cursor: pointer;
+      color: #6b7280;
+
+      &:hover {
+        background-color: #f9fafb;
+        color: #374151;
+      }
+    }
+
+    h1 {
+      flex: 1;
+      margin: 0;
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: #1e293b;
+    }
+  }
+
+  .strategy-description {
+    color: #64748b;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+
+    .btn-outline {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid #e5e7eb;
+      background: white;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-size: 0.875rem;
+      color: #374151;
+
+      &:hover {
+        background-color: #f9fafb;
+      }
+
+      &.btn-danger {
+        color: #ef4444;
+        border-color: #ef4444;
+
+        &:hover {
+          background-color: #ef4444;
+          color: white;
+        }
+      }
+    }
+  }
+
+  .last-update {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin: 0;
+  }
+}
+
+// Tabs
+.tabs-container {
+  .tabs-list {
+    display: flex;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 1.5rem;
+    background: white;
+    border-radius: 0.75rem 0.75rem 0 0;
+    overflow-x: auto;
+
+    .tab-trigger {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: none;
+      border: none;
+      padding: 1rem 1.5rem;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #64748b;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+
+      &:hover {
+        color: #1e293b;
+        background-color: #f8fafc;
+      }
+
+      &.active {
+        color: #3b82f6;
+        border-bottom-color: #3b82f6;
+        background-color: white;
+      }
+
+      .tab-number {
+        font-weight: 600;
+      }
+    }
+  }
+
+  .tab-content {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0 0 0.75rem 0.75rem;
+    min-height: 400px;
+  }
+}
+
+// Tab Panel
+.tab-panel {
+  padding: 1.5rem;
+
+  h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  .tab-description {
+    color: #64748b;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #64748b;
+  }
+}
+
+// Filters
+.objectives-filters,
+.scenarios-filters {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  .filter-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #64748b;
+    font-size: 0.875rem;
+  }
+
+  .filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+
+    .filter-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid #e5e7eb;
+      background: white;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-size: 0.875rem;
+      color: #374151;
+      transition: all 0.2s;
+
+      &:hover {
+        background-color: #f9fafb;
+      }
+
+      &.active {
+        background-color: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+      }
+
+      .filter-indicator {
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 50%;
+
+        &.blue {
+          background-color: #3b82f6;
+        }
+      }
+    }
+  }
+}
+
+// Actions
+.objectives-actions,
+.criteria-actions,
+.evaluations-actions,
+.scenarios-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+
+  .btn-primary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #1e293b;
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+
+    &:hover {
+      background-color: #1e3a8a;
+    }
+  }
+
+  .search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    i {
+      position: absolute;
+      left: 0.75rem;
+      color: #64748b;
+      z-index: 1;
+    }
+
+    input {
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      width: 16rem;
+      transition: border-color 0.2s;
+
+      &:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      &::placeholder {
+        color: #9ca3af;
+      }
+    }
+  }
+}
+
+// Tables
+.table-card {
+  margin-bottom: 1.5rem;
+
+  .table-container {
+    overflow-x: auto;
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+
+      thead {
+        background-color: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+
+        th {
+          padding: 1rem;
+          text-align: left;
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: #64748b;
+
+          .header-cell {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+
+            .icon-sort {
+              font-size: 0.75rem;
+              color: #9ca3af;
+            }
+          }
+        }
+      }
+
+      tbody {
+        .table-row {
+          border-bottom: 1px solid #e2e8f0;
+          transition: background-color 0.2s;
+
+          &:hover {
+            background-color: #f8fafc;
+          }
+
+          td {
+            padding: 1rem;
+            font-size: 0.875rem;
+            color: #64748b;
+
+            button {
+              background: none;
+              border: none;
+              color: #3b82f6;
+              cursor: pointer;
+              text-decoration: underline;
+              font-size: 0.875rem;
+
+              &:hover {
+                color: #1e3a8a;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Pagination
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+
+  .pagination-info {
+    font-size: 0.875rem;
+    color: #64748b;
+  }
+
+  .pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .pagination-btn {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #e5e7eb;
+      background: white;
+      border-radius: 0.375rem;
+      cursor: pointer;
+      font-size: 0.875rem;
+      color: #374151;
+
+      &:hover:not(:disabled) {
+        background-color: #f9fafb;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &.active {
+        background-color: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .strategy-detail-content {
+    padding: 1rem;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .objectives-actions,
+  .criteria-actions,
+  .evaluations-actions,
+  .scenarios-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+
+    .search-container input {
+      width: 100%;
+    }
+  }
+
+  .objectives-filters,
+  .scenarios-filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+
+    .filter-buttons {
+      justify-content: space-between;
+    }
+  }
+
+  .tabs-list {
+    .tab-trigger {
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+    }
+  }
+
+  .tab-panel {
+    padding: 1rem;
+  }
+
+  .table-container {
+    table {
+      font-size: 0.75rem;
+
+      th,
+      td {
+        padding: 0.5rem;
+      }
+    }
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
+}

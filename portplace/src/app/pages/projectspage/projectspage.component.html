@@ -152,25 +152,42 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let project of filteredProjects"
+            <tr *ngFor="let project of Projects"
                 class="table-row"
-                (click)="onProjectClick(project.id)">
+                >
               <td>
-                <button class="project-link">{{project.name}}</button>
+                <button (click)="onProjectClick(project.id!)" class="project-link">
+                  {{ project.name || 'não definido' }}
+                </button>
               </td>
-              <td>{{project.portfolio}}</td>
-              <td>{{project.budget}}</td>
-              <td>{{project.ev}}</td>
-              <td>{{project.pv}}</td>
-              <td>{{project.startDate}}</td>
-              <td>{{project.endDate}}</td>
+
+              <!-- Portfólio -->
+              <td>{{ project.portfolio || 'não definido' }}</td>
+
+              <td>{{ project.budget || 'não definido' }}</td>
+              <td>{{ project.earnedValue || 'não definido' }}</td>
+              <td>{{ project.plannedValue || 'não definido' }}</td>
+              <td>{{ project.startDate || 'não definido' }}</td>
+              <td>{{ project.endDate || 'não definido' }}</td>
               <td>
-                <app-badge [color]="project.statusColor">{{ getStatusLabel(project.status) }}</app-badge>
+                <app-badge [color]="getStatusColor(project.status)">
+                  {{ getStatusLabel(project.status) || 'não definido' }}
+                </app-badge>
               </td>
+
             </tr>
           </tbody>
         </table>
       </div>
     </app-card>
   </div>
+
+  <!-- Form Modal -->
+  <app-form-modal-component
+    [isVisible]="showCreateModal"
+    [config]="createProjectConfig"
+    (close)="closeCreateModal()"
+    (save)="onSaveProject($event)"
+    (cancel)="closeCreateModal()">
+  </app-form-modal-component>
 </div>
