@@ -152,9 +152,12 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let project of Projects"
-                class="table-row"
-                >
+            <div class="div-loading-projetcts" *ngIf="loadingProjects">Carregando projetos...</div>
+            <div *ngIf="!loadingProjects">
+
+              <tr *ngFor="let project of Projects"
+              class="table-row"
+              >
               <td>
                 <button (click)="onProjectClick(project.id!)" class="project-link">
                   {{ project.name || 'não definido' }}
@@ -176,6 +179,7 @@
               </td>
 
             </tr>
+          </div>
           </tbody>
         </table>
       </div>
