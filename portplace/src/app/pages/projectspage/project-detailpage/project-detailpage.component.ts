@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BadgeComponent } from "../../../components/badge/badge.component";
 import { FormsModule } from '@angular/forms';
-import { Evaluation, FormField, FormModalConfig, Indicator, Objective, Project, ProjectStatusEnum } from '../../../interface/interfacies';
+import { Evaluation, FormField, FormModalConfig, Indicator, Objective, Objectives, Project, ProjectStatusEnum } from '../../../interface/interfacies';
 import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.component';
 import { ProjetoService } from '../../../service/projeto.service';
 import { retry } from 'rxjs';
@@ -87,7 +87,7 @@ export class ProjectDetailpageComponent implements OnInit {
     }
   ];
 
-  objectives: Objective[] = [
+  objectives: Objectives[] = [
     { id: '1', name: 'Nome do objetivo 1' },
     { id: '2', name: 'Nome do objetivo 2' },
     { id: '3', name: 'Nome do objetivo 3' }

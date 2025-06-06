@@ -35,7 +35,17 @@ export interface Indicator {
   lastUpdate: string;
 }
 
+
 export interface Objective {
+  id: string
+  name: string
+  linkedCriteria: number
+  activePortfolios: number
+  activeProjects: number
+  status: "ATIVADO" | "CANCELADO"
+  statusColor: "green" | "gray"
+}
+export interface Objectives {
   id: string;
   name: string;
 }
@@ -57,4 +67,25 @@ export interface FormModalConfig {
   fields: FormField[];
   showValidationMessage?: boolean;
   validationMessage?: string;
+}
+export interface CriteriaGroup {
+  id: string
+  name: string
+  criteriaGroup: string
+}
+
+export interface EvaluationGroup {
+  id: string
+  name: string
+  criteriaGroup: string
+}
+
+export interface Scenario {
+  id: string
+  name: string
+  budget: string
+  evaluation: string
+  selectedProjects: number
+  status: "AGUARDANDO AUTORIZAÇÃO" | "AUTORIZADO" | "CANCELADO"
+  statusColor: "yellow" | "green" | "gray"
 }

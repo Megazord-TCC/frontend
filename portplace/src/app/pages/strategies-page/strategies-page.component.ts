@@ -74,7 +74,7 @@ export class StrategiesPageComponent implements OnInit{
   }
 
   onStrategyClick(strategyId: string): void {
-    this.router.navigate(['/strategies', strategyId]);
+    this.router.navigate(['/estrategia', strategyId]);
   }
 
   openCreateModal(): void {

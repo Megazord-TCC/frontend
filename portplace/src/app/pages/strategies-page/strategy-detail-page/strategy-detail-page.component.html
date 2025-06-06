@@ -1,0 +1,468 @@
+<div class="strategy-detail-layout">
+
+  <div class="strategy-detail-content">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <span>Início</span>
+      <span class="separator">></span>
+      <span (click)="goBack()" class="breadcrumb-link">Estratégias</span>
+      <span class="separator">></span>
+      <span class="current">{{strategy?.name}}</span>
+    </div>
+
+    <!-- Header -->
+    <div class="strategy-header">
+      <div class="header-top">
+        <button class="back-btn" (click)="goBack()">
+          <i class="icon-arrow-left">←</i>
+        </button>
+        <h1>{{strategy?.name}}</h1>
+        <app-badge color="green">{{strategy?.status}}</app-badge>
+      </div>
+      <p class="strategy-description">{{strategy?.description}}</p>
+      <div class="header-actions">
+        <button class="btn-outline">
+          <i class="icon-edit">✏️</i>
+          Editar
+        </button>
+        <button class="btn-outline">
+          <i class="icon-cancel">⏸️</i>
+          Cancelar
+        </button>
+        <button class="btn-outline btn-danger">
+          <i class="icon-trash">🗑️</i>
+          Excluir
+        </button>
+      </div>
+      <p class="last-update">{{strategy?.lastUpdate}}</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-container">
+      <div class="tabs-list">
+        <button
+          class="tab-trigger"
+          [class.active]="activeTab === 'objetivos'"
+          (click)="onTabChange('objetivos')">
+          <span class="tab-number">1.</span>
+          Objetivos
+        </button>
+        <button
+          class="tab-trigger"
+          [class.active]="activeTab === 'criterios'"
+          (click)="onTabChange('criterios')">
+          <span class="tab-number">2.</span>
+          Grupos de critérios
+        </button>
+        <button
+          class="tab-trigger"
+          [class.active]="activeTab === 'avaliacoes'"
+          (click)="onTabChange('avaliacoes')">
+          <span class="tab-number">3.</span>
+          Grupos de avaliações
+        </button>
+        <button
+          class="tab-trigger"
+          [class.active]="activeTab === 'cenarios'"
+          (click)="onTabChange('cenarios')">
+          <span class="tab-number">4.</span>
+          Cenários
+        </button>
+
+      </div>
+
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <!-- Objetivos Tab -->
+        <div *ngIf="activeTab === 'objetivos'" class="tab-panel">
+          <h3>Objetivos estratégicos</h3>
+          <p class="tab-description">
+            Cadastre os objetivos desta estratégia, os quais são utilizados como base para os critérios de avaliação.
+            Somente uma estratégia pode estar ativa, a qual tem efeito apenas para fins de organização.
+          </p>
+
+          <!-- Filters -->
+          <div class="objectives-filters">
+            <div class="filter-label">
+              <i class="icon-filter">🔽</i>
+              <span>Filtros:</span>
+            </div>
+            <div class="filter-buttons">
+              <button
+                class="filter-btn"
+                [class.active]="objectiveFilter === 'ativado'"
+                (click)="onObjectiveFilterChange('ativado')">
+                <div class="filter-indicator blue"></div>
+                Ativado
+              </button>
+              <button
+                class="filter-btn"
+                [class.active]="objectiveFilter === 'cancelado'"
+                (click)="onObjectiveFilterChange('cancelado')">
+                <div class="filter-indicator blue"></div>
+                Cancelado
+              </button>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="objectives-actions">
+            <button class="btn-primary" (click)="openObjectiveModal()">
+              <i class="icon-plus">+</i>
+              Cadastrar
+            </button>
+            <div class="search-container">
+              <i class="icon-search">🔍</i>
+              <input
+                type="text"
+                placeholder="Buscar pelo nome do objetivo"
+                [(ngModel)]="objectiveSearchTerm"
+                (input)="onObjectiveSearchChange()">
+            </div>
+          </div>
+
+          <!-- Objectives Table -->
+          <app-card class="table-card">
+            <div class="table-container">
+              <table class="objectives-table">
+                <thead>
+                  <tr>
+                    <th>
+                      <div class="header-cell">
+                        Nome do objetivo
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+                    <th>
+                      <div class="header-cell">
+                        Critérios vinculados
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+                    <th>
+                      <div class="header-cell">
+                        Portfólios ativos vinculados
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+                    <th>
+                      <div class="header-cell">
+                        Projetos ativos vinculados
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+                    <th>
+                      <div class="header-cell">
+                        Status
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let objective of filteredObjectives" class="table-row">
+                    <td>
+                      <button class="objective-link" (click)="openObjectiveModal(objective)">
+                        {{objective.name}}
+                      </button>
+                    </td>
+                    <td>{{objective.linkedCriteria}}</td>
+                    <td>{{objective.activePortfolios}}</td>
+                    <td>{{objective.activeProjects}}</td>
+                    <td>
+                      <app-badge [color]="objective.statusColor">{{objective.status}}</app-badge>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </app-card>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <p class="pagination-info">Mostrando 1 a {{filteredObjectives.length}} de {{filteredObjectives.length}} registros</p>
+            <div class="pagination-controls">
+              <button class="pagination-btn" disabled>
+                <i class="icon-chevron-left">‹</i>
+              </button>
+              <button class="pagination-btn active">1</button>
+              <button class="pagination-btn" disabled>
+                <i class="icon-chevron-right">›</i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grupos de Critérios Tab -->
+        <div *ngIf="activeTab === 'criterios'" class="tab-panel">
+          <h3>Grupos de critérios</h3>
+          <p class="tab-description">
+            Cadastre grupos de critérios a partir de objetivos estratégicos. Esses critérios são utilizados para gerar avaliações.
+          </p>
+
+          <!-- Actions -->
+          <div class="criteria-actions">
+            <button class="btn-primary" (click)="openCriteriaModal()">
+              <i class="icon-plus">+</i>
+              Cadastrar
+            </button>
+            <div class="search-container">
+              <i class="icon-search">🔍</i>
+              <input
+                type="text"
+                placeholder="Buscar em todas colunas"
+                [(ngModel)]="criteriaSearchTerm"
+                (input)="onCriteriaSearchChange()">
+            </div>
+          </div>
+
+          <!-- Criteria Groups Table -->
+          <app-card class="table-card">
+            <div class="table-container">
+              <table class="criteria-table">
+                <thead>
+                  <tr>
+                    <th>
+                      <div class="header-cell">
+                        Nome do grupo de critério
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+                    <th>
+                      <div class="header-cell">
+                        Grupo de critérios
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let criteria of filteredCriteriaGroups" class="table-row">
+                    <td>
+                      <button class="criteria-link" (click)="openCriteriaModal(criteria)">
+                        {{criteria.name}}
+                      </button>
+                    </td>
+                    <td>{{criteria.criteriaGroup}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </app-card>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <p class="pagination-info">Mostrando 1 a {{filteredCriteriaGroups.length}} de {{filteredCriteriaGroups.length}} registros</p>
+            <div class="pagination-controls">
+              <button class="pagination-btn" disabled>
+                <i class="icon-chevron-left">‹</i>
+              </button>
+              <button class="pagination-btn active">1</button>
+              <button class="pagination-btn" disabled>
+                <i class="icon-chevron-right">›</i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grupos de Avaliações Tab -->
+        <div *ngIf="activeTab === 'avaliacoes'" class="tab-panel">
+          <h3>Grupo de avaliações de projetos</h3>
+          <p class="tab-description">
+            Cadastre grupos de avaliações de projetos a partir de grupos de critérios. Essas avaliações são utilizadas para gerar cenários.
+          </p>
+
+          <!-- Actions -->
+          <div class="evaluations-actions">
+            <button class="btn-primary" (click)="openEvaluationModal()">
+              <i class="icon-plus">+</i>
+              Cadastrar
+            </button>
+            <div class="search-container">
+              <i class="icon-search">🔍</i>
+              <input
+                type="text"
+                placeholder="Buscar em todas colunas"
+                [(ngModel)]="evaluationSearchTerm"
+                (input)="onEvaluationSearchChange()">
+            </div>
+          </div>
+
+          <!-- Evaluation Groups Table -->
+          <app-card class="table-card">
+            <div class="table-container">
+              <table class="evaluations-table">
+                <thead>
+                  <tr>
+                    <th>
+                      <div class="header-cell">
+                        Nome da avaliação
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+                    <th>
+                      <div class="header-cell">
+                        Grupo de critérios
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let evaluation of filteredEvaluationGroups" class="table-row">
+                    <td>
+                      <button class="evaluation-link" (click)="openEvaluationModal(evaluation)">
+                        {{evaluation.name}}
+                      </button>
+                    </td>
+                    <td>{{evaluation.criteriaGroup}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </app-card>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <p class="pagination-info">Mostrando 1 a {{filteredEvaluationGroups.length}} de {{filteredEvaluationGroups.length}} registros</p>
+            <div class="pagination-controls">
+              <button class="pagination-btn" disabled>
+                <i class="icon-chevron-left">‹</i>
+              </button>
+              <button class="pagination-btn active">1</button>
+              <button class="pagination-btn" disabled>
+                <i class="icon-chevron-right">›</i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cenários Tab -->
+        <div *ngIf="activeTab === 'cenarios'" class="tab-panel">
+          <h3>Cenários de avaliação</h3>
+          <p class="tab-description">
+            Cadastre cenários de avaliação para vincular projetos a um portfólio. Durante esse processo é realizado o balanceamento.
+          </p>
+
+          <!-- Filters -->
+          <div class="scenarios-filters">
+            <div class="filter-label">
+              <i class="icon-filter">🔽</i>
+              <span>Filtros:</span>
+            </div>
+            <div class="filter-buttons">
+              <button
+                class="filter-btn"
+                [class.active]="scenarioFilter === 'aguardando'"
+                (click)="onScenarioFilterChange('aguardando')">
+                <div class="filter-indicator blue"></div>
+                Aguardando autorização
+              </button>
+              <button
+                class="filter-btn"
+                [class.active]="scenarioFilter === 'autorizado'"
+                (click)="onScenarioFilterChange('autorizado')">
+                <div class="filter-indicator blue"></div>
+                Autorizado
+              </button>
+              <button
+                class="filter-btn"
+                [class.active]="scenarioFilter === 'cancelado'"
+                (click)="onScenarioFilterChange('cancelado')">
+                <div class="filter-indicator blue"></div>
+                Cancelado
+              </button>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="scenarios-actions">
+            <button class="btn-primary" (click)="openScenarioModal()">
+              <i class="icon-plus">+</i>
+              Cadastrar
+            </button>
+            <div class="search-container">
+              <i class="icon-search">🔍</i>
+              <input
+                type="text"
+                placeholder="Buscar pelo nome do cenário"
+                [(ngModel)]="scenarioSearchTerm"
+                (input)="onScenarioSearchChange()">
+            </div>
+          </div>
+
+          <!-- Scenarios Table -->
+          <app-card class="table-card">
+            <div class="table-container">
+              <table class="scenarios-table">
+                <thead>
+                  <tr>
+                    <th>
+                      <div class="header-cell">
+                        Nome do cenário
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+                    <th>
+                      <div class="header-cell">
+                        Orçamento
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+                    <th>
+                      <div class="header-cell">
+                        Avaliação
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+                    <th>
+                      <div class="header-cell">
+                        Projetos selecionados
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+                    <th>
+                      <div class="header-cell">
+                        Status
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let scenario of filteredScenarios" class="table-row">
+                    <td>
+                      <button class="scenario-link" (click)="openScenarioModal(scenario)">
+                        {{scenario.name}}
+                      </button>
+                    </td>
+                    <td>{{scenario.budget}}</td>
+                    <td>{{scenario.evaluation}}</td>
+                    <td>{{scenario.selectedProjects}}</td>
+                    <td>
+                      <app-badge [color]="scenario.statusColor">{{scenario.status}}</app-badge>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </app-card>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <p class="pagination-info">Mostrando 1 a {{filteredScenarios.length}} de {{filteredScenarios.length}} registros</p>
+            <div class="pagination-controls">
+              <button class="pagination-btn" disabled>
+                <i class="icon-chevron-left">‹</i>
+              </button>
+              <button class="pagination-btn active">1</button>
+              <button class="pagination-btn" disabled>
+                <i class="icon-chevron-right">›</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
