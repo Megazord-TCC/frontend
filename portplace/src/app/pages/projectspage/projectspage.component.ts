@@ -25,6 +25,7 @@ import { FormModalComponentComponent } from '../../components/form-modal-compone
 })
 export class ProjectsComponent implements OnInit {
   showCreateModal = false;
+  loadingProjects = false;
   Projects: Project[] = [];
   allProjects: Project[] = [];
   searchTerm = '';
@@ -94,12 +95,15 @@ createProjectConfig: FormModalConfig = {
   }
 
   loadProjects(): void {
+    this.loadingProjects = true;
     this.projetoService.getAllProjects()
       .pipe(retry(5))
       .subscribe({
         next: (projects) => {
+          console.log('Projetos carregados:', projects);
           this.allProjects = projects;
           this.Projects = projects;
+          this.loadingProjects = false;
         },
         error: (err) => {
           console.error('Erro ao buscar projetos:', err);
