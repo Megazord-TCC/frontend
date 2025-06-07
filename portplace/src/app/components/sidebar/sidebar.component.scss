@@ -209,7 +209,6 @@
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
-  cursor: pointer;
   transition: all 0.2s;
   border: none;
 }
@@ -219,9 +218,7 @@
   border: 1px solid #e2e8f0;
   color: #64748b;
 
-  &:hover {
-    background-color: #e2e8f0;
-  }
+  
 }
 
 .logout-btn {

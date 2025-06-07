@@ -1,3 +1,10 @@
+$background-color: #f8fafc;
+$card-background: #ffffff;
+$text-primary: #1e293b;
+$text-secondary: #64748b;
+$border-color: #e2e8f0;
+$primary-color: #1e293b;
+$blue-color: #3b82f6;
 .strategy-detail-layout {
   display: flex;
   height: 100vh;
@@ -36,6 +43,9 @@
     color: #1e293b;
     font-weight: 500;
   }
+  span {
+    font-family: 'Roboto', sans-serif;
+  }
 }
 
 // Strategy Header
@@ -49,20 +59,20 @@
   .header-top {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 5px;
     margin-bottom: 1rem;
 
     .back-btn {
       background: none;
-      border: 1px solid #e5e7eb;
-      border-radius: 0.5rem;
-      padding: 0.5rem;
+      border: none;
+      color: #64748b;
       cursor: pointer;
-      color: #6b7280;
+      padding: 4px;
+      border-radius: 4px;
+      transition: background-color 0.2s;
 
       &:hover {
-        background-color: #f9fafb;
-        color: #374151;
+        background-color: #f1f5f9;
       }
     }
 
@@ -72,6 +82,7 @@
       font-size: 1.75rem;
       font-weight: 600;
       color: #1e293b;
+      font-family: 'Inter', sans-serif;
     }
   }
 
@@ -125,36 +136,36 @@
 .tabs-container {
   .tabs-list {
     display: flex;
-    border-bottom: 1px solid #e2e8f0;
-    margin-bottom: 1.5rem;
-    background: white;
-    border-radius: 0.75rem 0.75rem 0 0;
+    justify-content:center;
+    width: 675px;
+    height: 44px;
+    background: #e5e5e5; // fundo escuro conforme a imagem
+    border-radius: 0.5rem; // cantos levemente arredondados
     overflow-x: auto;
+    margin-bottom: 1.5rem;
 
     .tab-trigger {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      background: none;
+      background: transparent;
       border: none;
-      padding: 1rem 1.5rem;
+      padding: 0.75rem 1rem;
       cursor: pointer;
       font-size: 0.875rem;
       font-weight: 500;
-      color: #64748b;
-      border-bottom: 2px solid transparent;
+      color: #000; // texto preto
       transition: all 0.2s;
       white-space: nowrap;
 
       &:hover {
-        color: #1e293b;
-        background-color: #f8fafc;
+        background: rgba(255, 255, 255, 0.5); // fundo mais claro ao passar o mouse
       }
 
       &.active {
-        color: #3b82f6;
-        border-bottom-color: #3b82f6;
-        background-color: white;
+        background: #ffffff; // fundo branco no botão ativo
+        color: #000; // mantém o texto preto no botão ativo
+        border-radius: 0.25rem; // arredondamento suave no botão ativo
       }
 
       .tab-number {
@@ -162,6 +173,7 @@
       }
     }
   }
+
 
   .tab-content {
     background: white;
@@ -180,18 +192,87 @@
     font-size: 1.25rem;
     font-weight: 600;
     color: #1e293b;
+    font-family: 'Inter', sans-serif;
   }
 
   .tab-description {
     color: #64748b;
     margin-bottom: 1.5rem;
     line-height: 1.5;
+    font-family: 'Roboto', sans-serif;
   }
 
   .empty-state {
     text-align: center;
     padding: 2rem;
     color: #64748b;
+  }
+  .actions-right {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+
+    .btn-primary {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background-color: darken($primary-color, 5%);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+
+    }
+    .search-container {
+      position: relative;
+      border: 1px solid $border-color;
+      border-radius: 6px;
+      width: 256px;
+      transition: all 0.2s ease;
+      align-items: center;
+      justify-content: center;
+      display: flex;
+
+      &:focus-within {
+        border-color: $blue-color;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+      .nav-icon{
+        display: flex;
+        padding: 0;
+        padding-left: 5px;
+      }
+
+      input {
+        width: 100%;
+        padding: 8px 12px 8px 10px;
+        border: none;
+        background: transparent;
+        font-size: 14px;
+        font-family: 'Roboto', sans-serif;
+
+        &::placeholder {
+          color: $text-secondary;
+        }
+
+        &:focus {
+          outline: none;
+        }
+      }
+
+      @media (max-width: 768px) {
+        width: 100%;
+      }
+    }
+    @media (max-width: 768px) {
+      justify-content: center;
+    }
   }
 }
 
@@ -421,6 +502,57 @@
         border-color: #3b82f6;
       }
     }
+  }
+}
+
+.action-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      border: 1px solid #000;
+      border-radius: 4px;
+      background: transparent;
+      color: #000;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+
+      i {
+        font-size: 16px;
+      }
+
+      &.delete {
+        border-color: #f44336;
+        color: #f44336;
+
+        &:hover {
+          background-color: rgba(244, 67, 54, 0.05);
+        }
+      }
+    }
+  }
+
+  .last-update {
+    font-size: 12px;
+    color: #999;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
   }
 }
 
