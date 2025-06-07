@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { CardComponent } from '../../components/card/card.component';
 import { FormsModule } from '@angular/forms';
 import { BadgeComponent } from '../../components/badge/badge.component';
+import { SvgIconComponent } from '../../components/svg-icon/svg-icon.component';
 interface Strategy {
   id: string;
   name: string;
@@ -14,7 +15,13 @@ interface Strategy {
 
 @Component({
   selector: 'app-strategies-page',
-  imports: [CommonModule, CardComponent,FormsModule, BadgeComponent],
+  imports: [
+    CommonModule,
+    CardComponent,
+    FormsModule,
+    BadgeComponent,
+    SvgIconComponent
+  ],
   templateUrl: './strategies-page.component.html',
   styleUrl: './strategies-page.component.scss'
 })
@@ -80,4 +87,20 @@ export class StrategiesPageComponent implements OnInit{
   openCreateModal(): void {
     // Implementar modal de criação
   }
+  editStrategy() {
+    console.log('Editar estratégia');
+    // Lógica para edição
+  }
+
+  cancelStrategy() {
+    console.log('Cancelar estratégia');
+    // Lógica para cancelamento
+  }
+
+  deleteStrategy() {
+    console.log('Excluir estratégia');
+    // Lógica para exclusão
+    // Pode adicionar um modal de confirmação aqui
+  }
+
 }

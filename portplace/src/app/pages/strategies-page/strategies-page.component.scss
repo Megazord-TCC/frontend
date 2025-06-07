@@ -48,10 +48,13 @@ $blue-color: #3b82f6;
     font-weight: 600;
     color: $text-primary;
     margin: 0 0 8px 0;
+    font-family: 'Inter', sans-serif;
   }
 
   p {
     color: $text-secondary;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
     margin: 0;
     line-height: 1.5;
   }
@@ -62,6 +65,7 @@ $blue-color: #3b82f6;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 24px;
+  margin-top: 24px;
   gap: 16px;
 
   @media (max-width: 768px) {
@@ -214,6 +218,7 @@ $blue-color: #3b82f6;
     font-size: 14px;
     font-weight: 500;
     color: $text-secondary;
+    font-family: 'Roboto', sans-serif;
   }
 
   th,
@@ -239,6 +244,7 @@ $blue-color: #3b82f6;
     font-weight: 500;
     cursor: pointer;
     text-decoration: none;
+    font-family: 'Roboto', sans-serif;
 
     &:hover {
       color: $blue-color;
@@ -248,6 +254,8 @@ $blue-color: #3b82f6;
   td {
     color: $text-secondary;
     font-size: 14px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
   }
 }
 
@@ -296,5 +304,55 @@ $blue-color: #3b82f6;
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+}
+.action-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 12px;
+      border: 1px solid #000;
+      border-radius: 4px;
+      background: transparent;
+      color: #000;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+
+      i {
+        font-size: 16px;
+      }
+
+      &.delete {
+        border-color: #f44336;
+        color: #f44336;
+
+        &:hover {
+          background-color: rgba(244, 67, 54, 0.05);
+        }
+      }
+    }
+  }
+
+  .last-update {
+    font-size: 12px;
+    color: #999;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
   }
 }

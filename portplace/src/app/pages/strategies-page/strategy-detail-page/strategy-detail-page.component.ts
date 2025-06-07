@@ -4,11 +4,21 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BadgeComponent } from '../../../components/badge/badge.component';
 import { CardComponent } from '../../../components/card/card.component';
-import { CriteriaGroup, EvaluationGroup, Objective, Scenario } from '../../../interface/interfacies';
+import { CriteriaGroup, EvaluationGroup, Objective, Scenario,FormField } from '../../../interface/interfacies';
+import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.component';
+import { FormModalComponentComponent } from '../../../components/form-modal-component/form-modal-component.component';
+
 
 @Component({
   selector: 'app-strategy-detail-page',
-  imports: [CommonModule, FormsModule, CardComponent, BadgeComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    CardComponent,
+    BadgeComponent,
+    SvgIconComponent,
+    FormModalComponentComponent
+  ],
   templateUrl: './strategy-detail-page.component.html',
   styleUrl: './strategy-detail-page.component.scss'
 })
@@ -96,8 +106,47 @@ export class StrategyDetailPageComponent implements OnInit{
       statusColor: "gray",
     },
   ]
+  showCreateModal = false;
 
+  createProjectConfig: any = {
+    title: 'Cadastrar novo projeto',
+    fields: [
+      {
+        id: 'name',
+        label: 'Nome',
+        type: 'text',
+        value: '',
+        required: true,
+        placeholder: 'Digite o nome do projeto'
+      },
+      {
+        id: 'description',
+        label: 'Descrição',
+        type: 'textarea',
+        value: '',
+        required: false,
+        placeholder: 'Digite a descrição do projeto',
+        rows: 4
+      },
+      {
+        id: 'startDate',
+        label: 'Início planejado',
+        type: 'date',
+        value: '',
+        required: true
+      },
+      {
+        id: 'endDate',
+        label: 'Fim planejado',
+        type: 'date',
+        value: '',
+        required: true
+      }
+    ],
+    validationMessage: 'Os campos marcados com * são obrigatórios.'
+  };
    // Filtered arrays
+  allObjectives: Objective[] = []
   filteredObjectives: Objective[] = []
   filteredCriteriaGroups: CriteriaGroup[] = []
   filteredEvaluationGroups: EvaluationGroup[] = []
@@ -111,6 +160,7 @@ export class StrategyDetailPageComponent implements OnInit{
   evaluationSearchTerm = ""
   scenarioFilter = ""
   scenarioSearchTerm = ""
+  searchTerm = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -131,7 +181,36 @@ export class StrategyDetailPageComponent implements OnInit{
   onTabChange(tab: string): void {
     this.activeTab = tab;
   }
+  openCreateModal(): void {
+    // Reset form values
+    this.createProjectConfig.fields.forEach((field: any) => {
+      field.value = '';
+      field.hasError = false;
+      field.errorMessage = '';
+    });
+    this.showCreateModal = true;
+  }
+  onSearchChange(): void {
+    let filtered = [...this.allObjectives];
+    filtered = filtered.filter(project =>
+      project.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
+    this.filteredObjectives = filtered;
+  }
 
+  closeCreateModal(): void {
+    this.showCreateModal = false;
+  }
+  onSaveObjective(fields: any[]): void {
+    const projectData = fields.reduce((acc, field) => {
+      acc[field.id] = field.value;
+      return acc;
+    }, {} as any);
+
+    // Aqui você pode chamar um service ou emitir um evento
+    console.log('Novo projeto criado:', projectData);
+    this.closeCreateModal();
+  }
   // Criteria methods
   onCriteriaSearchChange(): void {
     this.applyCriteriaFilters()
@@ -255,5 +334,20 @@ export class StrategyDetailPageComponent implements OnInit{
 
   openObjectiveModal(objective?: Objective): void {
     // Implementar modal de objetivo
+  }
+   editStrategy() {
+    console.log('Editar estratégia');
+    // Lógica para edição
+  }
+
+  cancelStrategy() {
+    console.log('Cancelar estratégia');
+    // Lógica para cancelamento
+  }
+
+  deleteStrategy() {
+    console.log('Excluir estratégia');
+    // Lógica para exclusão
+    // Pode adicionar um modal de confirmação aqui
   }
 }
