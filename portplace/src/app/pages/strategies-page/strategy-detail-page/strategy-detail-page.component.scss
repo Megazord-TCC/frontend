@@ -184,6 +184,12 @@ $blue-color: #3b82f6;
     border: 1px solid #e2e8f0;
     border-radius: 0 0 0.75rem 0.75rem;
     min-height: 400px;
+    .div-loading-projetcts{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100px;
+    }
   }
 }
 
@@ -406,7 +412,7 @@ $blue-color: #3b82f6;
 
     table {
       width: 100%;
-      border-collapse: collapse;
+      table-layout: fixed;
 
       thead {
         background-color: #f8fafc;
@@ -422,13 +428,12 @@ $blue-color: #3b82f6;
           .header-cell {
             display: flex;
             align-items: center;
-            gap: 0.25rem;
+            justify-content: flex-start;
+            gap: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            color: $text-secondary;
             font-family: 'Roboto', sans-serif;
-
-            .icon-sort {
-              font-size: 0.75rem;
-              color: #9ca3af;
-            }
           }
         }
       }
@@ -454,12 +459,13 @@ $blue-color: #3b82f6;
               color: $blue-color;
             }
           }
+
           td {
             padding: 1rem;
             font-size: 0.875rem;
             color: #64748b;
             font-family: 'Roboto', sans-serif;
-           
+
             font-weight: 500;
           }
         }

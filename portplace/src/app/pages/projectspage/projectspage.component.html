@@ -81,7 +81,8 @@
     <!-- Table -->
     <app-card class="table-card">
       <div class="table-container">
-        <table class="projects-table">
+        <div class="div-loading-projetcts" *ngIf="loadingProjects">Carregando projetos...</div>
+        <table class="projects-table" *ngIf="!loadingProjects">
           <thead>
             <tr>
               <th>
@@ -152,8 +153,7 @@
             </tr>
           </thead>
           <tbody>
-            <div class="div-loading-projetcts" *ngIf="loadingProjects">Carregando projetos...</div>
-            <div *ngIf="!loadingProjects">
+
 
               <tr *ngFor="let project of Projects"
               class="table-row"
@@ -179,7 +179,7 @@
               </td>
 
             </tr>
-          </div>
+
           </tbody>
         </table>
       </div>

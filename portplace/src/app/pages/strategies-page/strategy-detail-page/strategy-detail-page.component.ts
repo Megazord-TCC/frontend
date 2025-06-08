@@ -7,6 +7,8 @@ import { CardComponent } from '../../../components/card/card.component';
 import { CriteriaGroup, EvaluationGroup, Objective, Scenario,FormField, Criterion, ImportanceScale, CriteriaComparison, RoleEnum, User } from '../../../interface/interfacies';
 import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.component';
 import { FormModalComponentComponent } from '../../../components/form-modal-component/form-modal-component.component';
+import { CriteriaGroupService } from '../../../service/criteria-group.service';
+import { firstValueFrom, retry } from 'rxjs';
 
 
 @Component({
@@ -52,7 +54,7 @@ export class StrategyDetailPageComponent implements OnInit{
     }
   ];
 
-
+  /*
   criteriaGroups: CriteriaGroup[] = [
     {
       id: 1,
@@ -150,6 +152,7 @@ export class StrategyDetailPageComponent implements OnInit{
     }
   ];
 
+  */
   evaluationGroups: EvaluationGroup[] = [
     {
       id: "1",
@@ -193,6 +196,7 @@ export class StrategyDetailPageComponent implements OnInit{
     },
   ]
   showCreateModal = false;
+  loadingProjects = false;
 
   formConfigs: { [key: string]: any } = {
     objetivos: {
@@ -232,12 +236,15 @@ export class StrategyDetailPageComponent implements OnInit{
 
   currentFormConfig: any = this.formConfigs['objetivos'];
    // Filtered arrays
-  allObjectives: Objective[] = []
-  filteredObjectives: Objective[] = []
-  filteredCriteriaGroups: CriteriaGroup[] = []
-  filteredEvaluationGroups: EvaluationGroup[] = []
-  filteredScenarios: Scenario[] = []
+  allObjectives: Objective[] = [];
+  filteredObjectives: Objective[] = [];
+  filteredCriteriaGroups: CriteriaGroup[] = [];
+  filteredEvaluationGroups: EvaluationGroup[] = [];
+  filteredScenarios: Scenario[] = [];
 
+
+  criteriaGroups: CriteriaGroup[] = [];
+  allCriteriaGroups: CriteriaGroup[] = [];
   // Tab and filter states
   activeTab = "objetivos"
   objectiveFilter = ""
@@ -247,19 +254,36 @@ export class StrategyDetailPageComponent implements OnInit{
   scenarioFilter = ""
   scenarioSearchTerm = ""
   searchTerm = '';
-  estrategiaId = '';
+  estrategiaId:number = 0;
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private criterioService: CriteriaGroupService
   ) {}
 
   ngOnInit(): void {
+    const idParam = this.route.snapshot.paramMap.get('estrategiaId');
+    this.estrategiaId = idParam ? Number(idParam) : 0;
     this.filteredObjectives = [...this.objectives];
-    this.filteredCriteriaGroups = [...this.criteriaGroups];
+    //this.filteredCriteriaGroups = [...this.criteriaGroups];
+    this.loadGruopCriteria();
     this.filteredEvaluationGroups = [...this.evaluationGroups];
     this.filteredScenarios = [...this.scenarios];
-    this.estrategiaId = this.route.snapshot.paramMap.get('estrategiaId') || '';
+  }
+
+  async loadGruopCriteria(): Promise<void> {
+    this.loadingProjects = true;
+    try {
+      const criteriaGroup = await firstValueFrom(this.criterioService.getAllCriterios(this.estrategiaId));
+      this.filteredCriteriaGroups = criteriaGroup;
+      this.criteriaGroups = criteriaGroup;
+      this.loadingProjects = false;
+      console.log('Grupo de critérios:', criteriaGroup);
+    } catch (err) {
+      console.error('Erro ao buscar grupo de criterios:', err);
+      this.loadingProjects = false;
+    }
   }
 
   goBack(): void {
@@ -281,6 +305,50 @@ export class StrategyDetailPageComponent implements OnInit{
     this.showCreateModal = true;
 
   }
+  createCriteriaGroup(newGroup: CriteriaGroup): void {
+    this.criterioService.createCriterio(newGroup, this.estrategiaId).subscribe({
+      next: (createdGroup) => {
+        console.log('Grupo de critérios criado:', createdGroup);
+        this.loadGruopCriteria();
+        this.closeCreateModal();
+      },
+      error: (err) => {
+        console.error('Erro ao criar grupo de critérios:', err);
+      }
+    });
+  }
+
+  // UPDATE
+  updateEstrategia(group: CriteriaGroup): void {
+    if (!group.id) {
+      console.error('ID do grupo de critérios não encontrado!');
+      return;
+    }
+    this.criterioService.updateCriterio(group.id, this.estrategiaId, group).subscribe({
+      next: (updatedGroup) => {
+        console.log('Grupo de critérios atualizado:', updatedGroup);
+        this.loadGruopCriteria();
+      },
+      error: (err) => {
+        console.error('Erro ao atualizar grupo de critérios:', err);
+      }
+    });
+  }
+
+  // DELETE
+  deleteEstrategia(groupId: number): void {
+    this.criterioService.deleteCriterio(groupId, this.estrategiaId).subscribe({
+      next: () => {
+        console.log('Grupo de critérios deletado!');
+        this.loadGruopCriteria();
+      },
+      error: (err) => {
+        console.error('Erro ao deletar grupo de critérios:', err);
+      }
+    });
+  }
+
+
   onSaveByActiveTab(fields: any[]): void {
     switch (this.activeTab) {
       case 'objetivos':
@@ -311,12 +379,30 @@ export class StrategyDetailPageComponent implements OnInit{
   }
 
   onSaveCriteriaGroup(fields: any[]): void {
-    const data = fields.reduce((acc, field) => {
+    const groupData = fields.reduce((acc, field) => {
       acc[field.id] = field.value;
       return acc;
     }, {} as any);
-    console.log('Novo grupo de critérios:', data);
-    this.closeCreateModal();
+
+    // Cria o objeto CriteriaGroup (ajuste conforme sua interface)
+    const newGroup: CriteriaGroup = {
+      name: groupData.name,
+      description: groupData.description,
+      disabled: false,
+      // Adicione outros campos obrigatórios se necessário
+    };
+
+    // Chama o service passando o id da estratégia
+    this.criterioService.createCriterio(newGroup, this.estrategiaId).subscribe({
+      next: (createdGroup) => {
+        console.log('Grupo de critérios criado:', createdGroup);
+        this.loadGruopCriteria(); // Atualiza a lista
+        this.closeCreateModal();
+      },
+      error: (err) => {
+        console.error('Erro ao criar grupo de critérios:', err);
+      }
+    });
   }
 
   onSaveEvaluation(fields: any[]): void {

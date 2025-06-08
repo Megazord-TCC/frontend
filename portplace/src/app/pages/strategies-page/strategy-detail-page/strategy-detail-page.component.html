@@ -283,7 +283,8 @@
           <!-- Criteria Groups Table -->
           <app-card class="table-card">
             <div class="table-container">
-              <table class="criteria-table">
+              <div class="div-loading-projetcts" *ngIf="loadingProjects">Carregando projetos...</div>
+              <table class="criteria-table" *ngIf="!loadingProjects">
                 <thead>
                   <tr>
                     <th>
@@ -329,18 +330,22 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let criteria of filteredCriteriaGroups" class="table-row">
-                    <td>
-                      <button class="link" (click)="openCriteriaGroup(criteria.id)">
-                        {{criteria.name}}
-                      </button>
-                    </td>
-                    <td>2 de 2</td>
-                    <td>{{getAvalicoesCoutntPorId(criteria.id!)}}</td>
-                    <td>
-                      <app-badge [color]="getStatusColorByDisabled(criteria.disabled)">{{getStatusLabelByDisabled(criteria.disabled)}}</app-badge>
-                    </td>
-                  </tr>
+
+
+
+                    <tr *ngFor="let criteria of filteredCriteriaGroups" class="table-row">
+                      <td>
+                        <button class="link" (click)="openCriteriaGroup(criteria.id)">
+                          {{criteria.name}}
+                        </button>
+                      </td>
+                      <td>2 de 2</td>
+                      <td>{{getAvalicoesCoutntPorId(criteria.id!)}}</td>
+                      <td class="status-cell">
+                        <app-badge [color]="getStatusColorByDisabled(criteria.disabled)">{{getStatusLabelByDisabled(criteria.disabled)}}</app-badge>
+                      </td>
+                    </tr>
+
                 </tbody>
               </table>
             </div>
