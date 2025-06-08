@@ -169,31 +169,51 @@
                     <th>
                       <div class="header-cell">
                         Nome do objetivo
-                        <i class="icon-sort">↕️</i>
+                        <app-svg-icon
+                          class="nav-icon"
+                          [path]="'assets/icon/sort-alt.svg'"
+                          [size]="18">
+                        </app-svg-icon>
                       </div>
                     </th>
                     <th>
                       <div class="header-cell">
                         Critérios vinculados
-                        <i class="icon-sort">↕️</i>
+                        <app-svg-icon
+                          class="nav-icon"
+                          [path]="'assets/icon/sort-alt.svg'"
+                          [size]="18">
+                        </app-svg-icon>
                       </div>
                     </th>
                     <th>
                       <div class="header-cell">
                         Portfólios ativos vinculados
-                        <i class="icon-sort">↕️</i>
+                        <app-svg-icon
+                          class="nav-icon"
+                          [path]="'assets/icon/sort-alt.svg'"
+                          [size]="18">
+                        </app-svg-icon>
                       </div>
                     </th>
                     <th>
                       <div class="header-cell">
                         Projetos ativos vinculados
-                        <i class="icon-sort">↕️</i>
+                        <app-svg-icon
+                          class="nav-icon"
+                          [path]="'assets/icon/sort-alt.svg'"
+                          [size]="18">
+                        </app-svg-icon>
                       </div>
                     </th>
                     <th>
                       <div class="header-cell">
                         Status
-                        <i class="icon-sort">↕️</i>
+                        <app-svg-icon
+                          class="nav-icon"
+                          [path]="'assets/icon/sort-alt.svg'"
+                          [size]="18">
+                        </app-svg-icon>
                       </div>
                     </th>
                   </tr>
@@ -201,7 +221,7 @@
                 <tbody>
                   <tr *ngFor="let objective of filteredObjectives" class="table-row">
                     <td>
-                      <button class="objective-link" (click)="openObjectiveModal(objective)">
+                      <button class="link" (click)="openObjectiveModal(objective)">
                         {{objective.name}}
                       </button>
                     </td>
@@ -216,21 +236,21 @@
               </table>
             </div>
           </app-card>
-
-          <!-- Pagination -->
-          <div class="pagination">
-            <p class="pagination-info">Mostrando 1 a {{filteredObjectives.length}} de {{filteredObjectives.length}} registros</p>
-            <div class="pagination-controls">
-              <button class="pagination-btn" disabled>
-                <i class="icon-chevron-left">‹</i>
-              </button>
-              <button class="pagination-btn active">1</button>
-              <button class="pagination-btn" disabled>
-                <i class="icon-chevron-right">›</i>
-              </button>
+          <!--
+            <div class="pagination">
+              <p class="pagination-info">Mostrando 1 a {{filteredObjectives.length}} de {{filteredObjectives.length}} registros</p>
+              <div class="pagination-controls">
+                <button class="pagination-btn" disabled>
+                  <i class="icon-chevron-left">‹</i>
+                </button>
+                <button class="pagination-btn active">1</button>
+                <button class="pagination-btn" disabled>
+                  <i class="icon-chevron-right">›</i>
+                </button>
+              </div>
             </div>
+            -->
           </div>
-        </div>
 
         <!-- Grupos de Critérios Tab -->
         <div *ngIf="activeTab === 'criterios'" class="tab-panel">
@@ -269,13 +289,41 @@
                     <th>
                       <div class="header-cell">
                         Nome do grupo de critério
-                        <i class="icon-sort">↕️</i>
+                        <app-svg-icon
+                          class="nav-icon"
+                          [path]="'assets/icon/sort-alt.svg'"
+                          [size]="18">
+                        </app-svg-icon>
                       </div>
                     </th>
                     <th>
                       <div class="header-cell">
-                        Grupo de critérios
-                        <i class="icon-sort">↕️</i>
+                        Objetivos vinculados
+                        <app-svg-icon
+                          class="nav-icon"
+                          [path]="'assets/icon/sort-alt.svg'"
+                          [size]="18">
+                        </app-svg-icon>
+                      </div>
+                    </th>
+                    <th>
+                      <div class="header-cell">
+                        Avaliações realizadas
+                        <app-svg-icon
+                          class="nav-icon"
+                          [path]="'assets/icon/sort-alt.svg'"
+                          [size]="18">
+                        </app-svg-icon>
+                      </div>
+                    </th>
+                    <th>
+                      <div class="header-cell">
+                        Status
+                        <app-svg-icon
+                          class="nav-icon"
+                          [path]="'assets/icon/sort-alt.svg'"
+                          [size]="18">
+                        </app-svg-icon>
                       </div>
                     </th>
                   </tr>
@@ -283,18 +331,22 @@
                 <tbody>
                   <tr *ngFor="let criteria of filteredCriteriaGroups" class="table-row">
                     <td>
-                      <button class="criteria-link" (click)="openCriteriaModal(criteria)">
+                      <button class="link" (click)="openCriteriaGroup(criteria.id)">
                         {{criteria.name}}
                       </button>
                     </td>
-                    <td>{{criteria.criteriaGroup}}</td>
+                    <td>2 de 2</td>
+                    <td>{{getAvalicoesCoutntPorId(criteria.id!)}}</td>
+                    <td>
+                      <app-badge [color]="getStatusColorByDisabled(criteria.disabled)">{{getStatusLabelByDisabled(criteria.disabled)}}</app-badge>
+                    </td>
                   </tr>
                 </tbody>
               </table>
             </div>
           </app-card>
 
-          <!-- Pagination -->
+          <!-- Pagination
           <div class="pagination">
             <p class="pagination-info">Mostrando 1 a {{filteredCriteriaGroups.length}} de {{filteredCriteriaGroups.length}} registros</p>
             <div class="pagination-controls">
@@ -307,6 +359,7 @@
               </button>
             </div>
           </div>
+          -->
         </div>
 
         <!-- Grupos de Avaliações Tab -->
@@ -520,10 +573,10 @@
     </div>
   </div>
   <app-form-modal-component
-  [isVisible]="showCreateModal"
-  [config]="createProjectConfig"
-  (close)="closeCreateModal()"
-  (save)="onSaveObjective($event)"
-  (cancel)="closeCreateModal()">
+    [isVisible]="showCreateModal"
+    [config]="currentFormConfig"
+    (close)="closeCreateModal()"
+    (save)="onSaveByActiveTab($event)"
+    (cancel)="closeCreateModal()">
 </app-form-modal-component>
 </div>

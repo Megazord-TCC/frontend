@@ -173,7 +173,7 @@ export class ProjectDetailpageComponent implements OnInit {
 
 
   goBack(): void {
-    this.router.navigate(['/projects']);
+    this.router.navigate(['/projetos']);
   }
 
   onTabChange(tab: string): void {

@@ -25,6 +25,8 @@
     "lucide-angular": "^0.511.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
+    "vite-plugin-static-copy": "^3.0.0",
+    "vite-plugin-string": "^1.2.3",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {

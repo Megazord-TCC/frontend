@@ -59,6 +59,7 @@ $shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 
     font-weight: 600;
     color: $text-primary;
     margin: 0;
+    font-family: 'Inter', sans-serif;
   }
 
   .close-btn {
@@ -120,6 +121,7 @@ $shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 
     font-size: 14px;
     color: #dc2626;
     font-weight: 500;
+    font-family: 'Roboto', sans-serif;
   }
 }
 
@@ -142,6 +144,7 @@ $shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 
     display: flex;
     align-items: center;
     gap: 4px;
+    font-family: 'Roboto', sans-serif;
 
     .required-asterisk {
       color: $danger-color;
@@ -157,6 +160,7 @@ $shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 
     font-size: 14px;
     transition: all 0.2s;
     background-color: white;
+    font-family: 'Roboto', sans-serif;
 
     &:focus {
       outline: none;
@@ -175,6 +179,7 @@ $shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 
     }
 
     &::placeholder {
+      font-family: 'Roboto', sans-serif;
       color: #9ca3af;
     }
   }
@@ -182,7 +187,7 @@ $shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 
   textarea {
     resize: vertical;
     min-height: 80px;
-    font-family: inherit;
+    font-family: 'Roboto', sans-serif;
   }
 
   .date-input-group {
@@ -217,6 +222,7 @@ $shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 
 
     span {
       font-weight: 500;
+      font-family: 'Roboto', sans-serif;
     }
   }
 }
@@ -237,7 +243,7 @@ $shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 
     cursor: pointer;
     transition: all 0.2s;
     border: 1px solid transparent;
-
+    font-family: 'Roboto', sans-serif;
     &:focus {
       outline: 2px solid $primary-color;
       outline-offset: 2px;
