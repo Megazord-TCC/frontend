@@ -9,8 +9,6 @@ import { Criterion } from '../interface/interfacies';
 })
 export class CriterioService {
 
-  private apiUrl = `${environment.apiUrl}/Criterios`;
-
   constructor(private http: HttpClient) { }
 
   // Headers com Content-Type JSON
@@ -21,28 +19,32 @@ export class CriterioService {
     });
   }
 
-  // Cadastrar novo projeto (POST)
-  createCriterio(criterio: Criterion): Observable<Criterion> {
-    return this.http.post<Criterion>(this.apiUrl, criterio, { headers: this.getHeaders() });
+  // BUSCA DE TODOS OS CRITÉRIOS
+  getAllCriterios(estrategiaId: number, groupId: number): Observable<Criterion[]> {
+    const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${groupId}/criteria`;
+    return this.http.get<Criterion[]>(url, { headers: this.getHeaders() });
   }
 
-  // Buscar todos os projetos (GET)
-  getAllCriterios(): Observable<Criterion[]> {
-    return this.http.get<Criterion[]>(this.apiUrl, { headers: this.getHeaders() });
+  getCriterioById(id: number, estrategiaId: number): Observable<Criterion> {
+    const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${id}/criteria`;
+    return this.http.get<Criterion>(url, { headers: this.getHeaders() });
   }
 
-  // Buscar projeto por ID (GET)
-  getCriterioById(id: number): Observable<Criterion> {
-    return this.http.get<Criterion>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+  // CADASTRAR DE CRITÉRIO
+  createCriterio(criterio: Criterion, estrategiaId: number, groupId: number): Observable<Criterion> {
+    const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${groupId}/criteria`;
+    return this.http.post<Criterion>(url, criterio, { headers: this.getHeaders() });
   }
 
-  // Atualizar projeto (PUT)
-  updateCriterio(id: number, Criterio: Criterion): Observable<Criterion> {
-    return this.http.put<Criterion>(`${this.apiUrl}/${id}`, Criterio, { headers: this.getHeaders() });
+  // EDIÇÃO DE CRITÉRIO
+  updateCriterio(criterioId: number, criterio: Criterion, estrategiaId: number, groupId: number): Observable<Criterion> {
+    const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${groupId}/criteria/${criterioId}`;
+    return this.http.put<Criterion>(url, criterio, { headers: this.getHeaders() });
   }
 
-  // Deletar projeto (DELETE)
-  deleteCriterio(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+  // DELETAR CRITÉRIO
+  deleteCriterio(criterioId: number, estrategiaId: number, groupId: number): Observable<void> {
+    const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${groupId}/criteria/${criterioId}/hard-delete`;
+    return this.http.delete<void>(url, { headers: this.getHeaders() });
   }
 }

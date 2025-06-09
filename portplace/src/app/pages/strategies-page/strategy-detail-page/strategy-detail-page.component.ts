@@ -26,8 +26,8 @@ import { firstValueFrom, retry } from 'rxjs';
 })
 export class StrategyDetailPageComponent implements OnInit{
   strategy: any = {
-    id: '2',
-    name: 'Estratégia 2024',
+    id: '11',
+    name: 'Estratégia 2025',
     status: 'ATIVO',
     description: 'Descrição da estratégia.',
     lastUpdate: 'Última alteração realizada por Carlos Bentes em 01/01/2025 14:30'

@@ -43,12 +43,12 @@ export class CriteriaGroupService {
   // Atualizar projeto (PUT)
   updateCriterio(id: number, estrategiaId: number, criterio: CriteriaGroup): Observable<CriteriaGroup> {
     const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${id}`;
-    return this.http.post<CriteriaGroup>(url,criterio, { headers: this.getHeaders() })
+    return this.http.put<CriteriaGroup>(url,criterio, { headers: this.getHeaders() })
   }
 
   // Deletar projeto (DELETE)
   deleteCriterio(id: number,estrategiaId: number): Observable<void> {
     const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${id}/hard-delete`;
-    return this.http.post<void>(url, {}, { headers: this.getHeaders() })
+    return this.http.delete<void>(url, { headers: this.getHeaders() })
   }
 }

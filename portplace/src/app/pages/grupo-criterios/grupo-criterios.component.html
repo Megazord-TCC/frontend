@@ -1,4 +1,4 @@
-<!--
+
 
   <div class="strategy-detail-layout">
 
@@ -8,7 +8,7 @@
         <span class="separator">></span>
         <span (click)="goBack()" class="breadcrumb-link">Estratégias</span>
         <span class="separator">></span>
-        <span class="current">{{criteriaGroup.name}}</span>
+        <span class="current">{{criteriaGroup?.name}}</span>
       </div>
 
     <div class="strategy-header">
@@ -20,24 +20,26 @@
             [size]="18">
           </app-svg-icon>
         </button>
-        <h1>{{criteriaGroup.name}}</h1>
-        <app-badge [color]="getStatusColorByDisabled(criteriaGroup.disabled)">{{getStatusLabelByDisabled(criteriaGroup.disabled)}}</app-badge>
+        <h1>{{criteriaGroup?.name}}</h1>
+        <app-badge [color]="getStatusColorByDisabled(criteriaGroup!.disabled)">{{getStatusLabelByDisabled(criteriaGroup!.disabled)}}</app-badge>
       </div>
-      <p class="strategy-description">{{criteriaGroup.description}}</p>
+      <p class="strategy-description">{{criteriaGroup?.description}}</p>
       <div class="action-header">
         <div class="action-buttons">
-          <button class="action-btn" (click)="editCriteria()">
+          <button class="action-btn" (click)="editCriteriaGroup()">
             <i class="icon-edit"></i>
             Editar
           </button>
-          <button class="action-btn cancel" (click)="cancelCriteria()">
+          <button class="action-btn delete" (click)="deleteCriteriaGroup()">
             <i class="icon-cancel"></i>
             Cancelar
           </button>
-          <button class="action-btn delete" (click)="deleteCriteria()">
-            <i class="icon-delete"></i>
-            Excluir
-          </button>
+          <!--
+            <button class="action-btn delete" (click)="deleteCriteriaGroup()">
+              <i class="icon-delete"></i>
+              Excluir
+            </button>
+            -->
         </div>
 
         <div class="last-update">
@@ -48,16 +50,10 @@
     </div>
 
       <div class="tab-content">
-
-
-
-
           <h3>Grupos de critérios</h3>
           <p class="tab-description">
             Cadastre grupos de critérios a partir de objetivos estratégicos. Esses critérios são utilizados para gerar avaliações.
           </p>
-
-
           <div class="actions-right">
             <button class="btn-primary" (click)="openCreateModal()">
               <i class="icon-plus">+</i>
@@ -77,8 +73,6 @@
                 (input)="onSearchChange()">
             </div>
           </div>
-
-
           <app-card class="table-card">
             <div class="table-container">
               <table class="criteria-table">
@@ -136,7 +130,7 @@
                     <td>2 de 2</td>
                     <td>2 de 2</td>
                     <td>
-                      <app-badge [color]="getStatusColorByDisabled(criteria.disabled)">{{getStatusLabelByDisabled(criteria.disabled)}}</app-badge>
+                      <app-badge [color]="getStatusColorByDisabled(!!criteria.disabled)">{{getStatusLabelByDisabled(!!criteria.disabled)}}</app-badge>
                     </td>
                   </tr>
                 </tbody>
@@ -154,11 +148,25 @@
 
   <app-form-modal-component
     [isVisible]="showCreateModal"
-    [config]="currentFormConfig"
+    [config]="createFormConfig"
     (close)="closeCreateModal()"
     (save)="onSaveByActiveTab($event)"
     (cancel)="closeCreateModal()">
   </app-form-modal-component>
+  <app-form-modal-component
+    [isVisible]="showDeleteModal"
+    [config]="deleteFormConfig"
+    (close)="closeDeleteModal()"
+    (save)="onSaveByActiveTab($event)"
+    (cancel)="closeDeleteModal()">
+  </app-form-modal-component>
+  <app-form-modal-component
+    [isVisible]="showEditModal"
+    [config]="editFormConfig"
+    (close)="closeEditModal()"
+    (save)="onSaveByActiveTab($event)"
+    (cancel)="closeEditModal()">
+  </app-form-modal-component>
 </div>
--->
-<p>Grupo de critérios</p>
+
+

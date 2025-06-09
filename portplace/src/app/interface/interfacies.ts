@@ -101,7 +101,7 @@ export interface Criterion {
   id?: number;
   name: string;
   description?: string;
-  criteriaGroup?: CriteriaGroup;
+  criteriaGroupId?: number;
   disabled?: boolean;
   lastModifiedAt?: Date;
   lastModifiedBy?: User;
