@@ -98,15 +98,18 @@ export interface CriteriaGroup {
   criteriaComparisons?: CriteriaComparison[];
 }
 export interface Criterion {
-  id?: number;
+  id: number;
   name: string;
   description?: string;
   criteriaGroupId?: number;
+  weight?: number;
   disabled?: boolean;
   lastModifiedAt?: Date;
   lastModifiedBy?: User;
   createdAt?: Date;
 }
+
+
 export interface Strategy {
   id: number;
   name?: string;
@@ -139,12 +142,12 @@ export interface User {
 }
 
 export enum ImportanceScale {
-    EXTREMELY_MORE_IMPORTANT = 'EXTREMELY_MORE_IMPORTANT',
-    MUCH_MORE_IMPORTANT = 'MUCH_MORE_IMPORTANT',
-    MORE_IMPORTANT = 'MORE_IMPORTANT',
-    EQUALLY_IMPORTANT = 'EQUALLY_IMPORTANT',
-    LESS_IMPORTANT = 'LESS_IMPORTANT',
-    MUCH_LESS_IMPORTANT = 'MUCH_LESS_IMPORTANT'
+  EXTREMELY_MORE_IMPORTANT = 'EXTREMELY_MORE_IMPORTANT',
+  MUCH_MORE_IMPORTANT = 'MUCH_MORE_IMPORTANT',
+  MORE_IMPORTANT = 'MORE_IMPORTANT',
+  EQUALLY_IMPORTANT = 'EQUALLY_IMPORTANT',
+  LESS_IMPORTANT = 'LESS_IMPORTANT',
+  MUCH_LESS_IMPORTANT = 'MUCH_LESS_IMPORTANT'
 }
 
 export const ImportanceScaleValues = {

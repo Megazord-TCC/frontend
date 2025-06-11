@@ -25,8 +25,8 @@ export class CriterioService {
     return this.http.get<Criterion[]>(url, { headers: this.getHeaders() });
   }
 
-  getCriterioById(id: number, estrategiaId: number): Observable<Criterion> {
-    const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${id}/criteria`;
+  getCriterioById(groupId: number, id:number, estrategiaId: number): Observable<Criterion> {
+    const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${groupId}/criteria/${id}`;
     return this.http.get<Criterion>(url, { headers: this.getHeaders() });
   }
 

@@ -1,3 +1,11 @@
+$primary-color: #1e293b;
+$border-color: #e2e8f0;
+$blue-color: #3b82f6;
+$background-color: #f8fafc;
+$card-background: #ffffff;
+$text-primary: #1e293b;
+$text-secondary: #64748b;
+
 .portfolios-container {
   padding: 32px;
 
@@ -9,6 +17,9 @@
     color: #64748b;
     margin-bottom: 16px;
 
+    text-decoration: none;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
     .separator {
       color: #64748b;
     }
@@ -101,13 +112,18 @@
     }
 
     .actions-right {
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
+
 
       .btn-primary {
+        display: flex;
+        align-items: center;
+        gap: 8px;
         padding: 8px 16px;
-        background-color: #1e293b;
+        background-color: darken($primary-color, 5%);
         color: white;
         border: none;
         border-radius: 6px;
@@ -116,26 +132,50 @@
         cursor: pointer;
         transition: background-color 0.2s;
 
-        &:hover {
-          background-color: #1e3a8a;
-        }
       }
-
       .search-container {
         position: relative;
+        border: 1px solid $border-color;
+        border-radius: 6px;
+        width: 256px;
+        transition: all 0.2s ease;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+
+        &:focus-within {
+          border-color: $blue-color;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        .nav-icon{
+          display: flex;
+          padding: 0;
+          padding-left: 5px;
+        }
 
         input {
-          padding-left: 40px;
-          width: 256px;
+          width: 100%;
+          padding: 8px 12px 8px 10px;
+          border: none;
+          background: transparent;
+          font-size: 14px;
+          font-family: 'Roboto', sans-serif;
+
+          &::placeholder {
+            color: $text-secondary;
+          }
+
+          &:focus {
+            outline: none;
+          }
         }
 
-        .icon-search {
-          position: absolute;
-          left: 12px;
-          top: 50%;
-          transform: translateY(-50%);
-          color: #64748b;
+        @media (max-width: 768px) {
+          width: 100%;
         }
+      }
+      @media (max-width: 768px) {
+        justify-content: center;
       }
     }
   }

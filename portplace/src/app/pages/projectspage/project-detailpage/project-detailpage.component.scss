@@ -37,21 +37,15 @@ $success-color: #10b981;
   font-size: 14px;
   color: $text-secondary;
   margin-bottom: 16px;
-  font-family: 'Inter', sans-serif;
+  text-decoration: none;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
 
   .separator {
     color: $text-secondary;
   }
 
-  .breadcrumb-link {
-    color: $blue-color;
-    cursor: pointer;
-    text-decoration: underline;
 
-    &:hover {
-      color: darken($blue-color, 10%);
-    }
-  }
 
   .current {
     color: $text-primary;

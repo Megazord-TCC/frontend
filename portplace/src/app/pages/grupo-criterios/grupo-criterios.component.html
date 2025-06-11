@@ -50,9 +50,9 @@
     </div>
 
       <div class="tab-content">
-          <h3>Grupos de critérios</h3>
+          <h3>Critérios do grupo</h3>
           <p class="tab-description">
-            Cadastre grupos de critérios a partir de objetivos estratégicos. Esses critérios são utilizados para gerar avaliações.
+            Cadastre os critérios deste grupo. Com base neles serão criados os critérios de avaliação.
           </p>
           <div class="actions-right">
             <button class="btn-primary" (click)="openCreateModal()">
@@ -80,7 +80,17 @@
                   <tr>
                     <th>
                       <div class="header-cell">
-                        Nome do grupo de critério
+                        Nome do critério
+                        <app-svg-icon
+                          class="nav-icon"
+                          [path]="'assets/icon/sort-alt.svg'"
+                          [size]="18">
+                        </app-svg-icon>
+                      </div>
+                    </th>
+                    <th>
+                      <div class="header-cell">
+                        Probabilidade
                         <app-svg-icon
                           class="nav-icon"
                           [path]="'assets/icon/sort-alt.svg'"
@@ -98,26 +108,7 @@
                         </app-svg-icon>
                       </div>
                     </th>
-                    <th>
-                      <div class="header-cell">
-                        Avaliações realizadas
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Status
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
+
                   </tr>
                 </thead>
                 <tbody>
@@ -127,11 +118,8 @@
                         {{criteria.name}}
                       </button>
                     </td>
-                    <td>2 de 2</td>
-                    <td>2 de 2</td>
-                    <td>
-                      <app-badge [color]="getStatusColorByDisabled(!!criteria.disabled)">{{getStatusLabelByDisabled(!!criteria.disabled)}}</app-badge>
-                    </td>
+                    <td>{{criteria.weight}}</td>
+                    <td>Não calculado</td>
                   </tr>
                 </tbody>
               </table>

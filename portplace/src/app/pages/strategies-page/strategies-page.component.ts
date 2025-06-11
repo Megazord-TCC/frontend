@@ -28,7 +28,7 @@ interface Strategy {
 export class StrategiesPageComponent implements OnInit{
   strategies: Strategy[] = [
     {
-      id: '11',
+      id: '1',
       name: 'Estratégia 2025',
       activeObjectives: 1,
       status: 'ATIVO',

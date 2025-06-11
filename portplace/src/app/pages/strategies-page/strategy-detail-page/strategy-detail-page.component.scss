@@ -26,15 +26,9 @@ $blue-color: #3b82f6;
   font-size: 0.875rem;
   color: #64748b;
 
-  .breadcrumb-link {
-    color: #3b82f6;
-    cursor: pointer;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-
+  text-decoration: none;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
   .separator {
     color: #9ca3af;
   }

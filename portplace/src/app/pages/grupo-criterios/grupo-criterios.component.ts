@@ -202,6 +202,7 @@ export class GrupoCriteriosComponent implements OnInit{
         next: () => {
           this.loadCriteria();
           this.closeCreateModal();
+          this.resetFormFields(this.createFormConfig);
         },
         error: (err) => {
           console.error('Erro ao criar critério:', err);
@@ -221,6 +222,7 @@ export class GrupoCriteriosComponent implements OnInit{
           next: () => {
             this.loadGruopCriteriaById();
             this.closeEditModal();
+            this.resetFormFields(this.editFormConfig);
           },
           error: (err) => {
             console.error('Erro ao editar grupo de critérios:', err);
@@ -234,11 +236,21 @@ export class GrupoCriteriosComponent implements OnInit{
         next: () => {
           this.goBack();
           this.closeDeleteModal();
+          this.resetFormFields(this.deleteFormConfig); 
         },
         error: (err) => {
           console.error('Erro ao excluir grupo de critérios:', err);
         }
       });
     }
+
   }
+  resetFormFields(formConfig: any): void {
+    if (formConfig && formConfig.fields) {
+      formConfig.fields.forEach((field: any) => {
+        field.value = '';
+      });
+    }
+  }
+
 }
