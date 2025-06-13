@@ -9,6 +9,7 @@ import { BadgeComponent } from '../../../components/badge/badge.component';
 import { CardComponent } from '../../../components/card/card.component';
 import { FormModalComponentComponent } from '../../../components/form-modal-component/form-modal-component.component';
 import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.component';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @Component({
   selector: 'app-criterio',
@@ -18,7 +19,8 @@ import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.componen
     CardComponent,
     BadgeComponent,
     SvgIconComponent,
-    FormModalComponentComponent
+    FormModalComponentComponent,
+    NgSelectModule
   ],
   templateUrl: './criterio.component.html',
   styleUrl: './criterio.component.scss'
@@ -74,7 +76,15 @@ export class CriterioComponent {
 
   selectedImportanceScale: ImportanceScale = ImportanceScale.EQUALLY_IMPORTANT;
   comparisonValues: { [key: number]: { [key: number]: ImportanceScale } } = {};
-  importanceScales = Object.values(ImportanceScale);
+  importanceScales = [
+    { value: ImportanceScale.EXTREMELY_MORE_IMPORTANT, label: 'Extremamente mais importante' },
+    { value: ImportanceScale.MUCH_MORE_IMPORTANT, label: 'Muito mais importante' },
+    { value: ImportanceScale.MORE_IMPORTANT, label: 'Mais importante' },
+    { value: ImportanceScale.EQUALLY_IMPORTANT, label: 'É tão importante quanto' },
+    { value: ImportanceScale.LESS_IMPORTANT, label: 'Menos importante' },
+    { value: ImportanceScale.MUCH_LESS_IMPORTANT, label: 'Muito menos importante' }
+  ];
+
 
   importanceScaleMap: { [key in ImportanceScale]: string } = {
     [ImportanceScale.EXTREMELY_MORE_IMPORTANT]: 'Extremamente mais importante',
@@ -195,15 +205,15 @@ export class CriterioComponent {
     if (!this.criteria || !this.filteredCriteriaGroups) return [];
     return this.filteredCriteriaGroups.filter(c => c.id !== this.criteria?.id);
   }
-  getComparisonValue(criteriaId: number, otherCriteriaId: number): ImportanceScale {
-    if (!this.comparisonValues[criteriaId]) {
-      this.comparisonValues[criteriaId] = {};
-    }
-    if (this.comparisonValues[criteriaId][otherCriteriaId] === undefined) {
-      this.comparisonValues[criteriaId][otherCriteriaId] = ImportanceScale.EQUALLY_IMPORTANT;
-    }
-    return this.comparisonValues[criteriaId][otherCriteriaId];
-  }
+  // getComparisonValue(criteriaId: number, otherCriteriaId: number): ImportanceScale {
+  //   if (!this.comparisonValues[criteriaId]) {
+  //     this.comparisonValues[criteriaId] = {};
+  //   }
+  //   if (this.comparisonValues[criteriaId][otherCriteriaId] === undefined) {
+  //     this.comparisonValues[criteriaId][otherCriteriaId] = ImportanceScale.EQUALLY_IMPORTANT;
+  //   }
+  //   return this.comparisonValues[criteriaId][otherCriteriaId];
+  // }
 
   setComparisonValue(criteriaId: number, otherCriteriaId: number, value: ImportanceScale): void {
     if (!this.comparisonValues[criteriaId]) {
@@ -211,5 +221,18 @@ export class CriterioComponent {
     }
     this.comparisonValues[criteriaId][otherCriteriaId] = value;
   }
+  getFilteredScales(otherCriteria: any): any[] {
 
+    return this.importanceScales.filter(scale => {
+
+      return this.criteria && scale.value !== this.comparisonValues[otherCriteria.id][this.criteria.id];
+
+    });
+  }
+   getImportanceScaleEntries() {
+    return Object.keys(this.importanceScaleMap).map(key => ({
+      key: key,
+      value: this.importanceScaleMap[key as ImportanceScale]
+    }));
+  }
 }
