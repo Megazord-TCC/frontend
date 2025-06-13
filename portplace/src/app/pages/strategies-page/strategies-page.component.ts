@@ -33,13 +33,6 @@ export class StrategiesPageComponent implements OnInit{
       activeObjectives: 1,
       status: 'ATIVO',
       statusColor: 'green'
-    },
-    {
-      id: '2',
-      name: 'Estratégia 2024',
-      activeObjectives: 0,
-      status: 'CANCELADO',
-      statusColor: 'gray'
     }
   ];
 

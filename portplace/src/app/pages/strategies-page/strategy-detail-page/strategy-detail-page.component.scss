@@ -26,15 +26,9 @@ $blue-color: #3b82f6;
   font-size: 0.875rem;
   color: #64748b;
 
-  .breadcrumb-link {
-    color: #3b82f6;
-    cursor: pointer;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-
+  text-decoration: none;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
   .separator {
     color: #9ca3af;
   }
@@ -136,11 +130,12 @@ $blue-color: #3b82f6;
 .tabs-container {
   .tabs-list {
     display: flex;
-    justify-content:center;
-    width: 675px;
+    justify-content: center;
+    align-items: center;
+    width: 684px;
     height: 44px;
     background: #e5e5e5; // fundo escuro conforme a imagem
-    border-radius: 0.5rem; // cantos levemente arredondados
+    border-radius: 0.5rem;
     overflow-x: auto;
     margin-bottom: 1.5rem;
 
@@ -150,22 +145,25 @@ $blue-color: #3b82f6;
       gap: 0.5rem;
       background: transparent;
       border: none;
-      padding: 0.75rem 1rem;
+      padding: 0.5rem 1rem; // padding um pouco menor
       cursor: pointer;
       font-size: 0.875rem;
       font-weight: 500;
       color: #000; // texto preto
-      transition: all 0.2s;
       white-space: nowrap;
+      border-radius: 0.25rem; // cantos suaves para todos
 
       &:hover {
-        background: rgba(255, 255, 255, 0.5); // fundo mais claro ao passar o mouse
+        background: rgba(255, 255, 255, 0.3);
       }
 
       &.active {
-        background: #ffffff; // fundo branco no botão ativo
-        color: #000; // mantém o texto preto no botão ativo
-        border-radius: 0.25rem; // arredondamento suave no botão ativo
+        background: #ffffff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); // leve sombra para realce
+        border-radius: 0.5rem; // cantos mais arredondados para destaque
+        color: #000;
+        height: 34px;
+        justify-content: center;
       }
 
       .tab-number {
@@ -180,6 +178,12 @@ $blue-color: #3b82f6;
     border: 1px solid #e2e8f0;
     border-radius: 0 0 0.75rem 0.75rem;
     min-height: 400px;
+    .div-loading-projetcts{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100px;
+    }
   }
 }
 
@@ -402,7 +406,7 @@ $blue-color: #3b82f6;
 
     table {
       width: 100%;
-      border-collapse: collapse;
+      table-layout: fixed;
 
       thead {
         background-color: #f8fafc;
@@ -418,12 +422,12 @@ $blue-color: #3b82f6;
           .header-cell {
             display: flex;
             align-items: center;
-            gap: 0.25rem;
-
-            .icon-sort {
-              font-size: 0.75rem;
-              color: #9ca3af;
-            }
+            justify-content: flex-start;
+            gap: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            color: $text-secondary;
+            font-family: 'Roboto', sans-serif;
           }
         }
       }
@@ -436,24 +440,27 @@ $blue-color: #3b82f6;
           &:hover {
             background-color: #f8fafc;
           }
+          .link {
+            background: none;
+            border: none;
+            color: #000000;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            font-family: 'Roboto', sans-serif;
+
+            &:hover {
+              color: $blue-color;
+            }
+          }
 
           td {
             padding: 1rem;
             font-size: 0.875rem;
             color: #64748b;
+            font-family: 'Roboto', sans-serif;
 
-            button {
-              background: none;
-              border: none;
-              color: #3b82f6;
-              cursor: pointer;
-              text-decoration: underline;
-              font-size: 0.875rem;
-
-              &:hover {
-                color: #1e3a8a;
-              }
-            }
+            font-weight: 500;
           }
         }
       }

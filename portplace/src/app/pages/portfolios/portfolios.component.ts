@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { BadgeComponent } from '../../components/badge/badge.component';
 import { CardComponent } from '../../components/card/card.component';
 import { PortfolioModalComponent } from '../../components/portfolio-modal/portfolio-modal.component';
+import { SvgIconComponent } from '../../components/svg-icon/svg-icon.component';
 type BadgeColor = 'gray' | 'green' | 'blue' | 'red' | 'yellow';
 interface Portfolio {
   id: number;
@@ -27,7 +28,7 @@ interface Portfolio {
     CardComponent,
     BadgeComponent,
     PortfolioModalComponent,
-
+    SvgIconComponent
   ],
 })
 export class PortfoliosComponent implements OnInit {
@@ -65,9 +66,28 @@ export class PortfoliosComponent implements OnInit {
   onFilterChange(filter: string): void {
     this.activeFilter = filter;
   }
+  onSearchChange(): void {
+    this.applyFilters();
+  }
+  openCreateModal(): void {
+    // Implementar modal de criação
+  }
+  applyFilters(): void {
+    let filtered = [...this.portfolios];
 
-  onSearchChange(value: string): void {
-    this.searchTerm = value;
+    if (this.activeFilter) {
+      filtered = filtered.filter(strategy =>
+        strategy.status.toLowerCase() === this.activeFilter.toLowerCase()
+      );
+    }
+
+    if (this.searchTerm) {
+      filtered = filtered.filter(strategy =>
+        strategy.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+      );
+    }
+
+    this.portfolios = filtered;
   }
 
   onPortfolioClick(portfolioId: number): void {

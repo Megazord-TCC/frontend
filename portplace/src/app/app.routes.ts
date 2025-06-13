@@ -11,6 +11,8 @@ import { LoginComponent } from './pages/login/login.component';
 import { StrategyDetailPageComponent } from './pages/strategies-page/strategy-detail-page/strategy-detail-page.component';
 import { PortfolioDetailComponent } from './pages/portfolios/portfoliodetail/portfoliodetail.component';
 import { ProjectDetailpageComponent } from './pages/projectspage/project-detailpage/project-detailpage.component';
+import { GrupoCriteriosComponent } from './pages/grupo-criterios/grupo-criterios.component';
+import { CriterioComponent } from './pages/grupo-criterios/criterio/criterio.component';
 
 export const routes: Routes = [
 
@@ -24,7 +26,9 @@ export const routes: Routes = [
   { path: 'estrategias', component: StrategiesPageComponent },
   { path: 'recursos', component: ResourcesPageComponent },
   { path: 'usuarios', component: UsersPageComponent },
-  { path: 'estrategia/:id', component: StrategyDetailPageComponent }
+  { path: 'estrategia/:estrategiaId', component: StrategyDetailPageComponent },
+  { path: 'estrategia/:estrategiaId/grupo-criterio/:grupoId', component: GrupoCriteriosComponent },
+  { path: 'estrategia/:estrategiaId/grupo-criterio/:grupoId/criterio/:criterioId', component: CriterioComponent }
 ];
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

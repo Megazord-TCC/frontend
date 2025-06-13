@@ -8,9 +8,9 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
   styleUrl: './svg-icon.component.scss'
 })
 export class SvgIconComponent implements OnChanges{
-   @Input() path: string = '';
+  @Input() path: string = '';
 
-  @Input() size!: number;  
+  @Input() size!: number;
 
   svgContent: SafeHtml = '';
 

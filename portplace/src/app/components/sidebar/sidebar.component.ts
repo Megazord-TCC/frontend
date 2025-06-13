@@ -34,8 +34,18 @@ export class SidebarComponent {
   constructor(private router: Router) {}
   activeNav: string = '';
   isActive(route: string): boolean {
-    return this.router.url === route || this.router.url.startsWith(route + '/');
-  }
+    if (this.router.url === route || this.router.url.startsWith(route + '/')) {
+      return true;
+    }
+    if (
+      (route === '/portfolios' && this.router.url.startsWith('/portfolio/')) ||
+      (route === '/projetos' && this.router.url.startsWith('/projeto/')) ||
+      (route === '/estrategias' && this.router.url.startsWith('/estrategia/'))
+    ) {
+      return true;
+    }
+    return false;
+}
 
   navigate(route: string): void {
      this.activeNav = route;
