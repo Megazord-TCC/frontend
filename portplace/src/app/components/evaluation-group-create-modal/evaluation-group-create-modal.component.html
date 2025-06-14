@@ -1,0 +1,49 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)" *ngIf="isVisible">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header">
+            <h2>Cadastrar grupo de avaliações</h2>
+            <button class="close-btn" (click)="onClose()">
+                <i class="icon-x">✕</i>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+            <!-- Validation Message -->
+            <div *ngIf="errorMessage" class="validation-error">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>{{ errorMessage }}</span>
+            </div>
+
+            <!-- Form Fields -->
+            <div class="form-fields" [ngClass]="{'disabled': isSubmitButtonDisabled}">
+                <div class="form-group">
+                    <label>Nome<span class="required-asterisk">*</span></label>
+                    <input [(ngModel)]="inputName" [disabled]="isSubmitButtonDisabled">
+                </div>
+
+                <div class="form-group">
+                    <label>Grupo de critérios relacionado<span class="required-asterisk">*</span></label>
+                    <select [(ngModel)]="inputCriteriaGroupSelectedId" [disabled]="isSubmitButtonDisabled">
+                        <option *ngFor="let criteriaGroup of inputCriteriaGroupsOptions"
+                            [ngValue]="criteriaGroup.id ? criteriaGroup.id.toString() : ''">
+                            {{ criteriaGroup.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <textarea [(ngModel)]="inputDescription" [disabled]="isSubmitButtonDisabled"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button class="btn-outline" (click)="onClose()">Cancelar</button>
+            <button class="btn-primary" (click)="onSave()" [disabled]="isSubmitButtonDisabled">Salvar</button>
+        </div>
+    </div>
+</div>

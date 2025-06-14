@@ -1,0 +1,127 @@
+<div class="strategy-detail-layout">
+
+    <div class="strategy-detail-content">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <span (click)="goToHomePage()" class="breadcrumb-link">Início</span>
+            <span class="separator">></span>
+            <span (click)="goToStrategiesPage()" class="breadcrumb-link">Estratégias</span>
+            <span class="separator">></span>
+            <span (click)="goBack()" class="breadcrumb-link">Estratégia 2024</span>
+            <span class="separator">></span>
+            <span class="current">{{evaluationGroup?.name}}</span>
+        </div>
+
+        <!-- Header -->
+        <div class="strategy-header">
+            <div class="header-top">
+                <button class="back-btn" (click)="goBack()">
+                    <app-svg-icon class="nav-icon" [path]="'assets/icon/voltar_vetor.svg'" [size]="18">
+                    </app-svg-icon>
+                </button>
+                <h1>{{evaluationGroup?.name}}</h1>
+            </div>
+            <p class="strategy-description">{{evaluationGroup?.description}}</p>
+            <div class="action-header">
+                <div class="action-buttons">
+                    <button class="action-btn" (click)="emptyMethod()">
+                        <i class="icon-edit"></i>
+                        Editar
+                    </button>
+                    <button class="action-btn delete" (click)="emptyMethod()">
+                        <i class="icon-delete"></i>
+                        Excluir
+                    </button>
+                </div>
+
+                <div class="last-update">
+                    <i class="icon-clock"></i>
+                    Última alteração realizada por Carlos Krefer em {{evaluationGroup?.lastModifiedAt | date: 'dd/MM/yyyy HH:mm'}}.
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs-container">
+            <div class="tab-content">
+                <div class="tab-panel">
+                    <h3>Projetos avaliados</h3>
+                    <p class="tab-description">
+                        Cadastre avaliações de projetos a partir de grupos de critérios <b>{{ evaluationGroup?.criteriaGroup?.name }}</b>.
+                    </p>
+
+                    <div class="actions-right">
+                        <button class="btn-primary" (click)="openCreateModal()">
+                            <i class="icon-plus">+</i>
+                            Cadastrar
+                        </button>
+                        <div class="search-container">
+
+                            <app-svg-icon class="nav-icon" [path]="'assets/icon/search_vetor.svg'" [size]="18">
+                            </app-svg-icon>
+                            <input type="text" placeholder="Buscar pelo nome do projeto" [(ngModel)]="searchTerm"
+                                (input)="emptyMethod()">
+                        </div>
+                    </div>
+
+                    <app-card class="table-card">
+                        <div class="table-container">
+                            <table class="objectives-table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <div class="header-cell">
+                                                Nome do projeto
+                                                <i class="icon-sort">↕️</i>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="header-cell">
+                                                Resultado (0 a 1000)
+                                                <i class="icon-sort">↕️</i>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="header-cell">
+                                                Prioridade
+                                                <i class="icon-sort">↕️</i>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let projectRanking of projectRankings" class="table-row">
+                                        <td>
+                                            <button class="objective-link" (click)="openEvaluationModal(projectRanking)">
+                                                {{projectRanking.name}}
+                                            </button>
+                                        </td>
+                                        <td>{{projectRanking.totalScore}}</td>
+                                        <td>{{projectRanking.position}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </app-card>
+
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <p class="pagination-info">Mostrando 1 a {{filteredProjectRankings.length}} de
+                            {{filteredProjectRankings.length}} registros</p>
+                        <div class="pagination-controls">
+                            <button class="pagination-btn" disabled>
+                                <i class="icon-chevron-left">‹</i>
+                            </button>
+                            <button class="pagination-btn active">1</button>
+                            <button class="pagination-btn" disabled>
+                                <i class="icon-chevron-right">›</i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <app-form-modal-component [isVisible]="showCreateModal" [config]="createProjectConfig" (close)="closeCreateModal()"
+        (save)="onSaveObjective($event)" (cancel)="closeCreateModal()">
+    </app-form-modal-component> -->
+</div>
