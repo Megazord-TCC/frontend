@@ -1,6 +1,4 @@
-
 <div class="strategy-detail-layout">
-
   <div class="strategy-detail-content">
 
     <div class="breadcrumb">
@@ -10,7 +8,6 @@
       <span class="separator">></span>
       <span class="current">{{criteria?.name}}</span>
     </div>
-
 
     <div class="strategy-header">
       <div class="header-top">
@@ -22,7 +19,6 @@
           </app-svg-icon>
         </button>
         <h1>{{criteria?.name}}</h1>
-
       </div>
       <p class="strategy-description">{{criteria?.description}}</p>
       <div class="action-header">
@@ -31,12 +27,6 @@
             <i class="icon-edit"></i>
             Editar
           </button>
-          <!--
-            <button class="action-btn cancel" (click)="cancelStrategy()">
-              <i class="icon-cancel"></i>
-              Cancelar
-            </button>
-            -->
           <button class="action-btn delete" (click)="deleteCriteria()">
             <i class="icon-delete"></i>
             Excluir
@@ -49,7 +39,6 @@
         </div>
       </div>
     </div>
-
 
     <div class="tabs-container">
       <div class="tabs-list">
@@ -77,35 +66,18 @@
           <span class="tab-number">2.</span>
           Comparações recíprocas
         </button>
-        <!--
-          <button
-          class="tab-trigger"
-          [class.active]="activeTab === 'objetivos'"
-          (click)="onTabChange('avaliacoes')">
-          <app-svg-icon
-          class="nav-icon"
-          [path]="'assets/icon/assignment_projetos_vetor.svg'"
-          [size]="18">
-        </app-svg-icon>
-        <span class="tab-number">3.</span>
-        Grupos de avaliações
-      </button>
-      -->
-
       </div>
-
 
       <div class="tab-content">
 
+        <!-- ABA DIRETAS (existente) -->
         <div *ngIf="activeTab === 'diretas'" class="tab-panel">
           <h3>Comparações diretas</h3>
           <p class="tab-description">
             Compare este critério aos outros do mesmo grupo. A partir disso será atribuído um peso para cada um.
           </p>
           <div class="actions-right">
-
             <div class="search-container">
-
               <app-svg-icon
                 class="nav-icon"
                 [path]="'assets/icon/search_vetor.svg'"
@@ -118,7 +90,6 @@
                 (input)="onSearchChange()">
             </div>
           </div>
-
 
           <div class="table-container">
             <!-- Cabeçalho como div -->
@@ -145,9 +116,7 @@
               </div>
             </div>
 
-            <!-- Corpo da tabela   como div -->
-
-            <!-- HTML Template -->
+            <!-- Corpo da tabela como div -->
             <div class="table-body">
               <ng-container *ngIf="criteria">
                 <div *ngFor="let otherCriteria of getOtherCriteria()" class="table-row">
@@ -157,7 +126,7 @@
                       <select class="custom-select"
                               [(ngModel)]="comparisonValues[criteria.id][otherCriteria.id]"
                               (change)="onImportanceChange(criteria, otherCriteria)">
-                        <option value="" disabled selected>Avalie</option>
+                        <option value="" disabled>Avalie</option>
                         <option *ngFor="let scale of getImportanceScaleEntries()"
                                 [value]="scale.key">
                           {{ scale.value }}
@@ -173,18 +142,15 @@
           </div>
         </div>
 
-
+        <!-- ABA RECÍPROCAS (nova) -->
         <div *ngIf="activeTab === 'reciprocas'" class="tab-panel">
           <h3>Comparações recíprocas</h3>
           <p class="tab-description">
             Confira as comparações feitas a partir de outros critérios em relação ao atual. Para alterar o valor, acesse o outro critério, clicando em seu nome.
           </p>
 
-
           <div class="actions-right">
-
             <div class="search-container">
-
               <app-svg-icon
                 class="nav-icon"
                 [path]="'assets/icon/search_vetor.svg'"
@@ -192,134 +158,86 @@
               </app-svg-icon>
               <input
                 type="text"
-                placeholder="Buscar pelo nome do projeto"
+                placeholder="Buscar pelo nome do critério"
                 [(ngModel)]="searchTerm"
                 (input)="onSearchChange()">
             </div>
           </div>
 
-
-          <app-card class="table-card">
-            <div class="table-container">
-              <div class="div-loading-projetcts" *ngIf="loadingCriterios">Carregando grupo de critério...</div>
-              <table *ngIf="!loadingCriterios">
-                <thead>
-                  <tr>
-                    <th>
-                      <div class="header-cell">
-                        Nome do grupo de critério
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Objetivos vinculados
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Avaliações realizadas
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Status
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let criteria of criteriaGroups" class="table-row">
-                      <td>{{criteria.name}}</td>
-                      <td>2 de 2</td>
-                      <td>{{criteria.name}}</td>
-                    </tr>
-                </tbody>
-              </table>
+          <div class="table-container">
+            <!-- Cabeçalho igual ao da aba diretas -->
+            <div class="table-header">
+              <div class="header-row">
+                <div class="header-cell">
+                  <div class="header-content">
+                    Critério comparador
+                    <app-svg-icon class="nav-icon" [path]="'assets/icon/sort-alt.svg'" [size]="18"></app-svg-icon>
+                  </div>
+                </div>
+                <div class="header-cell">
+                  <div class="header-content">
+                    Comparação recíproca
+                    <app-svg-icon class="nav-icon" [path]="'assets/icon/sort-alt.svg'" [size]="18"></app-svg-icon>
+                  </div>
+                </div>
+                <div class="header-cell">
+                  <div class="header-content">
+                    Critério atual
+                    <app-svg-icon class="nav-icon" [path]="'assets/icon/sort-alt.svg'" [size]="18"></app-svg-icon>
+                  </div>
+                </div>
+              </div>
             </div>
-          </app-card>
-        </div>
 
-        <!--
-          <div *ngIf="activeTab === 'objetivos'" class="tab-panel">
-            <h3>Grupo de avaliações de projetos</h3>
-            <p class="tab-description">
-              Cadastre grupos de avaliações de projetos a partir de grupos de critérios. Essas avaliações são utilizadas para gerar cenários.
-            </p>
-            <div class="actions-right">
-              <button class="btn-primary" (click)="openCreateModal()">
-                <i class="icon-plus">+</i>
-                Cadastrar
-              </button>
-              <div class="search-container">
-                <app-svg-icon
-                class="nav-icon"
-                [path]="'assets/icon/search_vetor.svg'"
-                [size]="18">
-              </app-svg-icon>
-              <input
-              type="text"
-              placeholder="Buscar pelo nome do projeto"
-              [(ngModel)]="searchTerm"
-              (input)="onSearchChange()">
+            <!-- Corpo da tabela igual ao da aba diretas -->
+            <div class="table-body">
+              <ng-container *ngIf="criteria">
+                <div *ngFor="let reciprocal of getReciprocalComparisons()" class="table-row">
+                  <div class="table-cell">
+                    <span
+                      class="criteria-link"
+                      (click)="navigateToCriteria(reciprocal.criteria.id)"
+                      [title]="'Ir para ' + reciprocal.criteria.name">
+                      {{reciprocal.criteria.name}}
+                    </span>
+                  </div>
+                  <div class="table-cell">
+                    <span
+                      class="comparison-text"
+                      [class.not-evaluated]="!reciprocal.hasComparison"
+                      [class.evaluated]="reciprocal.hasComparison">
+                      {{reciprocal.comparisonText}}
+                    </span>
+                  </div>
+                  <div class="table-cell">{{criteria?.name}}</div>
+                </div>
+              </ng-container>
+
+              <!-- Caso não tenha critérios -->
+              <div *ngIf="!criteria || getOtherCriteria().length === 0" class="empty-state">
+                <p>Não há outros critérios neste grupo para comparações recíprocas.</p>
+              </div>
             </div>
           </div>
-          <app-card class="table-card">
-            <div class="table-container">
-              <table class="evaluations-table">
-                <thead>
-                  <tr>
-                    <th>
-                      <div class="header-cell">
-                        Nome da avaliação
-                        <i class="icon-sort">↕️</i>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Grupo de critérios
-                        <i class="icon-sort">↕️</i>
-                      </div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let evaluation of filteredEvaluationGroups" class="table-row">
-                    <td>
-                      <button class="evaluation-link" (click)="openEvaluationModal(evaluation)">
-                        {{evaluation.name}}
-                      </button>
-                    </td>
-                    <td>{{evaluation.criteriaGroup}}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </app-card>
         </div>
-        -->
+
       </div>
     </div>
   </div>
+
+  <!-- Modais -->
+  <app-form-modal-component
+    [isVisible]="showDeleteModal"
+    [config]="deleteFormConfig"
+    (close)="closeDeleteModal()"
+    (save)="onSaveByActiveTab($event)"
+    (cancel)="closeDeleteModal()">
+  </app-form-modal-component>
+  <app-form-modal-component
+    [isVisible]="showEditModal"
+    [config]="editFormConfig"
+    (close)="closeEditModal()"
+    (save)="onSaveByActiveTab($event)"
+    (cancel)="closeEditModal()">
+  </app-form-modal-component>
 </div>
-
-
