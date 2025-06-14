@@ -9,6 +9,7 @@ import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.componen
 import { FormModalComponentComponent } from '../../../components/form-modal-component/form-modal-component.component';
 import { CriteriaGroupService } from '../../../service/criteria-group.service';
 import { firstValueFrom, retry } from 'rxjs';
+import { EvaluationGroupsTabComponent } from '../../../components/evaluation-groups-tab/evaluation-groups-tab.component';
 
 
 @Component({
@@ -19,7 +20,8 @@ import { firstValueFrom, retry } from 'rxjs';
     CardComponent,
     BadgeComponent,
     SvgIconComponent,
-    FormModalComponentComponent
+    FormModalComponentComponent,
+    EvaluationGroupsTabComponent
   ],
   templateUrl: './strategy-detail-page.component.html',
   styleUrl: './strategy-detail-page.component.scss'

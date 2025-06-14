@@ -13,6 +13,7 @@ import { PortfolioDetailComponent } from './pages/portfolios/portfoliodetail/por
 import { ProjectDetailpageComponent } from './pages/projectspage/project-detailpage/project-detailpage.component';
 import { GrupoCriteriosComponent } from './pages/grupo-criterios/grupo-criterios.component';
 import { CriterioComponent } from './pages/grupo-criterios/criterio/criterio.component';
+import { EvaluationGroupDetailPageComponent } from './pages/strategies-page/evaluation-group-detail-page/evaluation-group-detail-page.component';
 
 export const routes: Routes = [
 
@@ -28,7 +29,8 @@ export const routes: Routes = [
   { path: 'usuarios', component: UsersPageComponent },
   { path: 'estrategia/:estrategiaId', component: StrategyDetailPageComponent },
   { path: 'estrategia/:estrategiaId/grupo-criterio/:grupoId', component: GrupoCriteriosComponent },
-  { path: 'estrategia/:estrategiaId/grupo-criterio/:grupoId/criterio/:criterioId', component: CriterioComponent }
+  { path: 'estrategia/:estrategiaId/grupo-criterio/:grupoId/criterio/:criterioId', component: CriterioComponent },
+  { path: 'estrategia/:estrategiaId/grupo-avaliacao/:grupoAvaliacaoId', component: EvaluationGroupDetailPageComponent }
 ];
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
