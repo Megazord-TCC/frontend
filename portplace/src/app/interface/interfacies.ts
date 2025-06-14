@@ -122,14 +122,13 @@ export interface Strategy {
 
 export interface CriteriaComparison {
   id?: number;
-  comparedCriterion: Criterion;
-  referenceCriterion: Criterion;
+  comparedCriterionId?: number;
+  referenceCriterionId?: number;
   importanceScale: ImportanceScale;
-  criteriaGroup: CriteriaGroup;
-  disabled: boolean;
-  lastModifiedAt?: Date;
-  lastModifiedBy?: User;
+  criteriaGroupId?: number;
+  disabled?: boolean;
   createdAt?: Date;
+  lastModifiedAt?: User;
 }
 
 export interface User {

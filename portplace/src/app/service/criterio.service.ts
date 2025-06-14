@@ -26,7 +26,9 @@ export class CriterioService {
   }
 
   getCriterioById(groupId: number, id:number, estrategiaId: number): Observable<Criterion> {
-    const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${groupId}/criteria/${id}`;
+    let url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${groupId}/criteria/${id}`;
+    url += '?includeWeight=true';
+
     return this.http.get<Criterion>(url, { headers: this.getHeaders() });
   }
 
@@ -44,7 +46,7 @@ export class CriterioService {
 
   // DELETAR CRITÉRIO
   deleteCriterio(criterioId: number, estrategiaId: number, groupId: number): Observable<void> {
-    const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${groupId}/criteria/${criterioId}/hard-delete`;
+    const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${groupId}/criteria/${criterioId}`;
     return this.http.delete<void>(url, { headers: this.getHeaders() });
   }
 }
