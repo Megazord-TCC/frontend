@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CardComponent } from '../card/card.component';
 import { SvgIconComponent } from '../svg-icon/svg-icon.component';
@@ -24,6 +24,8 @@ import { EvaluationGroupCreateModal } from '../evaluation-group-create-modal/eva
 })
 export class EvaluationGroupsTabComponent {
 
+    @ViewChild(EvaluationGroupCreateModal) createModal!: EvaluationGroupCreateModal;
+
     strategyId = -1;
 
     httpClient = inject(HttpClient);
@@ -38,13 +40,14 @@ export class EvaluationGroupsTabComponent {
     showCreateModal = false;
 
     ngOnInit() {
-        this.strategyId = Number(this.route.snapshot.paramMap.get('id'));
+        this.strategyId = Number(this.route.snapshot.paramMap.get('estrategiaId'));
         this.filteredEvaluationGroups = [...this.evaluationGroups];
         this.setEvaluationGroupsByHttpRequest();
     }
 
     openCreateModal(): void {
         this.showCreateModal = true;
+        this.createModal.restartForm();
     }
 
     openEvaluation(evaluationGroup: EvaluationGroup) {

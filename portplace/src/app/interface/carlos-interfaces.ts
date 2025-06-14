@@ -19,6 +19,8 @@ export interface CriteriaGroup {
     lastModifiedAt: Date;
     createdAt: Date;
     disabled: boolean;
+    criteriaCount: number,
+    criteriaComparisonCount: number,
 }
 
 export interface Criteria {
