@@ -196,12 +196,14 @@ $blue-color: #3b82f6;
       cursor: pointer;
       transition: background-color 0.2s;
       font-family: 'Inter', sans-serif;
+      transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
       &.evaluation-btn {
-        background-color: #059669; // Verde para destacar o botão de avaliar
+        background-color: #000000; // Verde para destacar o botão de avaliar
 
         &:hover {
-          background-color: #047857;
+         transform: translateX(8px) scale(1.005);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
       }
 
@@ -320,16 +322,27 @@ $blue-color: #3b82f6;
           &:hover {
             background-color: #f8fafc;
           }
+          .link {
+            background: none;
+            border: none;
+            color: #000000;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 500;
+
+            &:hover {
+              color: $blue-color;
+            }
+          }
 
           td {
             padding: 1rem;
-            font-size: 0.875rem;
             color: #64748b;
-
-            .criterion-name {
-              font-weight: 500;
-              color: #1e293b;
-            }
+            font-size: 0.875rem;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 500;
           }
         }
       }
@@ -431,3 +444,4 @@ $blue-color: #3b82f6;
     align-items: center;
   }
 }
+

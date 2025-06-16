@@ -40,9 +40,11 @@
           </button>
         </div>
 
+        <!-- <div class="last-update">
+            Última alteração realizada em {{strategy?.lastModifiedAt | date: 'dd/MM/yyyy HH:mm'}}.
+        </div> -->
         <div class="last-update">
-          <i class="icon-clock"></i>
-          Última alteração realizada por Carlos Krefer em 01/01/2025 13:30.
+            Última alteração realizada em {{strategy?.lastUpdate | date: 'dd/MM/yyyy HH:mm'}}.
         </div>
       </div>
     </div>
@@ -59,7 +61,7 @@
             [path]="'assets/icon/p_vetor.svg'"
             [size]="18">
           </app-svg-icon>
-          <span class="tab-number">1.</span>
+          <span class="tab-number">1</span>
           Objetivos
         </button>
         <button
@@ -71,7 +73,7 @@
             [path]="'assets/icon/metrica_vetor.svg'"
             [size]="18">
           </app-svg-icon>
-          <span class="tab-number">2.</span>
+          <span class="tab-number">2</span>
           Grupos de critérios
         </button>
         <button
@@ -83,7 +85,7 @@
             [path]="'assets/icon/assignment_projetos_vetor.svg'"
             [size]="18">
           </app-svg-icon>
-          <span class="tab-number">3.</span>
+          <span class="tab-number">3</span>
           Grupos de avaliações
         </button>
         <button
@@ -95,7 +97,7 @@
             [path]="'assets/icon/cenarios_vetor.svg'"
             [size]="18">
           </app-svg-icon>
-          <span class="tab-number">4.</span>
+          <span class="tab-number">4</span>
           Cenários
         </button>
 

@@ -116,9 +116,7 @@ export class GrupoCriteriosComponent implements OnInit{
       this.filteredCriteriaGroups = criteriaGroup;
       this.criteriaGroups = criteriaGroup;
       this.loadingProjects = false;
-      console.log('Critérios:', criteriaGroup);
     } catch (err) {
-      console.error('Erro ao buscar grupo de criterios:', err);
       this.loadingProjects = false;
     }
   }
@@ -128,7 +126,7 @@ export class GrupoCriteriosComponent implements OnInit{
       const criteriaGroup = await firstValueFrom(this.criterioGroupService.getCriterioById(this.criteriaGroupId,this.estrategiaId));
       this.criteriaGroup = criteriaGroup;
 
-      console.log('Grupo de critério:', criteriaGroup);
+
     } catch (err) {
       console.error('Erro ao buscar grupo de criterios:', err);
 
@@ -216,8 +214,7 @@ export class GrupoCriteriosComponent implements OnInit{
           name: groupData.name,
           description: groupData.description
         };
-        console.log('Grupo de critérios :', this.criteriaGroup);
-        console.log('Grupo de critérios atualizado:', updatedGroup);
+      
         this.criterioGroupService.updateCriterio(this.criteriaGroupId, this.estrategiaId, updatedGroup).subscribe({
           next: () => {
             this.loadGruopCriteriaById();
@@ -236,7 +233,7 @@ export class GrupoCriteriosComponent implements OnInit{
         next: () => {
           this.goBack();
           this.closeDeleteModal();
-          this.resetFormFields(this.deleteFormConfig); 
+          this.resetFormFields(this.deleteFormConfig);
         },
         error: (err) => {
           console.error('Erro ao excluir grupo de critérios:', err);
@@ -252,5 +249,18 @@ export class GrupoCriteriosComponent implements OnInit{
       });
     }
   }
+  formatWeightAsPercentage(weight: number | null | undefined): string {
+  // Verifica se o valor é válido
+  if (weight == null || weight === undefined || isNaN(weight)) {
+    return '0%';
+  }
 
+  // Converte para percentual e arredonda
+  const percentage = Math.round(weight * 100);
+
+  // Garante que não seja negativo nem maior que 100%
+  const clampedPercentage = Math.max(0, Math.min(100, percentage));
+
+  return clampedPercentage + '%';
+}
 }

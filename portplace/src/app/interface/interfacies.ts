@@ -111,12 +111,11 @@ export interface CriteriaGroup {
   name: string;
   description?: string;
   disabled: boolean;
-  strategy?: Strategy;
   lastModifiedAt?: Date;
   lastModifiedBy?: User;
   createdAt?: Date;
-  criteria?: Criterion[];
-  criteriaComparisons?: CriteriaComparison[];
+  criteriaCount?: number;
+  criteriaComparisonCount?: number;
 }
 
 export interface Criterion {

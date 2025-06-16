@@ -444,10 +444,11 @@ $blue-color: #3b82f6;
             background: none;
             border: none;
             color: #000000;
-            font-weight: 500;
             cursor: pointer;
             text-decoration: none;
+            font-size: 0.875rem;
             font-family: 'Roboto', sans-serif;
+            font-weight: 500;
 
             &:hover {
               color: $blue-color;

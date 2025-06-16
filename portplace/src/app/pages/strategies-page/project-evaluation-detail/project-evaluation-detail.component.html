@@ -28,18 +28,11 @@
             <div class="action-header">
                 <div class="action-buttons">
                     <button class="action-btn">
-                        <i class="icon-edit">✏️</i>
                         Editar
                     </button>
                     <button class="action-btn delete">
-                        <i class="icon-delete">🗑️</i>
                         Excluir
                     </button>
-                </div>
-
-                <div class="last-update">
-                    <i class="icon-clock">🕒</i>
-                    Última alteração realizada por Carlos Krefer em {{project?.lastModifiedDate | date: 'dd/MM/yyyy HH:mm'}}.
                 </div>
             </div>
         </div>
@@ -57,7 +50,11 @@
                     <!-- Action Bar -->
                     <div class="actions-right">
                         <button class="btn-primary evaluation-btn" (click)="openEvaluationModal()">
-                            <i class="icon-star">⭐</i>
+                            <app-svg-icon
+                              class="nav-icon"
+                              [path]="'assets/icon/star_vector.svg'"
+                              [size]="18">
+                            </app-svg-icon>
                             Avaliar
                         </button>
                         <div class="search-container">
@@ -76,19 +73,31 @@
                                         <th>
                                             <div class="header-cell">
                                                 Nome do critério
-                                                <i class="icon-sort">↕️</i>
+                                                <app-svg-icon
+                                                  class="nav-icon"
+                                                  [path]="'assets/icon/sort-alt.svg'"
+                                                  [size]="18">
+                                                </app-svg-icon>
                                             </div>
                                         </th>
                                         <th>
                                             <div class="header-cell">
                                                 Nota atribuída (0 a 1000)
-                                                <i class="icon-sort">↕️</i>
+                                                <app-svg-icon
+                                                  class="nav-icon"
+                                                  [path]="'assets/icon/sort-alt.svg'"
+                                                  [size]="18">
+                                                </app-svg-icon>
                                             </div>
                                         </th>
                                         <th>
                                             <div class="header-cell">
                                                 Peso do critério
-                                                <i class="icon-sort">↕️</i>
+                                                <app-svg-icon
+                                                  class="nav-icon"
+                                                  [path]="'assets/icon/sort-alt.svg'"
+                                                  [size]="18">
+                                                </app-svg-icon>
                                             </div>
                                         </th>
                                     </tr>
@@ -107,33 +116,18 @@
                     </app-card>
 
                     <!-- Total Score Summary -->
-                    <div class="total-score-card" *ngIf="criteriaEvaluations.length > 0">
+                    <!-- <div class="total-score-card" *ngIf="criteriaEvaluations.length > 0">
                         <h4>Score Total Ponderado: {{getTotalScore() | number:'1.2-2'}}</h4>
                         <p class="score-explanation">
                             Calculado com base nas notas atribuídas e pesos dos critérios
                         </p>
-                    </div>
+                    </div> -->
 
                     <!-- Empty State -->
                     <div class="empty-state" *ngIf="criteriaEvaluations.length === 0">
                         <p>Nenhum critério encontrado para avaliação.</p>
                     </div>
 
-                    <!-- Pagination -->
-                    <div class="pagination" *ngIf="criteriaEvaluations.length > 0">
-                        <p class="pagination-info">
-                            Mostrando 1 a {{criteriaEvaluations.length}} de {{criteriaEvaluations.length}} registros
-                        </p>
-                        <div class="pagination-controls">
-                            <button class="pagination-btn" disabled>
-                                <i class="icon-chevron-left">‹</i>
-                            </button>
-                            <button class="pagination-btn active">1</button>
-                            <button class="pagination-btn" disabled>
-                                <i class="icon-chevron-right">›</i>
-                            </button>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

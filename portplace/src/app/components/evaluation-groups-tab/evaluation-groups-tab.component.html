@@ -29,13 +29,21 @@
                         <th>
                             <div class="header-cell">
                                 Nome da avaliação
-                                <i class="icon-sort">↕️</i>
+                                <app-svg-icon
+                                  class="nav-icon"
+                                  [path]="'assets/icon/sort-alt.svg'"
+                                  [size]="18">
+                                </app-svg-icon>
                             </div>
                         </th>
                         <th>
                             <div class="header-cell">
                                 Grupo de critérios
-                                <i class="icon-sort">↕️</i>
+                                <app-svg-icon
+                                  class="nav-icon"
+                                  [path]="'assets/icon/sort-alt.svg'"
+                                  [size]="18">
+                                </app-svg-icon>
                             </div>
                         </th>
                     </tr>
@@ -43,7 +51,7 @@
                 <tbody>
                     <tr *ngFor="let evaluationGroup of filteredEvaluationGroups" class="table-row">
                         <td>
-                            <button class="evaluation-link" (click)="openEvaluation(evaluationGroup)">
+                            <button class="link" (click)="openEvaluation(evaluationGroup)">
                                 {{ evaluationGroup.name }}
                             </button>
                         </td>

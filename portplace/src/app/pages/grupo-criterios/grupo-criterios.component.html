@@ -42,9 +42,8 @@
             -->
         </div>
 
-        <div class="last-update">
-          <i class="icon-clock"></i>
-          Última alteração realizada por Carlos Krefer em 01/01/2025 13:30.
+         <div class="last-update">
+            Última alteração realizada em {{criteriaGroup?.lastModifiedAt | date: 'dd/MM/yyyy HH:mm'}}.
         </div>
       </div>
     </div>
@@ -118,7 +117,7 @@
                         {{criteria.name}}
                       </button>
                     </td>
-                    <td>{{criteria.weight}}</td>
+                    <td>{{formatWeightAsPercentage(criteria.weight)}}</td>
                     <td>Não calculado</td>
                   </tr>
                 </tbody>

@@ -263,6 +263,7 @@ export class StrategyDetailPageComponent implements OnInit{
     this.loadGruopCriteria();
     this.filteredEvaluationGroups = [...this.evaluationGroups];
     this.filteredScenarios = [...this.scenarios];
+
   }
 
   async loadGruopCriteria(): Promise<void> {
@@ -272,7 +273,7 @@ export class StrategyDetailPageComponent implements OnInit{
       this.filteredCriteriaGroups = criteriaGroup;
       this.criteriaGroups = criteriaGroup;
       this.loadingProjects = false;
-      console.log('Grupo de critérios:', criteriaGroup);
+
     } catch (err) {
       console.error('Erro ao buscar grupo de criterios:', err);
       this.loadingProjects = false;
@@ -301,7 +302,7 @@ export class StrategyDetailPageComponent implements OnInit{
   createCriteriaGroup(newGroup: CriteriaGroup): void {
     this.criterioService.createCriterio(newGroup, this.estrategiaId).subscribe({
       next: (createdGroup) => {
-        console.log('Grupo de critérios criado:', createdGroup);
+
         this.loadGruopCriteria();
         this.closeCreateModal();
       },
@@ -314,12 +315,11 @@ export class StrategyDetailPageComponent implements OnInit{
   // UPDATE
   updateEstrategia(group: CriteriaGroup): void {
     if (!group.id) {
-      console.error('ID do grupo de critérios não encontrado!');
+
       return;
     }
     this.criterioService.updateCriterio(group.id, this.estrategiaId, group).subscribe({
       next: (updatedGroup) => {
-        console.log('Grupo de critérios atualizado:', updatedGroup);
         this.loadGruopCriteria();
       },
       error: (err) => {
@@ -332,7 +332,6 @@ export class StrategyDetailPageComponent implements OnInit{
   deleteEstrategia(groupId: number): void {
     this.criterioService.deleteCriterio(groupId, this.estrategiaId).subscribe({
       next: () => {
-        console.log('Grupo de critérios deletado!');
         this.loadGruopCriteria();
       },
       error: (err) => {
@@ -367,7 +366,6 @@ export class StrategyDetailPageComponent implements OnInit{
       acc[field.id] = field.value;
       return acc;
     }, {} as any);
-    console.log('Novo objetivo:', data);
     this.closeCreateModal();
   }
 
@@ -388,7 +386,6 @@ export class StrategyDetailPageComponent implements OnInit{
     // Chama o service passando o id da estratégia
     this.criterioService.createCriterio(newGroup, this.estrategiaId).subscribe({
       next: (createdGroup) => {
-        console.log('Grupo de critérios criado:', createdGroup);
         this.loadGruopCriteria(); // Atualiza a lista
         this.closeCreateModal();
       },
@@ -403,7 +400,6 @@ export class StrategyDetailPageComponent implements OnInit{
       acc[field.id] = field.value;
       return acc;
     }, {} as any);
-    console.log('Nova avaliação:', data);
     this.closeCreateModal();
   }
 
@@ -412,7 +408,6 @@ export class StrategyDetailPageComponent implements OnInit{
       acc[field.id] = field.value;
       return acc;
     }, {} as any);
-    console.log('Novo cenário:', data);
     this.closeCreateModal();
   }
 
@@ -461,7 +456,7 @@ export class StrategyDetailPageComponent implements OnInit{
     if (this.evaluationSearchTerm) {
       filtered = filtered.filter(
         (evaluation) =>
-          evaluation.name.toLowerCase().includes(this.evaluationSearchTerm.toLowerCase()) 
+          evaluation.name.toLowerCase().includes(this.evaluationSearchTerm.toLowerCase())
       )
     }
 
@@ -566,7 +561,9 @@ export class StrategyDetailPageComponent implements OnInit{
   }
   getAvalicoesCoutntPorId(groupId: number): number {
     const group = this.criteriaGroups.find(g => g.id === groupId);
-    return group && group.criteriaComparisons ? group.criteriaComparisons.length : 0;
+    console.log('Group:', group);
+    console.log('Group criteria comparisons:', group?.criteriaComparisonCount);
+    return group?.criteriaComparisonCount || 0;
   }
   getStatusLabelByDisabled(disabled: boolean): string {
     return disabled ? 'Desativado' : 'Ativado';

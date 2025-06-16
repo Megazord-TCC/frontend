@@ -60,18 +60,19 @@ export class EvaluationGroupDetailPageComponent {
   }
 
   setCurrentEvaluationGroupByHttpRequest() {
-      let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps`;
-      let criteriaGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups`;
+    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps`;
+    let criteriaGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups`;
 
-      let getAllEvaluationGroups$ = this.httpClient.get<EvaluationGroup[]>(evaluationGroupsRoute);
-      let getAllCriteriaGroups$ = this.httpClient.get<CriteriaGroup[]>(criteriaGroupsRoute);
+    let getAllEvaluationGroups$ = this.httpClient.get<EvaluationGroup[]>(evaluationGroupsRoute);
+    let getAllCriteriaGroups$ = this.httpClient.get<CriteriaGroup[]>(criteriaGroupsRoute);
 
-      forkJoin({ evaluationGroups: getAllEvaluationGroups$, criteriaGroups: getAllCriteriaGroups$ })
-        .pipe(
-          map(({ evaluationGroups, criteriaGroups }) => this.getManyEvaluationGroupView(evaluationGroups, criteriaGroups)),
-          map(evaluationGroups => evaluationGroups.find(evaluationGroup => evaluationGroup.id == this.evaluationGroupId))
-        )
-        .subscribe(evaluationGroup => this.evaluationGroup = evaluationGroup);
+    forkJoin({ evaluationGroups: getAllEvaluationGroups$, criteriaGroups: getAllCriteriaGroups$ })
+      .pipe(
+        map(({ evaluationGroups, criteriaGroups }) => this.getManyEvaluationGroupView(evaluationGroups, criteriaGroups)),
+        map(evaluationGroups => evaluationGroups.find(evaluationGroup => evaluationGroup.id == this.evaluationGroupId))
+      )
+      .subscribe(evaluationGroup => this.evaluationGroup = evaluationGroup);
+
   }
 
   getManyEvaluationGroupView(evaluationGroups: EvaluationGroup[], criteriaGroups: CriteriaGroup[]): EvaluationGroupView[] {
@@ -131,25 +132,25 @@ export class EvaluationGroupDetailPageComponent {
 
   // Modal de exclusão do grupo de avaliação - CORRIGIDO
   openDeleteModal(): void {
-    console.log('🗑️ Abrindo modal de exclusão');
+
     this.showDeleteModal = true;
   }
 
   closeDeleteModal(): void {
-    console.log('❌ Fechando modal de exclusão');
+
     this.showDeleteModal = false;
   }
 
   onEvaluationGroupDeleted(): void {
-    console.log('✅ Grupo de avaliação excluído com sucesso');
+
     // Redirecionar para a página de estratégias após exclusão
     this.router.navigateByUrl(`estrategia/${this.strategyId}`);
   }
 
   // Método para abrir modal de avaliação individual do projeto
   openEvaluationModal(projectRanking: ProjectRanking) {
-    console.log('🚀 Redirecionando para avaliação do projeto:', projectRanking);
-    console.log('📊 Dados do projeto:', {
+    console.log('Redirecionando para avaliação do projeto:', projectRanking);
+    console.log('Dados do projeto:', {
       projectId: projectRanking.projectId,
       name: projectRanking.name,
       position: projectRanking.position,
@@ -171,5 +172,11 @@ export class EvaluationGroupDetailPageComponent {
         project.name?.toLowerCase().includes(this.searchTerm.toLowerCase())
       );
     }
+  }
+  formatScoreBR(score: number): string {
+    if (score == null || score === undefined || isNaN(score)) {
+      return '0,00';
+    }
+    return score.toFixed(2).replace('.', ',');
   }
 }

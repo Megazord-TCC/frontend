@@ -123,22 +123,19 @@ export class ProjectEvaluationCreateModal {
       console.log('⏳ Executando todas as requisições simultaneamente...');
       forkJoin(evaluationPromises).subscribe({
         next: (results) => {
-          console.log('✅ Todas as avaliações criadas com sucesso!');
-          console.log('📊 Resultados:', results);
-          console.log('=== PROCESSO CONCLUÍDO COM SUCESSO ===');
           this.created.emit();
           this.onClose();
         },
         error: (error) => {
-          console.error('❌ Erro ao criar avaliações:', error);
-          console.log('=== PROCESSO FINALIZADO COM ERRO ===');
+          console.error(' Erro ao criar avaliações:', error);
+
           this.errorMessage = 'Ocorreu um erro inesperado. Tente novamente mais tarde.';
         }
       });
 
     } catch (error) {
-      console.error('❌ Erro ao buscar critérios:', error);
-      console.log('=== PROCESSO FINALIZADO COM ERRO ===');
+      console.error(' Erro ao buscar critérios:', error);
+
       this.errorMessage = 'Erro ao buscar critérios. Tente novamente mais tarde.';
     }
   }
