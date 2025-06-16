@@ -44,7 +44,7 @@ export class GrupoCriterioService {
 
   // DELETAR GRUPO DE CRITÉRIOS
   deleteCriteriaComparison(groupComparationId: number, groupId: number, estrategiaId: number): Observable<void> {
-    const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${groupId}/criteria-comparisons/${groupComparationId}`;
+    const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${groupId}/criteria-comparisons/${groupComparationId}/hard-delete`;
     return this.http.delete<void>(url, { headers: this.getHeaders() });
   }
 }

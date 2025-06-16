@@ -4,10 +4,10 @@ export interface EvaluationGroup {
     name: string;
     description: string;
     criteriaGroupId: number;
-    evaluations: Evaluation[];
+    evaluations?: Evaluation[];
     disabled: number;
-    createdAt: Date;
-    lastModifiedAt: Date;
+    createdAt?: Date;
+    lastModifiedAt?: Date;
 }
 
 export interface CriteriaGroup {
@@ -31,6 +31,7 @@ export interface Criteria {
     disabled: boolean;
     createdAt: Date;
     lastModifiedAt: Date;
+    weight: number;
 }
 
 export interface CriteriaComparison {
@@ -88,5 +89,34 @@ export interface ProjectRanking {
     name: string;
     position: number;
     totalScore: number;
+}
+
+export interface Project {
+  id?: number;
+  name: string;
+  description?: string;
+  status?: string;
+  createdDate?: string;
+  lastModifiedDate?: string;
+  createdBy?: string;
+  lastModifiedBy?: string;
+}
+
+export interface ProjectEvaluation {
+  id?: number;
+  projectId: number;
+  evaluationGroupId: number;
+  project?: Project;
+  scores?: CriteriaScore[];
+  totalScore?: number;
+  createdDate?: string;
+  lastModifiedDate?: string;
+}
+
+export interface CriteriaScore {
+  id?: number;
+  criteriaId: number;
+  score: number;
+  criteria?: Criteria;
 }
 

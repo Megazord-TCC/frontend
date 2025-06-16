@@ -1,0 +1,53 @@
+<div class="modal-overlay" *ngIf="isVisible" (click)="onOverlayClick($event)">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h2>Avaliar projeto</h2>
+      <button class="close-btn" (click)="onClose()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="project-info">
+        <p><strong>Projeto avaliado:</strong> {{project?.name}}</p>
+        <p class="instruction">Informe notas de 0 a 1000 para cada um dos critérios abaixo.</p>
+      </div>
+
+      <!-- Mensagem de erro -->
+      <div class="error-message" *ngIf="errorMessage">
+        <i class="icon-warning">⚠️</i>
+        {{errorMessage}}
+      </div>
+
+      <!-- Formulário de critérios -->
+      <form class="criteria-form">
+        <div class="criterion-field" *ngFor="let criterion of criteriaEvaluations">
+          <label [for]="'criterion-' + criterion.id" class="criterion-label">
+            {{criterion.name}} *
+          </label>
+          <input
+            [id]="'criterion-' + criterion.id"
+            type="number"
+            min="0"
+            max="1000"
+            class="criterion-input"
+            [class.error]="errorMessage && (!evaluationForm[criterion.id] || evaluationForm[criterion.id] < 0 || evaluationForm[criterion.id] > 1000)"
+            [(ngModel)]="evaluationForm[criterion.id]"
+            [name]="'criterion-' + criterion.id"
+            (input)="onScoreChange(criterion.id)"
+            placeholder="Digite uma nota de 0 a 1000">
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="onClose()">
+        Cancelar
+      </button>
+      <button
+        class="btn-primary"
+        (click)="onSave()"
+        [disabled]="isSubmitButtonDisabled">
+        Salvar
+      </button>
+    </div>
+  </div>
+</div>

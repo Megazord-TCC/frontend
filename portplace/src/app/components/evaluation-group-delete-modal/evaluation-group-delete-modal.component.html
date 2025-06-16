@@ -1,0 +1,96 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)" *ngIf="isVisible">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header">
+            <div class="header-icon">
+                <i class="icon-trash">🗑️</i>
+            </div>
+            <h2>Excluir grupo de avaliações</h2>
+            <button class="close-btn" (click)="onClose()" [disabled]="isDeleting">
+                <i class="icon-x">✕</i>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+            <!-- Error Message -->
+            <div *ngIf="errorMessage" class="validation-error">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>{{ errorMessage }}</span>
+            </div>
+
+            <!-- Loading State -->
+            <div *ngIf="isDeleting" class="loading-state">
+                <div class="loading-spinner">
+                    <i class="icon-loading">⏳</i>
+                </div>
+                <p>Excluindo grupo de avaliações...</p>
+            </div>
+
+            <!-- Confirmation Content -->
+            <div *ngIf="!isDeleting" class="confirmation-content">
+                <!-- Confirmation Message -->
+                <div class="confirmation-message">
+                    <h3>{{ getConfirmationMessage() }}</h3>
+                    <p class="warning-text">{{ getWarningMessage() }}</p>
+                </div>
+
+                <!-- Group Information -->
+                <div class="group-info" *ngIf="evaluationGroup">
+                    <div class="info-item">
+                        <span class="label">Nome:</span>
+                        <span class="value">{{ evaluationGroup.name }}</span>
+                    </div>
+                    <div class="info-item" *ngIf="evaluationGroup.description">
+                        <span class="label">Descrição:</span>
+                        <span class="value">{{ evaluationGroup.description }}</span>
+                    </div>
+                    <div class="info-item" *ngIf="evaluationGroup.criteriaGroup">
+                        <span class="label">Grupo de critérios:</span>
+                        <span class="value">{{ evaluationGroup.criteriaGroup.name }}</span>
+                    </div>
+                </div>
+
+                <!-- Warning Box -->
+                <div class="warning-box">
+                    <div class="warning-icon">
+                        <i class="icon-warning">⚠️</i>
+                    </div>
+                    <div class="warning-content">
+                        <h4>Atenção!</h4>
+                        <ul>
+                            <li>Esta ação é <strong>irreversível</strong></li>
+                            <li>Todas as <strong>avaliações de projetos</strong> deste grupo serão excluídas</li>
+                            <li>Os <strong>dados não poderão ser recuperados</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <div class="modal-actions">
+                <button
+                    class="btn-outline"
+                    (click)="onClose()"
+                    [disabled]="isDeleting">
+                    Cancelar
+                </button>
+                <button
+                    class="btn-danger"
+                    (click)="onDelete()"
+                    [disabled]="isDeleteButtonDisabled || isDeleting">
+                    <span *ngIf="!isDeleting">
+                        <i class="icon-trash">🗑️</i>
+                        Excluir definitivamente
+                    </span>
+                    <span *ngIf="isDeleting">
+                        <i class="icon-loading">⏳</i>
+                        Excluindo...
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

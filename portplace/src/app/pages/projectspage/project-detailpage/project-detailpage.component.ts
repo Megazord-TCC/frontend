@@ -93,11 +93,11 @@ export class ProjectDetailpageComponent implements OnInit {
     { id: '3', name: 'Nome do objetivo 3' }
   ];
 
-  evaluations: Evaluation[] = [
-    { id: '1', name: 'Nome do critério 1', weight: 30, value: 700 },
-    { id: '2', name: 'Nome do critério 2', weight: 20, value: 700 },
-    { id: '3', name: 'Nome do critério 3', weight: 50, value: 700 }
-  ];
+  // evaluations: Evaluation[] = [
+  //   { id: 1, name: 'Nome do critério 1', weight: 30, value: 700 },
+  //   { id: 2, name: 'Nome do critério 2', weight: 20, value: 700 },
+  //   { id: 3, name: 'Nome do critério 3', weight: 50, value: 700 }
+  // ];
   newProject: Project = {
     name: '',
     description: '',

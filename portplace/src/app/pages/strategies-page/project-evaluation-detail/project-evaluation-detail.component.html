@@ -1,0 +1,153 @@
+<div class="strategy-detail-layout">
+    <div class="strategy-detail-content">
+        <!-- Breadcrumb Navigation -->
+        <div class="breadcrumb">
+            <span (click)="goToHomePage()" class="breadcrumb-link">Início</span>
+            <span class="separator">></span>
+            <span (click)="goToStrategiesPage()" class="breadcrumb-link">Estratégias</span>
+            <span class="separator">></span>
+            <span (click)="goToStrategyPage()" class="breadcrumb-link">Estratégia 2024</span>
+            <span class="separator">></span>
+            <span (click)="goBack()" class="breadcrumb-link">{{evaluationGroup?.name}}</span>
+            <span class="separator">></span>
+            <span class="current">{{project?.name}}</span>
+        </div>
+
+        <!-- Page Header -->
+        <div class="strategy-header">
+            <div class="header-top">
+                <button class="back-btn" (click)="goBack()">
+                    <app-svg-icon class="nav-icon" [path]="'assets/icon/voltar_vetor.svg'" [size]="18">
+                    </app-svg-icon>
+                </button>
+                <h1>{{project?.name}}</h1>
+            </div>
+            <p class="strategy-description">Descrição da avaliação do projeto {{project?.name}}.</p>
+
+            <!-- Action Buttons -->
+            <div class="action-header">
+                <div class="action-buttons">
+                    <button class="action-btn">
+                        <i class="icon-edit">✏️</i>
+                        Editar
+                    </button>
+                    <button class="action-btn delete">
+                        <i class="icon-delete">🗑️</i>
+                        Excluir
+                    </button>
+                </div>
+
+                <div class="last-update">
+                    <i class="icon-clock">🕒</i>
+                    Última alteração realizada por Carlos Krefer em {{project?.lastModifiedDate | date: 'dd/MM/yyyy HH:mm'}}.
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="tabs-container">
+            <div class="tab-content">
+                <div class="tab-panel">
+                    <!-- Section Header -->
+                    <h3>Avaliação do projeto</h3>
+                    <p class="tab-description">
+                        Avalie este projeto em relação aos critérios do grupo <b>{{evaluationGroup?.criteriaGroup?.name}}</b>.
+                    </p>
+
+                    <!-- Action Bar -->
+                    <div class="actions-right">
+                        <button class="btn-primary evaluation-btn" (click)="openEvaluationModal()">
+                            <i class="icon-star">⭐</i>
+                            Avaliar
+                        </button>
+                        <div class="search-container">
+                            <app-svg-icon class="nav-icon" [path]="'assets/icon/search_vetor.svg'" [size]="18">
+                            </app-svg-icon>
+                            <input type="text" placeholder="Buscar em todas colunas">
+                        </div>
+                    </div>
+
+                    <!-- Criteria Evaluation Table -->
+                    <app-card class="table-card">
+                        <div class="table-container">
+                            <table class="objectives-table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <div class="header-cell">
+                                                Nome do critério
+                                                <i class="icon-sort">↕️</i>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="header-cell">
+                                                Nota atribuída (0 a 1000)
+                                                <i class="icon-sort">↕️</i>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="header-cell">
+                                                Peso do critério
+                                                <i class="icon-sort">↕️</i>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let criterion of criteriaEvaluations" class="table-row">
+                                        <td>
+                                            <span class="criterion-name">{{criterion.name}}</span>
+                                        </td>
+                                        <td class="score-cell">{{criterion.score}}</td>
+                                        <td class="weight-cell">{{formatWeight(criterion.weight)}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </app-card>
+
+                    <!-- Total Score Summary -->
+                    <div class="total-score-card" *ngIf="criteriaEvaluations.length > 0">
+                        <h4>Score Total Ponderado: {{getTotalScore() | number:'1.2-2'}}</h4>
+                        <p class="score-explanation">
+                            Calculado com base nas notas atribuídas e pesos dos critérios
+                        </p>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div class="empty-state" *ngIf="criteriaEvaluations.length === 0">
+                        <p>Nenhum critério encontrado para avaliação.</p>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination" *ngIf="criteriaEvaluations.length > 0">
+                        <p class="pagination-info">
+                            Mostrando 1 a {{criteriaEvaluations.length}} de {{criteriaEvaluations.length}} registros
+                        </p>
+                        <div class="pagination-controls">
+                            <button class="pagination-btn" disabled>
+                                <i class="icon-chevron-left">‹</i>
+                            </button>
+                            <button class="pagination-btn active">1</button>
+                            <button class="pagination-btn" disabled>
+                                <i class="icon-chevron-right">›</i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Evaluation Modal - CORRIGIDO -->
+    <app-project-criteria-evaluation-modal
+        *ngIf="showEvaluationModal"
+        [isVisible]="showEvaluationModal"
+        [project]="project"
+        [criteriaEvaluations]="criteriaEvaluations"
+        [strategyId]="strategyId"
+        [evaluationGroupId]="evaluationGroupId"
+        (close)="closeEvaluationModal()"
+        (updated)="onEvaluationUpdated()">
+    </app-project-criteria-evaluation-modal>
+</div>

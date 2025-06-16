@@ -2,9 +2,9 @@ export interface Project {
   id?: number;
   name: string;
   description: string;
-  portfolio?:string | undefined; // ou number se preferir trabalhar com IDs
-  startDate?: string; // ou Date se preferir trabalhar com objetos Date
-  endDate?: string;   // ou Date se preferir trabalhar com objetos Date
+  portfolio?: string | undefined;
+  startDate?: string;
+  endDate?: string;
   status: ProjectStatusEnum;
   projectManager?: number;
   earnedValue?: number;
@@ -12,6 +12,9 @@ export interface Project {
   actualCost?: number;
   budget?: number;
   payback?: number;
+  disable?: boolean;
+  createdAt?: string;
+  lastModifiedAt?: string;
 }
 
 export enum ProjectStatusEnum {
@@ -22,10 +25,20 @@ export enum ProjectStatusEnum {
 }
 
 export interface Evaluation {
-  id: string;
+  id: number;
+  projectId: number;
+  criterionId: number;
+  ahpId: number;
+  score: number;
+  createdAt?: string;
+  lastModifiedAt?: string;
+}
+
+export interface ProjectRanking {
+  projectId: number;
   name: string;
-  weight: number;
-  value: number;
+  position: number;
+  totalScore: number;
 }
 
 export interface Indicator {
@@ -34,7 +47,6 @@ export interface Indicator {
   value: string;
   lastUpdate: string;
 }
-
 
 export interface Objective {
   id: string
@@ -45,6 +57,7 @@ export interface Objective {
   status: "ATIVADO" | "CANCELADO"
   statusColor: "green" | "gray"
 }
+
 export interface Objectives {
   id: string;
   name: string;
@@ -57,7 +70,7 @@ export interface FormField {
   value: string;
   required: boolean;
   placeholder?: string;
-  rows?: number; // Para textarea
+  rows?: number;
   hasError?: boolean;
   errorMessage?: string;
 }
@@ -70,9 +83,17 @@ export interface FormModalConfig {
 }
 
 export interface EvaluationGroup {
-  id: string
-  name: string
-  criteriaGroup: string
+  id: number;
+  name: string;
+  description?: string;
+  criteriaGroupId: number;
+  disabled?: boolean;
+  createdAt?: string;
+  lastModifiedAt?: string;
+}
+
+export interface EvaluationGroupView extends EvaluationGroup {
+  criteriaGroup?: CriteriaGroup;
 }
 
 export interface Scenario {
@@ -97,18 +118,18 @@ export interface CriteriaGroup {
   criteria?: Criterion[];
   criteriaComparisons?: CriteriaComparison[];
 }
+
 export interface Criterion {
   id: number;
   name: string;
   description?: string;
-  criteriaGroupId?: number;
-  weight?: number;
+  criteriaGroupId: number;
+  weight: number;
   disabled?: boolean;
   lastModifiedAt?: Date;
   lastModifiedBy?: User;
   createdAt?: Date;
 }
-
 
 export interface Strategy {
   id: number;
@@ -146,7 +167,8 @@ export enum ImportanceScale {
   MORE_IMPORTANT = 'MORE_IMPORTANT',
   EQUALLY_IMPORTANT = 'EQUALLY_IMPORTANT',
   LESS_IMPORTANT = 'LESS_IMPORTANT',
-  MUCH_LESS_IMPORTANT = 'MUCH_LESS_IMPORTANT'
+  MUCH_LESS_IMPORTANT = 'MUCH_LESS_IMPORTANT',
+  EXTREMELY_LESS_IMPORTANT = 'EXTREMELY_LESS_IMPORTANT',
 }
 
 export const ImportanceScaleValues = {
@@ -157,6 +179,7 @@ export const ImportanceScaleValues = {
     [ImportanceScale.LESS_IMPORTANT]: { value: 1.0/3.0, reciprocal: 3.0 },
     [ImportanceScale.MUCH_LESS_IMPORTANT]: { value: 1.0/6.0, reciprocal: 6.0 }
 };
+
 export enum RoleEnum {
     PMO = 'PMO',
     PMO_ADM = 'PMO_ADM',

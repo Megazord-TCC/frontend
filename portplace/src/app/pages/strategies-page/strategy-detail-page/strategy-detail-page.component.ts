@@ -156,16 +156,7 @@ export class StrategyDetailPageComponent implements OnInit{
 
   */
   evaluationGroups: EvaluationGroup[] = [
-    {
-      id: "1",
-      name: "Avaliação 2",
-      criteriaGroup: "Aumentar lucro V2",
-    },
-    {
-      id: "2",
-      name: "Avaliação 1",
-      criteriaGroup: "Aumentar lucro V2",
-    },
+
   ]
 
   scenarios: Scenario[] = [
@@ -470,8 +461,7 @@ export class StrategyDetailPageComponent implements OnInit{
     if (this.evaluationSearchTerm) {
       filtered = filtered.filter(
         (evaluation) =>
-          evaluation.name.toLowerCase().includes(this.evaluationSearchTerm.toLowerCase()) ||
-          evaluation.criteriaGroup.toLowerCase().includes(this.evaluationSearchTerm.toLowerCase()),
+          evaluation.name.toLowerCase().includes(this.evaluationSearchTerm.toLowerCase()) 
       )
     }
 

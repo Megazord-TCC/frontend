@@ -46,7 +46,7 @@ export class CriterioService {
 
   // DELETAR CRITÉRIO
   deleteCriterio(criterioId: number, estrategiaId: number, groupId: number): Observable<void> {
-    const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${groupId}/criteria/${criterioId}`;
+    const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${groupId}/criteria/${criterioId}/hard-delete`;
     return this.http.delete<void>(url, { headers: this.getHeaders() });
   }
 }

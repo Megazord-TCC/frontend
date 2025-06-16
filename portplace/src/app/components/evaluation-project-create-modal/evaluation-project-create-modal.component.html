@@ -1,0 +1,47 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)" *ngIf="isVisible">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header">
+            <h2>Cadastrar avaliação de projeto</h2>
+            <button class="close-btn" (click)="onClose()">
+                <i class="icon-x">✕</i>
+            </button>
+        </div>
+        <!-- Body -->
+        <div class="modal-body">
+            <!-- Validation Message -->
+            <div *ngIf="errorMessage" class="validation-error">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>{{ errorMessage }}</span>
+            </div>
+            <!-- Form Fields -->
+            <div class="form-fields" [ngClass]="{'disabled': isSubmitButtonDisabled}">
+                <div class="form-group">
+                    <label>Projeto a ser avaliado<span class="required-asterisk">*</span></label>
+                    <select [(ngModel)]="inputProjectSelectedId" [disabled]="isSubmitButtonDisabled">
+                        <option value="">Projeto a ser avaliado</option>
+                        <option *ngFor="let project of inputProjectsOptions"
+                            [ngValue]="project.id ? project.id.toString() : ''">
+                            {{ project.name }}
+                        </option>
+                    </select>
+                    <div class="info-text" *ngIf="!inputProjectSelectedId">
+                        Neste momento são listados projetos não finalizados e no forem vinculados ao grupo de avaliações atual.
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <textarea [(ngModel)]="inputDescription" [disabled]="isSubmitButtonDisabled"
+                              placeholder="Descrição sobre a avaliação"></textarea>
+                </div>
+            </div>
+        </div>
+        <!-- Footer -->
+        <div class="modal-footer">
+            <div class="modal-actions">
+                <button class="btn-outline" (click)="onClose()">Cancelar</button>
+                <button class="btn-primary" (click)="onSave()" [disabled]="isSubmitButtonDisabled">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>

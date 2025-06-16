@@ -24,18 +24,18 @@
             <p class="strategy-description">{{evaluationGroup?.description}}</p>
             <div class="action-header">
                 <div class="action-buttons">
-                    <button class="action-btn" (click)="emptyMethod()">
-                        <i class="icon-edit"></i>
+                    <button class="action-btn" (click)="openEditModal()">
+                        <i class="icon-edit">✏️</i>
                         Editar
                     </button>
-                    <button class="action-btn delete" (click)="emptyMethod()">
-                        <i class="icon-delete"></i>
+                    <button class="action-btn delete" (click)="openDeleteModal()">
+                        <i class="icon-delete">🗑️</i>
                         Excluir
                     </button>
                 </div>
 
                 <div class="last-update">
-                    <i class="icon-clock"></i>
+                    <i class="icon-clock">🕒</i>
                     Última alteração realizada por Carlos Krefer em {{evaluationGroup?.lastModifiedAt | date: 'dd/MM/yyyy HH:mm'}}.
                 </div>
             </div>
@@ -55,11 +55,10 @@
                             Cadastrar
                         </button>
                         <div class="search-container">
-
                             <app-svg-icon class="nav-icon" [path]="'assets/icon/search_vetor.svg'" [size]="18">
                             </app-svg-icon>
                             <input type="text" placeholder="Buscar pelo nome do projeto" [(ngModel)]="searchTerm"
-                                (input)="emptyMethod()">
+                                (input)="onSearchChange()">
                         </div>
                     </div>
 
@@ -89,7 +88,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let projectRanking of projectRankings" class="table-row">
+                                    <tr *ngFor="let projectRanking of filteredProjectRankings" class="table-row">
                                         <td>
                                             <button class="objective-link" (click)="openEvaluationModal(projectRanking)">
                                                 {{projectRanking.name}}
@@ -104,7 +103,7 @@
                     </app-card>
 
                     <!-- Pagination -->
-                    <div class="pagination">
+                    <div class="pagination" *ngIf="filteredProjectRankings.length > 0">
                         <p class="pagination-info">Mostrando 1 a {{filteredProjectRankings.length}} de
                             {{filteredProjectRankings.length}} registros</p>
                         <div class="pagination-controls">
@@ -117,11 +116,38 @@
                             </button>
                         </div>
                     </div>
+
+                    <!-- Empty State -->
+                    <div class="empty-state" *ngIf="filteredProjectRankings.length === 0">
+                        <p>Nenhum projeto avaliado encontrado.</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- <app-form-modal-component [isVisible]="showCreateModal" [config]="createProjectConfig" (close)="closeCreateModal()"
-        (save)="onSaveObjective($event)" (cancel)="closeCreateModal()">
-    </app-form-modal-component> -->
+
+    <!-- Modal de Edição -->
+    <app-evaluation-group-edit-modal
+        [isVisible]="showEditModal"
+        [evaluationGroup]="evaluationGroup"
+        (close)="closeEditModal()"
+        (updated)="onEvaluationGroupUpdated()">
+    </app-evaluation-group-edit-modal>
+
+    <!-- Modal de Cadastro de Avaliação de Projeto -->
+    <app-project-evaluation-create-modal
+        [isVisible]="showCreateModal"
+        [evaluationGroup]="evaluationGroup"
+        (close)="closeCreateModal()"
+        (created)="onProjectEvaluationCreated()">
+    </app-project-evaluation-create-modal>
+
+    <!-- Modal de Exclusão -->
+    <app-evaluation-group-delete-modal
+        [isVisible]="showDeleteModal"
+        [evaluationGroup]="evaluationGroup"
+        (close)="closeDeleteModal()"
+        (deleted)="onEvaluationGroupDeleted()">
+    </app-evaluation-group-delete-modal>
+
 </div>
