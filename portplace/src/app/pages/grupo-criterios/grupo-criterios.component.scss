@@ -183,7 +183,7 @@ $blue-color: #3b82f6;
     transition: background-color 0.2s;
 
     &:hover {
-      background-color: darken($primary-color, 10%);
+      border-color: adjust-color($border-color, $lightness: -10%);
     }
   }
 

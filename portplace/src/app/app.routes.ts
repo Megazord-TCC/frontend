@@ -17,7 +17,6 @@ import { EvaluationGroupDetailPageComponent } from './pages/strategies-page/eval
 import { ProjectEvaluationDetailComponent } from './pages/strategies-page/project-evaluation-detail/project-evaluation-detail.component';
 
 export const routes: Routes = [
-
   { path: '', component: LoginComponent },
   { path: 'inicio', component: HomeComponent },
   { path: 'dashboard', component: DashboardComponent },
@@ -34,6 +33,7 @@ export const routes: Routes = [
   { path: 'estrategia/:estrategiaId/grupo-avaliacao/:grupoAvaliacaoId', component: EvaluationGroupDetailPageComponent },
   { path: 'estrategia/:estrategiaId/grupo-avaliacao/:grupoAvaliacaoId/projeto/:projetoId', component: ProjectEvaluationDetailComponent },
 ];
+
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
