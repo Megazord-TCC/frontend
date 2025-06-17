@@ -62,20 +62,7 @@
         </div>
     </app-card>
 
-    <!-- Pagination -->
-    <div class="pagination">
-        <p class="pagination-info">Mostrando 1 a {{filteredEvaluationGroups.length}} de
-            {{filteredEvaluationGroups.length}} registros</p>
-        <div class="pagination-controls">
-            <button class="pagination-btn" disabled>
-                <i class="icon-chevron-left">‹</i>
-            </button>
-            <button class="pagination-btn active">1</button>
-            <button class="pagination-btn" disabled>
-                <i class="icon-chevron-right">›</i>
-            </button>
-        </div>
-    </div>
+   
 </div>
 <app-evaluation-group-create-modal [isVisible]="showCreateModal" (close)="closeCreateModal()"
     (cancel)="closeCreateModal()">
