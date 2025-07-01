@@ -97,19 +97,19 @@ createProjectConfig: FormModalConfig = {
   loadProjects(): void {
     this.loadingProjects = true;
     this.projetoService.getAllProjects()
-      .pipe(retry(5))
-      .subscribe({
-        next: (projects) => {
-          console.log('Projetos carregados:', projects);
-          this.allProjects = projects;
-          this.Projects = projects;
-          this.loadingProjects = false;
-        },
-        error: (err) => {
-          console.error('Erro ao buscar projetos:', err);
-        }
-      });
-    }
+    .pipe(retry(5))
+    .subscribe({
+      next: (projects) => {
+        console.log('Projetos carregados:', projects);
+        this.allProjects = projects;
+        this.Projects = projects;
+        this.loadingProjects = false;
+      },
+      error: (err) => {
+        console.error('Erro ao buscar projetos:', err);
+      }
+    });
+  }
 
   createProject(): void {
     this.projetoService.createProject(this.newProject).subscribe({

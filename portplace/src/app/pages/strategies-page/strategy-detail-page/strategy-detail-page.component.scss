@@ -134,10 +134,13 @@ $blue-color: #3b82f6;
     align-items: center;
     width: 684px;
     height: 44px;
-    background: #e5e5e5; // fundo escuro conforme a imagem
+    background: #e5e5e5;
     border-radius: 0.5rem;
     overflow-x: auto;
     margin-bottom: 1.5rem;
+    padding: 5px; // Padding interno de 5px
+    gap: 4px; // Gap entre os botões
+    box-sizing: border-box; // Para incluir o padding no cálculo da largura
 
     .tab-trigger {
       display: flex;
@@ -145,22 +148,25 @@ $blue-color: #3b82f6;
       gap: 0.5rem;
       background: transparent;
       border: none;
-      padding: 0.5rem 1rem; // padding um pouco menor
+      padding: 0.5rem 1rem;
       cursor: pointer;
       font-size: 0.875rem;
       font-weight: 500;
-      color: #000; // texto preto
+      color: #000;
       white-space: nowrap;
-      border-radius: 0.25rem; // cantos suaves para todos
+      border-radius: 0.25rem;
+      flex: 1; // Para distribuir uniformemente o espaço
+      justify-content: center; // Centralizar conteúdo
 
       &:hover {
         background: rgba(255, 255, 255, 0.3);
+        border-radius: 0.5rem;
       }
 
       &.active {
         background: #ffffff;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); // leve sombra para realce
-        border-radius: 0.5rem; // cantos mais arredondados para destaque
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        border-radius: 0.5rem;
         color: #000;
         height: 34px;
         justify-content: center;
@@ -169,16 +175,21 @@ $blue-color: #3b82f6;
       .tab-number {
         font-weight: 600;
       }
+
+      .nav-icon {
+        display: flex;
+        align-items: center;
+      }
     }
   }
-
 
   .tab-content {
     background: white;
     border: 1px solid #e2e8f0;
     border-radius: 0 0 0.75rem 0.75rem;
     min-height: 400px;
-    .div-loading-projetcts{
+
+    .div-loading-projetcts {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -601,7 +612,7 @@ $blue-color: #3b82f6;
 
   .tabs-list {
     .tab-trigger {
-      padding: 0.75rem 1rem;
+      padding: 0.5rem 0.5rem;
       font-size: 0.75rem;
     }
   }
