@@ -1,17 +1,7 @@
 <div class="strategy-detail-layout">
     <div class="strategy-detail-content">
         <!-- Breadcrumb Navigation -->
-        <div class="breadcrumb">
-            <span (click)="goToHomePage()" class="breadcrumb-link">Início</span>
-            <span class="separator">></span>
-            <span (click)="goToStrategiesPage()" class="breadcrumb-link">Estratégias</span>
-            <span class="separator">></span>
-            <span (click)="goToStrategyPage()" class="breadcrumb-link">Estratégia 2024</span>
-            <span class="separator">></span>
-            <span (click)="goBack()" class="breadcrumb-link">{{evaluationGroup?.name}}</span>
-            <span class="separator">></span>
-            <span class="current">{{project?.name}}</span>
-        </div>
+        <app-breadcrumb></app-breadcrumb>
 
         <!-- Page Header -->
         <div class="strategy-header">

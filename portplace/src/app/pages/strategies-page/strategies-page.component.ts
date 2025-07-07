@@ -1,10 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CardComponent } from '../../components/card/card.component';
 import { FormsModule } from '@angular/forms';
 import { BadgeComponent } from '../../components/badge/badge.component';
 import { SvgIconComponent } from '../../components/svg-icon/svg-icon.component';
+import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
+import { BreadcrumbService } from '../../service/breadcrumb.service';
 interface Strategy {
   id: string;
   name: string;
@@ -20,12 +22,15 @@ interface Strategy {
     CardComponent,
     FormsModule,
     BadgeComponent,
-    SvgIconComponent
+    SvgIconComponent,
+    BreadcrumbComponent
   ],
   templateUrl: './strategies-page.component.html',
   styleUrl: './strategies-page.component.scss'
 })
-export class StrategiesPageComponent implements OnInit{
+export class StrategiesPageComponent implements OnInit {
+  private router = inject(Router);
+  private breadcrumbService = inject(BreadcrumbService);
   strategies: Strategy[] = [
     {
       id: '1',
@@ -40,9 +45,27 @@ export class StrategiesPageComponent implements OnInit{
   searchTerm = '';
   activeFilter = '';
 
-  constructor(private router: Router) {}
-
   ngOnInit(): void {
+    // COMPONENTE PAI: Configurar breadcrumbs base
+    this.breadcrumbService.setBreadcrumbs([
+      {
+        label: 'Início',
+        url: '/inicio',
+        isActive: false
+      },
+      {
+        label: 'Estratégias',
+        url: '/estrategias',
+        isActive: true
+      }
+    ]);
+
+    // COMPONENTE PAI: Remove qualquer breadcrumb filho somente se existir
+    const currentBreadcrumbs = this.breadcrumbService.getCurrentBreadcrumbs();
+    if (currentBreadcrumbs.length > 2) { // Só remove se tiver mais que [Início, Estratégias]
+      this.breadcrumbService.removeChildrenAfter('/estrategias');
+    }
+
     this.filteredStrategies = [...this.strategies];
   }
 

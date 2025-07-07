@@ -1,6 +1,6 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Subscription } from 'rxjs';
 import { CriterioService } from '../../../service/criterio.service';
 import { Criterion, ImportanceScale, CriteriaComparison } from '../../../interface/interfacies';
 import { CommonModule } from '@angular/common';
@@ -11,6 +11,8 @@ import { FormModalComponentComponent } from '../../../components/form-modal-comp
 import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { GrupoCriterioService } from '../../../service/criteria-group-comparations.service';
+import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
+import { BreadcrumbService } from '../../../service/breadcrumb.service';
 
 @Component({
   selector: 'app-criterio',
@@ -20,13 +22,15 @@ import { GrupoCriterioService } from '../../../service/criteria-group-comparatio
     CardComponent,
     BadgeComponent,
     SvgIconComponent,
+    BreadcrumbComponent,
     FormModalComponentComponent,
     NgSelectModule
   ],
   templateUrl: './criterio.component.html',
   styleUrl: './criterio.component.scss'
 })
-export class CriterioComponent implements OnDestroy {
+export class CriterioComponent implements OnInit, OnDestroy {
+  private routeSubscription?: Subscription;
 
   deleteFormConfig: any = {
     title: 'Cancelar grupo de critérios',
@@ -127,33 +131,46 @@ export class CriterioComponent implements OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private criterioService: CriterioService,
-    private criteriaGroupComparationsService: GrupoCriterioService
+    private criteriaGroupComparationsService: GrupoCriterioService,
+    private breadcrumbService: BreadcrumbService
   ) {}
 
   async ngOnInit(): Promise<void> {
     // LIMPAR DADOS ANTERIORES PRIMEIRO
     this.clearComponentData();
 
-    const estrategiaIdParam = this.route.snapshot.paramMap.get('estrategiaId');
-    this.estrategiaId = estrategiaIdParam ? Number(estrategiaIdParam) : 0;
-    const grupoIdParam = this.route.snapshot.paramMap.get('grupoId');
-    this.criteriaGroupId = grupoIdParam ? Number(grupoIdParam) : 0;
-    const criteriaId = this.route.snapshot.paramMap.get('criterioId');
-    this.criteriaId = criteriaId ? Number(criteriaId) : 0;
+    // Escutar mudanças nos parâmetros da rota para recarregar quando voltar
+    this.routeSubscription = this.route.paramMap.subscribe(async params => {
+      const estrategiaIdParam = params.get('estrategiaId');
+      this.estrategiaId = estrategiaIdParam ? Number(estrategiaIdParam) : 0;
+      const grupoIdParam = params.get('grupoId');
+      this.criteriaGroupId = grupoIdParam ? Number(grupoIdParam) : 0;
+      const criteriaId = params.get('criterioId');
+      this.criteriaId = criteriaId ? Number(criteriaId) : 0;
 
-    console.log('🔄 === INICIALIZANDO COMPONENTE ===');
-    console.log('  - Estratégia ID:', this.estrategiaId);
-    console.log('  - Grupo ID:', this.criteriaGroupId);
-    console.log('  - Critério ID:', this.criteriaId);
+      // COMPONENTE NETO: Simplesmente carrega dados e adiciona seu breadcrumb
+      console.log('📍 Componente neto: Critério inicializando/recarregando');
 
-    // Carregar dados em sequência
-    await this.loadCriteria();
-    await this.loadAllGroupCriteria();
-    await this.loadExistingComparisons();
+      console.log('🔄 === INICIALIZANDO/RECARREGANDO COMPONENTE ===');
+      console.log('  - Estratégia ID:', this.estrategiaId);
+      console.log('  - Grupo ID:', this.criteriaGroupId);
+      console.log('  - Critério ID:', this.criteriaId);
+
+      // Carregar dados em sequência
+      await this.loadCriteria();
+      await this.loadAllGroupCriteria();
+      await this.loadExistingComparisons();
+    });
   }
 
   ngOnDestroy(): void {
     console.log('🧹 === DESTRUINDO COMPONENTE ===');
+
+    // Limpar subscription para evitar memory leaks
+    if (this.routeSubscription) {
+      this.routeSubscription.unsubscribe();
+    }
+
     this.clearComponentData();
   }
 
@@ -186,6 +203,13 @@ export class CriterioComponent implements OnDestroy {
       const criterio = await firstValueFrom(this.criterioService.getCriterioById(this.criteriaGroupId, this.criteriaId, this.estrategiaId));
       this.criteria = criterio;
       console.log('Critério carregado:', criterio);
+
+      // COMPONENTE NETO: Adiciona seu breadcrumb ao array do pai
+      this.breadcrumbService.addChildBreadcrumb({
+        label: criterio.name || `Critério ${this.criteriaId}`,
+        url: `/estrategia/${this.estrategiaId}/grupo-criterio/${this.criteriaGroupId}/criterio/${this.criteriaId}`,
+        isActive: true
+      });
     } catch (err) {
       console.error('Erro ao buscar critério:', err);
     } finally {
@@ -566,6 +590,8 @@ export class CriterioComponent implements OnDestroy {
   }
 
   goBack(): void {
+    // Remover o breadcrumb do critério antes de navegar
+    this.breadcrumbService.removeBreadcrumbByUrl(`/estrategia/${this.estrategiaId}/grupo-criterio/${this.criteriaGroupId}/criterio/${this.criteriaId}`);
     this.router.navigate([`/estrategia`, this.estrategiaId, 'grupo-criterio', this.criteriaGroupId]);
   }
 

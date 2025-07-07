@@ -131,13 +131,11 @@ export interface Criterion {
 }
 
 export interface Strategy {
-  id: number;
-  name?: string;
-  description?: string;
-  disabled: boolean;
-  createdAt?: Date;
-  lastModifiedAt?: Date;
-  lastModifiedBy: number;
+  id: string;
+  name: string;
+  activeObjectives: number;
+  status: string;
+  statusColor: string;
 }
 
 export interface CriteriaComparison {
@@ -184,4 +182,10 @@ export enum RoleEnum {
     PMO_ADM = 'PMO_ADM',
     PROJECT_MANAGER = 'PROJECT_MANAGER',
     READER = 'READER'
+}
+
+export interface BreadcrumbItem {
+  label: string;
+  url: string;
+  isActive: boolean;
 }

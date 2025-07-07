@@ -3,13 +3,7 @@
   <div class="strategy-detail-layout">
 
     <div class="strategy-detail-content">
-      <div class="breadcrumb">
-        <span>Início</span>
-        <span class="separator">></span>
-        <span (click)="goBack()" class="breadcrumb-link">Estratégias</span>
-        <span class="separator">></span>
-        <span class="current">{{criteriaGroup?.name}}</span>
-      </div>
+      <app-breadcrumb></app-breadcrumb>
 
     <div class="strategy-header">
       <div class="header-top">
@@ -21,7 +15,7 @@
           </app-svg-icon>
         </button>
         <h1>{{criteriaGroup?.name}}</h1>
-        <app-badge [color]="getStatusColorByDisabled(criteriaGroup!.disabled)">{{getStatusLabelByDisabled(criteriaGroup!.disabled)}}</app-badge>
+        <app-badge *ngIf="criteriaGroup" [color]="getStatusColorByDisabled(criteriaGroup.disabled)">{{getStatusLabelByDisabled(criteriaGroup.disabled)}}</app-badge>
       </div>
       <p class="strategy-description">{{criteriaGroup?.description}}</p>
       <div class="action-header">

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EditPortfolioModalComponent } from '../../../components/edit-portfolio-modal/edit-portfolio-modal.component';
@@ -7,6 +7,8 @@ import { RiskModalComponent } from '../../../components/risk-modal/risk-modal.co
 import { BadgeComponent } from '../../../components/badge/badge.component';
 import { CardComponent } from '../../../components/card/card.component';
 import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.component';
+import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
+import { BreadcrumbService } from '../../../service/breadcrumb.service';
 import { Project, ProjectStatusEnum } from '../../../interface/interfacies';
 import { ProjetoService } from '../../../service/projeto.service';
 import { retry } from 'rxjs';
@@ -59,11 +61,17 @@ interface Category {
     RiskModalComponent,
     CardComponent,
     BadgeComponent,
-    SvgIconComponent
+    SvgIconComponent,
+    BreadcrumbComponent
   ],
   standalone: true
 })
 export class PortfolioDetailComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private breadcrumbService = inject(BreadcrumbService);
+  private projetoService = inject(ProjetoService);
+
   portfolioId!: number;
   portfolio!: Portfolio;
   activeTab = 'resumo';
@@ -159,18 +167,27 @@ export class PortfolioDetailComponent implements OnInit {
     }
   ];
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private projetoService: ProjetoService
-  ) {}
-
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.portfolioId = +params['id'];
       this.loadPortfolio();
+      this.setupBreadcrumbs();
     });
     this.loadProjects();
+  }
+
+  private setupBreadcrumbs(): void {
+    // Este é um componente filho, apenas adiciona seu breadcrumb
+    // Os breadcrumbs base já foram definidos pelo componente pai (/portfolios)
+
+    // Adicionar o breadcrumb do portfólio atual após carregar
+    if (this.portfolio) {
+      this.breadcrumbService.addChildBreadcrumb({
+        label: this.portfolio.name || `Portfólio ${this.portfolioId}`,
+        url: `/portfolio/${this.portfolioId}`,
+        isActive: true
+      });
+    }
   }
   loadProjects(): void {
     this.loadingProjects = true;
@@ -196,6 +213,17 @@ export class PortfolioDetailComponent implements OnInit {
       status: 'EM ANDAMENTO',
       lastUpdate: 'Última alteração realizada por Carlos Krefer em 01/01/2025 13:30'
     };
+
+    // Atualizar breadcrumb após carregar os dados
+    this.updateBreadcrumbWithPortfolioName();
+  }
+
+  private updateBreadcrumbWithPortfolioName(): void {
+    this.breadcrumbService.addChildBreadcrumb({
+      label: this.portfolio.name || `Portfólio ${this.portfolioId}`,
+      url: `/portfolio/${this.portfolioId}`,
+      isActive: true
+    });
   }
   onSearchChange(): void {
     this.applyFilters();

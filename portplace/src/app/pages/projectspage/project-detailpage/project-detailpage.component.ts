@@ -8,6 +8,8 @@ import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.componen
 import { ProjetoService } from '../../../service/projeto.service';
 import { retry } from 'rxjs';
 import { FormModalComponentComponent } from '../../../components/form-modal-component/form-modal-component.component';
+import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
+import { BreadcrumbService } from '../../../service/breadcrumb.service';
 
 
 
@@ -18,6 +20,7 @@ import { FormModalComponentComponent } from '../../../components/form-modal-comp
     FormsModule,
     BadgeComponent,
     SvgIconComponent,
+    BreadcrumbComponent,
     FormModalComponentComponent
   ],
   templateUrl: './project-detailpage.component.html',
@@ -142,16 +145,19 @@ export class ProjectDetailpageComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private projetoService: ProjetoService
+    private projetoService: ProjetoService,
+    private breadcrumbService: BreadcrumbService
   ) {}
 
   ngOnInit(): void {
+    // Este é um componente filho, não precisa configurar breadcrumbs base
+    // Os breadcrumbs base já foram definidos pelo componente pai (/projetos)
+
     const projectIdParam = this.route.snapshot.paramMap.get('id');
     const projectId = projectIdParam ? Number(projectIdParam) : null;
     if (projectId) {
       this.loadProjectDetails(projectId);
     }
-
   }
 
 
@@ -163,6 +169,12 @@ export class ProjectDetailpageComponent implements OnInit {
         next: (project) => {
           console.log('Detalhes do projeto:', project);
           this.project = project;
+          // Adicionar breadcrumb com o nome do projeto
+          this.breadcrumbService.addChildBreadcrumb({
+            label: project.name || `Projeto ${projectId}`,
+            url: `/projetos/${projectId}`,
+            isActive: true
+          });
         },
         error: (err) => {
           console.error('Erro ao buscar detalhes do projeto:', err);

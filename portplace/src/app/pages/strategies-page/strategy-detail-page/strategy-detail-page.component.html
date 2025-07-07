@@ -2,13 +2,7 @@
 
   <div class="strategy-detail-content">
     <!-- Breadcrumb -->
-    <div class="breadcrumb">
-      <span>Início</span>
-      <span class="separator">></span>
-      <span (click)="goBack()" class="breadcrumb-link">Estratégias</span>
-      <span class="separator">></span>
-      <span class="current">{{strategy?.name}}</span>
-    </div>
+    <app-breadcrumb></app-breadcrumb>
 
     <!-- Header -->
     <div class="strategy-header">
@@ -27,7 +21,7 @@
       <div class="action-header">
         <div class="action-buttons">
           <button class="action-btn" (click)="editStrategy()">
-            
+
             Editar
           </button>
           <button class="action-btn cancel" (click)="cancelStrategy()">
