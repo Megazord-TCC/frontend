@@ -1,10 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CardComponent } from '../../components/card/card.component';
 import { FormsModule } from '@angular/forms';
 import { BadgeComponent } from '../../components/badge/badge.component';
 import { ProgressComponent } from '../../components/progress/progress.component';
 import { SvgIconComponent } from '../../components/svg-icon/svg-icon.component';
+import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
+import { BreadcrumbService } from '../../service/breadcrumb.service';
+import { Router } from '@angular/router';
 
 interface MetricCard {
   title: string;
@@ -34,10 +37,14 @@ interface Risk {
     FormsModule,
     ProgressComponent,
     BadgeComponent,
-    SvgIconComponent
+    SvgIconComponent,
+    BreadcrumbComponent
   ],
 })
 export class DashboardComponent implements OnInit {
+  private breadcrumbService = inject(BreadcrumbService);
+  private router = inject(Router);
+
   hasPortfolio = true;
   expandedSections: string[] = [];
   selectedPortfolio = 'portfolio1';
@@ -86,7 +93,24 @@ export class DashboardComponent implements OnInit {
     { name: 'Nome do objetivo 3', description: 'Descrição do objetivo.' }
   ];
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // Configurar breadcrumbs para Dashboard
+    this.breadcrumbService.setBreadcrumbs([
+      {
+        label: 'Início',
+        url: '/inicio',
+        isActive: false
+      },
+      {
+        label: 'Dashboard',
+        url: '/dashboard',
+        isActive: true
+      }
+    ]);
+
+    // Remover breadcrumbs filhos quando retorna para esta página
+    this.breadcrumbService.removeChildrenAfter('/dashboard');
+  }
 
   toggleSection(section: string): void {
     const index = this.expandedSections.indexOf(section);

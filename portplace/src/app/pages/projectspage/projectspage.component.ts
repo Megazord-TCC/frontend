@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CardComponent } from '../../components/card/card.component';
 import { Router } from '@angular/router';
 import { BadgeComponent } from '../../components/badge/badge.component';
-import { FormField, FormModalConfig, Project, ProjectStatusEnum } from '../../interface/interfacies';
+import { FormField, FormModalConfig, Project, ProjectPageableResponse, ProjectStatusEnum } from '../../interface/interfacies';
 import { SvgIconComponent } from '../../components/svg-icon/svg-icon.component';
+import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
+import { BreadcrumbService } from '../../service/breadcrumb.service';
 import { ProjetoService } from '../../service/projeto.service';
 import { retry } from 'rxjs';
 import { FormModalComponentComponent } from '../../components/form-modal-component/form-modal-component.component';
@@ -18,6 +20,7 @@ import { FormModalComponentComponent } from '../../components/form-modal-compone
     CardComponent,
     BadgeComponent,
     SvgIconComponent,
+    BreadcrumbComponent,
     FormModalComponentComponent
   ],
   templateUrl: './projectspage.component.html',
@@ -87,29 +90,45 @@ createProjectConfig: FormModalConfig = {
 
   constructor(
     private router: Router,
-    private projetoService: ProjetoService
+    private projetoService: ProjetoService,
+    private breadcrumbService: BreadcrumbService
   ) {}
 
   ngOnInit(): void {
+    this.breadcrumbService.setBreadcrumbs([
+      { label: 'Início', url: '/inicio', isActive: false },
+      { label: 'Projetos', url: '/projetos', isActive: true }
+    ]);
+
+    // Remover breadcrumbs filhos quando retorna para esta página
+    this.breadcrumbService.removeChildrenAfter('/projetos');
+
     this.loadProjects();
   }
 
   loadProjects(): void {
     this.loadingProjects = true;
     this.projetoService.getAllProjects()
-      .pipe(retry(5))
-      .subscribe({
-        next: (projects) => {
-          console.log('Projetos carregados:', projects);
-          this.allProjects = projects;
-          this.Projects = projects;
-          this.loadingProjects = false;
-        },
-        error: (err) => {
-          console.error('Erro ao buscar projetos:', err);
-        }
-      });
-    }
+    .pipe(retry(5))
+    .subscribe({
+      next: (response: ProjectPageableResponse) => {
+        console.log('Resposta paginada da API:', response);
+        console.log(`Total de elementos: ${response.totalElements}`);
+        console.log(`Página atual: ${response.number + 1} de ${response.totalPages}`);
+
+        // Extrair projetos da resposta paginada
+        this.allProjects = response.content;
+        this.Projects = response.content;
+        this.loadingProjects = false;
+      },
+      error: (err) => {
+        console.error('Erro ao buscar projetos:', err);
+        this.allProjects = [];
+        this.Projects = [];
+        this.loadingProjects = false;
+      }
+    });
+  }
 
   createProject(): void {
     this.projetoService.createProject(this.newProject).subscribe({

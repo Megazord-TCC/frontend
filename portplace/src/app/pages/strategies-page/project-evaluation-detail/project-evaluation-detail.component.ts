@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BadgeComponent } from '../../../components/badge/badge.component';
@@ -14,9 +14,11 @@ import {
   EvaluationGroupView,
   Project
 } from '../../../interface/carlos-interfaces';
-import { forkJoin, map, firstValueFrom } from 'rxjs';
+import { forkJoin, map, firstValueFrom, Subscription } from 'rxjs';
 import { ProjectCriteriaEvaluationModal } from '../../../components/project-criteria-evaluation-modal/project-criteria-evaluation-modal.component';
 import { Criterion } from '../../../interface/interfacies';
+import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
+import { BreadcrumbService } from '../../../service/breadcrumb.service';
 
 // Interface local para combinar dados de critério com avaliação
 interface CriteriaEvaluation {
@@ -34,18 +36,20 @@ interface CriteriaEvaluation {
     CommonModule,
     FormsModule,
     CardComponent,
-    BadgeComponent,
     SvgIconComponent,
+    BreadcrumbComponent,
     ProjectCriteriaEvaluationModal
   ],
   templateUrl: './project-evaluation-detail.component.html',
   styleUrl: './project-evaluation-detail.component.scss'
 })
-export class ProjectEvaluationDetailComponent implements OnInit {
+export class ProjectEvaluationDetailComponent implements OnInit, OnDestroy {
+  private routeSubscription?: Subscription;
 
   httpClient = inject(HttpClient);
   route = inject(ActivatedRoute);
   router = inject(Router);
+  breadcrumbService = inject(BreadcrumbService);
 
   // Parâmetros da rota
   strategyId = -1;
@@ -63,19 +67,32 @@ export class ProjectEvaluationDetailComponent implements OnInit {
   ngOnInit(): void {
     console.log('🚀 Inicializando ProjectEvaluationDetailComponent');
 
-    // Extrair parâmetros da rota
-    this.strategyId = Number(this.route.snapshot.paramMap.get('estrategiaId'));
-    this.evaluationGroupId = Number(this.route.snapshot.paramMap.get('grupoAvaliacaoId'));
-    this.projectId = Number(this.route.snapshot.paramMap.get('projetoId'));
+    // Escutar mudanças nos parâmetros da rota para recarregar quando voltar
+    this.routeSubscription = this.route.paramMap.subscribe(params => {
+      // Extrair parâmetros da rota
+      this.strategyId = Number(params.get('estrategiaId'));
+      this.evaluationGroupId = Number(params.get('grupoAvaliacaoId'));
+      this.projectId = Number(params.get('projetoId'));
 
-    console.log('📊 Parâmetros da rota:', {
-      strategyId: this.strategyId,
-      evaluationGroupId: this.evaluationGroupId,
-      projectId: this.projectId
+      // COMPONENTE NETO: Recarregar dados quando parâmetros mudam
+      console.log('📍 Componente neto: Projeto de Avaliação inicializando/recarregando');
+
+      console.log('📊 Parâmetros da rota:', {
+        strategyId: this.strategyId,
+        evaluationGroupId: this.evaluationGroupId,
+        projectId: this.projectId
+      });
+
+      // Carregar todos os dados necessários
+      this.loadData();
     });
+  }
 
-    // Carregar todos os dados necessários
-    this.loadData();
+  ngOnDestroy(): void {
+    // Limpar subscription para evitar memory leaks
+    if (this.routeSubscription) {
+      this.routeSubscription.unsubscribe();
+    }
   }
 
   loadData(): void {
@@ -93,6 +110,13 @@ export class ProjectEvaluationDetailComponent implements OnInit {
       next: (project) => {
         console.log('✅ Projeto carregado:', project);
         this.project = project;
+
+        // Usar addChildBreadcrumb para adicionar breadcrumb filho
+        this.breadcrumbService.addChildBreadcrumb({
+          label: project.name || `Projeto ${this.projectId}`,
+          url: `/estrategia/${this.strategyId}/grupo-avaliacao/${this.evaluationGroupId}/projeto/${this.projectId}`,
+          isActive: true
+        });
       },
       error: (error) => {
         console.error('❌ Erro ao carregar projeto:', error);
@@ -204,6 +228,8 @@ export class ProjectEvaluationDetailComponent implements OnInit {
   }
 
   goBack(): void {
+    // Remover o breadcrumb do projeto antes de navegar
+    this.breadcrumbService.removeBreadcrumbByUrl(`/estrategia/${this.strategyId}/grupo-avaliacao/${this.evaluationGroupId}/projeto/${this.projectId}`);
     this.router.navigateByUrl(`estrategia/${this.strategyId}/grupo-avaliacao/${this.evaluationGroupId}`);
   }
 

@@ -17,6 +17,35 @@ export interface Project {
   lastModifiedAt?: string;
 }
 
+export interface ProjectPageableResponse {
+  content: Project[];
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+    sort: {
+      empty: boolean;
+      unsorted: boolean;
+      sorted: boolean;
+    };
+    offset: number;
+    unpaged: boolean;
+    paged: boolean;
+  };
+  last: boolean;
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  sort: {
+    empty: boolean;
+    unsorted: boolean;
+    sorted: boolean;
+  };
+  first: boolean;
+  numberOfElements: number;
+  empty: boolean;
+}
+
 export enum ProjectStatusEnum {
   CANDIDATE = 'CANDIDATE',
   PLANNING = 'PLANNING',
@@ -131,13 +160,11 @@ export interface Criterion {
 }
 
 export interface Strategy {
-  id: number;
-  name?: string;
-  description?: string;
-  disabled: boolean;
-  createdAt?: Date;
-  lastModifiedAt?: Date;
-  lastModifiedBy: number;
+  id: string;
+  name: string;
+  activeObjectives: number;
+  status: string;
+  statusColor: string;
 }
 
 export interface CriteriaComparison {
@@ -184,4 +211,10 @@ export enum RoleEnum {
     PMO_ADM = 'PMO_ADM',
     PROJECT_MANAGER = 'PROJECT_MANAGER',
     READER = 'READER'
+}
+
+export interface BreadcrumbItem {
+  label: string;
+  url: string;
+  isActive: boolean;
 }

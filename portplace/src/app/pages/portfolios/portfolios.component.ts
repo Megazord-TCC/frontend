@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BadgeComponent } from '../../components/badge/badge.component';
 import { CardComponent } from '../../components/card/card.component';
 import { PortfolioModalComponent } from '../../components/portfolio-modal/portfolio-modal.component';
 import { SvgIconComponent } from '../../components/svg-icon/svg-icon.component';
+import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
+import { BreadcrumbService } from '../../service/breadcrumb.service';
 type BadgeColor = 'gray' | 'green' | 'blue' | 'red' | 'yellow';
 interface Portfolio {
   id: number;
@@ -28,10 +30,14 @@ interface Portfolio {
     CardComponent,
     BadgeComponent,
     PortfolioModalComponent,
-    SvgIconComponent
+    SvgIconComponent,
+    BreadcrumbComponent
   ],
 })
 export class PortfoliosComponent implements OnInit {
+  private router = inject(Router);
+  private breadcrumbService = inject(BreadcrumbService);
+
   showModal = false;
   activeFilter = 'all';
   searchTerm = '';
@@ -59,9 +65,24 @@ export class PortfoliosComponent implements OnInit {
     }
   ];
 
-  constructor(private router: Router) {}
+  ngOnInit(): void {
+    // COMPONENTE PAI: Configurar breadcrumbs base e remover filhos
+    this.breadcrumbService.setBreadcrumbs([
+      {
+        label: 'Início',
+        url: '/inicio',
+        isActive: false
+      },
+      {
+        label: 'Portfólios',
+        url: '/portfolios',
+        isActive: true
+      }
+    ]);
 
-  ngOnInit(): void {}
+    // COMPONENTE PAI: Remove qualquer breadcrumb filho que possa existir
+    this.breadcrumbService.removeChildrenAfter('/portfolios');
+  }
 
   onFilterChange(filter: string): void {
     this.activeFilter = filter;

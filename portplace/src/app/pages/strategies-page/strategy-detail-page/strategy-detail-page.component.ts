@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BadgeComponent } from '../../../components/badge/badge.component';
@@ -8,8 +8,10 @@ import { CriteriaGroup, EvaluationGroup, Objective, Scenario,FormField, Criterio
 import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.component';
 import { FormModalComponentComponent } from '../../../components/form-modal-component/form-modal-component.component';
 import { CriteriaGroupService } from '../../../service/criteria-group.service';
-import { firstValueFrom, retry } from 'rxjs';
+import { firstValueFrom, retry, Subscription } from 'rxjs';
 import { EvaluationGroupsTabComponent } from '../../../components/evaluation-groups-tab/evaluation-groups-tab.component';
+import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
+import { BreadcrumbService } from '../../../service/breadcrumb.service';
 
 
 @Component({
@@ -20,16 +22,18 @@ import { EvaluationGroupsTabComponent } from '../../../components/evaluation-gro
     CardComponent,
     BadgeComponent,
     SvgIconComponent,
+    BreadcrumbComponent,
     FormModalComponentComponent,
     EvaluationGroupsTabComponent
   ],
   templateUrl: './strategy-detail-page.component.html',
   styleUrl: './strategy-detail-page.component.scss'
 })
-export class StrategyDetailPageComponent implements OnInit{
+export class StrategyDetailPageComponent implements OnInit, OnDestroy {
+  private routeSubscription?: Subscription;
   strategy: any = {
     id: '11',
-    name: 'Estratégia 2025',
+    name: 'Estratégia 2024', // Mudei para 2024 que é o que você mencionou
     status: 'ATIVO',
     description: 'Descrição da estratégia.',
     lastUpdate: 'Última alteração realizada por Carlos Bentes em 01/01/2025 14:30'
@@ -252,18 +256,45 @@ export class StrategyDetailPageComponent implements OnInit{
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private criterioService: CriteriaGroupService
+    private criterioService: CriteriaGroupService,
+    private breadcrumbService: BreadcrumbService
   ) {}
 
   ngOnInit(): void {
-    const idParam = this.route.snapshot.paramMap.get('estrategiaId');
-    this.estrategiaId = idParam ? Number(idParam) : 0;
-    this.filteredObjectives = [...this.objectives];
-    //this.filteredCriteriaGroups = [...this.criteriaGroups];
-    this.loadGruopCriteria();
-    this.filteredEvaluationGroups = [...this.evaluationGroups];
-    this.filteredScenarios = [...this.scenarios];
+    // Escutar mudanças nos parâmetros da rota para recarregar quando voltar
+    this.routeSubscription = this.route.paramMap.subscribe(params => {
+      const estrategiaIdParam = params.get('estrategiaId');
+      this.estrategiaId = estrategiaIdParam ? Number(estrategiaIdParam) : 0;
 
+      // COMPONENTE PAI: Configurar breadcrumbs base
+      console.log('📍 Componente pai: Strategy Detail recarregando');
+
+      // COMPONENTE PAI: Constrói breadcrumbs base UMA VEZ
+      this.breadcrumbService.setBreadcrumbs([
+        { label: 'Início', url: '/inicio', isActive: false },
+        { label: 'Estratégias', url: '/estrategias', isActive: false },
+        { label: this.strategy?.name || 'Estratégia 2024', url: `/estrategia/${this.estrategiaId}`, isActive: true }
+      ]);
+
+      // COMPONENTE PAI: Remove breadcrumbs filhos quando volta ao foco somente se necessário
+      const currentBreadcrumbs = this.breadcrumbService.getCurrentBreadcrumbs();
+      if (currentBreadcrumbs.length > 3) { // Só remove se tiver mais que [Início, Estratégias, Estratégia Atual]
+        this.breadcrumbService.removeChildrenAfter(`/estrategia/${this.estrategiaId}`);
+      }
+
+      // Carregar dados
+      this.filteredObjectives = [...this.objectives];
+      this.loadGruopCriteria();
+      this.filteredEvaluationGroups = [...this.evaluationGroups];
+      this.filteredScenarios = [...this.scenarios];
+    });
+  }
+
+  ngOnDestroy(): void {
+    // Limpar subscription para evitar memory leaks
+    if (this.routeSubscription) {
+      this.routeSubscription.unsubscribe();
+    }
   }
 
   async loadGruopCriteria(): Promise<void> {

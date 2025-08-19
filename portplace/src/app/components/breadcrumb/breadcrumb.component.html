@@ -1,0 +1,14 @@
+<nav class="breadcrumb-container" *ngIf="breadcrumbs.length > 0">
+  <ng-container *ngFor="let breadcrumb of breadcrumbs; let i = index; let last = last">
+    <ng-container *ngIf="!breadcrumb.isActive">
+      <a (click)="onBreadcrumbClick(i)" class="breadcrumb-link" [class.clickable]="!breadcrumb.isActive">
+        {{ breadcrumb.label }}
+      </a>
+      <mat-icon class="separator">chevron_right</mat-icon>
+    </ng-container>
+    <ng-container *ngIf="breadcrumb.isActive">
+      <span class="current">{{ breadcrumb.label }}</span>
+    </ng-container>
+  </ng-container>
+</nav>
+

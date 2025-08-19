@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 import {
   ChartColumn,
@@ -13,17 +13,25 @@ import {
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SvgIconComponent } from '../../components/svg-icon/svg-icon.component';
+import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
+import { BreadcrumbService } from '../../service/breadcrumb.service';
 
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule,SvgIconComponent],
+  imports: [CommonModule, SvgIconComponent, BreadcrumbComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent {
-  constructor(public router: Router) {}
+export class HomeComponent implements OnInit {
+  public router = inject(Router);
+  private breadcrumbService = inject(BreadcrumbService);
+
+  ngOnInit(): void {
+    // Inicializar breadcrumbs apenas com "Início"
+    this.breadcrumbService.initializeBreadcrumbs();
+  }
 
    navigationCards = [
     {

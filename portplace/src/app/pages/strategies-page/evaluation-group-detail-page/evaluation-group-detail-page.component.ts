@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BadgeComponent } from '../../../components/badge/badge.component';
@@ -12,8 +12,10 @@ import { ProjectEvaluationCreateModal } from '../../../components/evaluation-pro
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { CriteriaGroup, Evaluation, EvaluationGroup, EvaluationGroupView, ProjectRanking, User } from '../../../interface/carlos-interfaces';
-import { filter, forkJoin, map, switchMap, tap } from 'rxjs';
+import { filter, forkJoin, map, switchMap, tap, Subscription } from 'rxjs';
 import { EvaluationGroupDeleteModal } from '../../../components/evaluation-group-delete-modal/evaluation-group-delete-modal.component';
+import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
+import { BreadcrumbService } from '../../../service/breadcrumb.service';
 
 @Component({
   selector: 'app-evaluation-group-detail-page',
@@ -27,16 +29,19 @@ import { EvaluationGroupDeleteModal } from '../../../components/evaluation-group
     EvaluationGroupsTabComponent,
     EvaluationGroupEditModal,
     ProjectEvaluationCreateModal,
-    EvaluationGroupDeleteModal
+    EvaluationGroupDeleteModal,
+    BreadcrumbComponent
   ],
   templateUrl: './evaluation-group-detail-page.component.html',
   styleUrl: './evaluation-group-detail-page.component.scss'
 })
-export class EvaluationGroupDetailPageComponent {
+export class EvaluationGroupDetailPageComponent implements OnInit, OnDestroy {
+  private routeSubscription?: Subscription;
 
   httpClient = inject(HttpClient);
   route = inject(ActivatedRoute);
   router = inject(Router);
+  breadcrumbService = inject(BreadcrumbService);
 
   strategyId = -1;
   evaluationGroupId = -1;
@@ -53,10 +58,30 @@ export class EvaluationGroupDetailPageComponent {
   showDeleteModal = false;
 
   ngOnInit(): void {
-    this.strategyId = Number(this.route.snapshot.paramMap.get('estrategiaId'));
-    this.evaluationGroupId = Number(this.route.snapshot.paramMap.get('grupoAvaliacaoId'));
-    this.setCurrentEvaluationGroupByHttpRequest();
-    this.setProjectRankingsByHttpRequest();
+    // Escutar mudanças nos parâmetros da rota para recarregar quando voltar
+    this.routeSubscription = this.route.paramMap.subscribe(params => {
+      this.strategyId = Number(params.get('estrategiaId'));
+      this.evaluationGroupId = Number(params.get('grupoAvaliacaoId'));
+
+      // COMPONENTE FILHO: Recarregar dados quando parâmetros mudam
+      console.log('📍 Componente filho: Grupo de Avaliação inicializando/recarregando');
+
+      this.setCurrentEvaluationGroupByHttpRequest();
+      this.setProjectRankingsByHttpRequest();
+    });
+  }
+
+  ngOnDestroy(): void {
+    // Limpar subscription para evitar memory leaks
+    if (this.routeSubscription) {
+      this.routeSubscription.unsubscribe();
+    }
+  }
+
+  private setupBreadcrumbs(): void {
+    // Usar buildChildBreadcrumbs para construir baseado no pai atual
+    // O breadcrumb do grupo será adicionado quando os dados estiverem carregados
+    console.log('📍 Configurando breadcrumbs para grupo de avaliação');
   }
 
   setCurrentEvaluationGroupByHttpRequest() {
@@ -71,8 +96,18 @@ export class EvaluationGroupDetailPageComponent {
         map(({ evaluationGroups, criteriaGroups }) => this.getManyEvaluationGroupView(evaluationGroups, criteriaGroups)),
         map(evaluationGroups => evaluationGroups.find(evaluationGroup => evaluationGroup.id == this.evaluationGroupId))
       )
-      .subscribe(evaluationGroup => this.evaluationGroup = evaluationGroup);
+      .subscribe(evaluationGroup => {
+        this.evaluationGroup = evaluationGroup;
 
+        // Usar addChildBreadcrumb para adicionar breadcrumb filho
+        if (evaluationGroup) {
+          this.breadcrumbService.addChildBreadcrumb({
+            label: evaluationGroup.name,
+            url: `/estrategia/${this.strategyId}/grupo-avaliacao/${this.evaluationGroupId}`,
+            isActive: true
+          });
+        }
+      });
   }
 
   getManyEvaluationGroupView(evaluationGroups: EvaluationGroup[], criteriaGroups: CriteriaGroup[]): EvaluationGroupView[] {
@@ -101,6 +136,8 @@ export class EvaluationGroupDetailPageComponent {
   }
 
   goBack(): void {
+    // Remover o breadcrumb do grupo de avaliação antes de navegar
+    this.breadcrumbService.removeBreadcrumbByUrl(`/estrategia/${this.strategyId}/grupo-avaliacao/${this.evaluationGroupId}`);
     this.router.navigateByUrl(`estrategia/${this.strategyId}`);
   }
 

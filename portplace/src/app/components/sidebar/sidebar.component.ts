@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { SvgIconComponent } from '../svg-icon/svg-icon.component';
+import { BreadcrumbService } from '../../service/breadcrumb.service';
 
 interface MenuItem {
   id: string;
@@ -21,6 +22,9 @@ export class SidebarComponent {
   @Input() currentPage: string = '';
   @Output() pageChange = new EventEmitter<string>();
 
+  private router = inject(Router);
+  private breadcrumbService = inject(BreadcrumbService);
+
   menuItems: MenuItem[] = [
     { id: 'inicio', label: 'Início', icon: 'assets/icon/home_vetor.svg', route: '/inicio' },
     { id: 'dashboard', label: 'Dashboard', icon: 'assets/icon/dashboard_vetor.svg', route: '/dashboard' },
@@ -30,8 +34,6 @@ export class SidebarComponent {
     { id: 'resources', label: 'Recursos', icon: 'assets/icon/recursos_vetor.svg', route: '/recursos' },
     { id: 'users', label: 'Usuários', icon: 'assets/icon/usuarios_vetor.svg', route: '/usuarios' }
   ];
-
-  constructor(private router: Router) {}
   activeNav: string = '';
   isActive(route: string): boolean {
     if (this.router.url === route || this.router.url.startsWith(route + '/')) {
@@ -48,8 +50,38 @@ export class SidebarComponent {
 }
 
   navigate(route: string): void {
-     this.activeNav = route;
+    this.activeNav = route;
+
+    // Configurar breadcrumbs baseado na rota
+    this.setupBreadcrumbsForRoute(route);
+
     this.router.navigate([route]);
+  }
+
+  private setupBreadcrumbsForRoute(route: string): void {
+    // Encontrar o menu item correspondente
+    const menuItem = this.menuItems.find(item => item.route === route);
+
+    if (menuItem) {
+      if (route === '/inicio') {
+        // Para início, apenas inicializar
+        this.breadcrumbService.initializeBreadcrumbs();
+      } else {
+        // Para outras rotas, configurar breadcrumbs
+        this.breadcrumbService.setBreadcrumbs([
+          {
+            label: 'Início',
+            url: '/inicio',
+            isActive: false
+          },
+          {
+            label: menuItem.label,
+            url: route,
+            isActive: true
+          }
+        ]);
+      }
+    }
   }
 
   closeSidebar(): void {

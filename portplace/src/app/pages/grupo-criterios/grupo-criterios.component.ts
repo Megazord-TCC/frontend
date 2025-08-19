@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BadgeComponent } from '../../components/badge/badge.component';
 import { CardComponent } from '../../components/card/card.component';
@@ -7,9 +7,11 @@ import { FormModalComponentComponent } from '../../components/form-modal-compone
 import { SvgIconComponent } from '../../components/svg-icon/svg-icon.component';
 import { CriteriaComparison, CriteriaGroup, Criterion, ImportanceScale, Objective, RoleEnum, User } from '../../interface/interfacies';
 import { ActivatedRoute, Router } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Subscription } from 'rxjs';
 import { CriterioService } from '../../service/criterio.service';
 import { CriteriaGroupService } from '../../service/criteria-group.service';
+import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
+import { BreadcrumbService } from '../../service/breadcrumb.service';
 
 @Component({
   selector: 'app-grupo-criterios',
@@ -19,12 +21,14 @@ import { CriteriaGroupService } from '../../service/criteria-group.service';
     CardComponent,
     BadgeComponent,
     SvgIconComponent,
+    BreadcrumbComponent,
     FormModalComponentComponent
   ],
   templateUrl: './grupo-criterios.component.html',
   styleUrl: './grupo-criterios.component.scss'
 })
-export class GrupoCriteriosComponent implements OnInit{
+export class GrupoCriteriosComponent implements OnInit, OnDestroy {
+  private routeSubscription?: Subscription;
 
   createFormConfig: any = {
   // Defina aqui a configuração do formulário conforme sua necessidade
@@ -97,16 +101,30 @@ export class GrupoCriteriosComponent implements OnInit{
     private route: ActivatedRoute,
     private router: Router,
     private criterioService: CriterioService,
-    private criterioGroupService: CriteriaGroupService
+    private criterioGroupService: CriteriaGroupService,
+    private breadcrumbService: BreadcrumbService
   ) {}
   ngOnInit(): void {
-    const estrategiaIdParam = this.route.snapshot.paramMap.get('estrategiaId');
-    this.estrategiaId = estrategiaIdParam ? Number(estrategiaIdParam) : 0;
-    const grupoIdParam = this.route.snapshot.paramMap.get('grupoId');
-    this.criteriaGroupId = grupoIdParam ? Number(grupoIdParam) : 0;
-    this.loadCriteria();
-    this.filteredCriteriaGroups = [...this.criteriaGroups];
-    this.loadGruopCriteriaById();
+    // Escutar mudanças nos parâmetros da rota para recarregar quando voltar
+    this.routeSubscription = this.route.paramMap.subscribe(params => {
+      const estrategiaIdParam = params.get('estrategiaId');
+      this.estrategiaId = estrategiaIdParam ? Number(estrategiaIdParam) : 0;
+      const grupoIdParam = params.get('grupoId');
+      this.criteriaGroupId = grupoIdParam ? Number(grupoIdParam) : 0;
+
+      // COMPONENTE FILHO: Simplesmente carrega dados e adiciona seu breadcrumb
+      console.log('📍 Componente filho: Grupo de Critérios inicializando/recarregando');
+
+      this.loadCriteria();
+      this.loadGruopCriteriaById();
+    });
+  }
+
+  ngOnDestroy(): void {
+    // Limpar subscription para evitar memory leaks
+    if (this.routeSubscription) {
+      this.routeSubscription.unsubscribe();
+    }
   }
 
   async loadCriteria(): Promise<void> {
@@ -121,19 +139,25 @@ export class GrupoCriteriosComponent implements OnInit{
     }
   }
   async loadGruopCriteriaById(): Promise<void> {
-
     try {
       const criteriaGroup = await firstValueFrom(this.criterioGroupService.getCriterioById(this.criteriaGroupId,this.estrategiaId));
       this.criteriaGroup = criteriaGroup;
 
+      // COMPONENTE FILHO: Adiciona seu breadcrumb ao array do pai
+      this.breadcrumbService.addChildBreadcrumb({
+        label: criteriaGroup.name || `Grupo ${this.criteriaGroupId}`,
+        url: `/estrategia/${this.estrategiaId}/grupo-criterio/${this.criteriaGroupId}`,
+        isActive: true
+      });
 
     } catch (err) {
       console.error('Erro ao buscar grupo de criterios:', err);
-
     }
   }
 
   goBack(): void {
+    // Remover o breadcrumb do grupo antes de navegar
+    this.breadcrumbService.removeBreadcrumbByUrl(`/estrategia/${this.estrategiaId}/grupo-criterio/${this.criteriaGroupId}`);
     this.router.navigate([`/estrategia`, this.estrategiaId]);
   }
 
@@ -214,7 +238,7 @@ export class GrupoCriteriosComponent implements OnInit{
           name: groupData.name,
           description: groupData.description
         };
-      
+
         this.criterioGroupService.updateCriterio(this.criteriaGroupId, this.estrategiaId, updatedGroup).subscribe({
           next: () => {
             this.loadGruopCriteriaById();
