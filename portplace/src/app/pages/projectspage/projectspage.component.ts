@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CardComponent } from '../../components/card/card.component';
 import { Router } from '@angular/router';
 import { BadgeComponent } from '../../components/badge/badge.component';
-import { FormField, FormModalConfig, Project, ProjectStatusEnum } from '../../interface/interfacies';
+import { FormField, FormModalConfig, Project, ProjectPageableResponse, ProjectStatusEnum } from '../../interface/interfacies';
 import { SvgIconComponent } from '../../components/svg-icon/svg-icon.component';
 import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../service/breadcrumb.service';
@@ -111,14 +111,21 @@ createProjectConfig: FormModalConfig = {
     this.projetoService.getAllProjects()
     .pipe(retry(5))
     .subscribe({
-      next: (projects) => {
-        console.log('Projetos carregados:', projects);
-        this.allProjects = projects;
-        this.Projects = projects;
+      next: (response: ProjectPageableResponse) => {
+        console.log('Resposta paginada da API:', response);
+        console.log(`Total de elementos: ${response.totalElements}`);
+        console.log(`Página atual: ${response.number + 1} de ${response.totalPages}`);
+
+        // Extrair projetos da resposta paginada
+        this.allProjects = response.content;
+        this.Projects = response.content;
         this.loadingProjects = false;
       },
       error: (err) => {
         console.error('Erro ao buscar projetos:', err);
+        this.allProjects = [];
+        this.Projects = [];
+        this.loadingProjects = false;
       }
     });
   }

@@ -9,7 +9,7 @@ import { CardComponent } from '../../../components/card/card.component';
 import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.component';
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../../service/breadcrumb.service';
-import { Project, ProjectStatusEnum } from '../../../interface/interfacies';
+import { Project, ProjectPageableResponse, ProjectStatusEnum } from '../../../interface/interfacies';
 import { ProjetoService } from '../../../service/projeto.service';
 import { retry } from 'rxjs';
 
@@ -194,14 +194,21 @@ export class PortfolioDetailComponent implements OnInit {
     this.projetoService.getAllProjects()
     .pipe(retry(5))
     .subscribe({
-      next: (projects) => {
-        console.log('Projetos carregados:', projects);
-        this.allProjects = projects;
-        this.Projects = projects;
+      next: (response: ProjectPageableResponse) => {
+        console.log('Resposta paginada da API (Portfolio Detail):', response);
+        console.log(`Total de elementos: ${response.totalElements}`);
+        console.log(`Página atual: ${response.number + 1} de ${response.totalPages}`);
+
+        // Extrair projetos da resposta paginada
+        this.allProjects = response.content;
+        this.Projects = response.content;
         this.loadingProjects = false;
       },
       error: (err) => {
         console.error('Erro ao buscar projetos:', err);
+        this.allProjects = [];
+        this.Projects = [];
+        this.loadingProjects = false;
       }
     });
   }

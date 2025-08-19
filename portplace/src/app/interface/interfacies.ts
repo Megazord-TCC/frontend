@@ -17,6 +17,35 @@ export interface Project {
   lastModifiedAt?: string;
 }
 
+export interface ProjectPageableResponse {
+  content: Project[];
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+    sort: {
+      empty: boolean;
+      unsorted: boolean;
+      sorted: boolean;
+    };
+    offset: number;
+    unpaged: boolean;
+    paged: boolean;
+  };
+  last: boolean;
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  sort: {
+    empty: boolean;
+    unsorted: boolean;
+    sorted: boolean;
+  };
+  first: boolean;
+  numberOfElements: number;
+  empty: boolean;
+}
+
 export enum ProjectStatusEnum {
   CANDIDATE = 'CANDIDATE',
   PLANNING = 'PLANNING',

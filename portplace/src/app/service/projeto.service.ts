@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Project } from '../interface/interfacies';
+import { Project, ProjectPageableResponse } from '../interface/interfacies';
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
 
@@ -26,8 +26,8 @@ export class ProjetoService {
   }
 
   // Buscar todos os projetos (GET)
-  getAllProjects(): Observable<Project[]> {
-    return this.http.get<Project[]>(this.apiUrl, { headers: this.getHeaders() });
+  getAllProjects(): Observable<ProjectPageableResponse> {
+    return this.http.get<ProjectPageableResponse>(this.apiUrl, { headers: this.getHeaders() });
   }
 
   // Buscar projeto por ID (GET)
