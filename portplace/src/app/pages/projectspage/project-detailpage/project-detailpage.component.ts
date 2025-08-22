@@ -3,15 +3,13 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BadgeComponent } from "../../../components/badge/badge.component";
 import { FormsModule } from '@angular/forms';
-import { Evaluation, FormField, FormModalConfig, Indicator, Objective, Objectives, Project, ProjectStatusEnum } from '../../../interface/interfacies';
+import { FormField, FormModalConfig, Objectives, Project, ProjectStatusEnum } from '../../../interface/interfacies';
 import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.component';
 import { ProjetoService } from '../../../service/projeto.service';
 import { retry } from 'rxjs';
 import { FormModalComponentComponent } from '../../../components/form-modal-component/form-modal-component.component';
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../../service/breadcrumb.service';
-
-
 
 @Component({
   selector: 'app-project-detailpage',
@@ -27,68 +25,15 @@ import { BreadcrumbService } from '../../../service/breadcrumb.service';
   styleUrl: './project-detailpage.component.scss'
 })
 export class ProjectDetailpageComponent implements OnInit {
-  showEditModal = false;
-  project: any = {
-    id: '1',
-    name: 'Projeto 1',
-    status: 'EM ANÁLISE',
-    statusColor: 'yellow',
-    description: 'Descrição do projeto 1.',
-    startDate: '01/01/2000',
-    endDate: '02/01/2000',
-    lastUpdate: 'Última alteração realizada por Carlos Krefer em 01/01/2025 13:30.'
-  };
 
-  indicators: Indicator[] = [
-    {
-      id: '1',
-      label: 'Valor Agregado (EV)',
-      value: 'R$ 1.600.000,00',
-      lastUpdate: 'Última alteração realizada em 01/01/2025 13:30'
-    },
-    {
-      id: '2',
-      label: 'Valor Planejado (PV)',
-      value: 'R$ 1.600.000,00',
-      lastUpdate: 'Última alteração realizada em 01/01/2025 13:30'
-    },
-    {
-      id: '3',
-      label: 'Retorno no Investimento (ROI)',
-      value: '3',
-      lastUpdate: 'Última alteração realizada em 01/01/2025 13:30'
-    },
-    {
-      id: '4',
-      label: 'Valor Presente Líquido (VPL)',
-      value: '3',
-      lastUpdate: 'Última alteração realizada em 01/01/2025 13:30'
-    },
-    {
-      id: '5',
-      label: 'Payback (anos)',
-      value: '3',
-      lastUpdate: 'Última alteração realizada em 01/01/2025 13:30'
-    },
-    {
-      id: '6',
-      label: 'Índice de Performance de Custo (CPI)',
-      value: '3',
-      lastUpdate: 'Última alteração realizada em 01/01/2025 13:30'
-    },
-    {
-      id: '7',
-      label: 'Índice de Desemp. de Cronograma (SPI)',
-      value: '3',
-      lastUpdate: 'Última alteração realizada em 01/01/2025 13:30'
-    },
-    {
-      id: '8',
-      label: 'Estimativa de Conclusão (ETC)',
-      value: 'R$ 10,00',
-      lastUpdate: 'Última alteração realizada em 01/01/2025 13:30'
-    }
-  ];
+  project: any = {};
+
+  // Campos editáveis para binding com inputs
+  earnedValue: number = 0;
+  plannedValue: number = 0;
+  actualCost: number = 0;
+  budget: number = 0;
+  payback: number = 0;
 
   objectives: Objectives[] = [
     { id: '1', name: 'Nome do objetivo 1' },
@@ -96,15 +41,10 @@ export class ProjectDetailpageComponent implements OnInit {
     { id: '3', name: 'Nome do objetivo 3' }
   ];
 
-  // evaluations: Evaluation[] = [
-  //   { id: 1, name: 'Nome do critério 1', weight: 30, value: 700 },
-  //   { id: 2, name: 'Nome do critério 2', weight: 20, value: 700 },
-  //   { id: 3, name: 'Nome do critério 3', weight: 50, value: 700 }
-  // ];
   newProject: Project = {
     name: '',
     description: '',
-    portfolio: undefined  ,
+    portfolio: undefined,
     startDate: '',
     endDate: '',
     status: ProjectStatusEnum.CANDIDATE,
@@ -115,6 +55,7 @@ export class ProjectDetailpageComponent implements OnInit {
     budget: 0,
     payback: 0
   };
+
   editPortfolioConfig: FormModalConfig = {
     title: 'Editar portfólio',
     fields: [
@@ -138,9 +79,26 @@ export class ProjectDetailpageComponent implements OnInit {
     ],
     validationMessage: 'Os campos marcados com * são obrigatórios.'
   };
-  Projects: Project[] = [];
-  allProjects: Project[] =[];
+
+  cancelProjectConfig: FormModalConfig = {
+    title: 'Cancelar projeto',
+    fields: [
+      {
+        id: 'reason',
+        label: 'Justificativa do cancelamento',
+        type: 'textarea',
+        value: '',
+        required: true,
+        placeholder: 'Digite o motivo do cancelamento...',
+        rows: 4
+      }
+    ],
+    validationMessage: 'A justificativa do cancelamento é obrigatória.'
+  };
+
   activeTab = 'indicadores';
+  showCancelModal = false;
+  showEditModal = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -150,9 +108,6 @@ export class ProjectDetailpageComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Este é um componente filho, não precisa configurar breadcrumbs base
-    // Os breadcrumbs base já foram definidos pelo componente pai (/projetos)
-
     const projectIdParam = this.route.snapshot.paramMap.get('id');
     const projectId = projectIdParam ? Number(projectIdParam) : null;
     if (projectId) {
@@ -160,7 +115,121 @@ export class ProjectDetailpageComponent implements OnInit {
     }
   }
 
+  // Getters para valores calculados
+  get cpi(): string {
+    if (this.actualCost === 0) return 'N/A';
+    const cpi = this.earnedValue / this.actualCost;
+    return cpi.toFixed(2);
+  }
 
+  get spi(): string {
+    if (this.plannedValue === 0) return 'N/A';
+    const spi = this.earnedValue / this.plannedValue;
+    return spi.toFixed(2);
+  }
+
+  get progress(): string {
+    if (this.plannedValue === 0) return '0%';
+    const progress = (this.earnedValue / this.plannedValue) * 100;
+    return `${progress.toFixed(1)}%`;
+  }
+
+  get eac(): string {
+    if (this.actualCost === 0 || this.budget === 0) return 'N/A';
+    const cpi = this.earnedValue / this.actualCost;
+    if (cpi === 0) return 'N/A';
+    const eac = this.budget / cpi;
+    return this.formatCurrency(eac);
+  }
+
+  get etc(): string {
+    if (this.actualCost === 0 || this.budget === 0) return 'N/A';
+    const cpi = this.earnedValue / this.actualCost;
+    if (cpi === 0) return 'N/A';
+    const eac = this.budget / cpi;
+    const etc = eac - this.actualCost;
+    return this.formatCurrency(etc);
+  }
+
+  // Formatação de moeda
+  formatCurrency(value: number): string {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
+  }
+
+  // Métodos para salvar cada campo individual
+  saveEarnedValue(): void {
+    this.updateProjectField('earnedValue', this.earnedValue);
+  }
+
+  savePlannedValue(): void {
+    this.updateProjectField('plannedValue', this.plannedValue);
+  }
+
+  saveActualCost(): void {
+    this.updateProjectField('actualCost', this.actualCost);
+  }
+
+  saveBudget(): void {
+    this.updateProjectField('budget', this.budget);
+  }
+
+  savePayback(): void {
+    this.updateProjectField('payback', this.payback);
+  }
+
+
+
+  private updateProjectField(fieldName: string, value: number): void {
+    // Sanitizar os dados antes de enviar
+    const sanitizedProject = this.sanitizeProjectData({
+      ...this.project,
+      [fieldName]: value
+    });
+
+
+    this.projetoService.updateProject(this.project.id, sanitizedProject)
+      .pipe(retry(3))
+      .subscribe({
+        next: (updatedProject) => {
+          this.project = updatedProject;
+          this.syncFormValues();
+        },
+        error: (err) => {
+          alert('Erro ao salvar. Tente novamente.');
+        }
+      });
+  }
+
+  private sanitizeProjectData(project: any): Project {
+    return {
+      id: project.id,
+      name: project.name || '',
+      description: project.description || '',
+      startDate: project.startDate || '',
+      endDate: project.endDate || '',
+      status: project.status || ProjectStatusEnum.CANDIDATE,
+      projectManager: Number(project.projectManager) || 1,
+      earnedValue: Number(project.earnedValue) || 0,
+      plannedValue: Number(project.plannedValue) || 0,
+      actualCost: Number(project.actualCost) || 0,
+      budget: Number(project.budget) || 0,
+      payback: Number(project.payback) || 0,
+      // Remover campos que podem causar problemas
+      ...(project.portfolio && { portfolio: project.portfolio }),
+      ...(project.cancellationReason && { cancellationReason: project.cancellationReason })
+    };
+  }
+
+  private syncFormValues(): void {
+    this.earnedValue = this.project.earnedValue || 0;
+    this.plannedValue = this.project.plannedValue || 0;
+    this.actualCost = this.project.actualCost || 0;
+    this.budget = this.project.budget || 0;
+    this.payback = this.project.payback || 0;
+  }
 
   loadProjectDetails(projectId: number): void {
     this.projetoService.getProjectById(projectId)
@@ -169,7 +238,7 @@ export class ProjectDetailpageComponent implements OnInit {
         next: (project) => {
           console.log('Detalhes do projeto:', project);
           this.project = project;
-          // Adicionar breadcrumb com o nome do projeto
+          this.syncFormValues();
           this.breadcrumbService.addChildBreadcrumb({
             label: project.name || `Projeto ${projectId}`,
             url: `/projetos/${projectId}`,
@@ -183,7 +252,6 @@ export class ProjectDetailpageComponent implements OnInit {
       });
   }
 
-
   goBack(): void {
     this.router.navigate(['/projetos']);
   }
@@ -192,16 +260,11 @@ export class ProjectDetailpageComponent implements OnInit {
     this.activeTab = tab;
   }
 
-  saveIndicator(indicator: Indicator): void {
-    console.log('Saving indicator:', indicator);
-    // Implement save logic here
-  }
-
   resetNewProject(): void {
     this.newProject = {
       name: '',
       description: '',
-      portfolio: undefined  ,
+      portfolio: undefined,
       startDate: '',
       endDate: '',
       status: ProjectStatusEnum.CANDIDATE,
@@ -213,12 +276,11 @@ export class ProjectDetailpageComponent implements OnInit {
       payback: 0
     };
   }
+
   openEditModal(): void {
-    // Populate form with existing data
     this.editPortfolioConfig.fields[0].value = this.project.name;
     this.editPortfolioConfig.fields[1].value = this.project.description || '';
 
-    // Reset validation
     this.editPortfolioConfig.fields.forEach(field => {
       field.hasError = false;
       field.errorMessage = '';
@@ -237,35 +299,83 @@ export class ProjectDetailpageComponent implements OnInit {
       return acc;
     }, {} as any);
 
-
-    const newProject: Project = {
-      id: this.project.id,
+    const updatedProject = {
+      ...this.project,
       name: projectData.name,
-      description: projectData.description,
-      status: this.project.status || '',
-      earnedValue: this.project.earnedValue || '',
-      plannedValue: this.project.plannedValue || '',
-      actualCost: this.project.actualCost || '',
-      budget: this.project.budget || '',
-      payback: this.project.payback,
-      startDate: this.project.startDate || '',
-      endDate: this.project.endDate || '',
-      projectManager: this.project.projectManager || 1
+      description: projectData.description
     };
-    console.log('Dados do projeto a serem atualizados:', newProject);
-    this.projetoService.updateProject(this.project.id, newProject)
-     .pipe(retry(5))
-     .subscribe({
-      next: (createdProject) => {
-        console.log('Projeto alterado:', createdProject);
-        this.loadProjectDetails(this.project.id);
-        this.resetNewProject();
-      },
-      error: (err) => {
-        console.error('Erro ao alterar projeto:', err);
-      }
-    });
+
+    const sanitizedProject = this.sanitizeProjectData(updatedProject);
+
+    console.log('Dados do projeto a serem atualizados:', sanitizedProject);
+
+    this.projetoService.updateProject(this.project.id, sanitizedProject)
+      .pipe(retry(5))
+      .subscribe({
+        next: (createdProject) => {
+          console.log('Projeto alterado:', createdProject);
+          this.loadProjectDetails(this.project.id);
+          this.resetNewProject();
+        },
+        error: (err) => {
+          console.error('Erro ao alterar projeto:', err);
+          console.error('Detalhes do erro:', err.error);
+        }
+      });
 
     this.closeEditModal();
+  }
+
+  closeCancelModal(): void {
+    this.showCancelModal = false;
+  }
+
+  openCancelModal(): void {
+    this.cancelProjectConfig.fields[0].value = '';
+    this.cancelProjectConfig.fields.forEach(field => {
+      field.hasError = false;
+      field.errorMessage = '';
+    });
+    this.showCancelModal = true;
+  }
+
+  onCancelProject(fields: FormField[]): void {
+    const cancelReason = fields.find(f => f.id === 'reason')?.value || '';
+
+    const cancelData = {
+      projectId: this.project.id,
+      reason: cancelReason,
+      status: ProjectStatusEnum.FINISHED,
+      cancelledDate: new Date().toISOString()
+    };
+
+    console.log('Cancelando projeto:', cancelData);
+
+    const updatedProject = {
+      ...this.project,
+      status: ProjectStatusEnum.FINISHED,
+      cancellationReason: cancelReason
+    };
+
+    const sanitizedProject = this.sanitizeProjectData(updatedProject);
+
+    this.projetoService.updateProject(this.project.id, sanitizedProject)
+    .pipe(retry(3))
+    .subscribe({
+      next: (updatedProject) => {
+        console.log('Projeto cancelado com sucesso:', updatedProject);
+        this.closeCancelModal();
+        this.loadProjectDetails(this.project.id);
+        alert('Projeto cancelado com sucesso');
+        setTimeout(() => {
+          this.router.navigate(['/projetos']);
+        }, 1000);
+      },
+      error: (err) => {
+        console.error('Erro ao cancelar projeto:', err);
+        console.error('Detalhes do erro:', err.error);
+        alert('Erro ao cancelar o projeto. Tente novamente.');
+      }
+    });
   }
 }

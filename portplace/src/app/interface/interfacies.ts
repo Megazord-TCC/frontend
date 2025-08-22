@@ -2,19 +2,20 @@ export interface Project {
   id?: number;
   name: string;
   description: string;
-  portfolio?: string | undefined;
-  startDate?: string;
-  endDate?: string;
+  portfolio?: any;
+  startDate: string;
+  endDate: string;
   status: ProjectStatusEnum;
-  projectManager?: number;
-  earnedValue?: number;
-  plannedValue?: number;
-  actualCost?: number;
-  budget?: number;
-  payback?: number;
-  disable?: boolean;
+  projectManager: number;
+  earnedValue: number;
+  plannedValue: number;
+  actualCost: number;
+  budget: number;
+  payback: number;
   createdAt?: string;
   lastModifiedAt?: string;
+  disabled?: boolean;
+  cancellationReason?: string;
 }
 
 export interface ProjectPageableResponse {
@@ -75,6 +76,9 @@ export interface Indicator {
   label: string;
   value: string;
   lastUpdate: string;
+  displayValue?: string;
+  isEditable?: boolean;
+  fieldName?: string;
 }
 
 export interface Objective {
