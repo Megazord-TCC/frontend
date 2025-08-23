@@ -66,7 +66,7 @@ export class EvaluationGroupDeleteModal {
     this.clearMessages();
 
     try {
-      const evaluationGroupRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps/${this.evaluationGroup.id}`;
+      const evaluationGroupRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroup.id}`;
       console.log('🔍 URL de exclusão:', evaluationGroupRoute);
 
       const deleteEvaluationGroup$ = this.httpClient.delete(evaluationGroupRoute);

@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { CriteriaComparison, CriteriaGroup } from '../interface/interfacies';
+import { Page } from '../interface/carlos-interfaces';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +22,7 @@ export class GrupoCriterioService {
   // BUSCA DE TODOS OS GRUPOS DE CRITÉRIOS
   getCriteriaComparisons(groupId: number,estrategiaId: number): Observable<CriteriaComparison[]> {
     const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${groupId}/criteria-comparisons`;
-    return this.http.get<CriteriaComparison[]>(url, { headers: this.getHeaders() });
+    return this.http.get<Page<CriteriaComparison>>(url, { headers: this.getHeaders(), params: { size: 1000 } }).pipe(map(page => page.content));
   }
 
   // BUSCA DE UM GRUPO DE CRITÉRIOS POR ID

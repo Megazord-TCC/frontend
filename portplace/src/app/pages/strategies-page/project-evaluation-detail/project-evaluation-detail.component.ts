@@ -12,6 +12,7 @@ import {
   Evaluation,
   EvaluationGroup,
   EvaluationGroupView,
+  Page,
   Project
 } from '../../../interface/carlos-interfaces';
 import { forkJoin, map, firstValueFrom, Subscription } from 'rxjs';
@@ -125,13 +126,13 @@ export class ProjectEvaluationDetailComponent implements OnInit, OnDestroy {
   }
 
   loadEvaluationGroup(): void {
-    const evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps`;
+    const evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups`;
     const criteriaGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups`;
 
     console.log('🔍 Buscando grupo de avaliação e critérios...');
 
-    const getAllEvaluationGroups$ = this.httpClient.get<EvaluationGroup[]>(evaluationGroupsRoute);
-    const getAllCriteriaGroups$ = this.httpClient.get<CriteriaGroup[]>(criteriaGroupsRoute);
+    const getAllEvaluationGroups$ = this.httpClient.get<Page<EvaluationGroup>>(evaluationGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
+    const getAllCriteriaGroups$ = this.httpClient.get<Page<CriteriaGroup>>(criteriaGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
 
     forkJoin({
       evaluationGroups: getAllEvaluationGroups$,
@@ -168,7 +169,7 @@ export class ProjectEvaluationDetailComponent implements OnInit, OnDestroy {
       console.log('📋 Carregando critérios e avaliações...');
 
       // 1. Buscar grupo de avaliação para obter criteriaGroupId
-      const evaluationGroupRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps/${this.evaluationGroupId}`;
+      const evaluationGroupRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroupId}`;
       const evaluationGroup = await firstValueFrom(
         this.httpClient.get<EvaluationGroup>(evaluationGroupRoute)
       );
@@ -178,15 +179,15 @@ export class ProjectEvaluationDetailComponent implements OnInit, OnDestroy {
       // 2. Buscar critérios do grupo usando criteriaGroupId
       const criteriaRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups/${evaluationGroup.criteriaGroupId}/criteria`;
       const criteria = await firstValueFrom(
-        this.httpClient.get<Criterion[]>(criteriaRoute) // CORRIGIDO: usar Criterion[]
+        this.httpClient.get<Page<Criterion>>(criteriaRoute, { params: { size: 1000 } }).pipe(map(page => page.content))
       );
 
       console.log('📝 Critérios encontrados:', criteria);
 
       // 3. Buscar avaliações existentes para este projeto
-      const evaluationsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps/${this.evaluationGroupId}/evaluations`;
+      const evaluationsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroupId}/evaluations`;
       const evaluations = await firstValueFrom(
-        this.httpClient.get<Evaluation[]>(evaluationsRoute)
+        this.httpClient.get<Page<Evaluation>>(evaluationsRoute, { params: { size: 1000 } }).pipe(map(page => page.content))
       );
 
       console.log('⭐ Avaliações encontradas:', evaluations);

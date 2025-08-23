@@ -11,7 +11,7 @@ import { EvaluationGroupEditModal } from '../../../components/evaluation-group-e
 import { ProjectEvaluationCreateModal } from '../../../components/evaluation-project-create-modal/evaluation-project-create-modal.component';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { CriteriaGroup, Evaluation, EvaluationGroup, EvaluationGroupView, ProjectRanking, User } from '../../../interface/carlos-interfaces';
+import { CriteriaGroup, Evaluation, EvaluationGroup, EvaluationGroupView, Page, ProjectRanking, User } from '../../../interface/carlos-interfaces';
 import { filter, forkJoin, map, switchMap, tap, Subscription } from 'rxjs';
 import { EvaluationGroupDeleteModal } from '../../../components/evaluation-group-delete-modal/evaluation-group-delete-modal.component';
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
@@ -85,11 +85,11 @@ export class EvaluationGroupDetailPageComponent implements OnInit, OnDestroy {
   }
 
   setCurrentEvaluationGroupByHttpRequest() {
-    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps`;
+    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups`;
     let criteriaGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups`;
 
-    let getAllEvaluationGroups$ = this.httpClient.get<EvaluationGroup[]>(evaluationGroupsRoute);
-    let getAllCriteriaGroups$ = this.httpClient.get<CriteriaGroup[]>(criteriaGroupsRoute);
+    let getAllEvaluationGroups$ = this.httpClient.get<Page<EvaluationGroup>>(evaluationGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
+    let getAllCriteriaGroups$ = this.httpClient.get<Page<CriteriaGroup>>(criteriaGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
 
     forkJoin({ evaluationGroups: getAllEvaluationGroups$, criteriaGroups: getAllCriteriaGroups$ })
       .pipe(
@@ -118,7 +118,7 @@ export class EvaluationGroupDetailPageComponent implements OnInit, OnDestroy {
   }
 
   setProjectRankingsByHttpRequest() {
-    let projectRankingsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps/${this.evaluationGroupId}/ranking`;
+    let projectRankingsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroupId}/ranking`;
     let getAllProjectRankings$ =  this.httpClient.get<ProjectRanking[]>(projectRankingsRoute);
 
     getAllProjectRankings$.subscribe(projectRankings => {

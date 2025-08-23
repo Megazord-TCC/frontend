@@ -92,12 +92,12 @@ export class ProjectCriteriaEvaluationModal {
 
         if (criterion.evaluationId) {
           // Atualizar avaliação existente
-          const updateRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps/${this.evaluationGroupId}/evaluations/${criterion.evaluationId}`;
+          const updateRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroupId}/evaluations/${criterion.evaluationId}`;
+          
           const body = {
             score: newScore,
-            projectId: this.project!.id, // USAR ! DEPOIS DA VALIDAÇÃO
-            criterionId: criterion.id,
-            ahpId: this.evaluationGroupId
+            name: 'Avaliação', // Nome qualquer porque eu acho que não tinha que nem existir esse 'name'
+            description: 'Descrição' // Description qualquer porque eu acho que nem tinha que existir esse 'description'
           };
 
           console.log(`🔄 Atualizando avaliação existente para critério ${criterion.name}:`, {
@@ -108,7 +108,7 @@ export class ProjectCriteriaEvaluationModal {
           return this.httpClient.put(updateRoute, body);
         } else {
           // Criar nova avaliação
-          const createRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps/${this.evaluationGroupId}/evaluations`;
+          const createRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroupId}/evaluations`;
           const body = {
             score: newScore,
             projectId: this.project!.id, // USAR ! DEPOIS DA VALIDAÇÃO

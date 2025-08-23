@@ -6,7 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../environments/environment';
 import { ActivatedRoute, Router } from '@angular/router';
-import { EvaluationGroup, EvaluationGroupView, CriteriaGroup } from '../../interface/carlos-interfaces';
+import { EvaluationGroup, EvaluationGroupView, CriteriaGroup, Page } from '../../interface/carlos-interfaces';
 import { forkJoin, map } from 'rxjs';
 import { EvaluationGroupCreateModal } from '../evaluation-group-create-modal/evaluation-group-create-modal.component';
 
@@ -67,11 +67,11 @@ export class EvaluationGroupsTabComponent {
     }
 
     setEvaluationGroupsByHttpRequest() {
-        let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps`;
+        let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups`;
         let criteriaGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups`;
 
-        let getAllEvaluationGroups$ = this.httpClient.get<EvaluationGroup[]>(evaluationGroupsRoute);
-        let getAllCriteriaGroups$ = this.httpClient.get<CriteriaGroup[]>(criteriaGroupsRoute);
+        let getAllEvaluationGroups$ = this.httpClient.get<Page<EvaluationGroup>>(evaluationGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
+        let getAllCriteriaGroups$ = this.httpClient.get<Page<CriteriaGroup>>(criteriaGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
 
         forkJoin({ evaluationGroups: getAllEvaluationGroups$, criteriaGroups: getAllCriteriaGroups$ })
             .pipe(map(({ evaluationGroups, criteriaGroups }) => this.getManyEvaluationGroupView(evaluationGroups, criteriaGroups)))

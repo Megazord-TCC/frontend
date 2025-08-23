@@ -33,7 +33,7 @@ export class CriteriaGroupService {
   getAllCriterios( estrategiaId: number): Observable<CriteriaGroup[]> {
     const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups`;
     console.log('URL:', url);
-    return this.http.get<Page<CriteriaGroup>>(url, { headers: this.getHeaders() })
+    return this.http.get<Page<CriteriaGroup>>(url, { headers: this.getHeaders(), params: { size: 1000 } })
         .pipe(map(page => page.content));
   }
 

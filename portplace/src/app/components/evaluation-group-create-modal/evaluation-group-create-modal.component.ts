@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CriteriaGroup, EvaluationGroup } from '../../interface/carlos-interfaces';
+import { CriteriaGroup, EvaluationGroup, Page } from '../../interface/carlos-interfaces';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../environments/environment';
@@ -62,7 +62,7 @@ export class EvaluationGroupCreateModal {
     if (!isFormValid)
       return;
 
-    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps`;
+    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups`;
     let body = {
       name: this.inputName,
       description: this.inputDescription,
@@ -88,10 +88,13 @@ export class EvaluationGroupCreateModal {
   }
 
   getNewlyCreatedEvaluationGroupByHttpRequest(): Observable<EvaluationGroup | undefined> {
-    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps`;
+    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups`;
 
-    return this.httpClient.get<EvaluationGroup[]>(evaluationGroupsRoute)
-      .pipe(map(evaluationGroups => evaluationGroups.find(evaluationGroup => evaluationGroup.name == this.inputName)));
+    return this.httpClient.get<Page<EvaluationGroup>>(evaluationGroupsRoute, { params: { size: 1000 } })
+      .pipe(
+        map(page => page.content),
+        map(evaluationGroups => evaluationGroups.find(evaluationGroup => evaluationGroup.name == this.inputName))
+    );
   }
 
   clearForm() {
@@ -117,8 +120,8 @@ export class EvaluationGroupCreateModal {
   }
 
   async isNameUnique(): Promise<boolean> {
-    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps`;
-    let getAllEvaluationGroups$ = this.httpClient.get<EvaluationGroup[]>(evaluationGroupsRoute);
+    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups`;
+    let getAllEvaluationGroups$ = this.httpClient.get<Page<EvaluationGroup>>(evaluationGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
     let evaluationGroups = await firstValueFrom(getAllEvaluationGroups$);
     let isUnique = !evaluationGroups.some(evaluationGroup => evaluationGroup.name == this.inputName);
 
@@ -172,7 +175,7 @@ export class EvaluationGroupCreateModal {
 
   setInputCriteriaGroupOptions() {
     let criteriaGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups`;
-    let getAllCriteriaGroups$ = this.httpClient.get<CriteriaGroup[]>(criteriaGroupsRoute);
+    let getAllCriteriaGroups$ = this.httpClient.get<Page<CriteriaGroup>>(criteriaGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
 
     // TODO: Adicionar regra para "O grupo de critérios selecionado não possui critérios. Acesse sua página e realize o cadastro.".
     // TODO: Adicionar regra para "Os critérios do grupo de critérios selecionado não foram totalmente comparados entre si. Acesse sua página e finalize a comparação.".
