@@ -1,4 +1,48 @@
 
+/**
+ * Interface utilizada para quando o backend retorna uma lista paginada.
+ *
+ * O tipo genérico `T` representa o tipo dos itens retornados na lista.
+ * Por exemplo, `User` caso a API retorne uma lista paginada de usuários.
+ *
+ * Obs: se você não liga para paginação, use apenas a propriedade `content`.
+ *
+ * @template T Tipo dos elementos da lista.
+ * @property {T[]} content Lista de elementos do tipo `T`.
+ * 
+ * @example
+ * // GET no backend para uma lista de grupo de critérios
+ * this.http.get<Page<CriteriaGroup>>(url, { headers: this.getHeaders() })
+ */
+export interface Page<T> {
+    content: T[];
+    pageable: {
+        pageNumber: number,
+        pageSize: number,
+        sort: {
+            empty: boolean,
+            sorted: boolean,
+            unsorted: boolean
+        },
+        offset: number,
+        paged: boolean,
+        unpaged: boolean
+    },
+    last: boolean,
+    totalElements: number,
+    totalPages: number,
+    size: number,
+    number: number,
+    sort: {
+        empty: boolean,
+        sorted: boolean,
+        unsorted: boolean
+    },
+    numberOfElements: number,
+    first: boolean,
+    empty: boolean
+}
+
 export interface EvaluationGroup {
     id: number;
     name: string;

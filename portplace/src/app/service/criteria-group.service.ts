@@ -1,8 +1,9 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { CriteriaGroup } from '../interface/interfacies';
+import { Page } from '../interface/carlos-interfaces';
 
 @Injectable({
   providedIn: 'root'
@@ -27,11 +28,13 @@ export class CriteriaGroupService {
     return this.http.post<CriteriaGroup>(url,criterio, { headers: this.getHeaders() });
   }
 
-  // Buscar todos os projetos (GET)
+  // Buscar todos os grupo de critérios (GET)
+  // TODO: Renomear para getAllCriteriaGroups ou getAllGrupoCriterios
   getAllCriterios( estrategiaId: number): Observable<CriteriaGroup[]> {
     const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups`;
     console.log('URL:', url);
-    return this.http.get<CriteriaGroup[]>(url, { headers: this.getHeaders() });
+    return this.http.get<Page<CriteriaGroup>>(url, { headers: this.getHeaders(), params: { size: 1000 } })
+        .pipe(map(page => page.content));
   }
 
   // Buscar projeto por ID (GET)

@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CriteriaGroup, EvaluationGroup, EvaluationGroupView } from '../../interface/carlos-interfaces';
+import { CriteriaGroup, EvaluationGroup, EvaluationGroupView, Page } from '../../interface/carlos-interfaces';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from '../../environments/environment';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, map } from 'rxjs';
 
 @Component({
   selector: 'app-evaluation-group-edit-modal',
@@ -72,7 +72,7 @@ export class EvaluationGroupEditModal {
     if (!isFormValid)
       return;
 
-    let evaluationGroupRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps/${this.evaluationGroup?.id}`;
+    let evaluationGroupRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroup?.id}`;
     let body = {
       name: this.inputName,
       description: this.inputDescription,
@@ -98,7 +98,7 @@ export class EvaluationGroupEditModal {
 
     this.isDeleteButtonDisabled = true;
 
-    let evaluationGroupRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps/${this.evaluationGroup?.id}`;
+    let evaluationGroupRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroup?.id}`;
     let deleteEvaluationGroup$ = this.httpClient.delete(evaluationGroupRoute);
 
     deleteEvaluationGroup$.subscribe({
@@ -142,8 +142,8 @@ export class EvaluationGroupEditModal {
       return true;
     }
 
-    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps`;
-    let getAllEvaluationGroups$ = this.httpClient.get<EvaluationGroup[]>(evaluationGroupsRoute);
+    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups`;
+    let getAllEvaluationGroups$ = this.httpClient.get<Page<EvaluationGroup>>(evaluationGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
     let evaluationGroups = await firstValueFrom(getAllEvaluationGroups$);
     let isUnique = !evaluationGroups.some(evaluationGroup =>
       evaluationGroup.name === this.inputName && evaluationGroup.id !== this.evaluationGroup?.id
@@ -199,7 +199,7 @@ export class EvaluationGroupEditModal {
 
   setInputCriteriaGroupOptions() {
     let criteriaGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups`;
-    let getAllCriteriaGroups$ = this.httpClient.get<CriteriaGroup[]>(criteriaGroupsRoute);
+    let getAllCriteriaGroups$ = this.httpClient.get<Page<CriteriaGroup>>(criteriaGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
 
     getAllCriteriaGroups$.subscribe(criteriaGroups => {
       this.inputCriteriaGroupsOptions = criteriaGroups;
