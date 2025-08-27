@@ -9,9 +9,186 @@
       <p>Gerencie os recursos do sistema.</p>
     </div>
 
-    <!-- Content -->
-    <div class="resources-content-area">
-      <p>resources-page works!</p>
+    <!-- Filters -->
+    <div class="filters-section">
+      <div class="filters-left">
+        <div class="filter-label">
+          <app-svg-icon
+            class="nav-icon"
+            [path]="'assets/icon/filter_vetor.svg'"
+            [size]="18">
+          </app-svg-icon>
+          <span>Filtros:</span>
+        </div>
+        <div class="filter-buttons">
+          <button
+            class="filter-btn"
+            [class.active]="activeFilter === 'em-analise'"
+            (click)="onFilterChange('em-analise')">
+            <div class="filter-indicator blue"></div>
+            Em análise
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="activeFilter === 'em-andamento'"
+            (click)="onFilterChange('em-andamento')">
+            <div class="filter-indicator blue"></div>
+            Em andamento
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="activeFilter === 'finalizado'"
+            (click)="onFilterChange('finalizado')">
+            <div class="filter-indicator blue"></div>
+            Finalizado
+          </button>
+          <button
+            class="filter-btn"
+            [class.active]="activeFilter === 'cancelado'"
+            (click)="onFilterChange('cancelado')">
+            <div class="filter-indicator blue"></div>
+            Cancelado
+          </button>
+        </div>
+      </div>
+
+      <div class="actions-right">
+        <button class="btn-primary" (click)="openCreateModal()">
+          <i class="icon-plus">+</i>
+          Cadastrar
+        </button>
+        <div class="search-container">
+
+          <app-svg-icon
+            class="nav-icon"
+            [path]="'assets/icon/search_vetor.svg'"
+            [size]="18">
+          </app-svg-icon>
+          <input
+            type="text"
+            placeholder="Buscar pelo nome do projeto"
+            [(ngModel)]="searchTerm"
+            (input)="onSearchChange()">
+        </div>
+      </div>
     </div>
+
+
+    <!-- Table -->
+    <app-card class="table-card">
+      <div class="table-container">
+        <div class="div-loading-projetcts" *ngIf="loadingResources">Carregando projetos...</div>
+        <table class="Resources-table" *ngIf="!loadingResources">
+          <thead>
+            <tr>
+              <th>
+                <div class="header-cell">
+                  Nome do projeto
+                </div>
+              </th>
+              <th>
+                <div class="header-cell">
+                  Portfólio
+                </div>
+              </th>
+              <th>
+                <div class="header-cell">
+                  Orçamento
+                </div>
+              </th>
+              <th>
+                <div class="header-cell">
+                  EV
+                  <app-svg-icon
+                    class="nav-icon"
+                    [path]="'assets/icon/sort-alt.svg'"
+                    [size]="18">
+                  </app-svg-icon>
+                </div>
+              </th>
+              <th>
+                <div class="header-cell">
+                  PV
+                  <app-svg-icon
+                    class="nav-icon"
+                    [path]="'assets/icon/sort-alt.svg'"
+                    [size]="18">
+                  </app-svg-icon>
+                </div>
+              </th>
+              <th>
+                <div class="header-cell">
+                  Início planejado
+                  <app-svg-icon
+                    class="nav-icon"
+                    [path]="'assets/icon/sort-alt.svg'"
+                    [size]="18">
+                  </app-svg-icon>
+                </div>
+              </th>
+              <th>
+                <div class="header-cell">
+                  Fim planejado
+                  <app-svg-icon
+                    class="nav-icon"
+                    [path]="'assets/icon/sort-alt.svg'"
+                    [size]="18">
+                  </app-svg-icon>
+                </div>
+              </th>
+              <th>
+                <div class="header-cell">
+                  Status
+                  <app-svg-icon
+                    class="nav-icon"
+                    [path]="'assets/icon/sort-alt.svg'"
+                    [size]="18">
+                  </app-svg-icon>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+
+
+              <tr *ngFor="let project of Resources"
+              class="table-row"
+              >
+              <td>
+                <button (click)="onProjectClick(project.id!)" class="project-link">
+                  {{ project.name || 'não definido' }}
+                </button>
+              </td>
+
+              <!-- Portfólio -->
+              <td>{{ project.portfolio || 'não definido' }}</td>
+
+              <td>{{ project.budget || 'não definido' }}</td>
+              <td>{{ project.earnedValue || 'não definido' }}</td>
+              <td>{{ project.plannedValue || 'não definido' }}</td>
+              <td>{{ project.startDate || 'não definido' }}</td>
+              <td>{{ project.endDate || 'não definido' }}</td>
+              <td>
+                <app-badge [color]="getStatusColor(project.status)">
+                  {{ getStatusLabel(project.status) || 'não definido' }}
+                </app-badge>
+              </td>
+
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </app-card>
   </div>
+
+  <!-- Form Modal -->
+  <app-form-modal-component
+    [isVisible]="showCreateModal"
+    [config]="createResourcesConfig"
+    (close)="closeCreateModal()"
+    (save)="onSaveProject($event)"
+    (cancel)="closeCreateModal()">
+  </app-form-modal-component>
+
 </div>

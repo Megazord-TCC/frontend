@@ -41,22 +41,26 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
 
   objectives: Objective[] = [
     {
-      id: '1',
+      id: 1,
       name: 'Aumentar lucro',
-      linkedCriteria: 1,
-      activePortfolios: 1,
-      activeProjects: 2,
+      disabled: false,
+      description: 'Aumentar o lucro da empresa em 20%',
+      strategyId: 1,
       status: 'ATIVADO',
-      statusColor: 'green'
+      statusColor: 'green',
+      createdAt: '2023-01-01T00:00:00Z',
+      lastModifiedAt: '2023-01-01T00:00:00Z'
     },
     {
-      id: '2',
+      id: 2,
       name: 'Capacitar empregados',
-      linkedCriteria: 0,
-      activePortfolios: 0,
-      activeProjects: 1,
+      disabled: false,
+      description: 'Capacitar os empregados da empresa',
+      strategyId: 1,
       status: 'CANCELADO',
-      statusColor: 'gray'
+      statusColor: 'gray',
+      createdAt: '2023-01-01T00:00:00Z',
+      lastModifiedAt: '2023-01-01T00:00:00Z'
     }
   ];
 
@@ -250,7 +254,6 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
   evaluationSearchTerm = ""
   scenarioFilter = ""
   scenarioSearchTerm = ""
-  searchTerm = '';
   estrategiaId:number = 0;
 
   constructor(
@@ -442,12 +445,36 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
     this.closeCreateModal();
   }
 
-  onSearchChange(): void {
-    let filtered = [...this.allObjectives];
-    filtered = filtered.filter(project =>
-      project.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+  onSearchObjectives(): void {
+    let filtered = [...this.objectives];
+    filtered = filtered.filter(objective =>
+      objective.name.toLowerCase().includes(this.objectiveSearchTerm.toLowerCase())
     );
     this.filteredObjectives = filtered;
+  }
+
+  onSearchCriterios(): void {
+    let filtered = [...this.criteriaGroups];
+    filtered = filtered.filter(criterio =>
+      criterio.name.toLowerCase().includes(this.criteriaSearchTerm.toLowerCase())
+    );
+    this.filteredCriteriaGroups = filtered;
+  }
+
+  onSearchAvaliacoes(): void {
+    let filtered = [...this.evaluationGroups];
+    filtered = filtered.filter(avaliacao =>
+      avaliacao.name.toLowerCase().includes(this.evaluationSearchTerm.toLowerCase())
+    );
+    this.filteredEvaluationGroups = filtered;
+  }
+
+  onSearchCenarios(): void {
+    let filtered = [...this.scenarios];
+    filtered = filtered.filter(cenario =>
+      cenario.name.toLowerCase().includes(this.scenarioSearchTerm.toLowerCase())
+    );
+    this.filteredScenarios = filtered;
   }
 
   closeCreateModal(): void {
@@ -455,7 +482,7 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
   }
   // Criteria methods
   onCriteriaSearchChange(): void {
-    this.applyCriteriaFilters()
+    this.onSearchCriterios()
   }
 
   applyCriteriaFilters(): void {
@@ -478,7 +505,7 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
 
   // Evaluation methods
   onEvaluationSearchChange(): void {
-    this.applyEvaluationFilters()
+    this.onSearchAvaliacoes()
   }
 
   applyEvaluationFilters(): void {
@@ -551,7 +578,7 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
   }
 
   onObjectiveSearchChange(): void {
-    this.applyObjectiveFilters();
+    this.onSearchObjectives();
   }
 
   applyObjectiveFilters(): void {
@@ -572,8 +599,8 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
     this.filteredObjectives = filtered;
   }
 
-  openObjectiveModal(objective?: Objective): void {
-    // Implementar modal de objetivo
+  openObjectiveModal(objectiveId?: number): void {
+    this.router.navigate([`/estrategia`, this.estrategiaId, 'objetivo', objectiveId]);
   }
   editStrategy() {
     console.log('Editar estratégia');

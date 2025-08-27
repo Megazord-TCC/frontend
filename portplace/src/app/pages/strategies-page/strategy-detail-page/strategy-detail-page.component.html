@@ -150,9 +150,9 @@
               </app-svg-icon>
               <input
                 type="text"
-                placeholder="Buscar pelo nome do projeto"
-                [(ngModel)]="searchTerm"
-                (input)="onSearchChange()">
+                placeholder="Buscar pelo nome do objetivo"
+                [(ngModel)]="objectiveSearchTerm"
+                (input)="onSearchObjectives()">
             </div>
           </div>
 
@@ -217,13 +217,13 @@
                 <tbody>
                   <tr *ngFor="let objective of filteredObjectives" class="table-row">
                     <td>
-                      <button class="link" (click)="openObjectiveModal(objective)">
+                      <button class="link" (click)="openObjectiveModal(objective.id)">
                         {{objective.name}}
                       </button>
                     </td>
-                    <td>{{objective.linkedCriteria}}</td>
-                    <td>{{objective.activePortfolios}}</td>
-                    <td>{{objective.activeProjects}}</td>
+                    <td>2</td>
+                    <td>2</td>
+                    <td>2</td>
                     <td>
                       <app-badge [color]="objective.statusColor">{{objective.status}}</app-badge>
                     </td>
@@ -270,9 +270,9 @@
               </app-svg-icon>
               <input
                 type="text"
-                placeholder="Buscar pelo nome do projeto"
-                [(ngModel)]="searchTerm"
-                (input)="onSearchChange()">
+                placeholder="Buscar pelo nome do grupo de critério"
+                [(ngModel)]="criteriaSearchTerm"
+                (input)="onSearchCriterios()">
             </div>
           </div>
 
@@ -419,9 +419,9 @@
               </app-svg-icon>
               <input
                 type="text"
-                placeholder="Buscar pelo nome do projeto"
-                [(ngModel)]="searchTerm"
-                (input)="onSearchChange()">
+                placeholder="Buscar pelo nome do cenário"
+                [(ngModel)]="scenarioSearchTerm"
+                (input)="onSearchCenarios()">
             </div>
           </div>
 

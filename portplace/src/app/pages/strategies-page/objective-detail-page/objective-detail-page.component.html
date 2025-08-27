@@ -1,0 +1,328 @@
+<div class="objective-detail-layout">
+
+  <div class="objective-detail-content">
+    <!-- Breadcrumb -->
+    <app-breadcrumb></app-breadcrumb>
+
+    <!-- Header -->
+    <div class="objective-header">
+      <div class="header-top">
+        <button class="back-btn" (click)="goBack()">
+          <app-svg-icon
+            class="nav-icon"
+            [path]="'assets/icon/voltar_vetor.svg'"
+            [size]="18">
+          </app-svg-icon>
+        </button>
+        <h1>{{objective.name}}</h1>
+        <app-badge color="green">{{objective.status}}</app-badge>
+      </div>
+      <p class="objective-description">{{objective.description}}</p>
+      <div class="action-header">
+        <div class="action-buttons">
+          <button class="action-btn" (click)="editObjective()">
+
+            Editar
+          </button>
+          <button class="action-btn cancel" (click)="cancelObjective()">
+
+            Cancelar
+          </button>
+          <button class="action-btn delete" (click)="deleteObjective()">
+
+            Excluir
+          </button>
+        </div>
+
+        <!-- <div class="last-update">
+            Última alteração realizada em {{objective?.lastModifiedAt | date: 'dd/MM/yyyy HH:mm'}}.
+        </div> -->
+        <div class="last-update">
+            Última alteração realizada em {{objective.lastModifiedAt | date: 'dd/MM/yyyy HH:mm'}}.
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-container">
+      <div class="tabs-list">
+        <button
+          class="tab-trigger"
+          [class.active]="activeTab === 'criterios'"
+          (click)="onTabChange('criterios')">
+          <app-svg-icon
+            class="nav-icon"
+            [path]="'assets/icon/p_vetor.svg'"
+            [size]="18">
+          </app-svg-icon>
+          Critérios
+        </button>
+        <button
+          class="tab-trigger"
+          [class.active]="activeTab === 'portfolios'"
+          (click)="onTabChange('portfolios')">
+          <app-svg-icon
+            class="nav-icon"
+            [path]="'assets/icon/metrica_vetor.svg'"
+            [size]="18">
+          </app-svg-icon>
+          Portfólios
+        </button>
+        <button
+          class="tab-trigger"
+          [class.active]="activeTab === 'projetos'"
+          (click)="onTabChange('projetos')">
+          <app-svg-icon
+            class="nav-icon"
+            [path]="'assets/icon/assignment_projetos_vetor.svg'"
+            [size]="18">
+          </app-svg-icon>
+          Projetos
+        </button>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="tab-content">
+
+        <!-- Grupos de Critérios Tab -->
+        <div *ngIf="activeTab === 'criterios'" class="tab-panel">
+          <h3>Grupos de critérios vinculados ao objetivo</h3>
+
+
+          <!-- Actions -->
+          <div class="actions-right">
+            <div class="search-container">
+
+              <app-svg-icon
+                class="nav-icon"
+                [path]="'assets/icon/search_vetor.svg'"
+                [size]="18">
+              </app-svg-icon>
+              <input
+                type="text"
+                placeholder="Buscar pelo nome do critério"
+                [(ngModel)]="searchTerm"
+                (input)="onSearchCriterio()">
+            </div>
+          </div>
+
+          <!-- Criteria Groups Table -->
+          <app-card class="table-card">
+            <div class="table-container">
+              <div class="div-loading-projetcts" *ngIf="loadingCriteria">Carregando grupo de critério...</div>
+              <table class="criteria-table" *ngIf="!loadingCriteria">
+                <thead>
+                  <tr>
+                    <th>
+                      <div class="header-cell">
+                        Nome do grupo de critério
+                        <app-svg-icon
+                          class="nav-icon"
+                          [path]="'assets/icon/sort-alt.svg'"
+                          [size]="18">
+                        </app-svg-icon>
+                      </div>
+                    </th>
+                    <th>
+                      <div class="header-cell">
+                        Status
+                        <app-svg-icon
+                          class="nav-icon"
+                          [path]="'assets/icon/sort-alt.svg'"
+                          [size]="18">
+                        </app-svg-icon>
+                      </div>
+                    </th>
+
+                  </tr>
+                </thead>
+                <tbody>
+
+
+
+                    <tr *ngFor="let criteria of filteredCriterios" class="table-row">
+                      <td>
+                        <button class="link" (click)="openCriteriaGroup(criteria.id)">
+                          {{criteria.name}}
+                        </button>
+                      </td>
+                      <td class="status-cell">
+                        <app-badge [color]="getStatusColorByDisabled(criteria.disabled)">{{getStatusLabelByDisabled(criteria.disabled)}}</app-badge>
+                      </td>
+                    </tr>
+
+                </tbody>
+              </table>
+            </div>
+          </app-card>
+
+          <!-- Pagination
+          <div class="pagination">
+            <p class="pagination-info">Mostrando 1 a {{filteredCriteriaGroups.length}} de {{filteredCriteriaGroups.length}} registros</p>
+            <div class="pagination-controls">
+              <button class="pagination-btn" disabled>
+                <i class="icon-chevron-left">‹</i>
+              </button>
+              <button class="pagination-btn active">1</button>
+              <button class="pagination-btn" disabled>
+                <i class="icon-chevron-right">›</i>
+              </button>
+            </div>
+          </div>
+          -->
+        </div>
+
+        <!-- Grupos de Avaliações Tab -->
+        <div *ngIf="activeTab === 'portfolios'" class="tab-panel">
+          <h3>Portfólios vinculados ao objetivo</h3>
+
+
+
+
+          <!-- Actions -->
+          <div class="actions-right">
+
+            <div class="search-container">
+
+              <app-svg-icon
+                class="nav-icon"
+                [path]="'assets/icon/search_vetor.svg'"
+                [size]="18">
+              </app-svg-icon>
+              <input
+                type="text"
+                placeholder="Buscar pelo nome do portfólio"
+                [(ngModel)]="searchTerm"
+                (input)="onSearchPortfolios()">
+            </div>
+          </div>
+
+          <!-- Scenarios Table -->
+          <app-card class="table-card">
+            <div class="table-container">
+              <div class="div-loading-projetcts" *ngIf="loadingPortfolios">Carregando portfolios vinculados...</div>
+              <table class="scenarios-table" *ngIf="!loadingPortfolios">
+                <thead>
+                  <tr>
+                    <th>
+                      <div class="header-cell">
+                        Nome do portfólio
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+
+                    <th>
+                      <div class="header-cell">
+                        Status
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let portfolio of filteredPortfolios" class="table-row">
+                    <td>
+                      <button class="scenario-link" (click)="openPortfolio(portfolio)">
+                        {{portfolio.name}}
+                      </button>
+                    </td>
+                    <td>
+                      <app-badge [color]="portfolio.statusColor">{{portfolio.status}}</app-badge>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </app-card>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <p class="pagination-info">Mostrando 1 a {{filteredPortfolios.length}} de {{filteredPortfolios.length}} registros</p>
+            <div class="pagination-controls">
+              <button class="pagination-btn" disabled>
+                <i class="icon-chevron-left">‹</i>
+              </button>
+              <button class="pagination-btn active">1</button>
+              <button class="pagination-btn" disabled>
+                <i class="icon-chevron-right">›</i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- Projetos Tab -->
+        <div *ngIf="activeTab === 'projetos'" class="tab-panel">
+          <h3>Projetos vinculados ao objetivo</h3>
+
+          <!-- Actions -->
+          <div class="actions-right">
+            <div class="search-container">
+
+              <app-svg-icon
+                class="nav-icon"
+                [path]="'assets/icon/search_vetor.svg'"
+                [size]="18">
+              </app-svg-icon>
+              <input
+                type="text"
+                placeholder="Buscar pelo nome do projeto"
+                [(ngModel)]="searchTerm"
+                (input)="onSearchProjetos()">
+            </div>
+          </div>
+
+          <!-- Scenarios Table -->
+          <app-card class="table-card">
+            <div class="table-container">
+               <div class="div-loading-projetcts" *ngIf="loadingProjects">Carregando portfolios vinculados...</div>
+              <table class="scenarios-table" *ngIf="!loadingProjects">
+                <thead>
+                  <tr>
+                    <th>
+                      <div class="header-cell">
+                        Nome do cenário
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+                    <th>
+                      <div class="header-cell">
+                        Status
+                        <i class="icon-sort">↕️</i>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let projeto of filteredProjetos" class="table-row">
+                    <td>
+                      <button class="scenario-link" (click)="openProjeto(projeto)">
+                        {{projeto.name}}
+                      </button>
+                    </td>
+                    <td>
+                      <app-badge [color]="projeto.statusColor">{{projeto.status}}</app-badge>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </app-card>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <p class="pagination-info">Mostrando 1 a {{filteredProjetos.length}} de {{filteredProjetos.length}} registros</p>
+            <div class="pagination-controls">
+              <button class="pagination-btn" disabled>
+                <i class="icon-chevron-left">‹</i>
+              </button>
+              <button class="pagination-btn active">1</button>
+              <button class="pagination-btn" disabled>
+                <i class="icon-chevron-right">›</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
