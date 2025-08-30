@@ -15,6 +15,7 @@ import { GrupoCriteriosComponent } from './pages/grupo-criterios/grupo-criterios
 import { CriterioComponent } from './pages/grupo-criterios/criterio/criterio.component';
 import { EvaluationGroupDetailPageComponent } from './pages/strategies-page/evaluation-group-detail-page/evaluation-group-detail-page.component';
 import { ProjectEvaluationDetailComponent } from './pages/strategies-page/project-evaluation-detail/project-evaluation-detail.component';
+import { ScenarioDetailPageComponent } from './pages/strategies-page/scenario-detail-page/scenario-detail-page.component';
 
 export const routes: Routes = [
 
@@ -33,7 +34,9 @@ export const routes: Routes = [
   { path: 'estrategia/:estrategiaId/grupo-criterio/:grupoId/criterio/:criterioId', component: CriterioComponent },
   { path: 'estrategia/:estrategiaId/grupo-avaliacao/:grupoAvaliacaoId', component: EvaluationGroupDetailPageComponent },
   { path: 'estrategia/:estrategiaId/grupo-avaliacao/:grupoAvaliacaoId/projeto/:projetoId', component: ProjectEvaluationDetailComponent },
+  { path: 'estrategia/:estrategiaId/cenario/:cenarioId', component: ScenarioDetailPageComponent },
 ];
+
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]

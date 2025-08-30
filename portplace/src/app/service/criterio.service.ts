@@ -3,7 +3,7 @@ import { environment } from '../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { Criterion } from '../interface/interfacies';
-import { Page } from '../interface/carlos-interfaces';
+import { Page } from '../models/pagination-models';
 
 @Injectable({
   providedIn: 'root'

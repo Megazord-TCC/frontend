@@ -12,7 +12,6 @@ import {
   Evaluation,
   EvaluationGroup,
   EvaluationGroupView,
-  Page,
   Project
 } from '../../../interface/carlos-interfaces';
 import { forkJoin, map, firstValueFrom, Subscription } from 'rxjs';
@@ -20,6 +19,7 @@ import { ProjectCriteriaEvaluationModal } from '../../../components/project-crit
 import { Criterion } from '../../../interface/interfacies';
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../../service/breadcrumb.service';
+import { Page } from '../../../models/pagination-models';
 
 // Interface local para combinar dados de critério com avaliação
 interface CriteriaEvaluation {

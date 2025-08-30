@@ -12,6 +12,7 @@ import { firstValueFrom, retry, Subscription } from 'rxjs';
 import { EvaluationGroupsTabComponent } from '../../../components/evaluation-groups-tab/evaluation-groups-tab.component';
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../../service/breadcrumb.service';
+import { ScenarioTabComponent } from '../../../components/scenario-tab/scenario-tab.component';
 
 
 @Component({
@@ -24,7 +25,8 @@ import { BreadcrumbService } from '../../../service/breadcrumb.service';
     SvgIconComponent,
     BreadcrumbComponent,
     FormModalComponentComponent,
-    EvaluationGroupsTabComponent
+    EvaluationGroupsTabComponent,
+    ScenarioTabComponent
   ],
   templateUrl: './strategy-detail-page.component.html',
   styleUrl: './strategy-detail-page.component.scss'

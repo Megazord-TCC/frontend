@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CriteriaGroup, EvaluationGroup, EvaluationGroupView, Page } from '../../interface/carlos-interfaces';
+import { CriteriaGroup, EvaluationGroup, EvaluationGroupView } from '../../interface/carlos-interfaces';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { firstValueFrom, map } from 'rxjs';
+import { Page } from '../../models/pagination-models';
 
 @Component({
   selector: 'app-evaluation-group-edit-modal',

@@ -2,20 +2,18 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BadgeComponent } from '../../../components/badge/badge.component';
 import { CardComponent } from '../../../components/card/card.component';
 import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.component';
-import { FormModalComponentComponent } from '../../../components/form-modal-component/form-modal-component.component';
-import { EvaluationGroupsTabComponent } from '../../../components/evaluation-groups-tab/evaluation-groups-tab.component';
 import { EvaluationGroupEditModal } from '../../../components/evaluation-group-edit-modal/evaluation-group-edit-modal.component';
 import { ProjectEvaluationCreateModal } from '../../../components/evaluation-project-create-modal/evaluation-project-create-modal.component';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { CriteriaGroup, Evaluation, EvaluationGroup, EvaluationGroupView, Page, ProjectRanking, User } from '../../../interface/carlos-interfaces';
-import { filter, forkJoin, map, switchMap, tap, Subscription } from 'rxjs';
+import { CriteriaGroup, EvaluationGroup, EvaluationGroupView, ProjectRanking } from '../../../interface/carlos-interfaces';
+import { forkJoin, map, Subscription } from 'rxjs';
 import { EvaluationGroupDeleteModal } from '../../../components/evaluation-group-delete-modal/evaluation-group-delete-modal.component';
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../../service/breadcrumb.service';
+import { Page } from '../../../models/pagination-models';
 
 @Component({
   selector: 'app-evaluation-group-detail-page',
@@ -23,10 +21,7 @@ import { BreadcrumbService } from '../../../service/breadcrumb.service';
     CommonModule,
     FormsModule,
     CardComponent,
-    BadgeComponent,
     SvgIconComponent,
-    FormModalComponentComponent,
-    EvaluationGroupsTabComponent,
     EvaluationGroupEditModal,
     ProjectEvaluationCreateModal,
     EvaluationGroupDeleteModal,
