@@ -1,0 +1,12 @@
+<div class="actions-right" [class.flex-end]="!actionButton">
+    <button *ngIf="actionButton" class="btn-primary" (click)="actionButtonClick.emit()">
+        <app-svg-icon *ngIf="actionButton.hasIcon" class="nav-icon" [path]="actionButton.iconPath" [size]="18"></app-svg-icon>
+        {{ actionButton.label }}
+    </button>
+    <div class="search-container" *ngIf="filterText">
+        <app-svg-icon class="nav-icon" [path]="'assets/icon/search_vetor.svg'" [size]="18">
+        </app-svg-icon>
+        <input type="text" [placeholder]="filterText.label" [(ngModel)]="filterTextCurrentValue"
+            (input)="onFilterTextInput()">
+    </div>
+</div>

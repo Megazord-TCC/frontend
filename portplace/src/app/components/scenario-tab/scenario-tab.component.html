@@ -1,0 +1,20 @@
+<div class="tab-panel">
+    <h3>Cenários de avaliação</h3>
+    <p class="tab-description">
+        Cadastre cenários de avaliação para vincular projetos a um portfólio. Durante esse processo é realizado o
+        balanceamento.
+    </p>
+
+    <app-table 
+        [dataRetrievalMethodRef]="this.getDataForTableComponent"
+        [filterButtons]="filterButtons"
+        [filterText]="filterText"
+        [columns]="columns"
+        [actionButton]="actionButton"
+        (actionButtonClick)="openCreateModal()"
+        (mainColumnRowClick)="openScenario($event)">
+    </app-table>
+</div>
+<app-scenario-create-modal [isVisible]="showCreateModal" (close)="closeCreateModal()"
+    (cancel)="closeCreateModal()">
+</app-scenario-create-modal>

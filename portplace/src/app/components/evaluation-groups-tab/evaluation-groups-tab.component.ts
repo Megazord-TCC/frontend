@@ -6,9 +6,10 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../environments/environment';
 import { ActivatedRoute, Router } from '@angular/router';
-import { EvaluationGroup, EvaluationGroupView, CriteriaGroup, Page } from '../../interface/carlos-interfaces';
+import { EvaluationGroup, EvaluationGroupView, CriteriaGroup } from '../../interface/carlos-interfaces';
 import { forkJoin, map } from 'rxjs';
 import { EvaluationGroupCreateModal } from '../evaluation-group-create-modal/evaluation-group-create-modal.component';
+import { Page } from '../../models/pagination-models';
 
 @Component({
   selector: 'app-evaluation-groups-tab',

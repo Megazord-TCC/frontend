@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { map, Observable } from 'rxjs';
 import { CriteriaGroup } from '../interface/interfacies';
-import { Page } from '../interface/carlos-interfaces';
+import { Page } from '../models/pagination-models';
 
 @Injectable({
   providedIn: 'root'

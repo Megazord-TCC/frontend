@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
-import { CriteriaComparison, CriteriaGroup } from '../interface/interfacies';
-import { Page } from '../interface/carlos-interfaces';
+import { CriteriaComparison } from '../interface/interfacies';
+import { Page } from '../models/pagination-models';
 
 @Injectable({
   providedIn: 'root'

@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CriteriaGroup, EvaluationGroup, Page } from '../../interface/carlos-interfaces';
+import { CriteriaGroup, EvaluationGroup } from '../../interface/carlos-interfaces';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../environments/environment';
-import { filter, firstValueFrom, map, Observable } from 'rxjs';
+import { firstValueFrom, map, Observable } from 'rxjs';
+import { Page } from '../../models/pagination-models';
 
 @Component({
   selector: 'app-evaluation-group-create-modal',
@@ -177,8 +178,6 @@ export class EvaluationGroupCreateModal {
     let criteriaGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups`;
     let getAllCriteriaGroups$ = this.httpClient.get<Page<CriteriaGroup>>(criteriaGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
 
-    // TODO: Adicionar regra para "O grupo de critérios selecionado não possui critérios. Acesse sua página e realize o cadastro.".
-    // TODO: Adicionar regra para "Os critérios do grupo de critérios selecionado não foram totalmente comparados entre si. Acesse sua página e finalize a comparação.".
     getAllCriteriaGroups$.subscribe(criteriaGroups => {
       this.inputCriteriaGroupsOptions = criteriaGroups;
 

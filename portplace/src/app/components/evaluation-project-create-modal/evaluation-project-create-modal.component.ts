@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { firstValueFrom, forkJoin, map } from 'rxjs';
-import { Page } from '../../interface/carlos-interfaces';
+import { Page } from '../../models/pagination-models';
 
 @Component({
   selector: 'app-project-evaluation-create-modal',
