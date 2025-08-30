@@ -92,17 +92,17 @@ export const getFilterButtons = (): InputFilter[] => {
 
     input = new InputFilter();
     input.label = 'Aguardando autorização';
-    input.queryParam = { name: 'status', value: ScenarioStatusEnum.WAITING_AUTHORIZATION.valueOf().toString() };
+    input.queryParam = { name: 'status', value: "WAITING_AUTHORIZATION" };
     inputs.push(input);
 
     input = new InputFilter();
     input.label = 'Autorizado';
-    input.queryParam = { name: 'status', value: ScenarioStatusEnum.AUTHORIZED.valueOf().toString() };
+    input.queryParam = { name: 'status', value: "AUTHORIZED" };
     inputs.push(input);
 
     input = new InputFilter();
     input.label = 'Cancelado';
-    input.queryParam = { name: 'status', value: ScenarioStatusEnum.CANCELLED.valueOf().toString() };
+    input.queryParam = { name: 'status', value: "CANCELLED" };
     inputs.push(input);
 
     return inputs;

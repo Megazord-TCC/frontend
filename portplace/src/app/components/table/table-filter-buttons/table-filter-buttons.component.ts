@@ -36,6 +36,8 @@ export class TableFilterButtonsComponent {
     activeFilterButtonLabel = '';
 
     onFilterButtonClick(filterButton: InputFilter) {
+        this.queryParams.page = 0; // Volta para a primeira página quando muda algum filtro.
+
         // Este filtro estava ativo, e agora deseja desativá-lo.
         if (this.activeFilterButtonLabel == filterButton.label) {
             this.activeFilterButtonLabel = '';

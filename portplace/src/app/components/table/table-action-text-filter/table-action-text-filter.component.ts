@@ -41,6 +41,8 @@ export class TableActionTextFilterComponent {
     filterTextCurrentValue = '';
 
     onFilterTextInput() {
+        this.queryParams.page = 0; // Volta para a primeira página quando muda algum filtro.
+        
         // Há texto no input de filtro de texto
         if (this.filterTextCurrentValue) {
             let queryParam: QueryParam = { ...this.filterText!.queryParam };
