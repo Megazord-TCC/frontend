@@ -48,10 +48,10 @@ export interface ProjectPageableResponse {
 }
 
 export enum ProjectStatusEnum {
-  CANDIDATE = 'CANDIDATE',
-  PLANNING = 'PLANNING',
+  IN_ANALYSIS = 'IN_ANALYSIS',
   IN_PROGRESS = 'IN_PROGRESS',
-  FINISHED = 'FINISHED'
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED'
 }
 
 export interface Evaluation {
@@ -251,4 +251,22 @@ export interface Risk {
   severity: number;
   resolvedOccurrences: number;
   unresolvedOccurrences: number;
+}
+
+// Interfaces para tratamento de erros da API
+export interface ApiError {
+  status: number;
+  message: string;
+  path: string;
+  method: string;
+  timestamp: string;
+  errors?: ValidationError[];
+}
+
+export interface ValidationError {
+  field?: string;
+  rejectedValue?: any;
+  defaultMessage?: string;
+  code?: string;
+  objectName?: string;
 }

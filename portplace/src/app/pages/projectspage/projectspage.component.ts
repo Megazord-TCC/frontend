@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CardComponent } from '../../components/card/card.component';
 import { Router } from '@angular/router';
 import { BadgeComponent } from '../../components/badge/badge.component';
-import { FormField, FormModalConfig, Project, ProjectPageableResponse, ProjectStatusEnum } from '../../interface/interfacies';
+import { FormField, FormModalConfig, Project, ProjectPageableResponse, ProjectStatusEnum, ApiError, ValidationError } from '../../interface/interfacies';
 import { SvgIconComponent } from '../../components/svg-icon/svg-icon.component';
 import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../service/breadcrumb.service';
@@ -40,7 +40,7 @@ export class ProjectsComponent implements OnInit {
     portfolio: undefined  ,
     startDate: '',
     endDate: '',
-    status: ProjectStatusEnum.CANDIDATE,
+    status: ProjectStatusEnum.IN_ANALYSIS,
     projectManager: 1,
     earnedValue: 0,
     plannedValue: 0,
@@ -131,6 +131,8 @@ export class ProjectsComponent implements OnInit {
   }
 
   createProject(): void {
+    console.log('Dados do projeto sendo enviados:', this.newProject);
+
     this.projetoService.createProject(this.newProject).subscribe({
       next: (createdProject) => {
         console.log('Projeto criado:', createdProject);
@@ -138,7 +140,8 @@ export class ProjectsComponent implements OnInit {
         this.resetNewProject();
       },
       error: (err) => {
-        console.error('Erro ao criar projeto:', err);
+        console.error('Erro completo ao criar projeto:', err);
+        this.handleApiError(err);
       }
     });
   }
@@ -185,10 +188,10 @@ export class ProjectsComponent implements OnInit {
 
     if (this.activeFilter) {
       const filterMap: { [key: string]: ProjectStatusEnum } = {
-        'em-analise': ProjectStatusEnum.CANDIDATE,
-        'em-planejamento': ProjectStatusEnum.PLANNING,
+        'em-analise': ProjectStatusEnum.IN_ANALYSIS,
+        'cancelado': ProjectStatusEnum.CANCELLED,
         'em-andamento': ProjectStatusEnum.IN_PROGRESS,
-        'finalizado': ProjectStatusEnum.FINISHED
+        'finalizado': ProjectStatusEnum.COMPLETED
       };
 
       filtered = filtered.filter(project =>
@@ -216,7 +219,7 @@ export class ProjectsComponent implements OnInit {
       portfolio: undefined  ,
       startDate: '',
       endDate: '',
-      status: ProjectStatusEnum.CANDIDATE,
+      status: ProjectStatusEnum.IN_ANALYSIS,
       projectManager: 1,
       earnedValue: 0,
       plannedValue: 0,
@@ -247,13 +250,21 @@ export class ProjectsComponent implements OnInit {
       return acc;
     }, {} as any);
 
+    // Validar dados antes de enviar
+    const validationResult = this.validateProjectData(projectData);
+    if (!validationResult.isValid) {
+      console.error('Dados inválidos:', validationResult.errors);
+      // Aqui você pode mostrar os erros no formulário
+      return;
+    }
+
     const newProject: Project = {
       name: projectData.name,
       description: projectData.description,
-      portfolio: undefined  ,
+      portfolio: undefined,
       startDate: projectData.startDate,
       endDate: projectData.endDate,
-      status: ProjectStatusEnum.CANDIDATE,
+      status: ProjectStatusEnum.IN_ANALYSIS,
       projectManager: 1,
       earnedValue: 0,
       plannedValue: 0,
@@ -262,17 +273,89 @@ export class ProjectsComponent implements OnInit {
       payback: 0
     };
 
+    console.log('Dados do projeto sendo enviados:', newProject);
+
     this.projetoService.createProject(newProject).subscribe({
       next: (createdProject) => {
         console.log('Projeto criado:', createdProject);
         this.loadProjects();
         this.resetNewProject();
+        this.closeCreateModal();
       },
       error: (err) => {
-        console.error('Erro ao criar projeto:', err);
+        console.error('Erro completo ao criar projeto:', err);
+
+        this.handleApiError(err);
+
+        // Manter o modal aberto para que o usuário possa corrigir
+        // this.closeCreateModal(); // Remover esta linha para não fechar o modal
       }
     });
-    this.closeCreateModal();
+  }
+
+  private validateProjectData(data: any): { isValid: boolean; errors: string[] } {
+    const errors: string[] = [];
+
+    // Validar nome
+    if (!data.name || data.name.trim() === '') {
+      errors.push('Nome é obrigatório');
+    }
+
+    // Validar datas
+    if (!data.startDate) {
+      errors.push('Data de início é obrigatória');
+    }
+
+    if (!data.endDate) {
+      errors.push('Data de fim é obrigatória');
+    }
+
+    if (data.startDate && data.endDate) {
+      const startDate = new Date(data.startDate);
+      const endDate = new Date(data.endDate);
+
+      if (startDate >= endDate) {
+        errors.push('Data de fim deve ser posterior à data de início');
+      }
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  }
+
+  private handleApiError(err: any): void {
+    console.error('Detalhes do erro:', {
+      status: err.status,
+      statusText: err.statusText,
+      url: err.url
+    });
+
+    if (err.error) {
+      const apiError = err.error as ApiError;
+      console.error('Erro da API:', {
+        status: apiError.status || err.status,
+        message: apiError.message,
+        path: apiError.path,
+        method: apiError.method,
+        timestamp: apiError.timestamp
+      });
+
+      // Se houver erros de validação específicos, exiba-os
+      if (apiError.errors && Array.isArray(apiError.errors)) {
+        console.error('Erros de validação específicos:');
+        apiError.errors.forEach((error: ValidationError, index: number) => {
+          console.error(`Erro ${index + 1}:`, {
+            campo: error.field,
+            valorRejeitado: error.rejectedValue,
+            mensagem: error.defaultMessage,
+            codigo: error.code,
+            objeto: error.objectName
+          });
+        });
+      }
+    }
   }
 
   getStatusLabel(status: string |ProjectStatusEnum): string {
@@ -280,13 +363,13 @@ export class ProjectsComponent implements OnInit {
       status = ProjectStatusEnum[status as keyof typeof ProjectStatusEnum];
     }
     switch (status) {
-      case ProjectStatusEnum.CANDIDATE:
+      case ProjectStatusEnum.IN_ANALYSIS:
         return 'EM ANÁLISE';
-      case ProjectStatusEnum.PLANNING:
-        return 'EM PLANEJAMENTO';
+      case ProjectStatusEnum.CANCELLED:
+        return 'CANCELADO';
       case ProjectStatusEnum.IN_PROGRESS:
         return 'EM ANDAMENTO';
-      case ProjectStatusEnum.FINISHED:
+      case ProjectStatusEnum.COMPLETED:
         return 'FINALIZADO';
       default:
         return '';
@@ -298,17 +381,16 @@ export class ProjectsComponent implements OnInit {
       status = ProjectStatusEnum[status as keyof typeof ProjectStatusEnum];
     }
     switch (status) {
-      case ProjectStatusEnum.CANDIDATE:
+      case ProjectStatusEnum.IN_ANALYSIS:
         return 'yellow';
-      case ProjectStatusEnum.PLANNING:
-        return 'blue';
       case ProjectStatusEnum.IN_PROGRESS:
+        return 'blue';
+      case ProjectStatusEnum.COMPLETED:
         return 'green';
-      case ProjectStatusEnum.FINISHED:
+      case ProjectStatusEnum.CANCELLED:
         return 'red';
       default:
         return 'gray';
     }
   }
-
 }

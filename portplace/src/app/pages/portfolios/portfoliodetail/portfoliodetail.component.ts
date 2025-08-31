@@ -247,10 +247,10 @@ export class PortfolioDetailComponent implements OnInit {
 
     if (this.activeFilter) {
       const filterMap: { [key: string]: ProjectStatusEnum } = {
-        'em-analise': ProjectStatusEnum.CANDIDATE,
-        'em-planejamento': ProjectStatusEnum.PLANNING,
+        'em-analise': ProjectStatusEnum.IN_ANALYSIS,
+        'cancelado': ProjectStatusEnum.CANCELLED,
         'em-andamento': ProjectStatusEnum.IN_PROGRESS,
-        'finalizado': ProjectStatusEnum.FINISHED
+        'finalizado': ProjectStatusEnum.COMPLETED
       };
 
       filtered = filtered.filter(project =>
