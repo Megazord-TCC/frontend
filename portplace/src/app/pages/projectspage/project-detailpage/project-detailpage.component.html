@@ -1,5 +1,4 @@
 <div class="project-detail-layout">
-
   <div class="project-detail-content">
     <!-- Breadcrumb -->
     <app-breadcrumb></app-breadcrumb>
@@ -8,7 +7,6 @@
     <div class="project-header">
       <div class="header-top">
         <button class="back-btn" (click)="goBack()">
-
           <app-svg-icon
             class="nav-icon"
             [path]="'assets/icon/voltar_vetor.svg'"
@@ -26,14 +24,21 @@
       </div>
 
       <div class="header-actions">
-        <button class="btn-outline"  (click)="openEditModal()">
-
+        <button class="btn-outline" (click)="openEditModal()">
           <app-svg-icon
             class="nav-icon"
             [path]="'assets/icon/editar_vetor.svg'"
             [size]="18">
           </app-svg-icon>
           Editar dados básicos
+        </button>
+        <button class="btn-outline" (click)="openCancelModal()">
+          <app-svg-icon
+            class="nav-icon"
+            [path]="'assets/icon/editar_vetor.svg'"
+            [size]="18">
+          </app-svg-icon>
+          Cancelar projeto
         </button>
         <button class="btn-outline btn-danger">
           <app-svg-icon
@@ -80,19 +85,25 @@
         <div *ngIf="activeTab === 'indicadores'" class="tab-panel">
           <h3>Indicadores</h3>
           <p class="tab-description">
-            Atualize os indicadores do projeto com os valores mais recentes.
+            <strong>Campos editáveis:</strong> Atualize os valores base do projeto (EV, PV, AC, BAC, Payback).<br>
+            <strong>Campos calculados:</strong> São atualizados automaticamente com base nos valores editáveis.
           </p>
 
+      
           <div class="indicators-grid">
-            <div *ngFor="let indicator of indicators" class="indicator-item">
-              <label>{{indicator.label}}</label>
+            <!-- Valor Agregado (EV) -->
+            <div class="indicator-item">
+              <label>Valor Agregado (EV) - Editável</label>
               <div class="indicator-input-group">
                 <input
-                  type="text"
-                  [(ngModel)]="indicator.value"
-                  class="indicator-input">
-                <button class="save-btn" (click)="saveIndicator(indicator)">
-
+                  type="number"
+                  [(ngModel)]="earnedValue"
+                  class="indicator-input"
+                  step="0.01"
+                  min="0"
+                  [value]="earnedValue || 0"
+                  placeholder="Digite o valor agregado">
+                <button class="save-btn" (click)="saveEarnedValue()">
                   <app-svg-icon
                     class="nav-icon"
                     [path]="'assets/icon/salvar_vetor.svg'"
@@ -101,7 +112,152 @@
                   Salvar
                 </button>
               </div>
-              <p class="last-update-text">{{indicator.lastUpdate}}</p>
+              <p class="last-update-text">Valor atual: {{formatCurrency(earnedValue || 0)}}</p>
+            </div>
+
+            <!-- Valor Planejado (PV) -->
+            <div class="indicator-item">
+              <label>Valor Planejado (PV) - Editável</label>
+              <div class="indicator-input-group">
+                <input
+                  type="number"
+                  [(ngModel)]="plannedValue"
+                  class="indicator-input"
+                  step="0.01"
+                  min="0"
+                  [value]="plannedValue || 0"
+                  placeholder="Digite o valor planejado">
+                <button class="save-btn" (click)="savePlannedValue()">
+                  <app-svg-icon
+                    class="nav-icon"
+                    [path]="'assets/icon/salvar_vetor.svg'"
+                    [size]="18">
+                  </app-svg-icon>
+                  Salvar
+                </button>
+              </div>
+              <p class="last-update-text">Valor atual: {{formatCurrency(plannedValue || 0)}}</p>
+            </div>
+
+            <!-- Custo Real (AC) -->
+            <div class="indicator-item">
+              <label>Custo Real (AC) - Editável</label>
+              <div class="indicator-input-group">
+                <input
+                  type="number"
+                  [(ngModel)]="actualCost"
+                  class="indicator-input"
+                  step="0.01"
+                  min="0"
+                  [value]="actualCost || 0"
+                  placeholder="Digite o custo real">
+                <button class="save-btn" (click)="saveActualCost()">
+                  <app-svg-icon
+                    class="nav-icon"
+                    [path]="'assets/icon/salvar_vetor.svg'"
+                    [size]="18">
+                  </app-svg-icon>
+                  Salvar
+                </button>
+              </div>
+              <p class="last-update-text">Valor atual: {{formatCurrency(actualCost || 0)}}</p>
+            </div>
+
+            <!-- Orçamento Planejado (BAC) -->
+            <div class="indicator-item">
+              <label>Orçamento Planejado (BAC) - Editável</label>
+              <div class="indicator-input-group">
+                <input
+                  type="number"
+                  [(ngModel)]="budget"
+                  class="indicator-input"
+                  step="0.01"
+                  min="0"
+                  [value]="budget || 0"
+                  placeholder="Digite o orçamento">
+                <button class="save-btn" (click)="saveBudget()">
+                  <app-svg-icon
+                    class="nav-icon"
+                    [path]="'assets/icon/salvar_vetor.svg'"
+                    [size]="18">
+                  </app-svg-icon>
+                  Salvar
+                </button>
+              </div>
+              <p class="last-update-text">Valor atual: {{formatCurrency(budget || 0)}}</p>
+            </div>
+
+            <!-- Payback -->
+            <div class="indicator-item">
+              <label>Payback (anos) - Editável</label>
+              <div class="indicator-input-group">
+                <input
+                  type="number"
+                  [(ngModel)]="payback"
+                  class="indicator-input"
+                  step="0.1"
+                  min="0"
+                  [value]="payback || 0"
+                  placeholder="Digite o payback em anos">
+                <button class="save-btn" (click)="savePayback()">
+                  <app-svg-icon
+                    class="nav-icon"
+                    [path]="'assets/icon/salvar_vetor.svg'"
+                    [size]="18">
+                  </app-svg-icon>
+                  Salvar
+                </button>
+              </div>
+              <p class="last-update-text">Valor atual: {{payback || 0}} anos</p>
+            </div>
+
+          </div>
+
+
+          <div class="strategic-links">
+            <!-- CPI -->
+            <div class="link-item">
+
+              <div class="link-info">
+                <span class="link-title">{{cpi}}</span>
+                <span class="link-subtitle">CPI (EV ÷ AC)</span>
+              </div>
+            </div>
+
+            <!-- SPI -->
+            <div class="link-item">
+
+              <div class="link-info">
+                <span class="link-title">{{spi}}</span>
+                <span class="link-subtitle">SPI (EV ÷ PV)</span>
+              </div>
+            </div>
+
+            <!-- Progresso -->
+            <div class="link-item">
+
+              <div class="link-info">
+                <span class="link-title">{{progress}}</span>
+                <span class="link-subtitle">Progresso (%)</span>
+              </div>
+            </div>
+
+            <!-- EAC -->
+            <div class="link-item">
+
+              <div class="link-info">
+                <span class="link-title">{{eac}}</span>
+                <span class="link-subtitle">EAC (BAC ÷ CPI)</span>
+              </div>
+            </div>
+
+            <!-- ETC -->
+            <div class="link-item">
+
+              <div class="link-info">
+                <span class="link-title">{{etc}}</span>
+                <span class="link-subtitle">ETC (EAC - AC)</span>
+              </div>
             </div>
           </div>
         </div>
@@ -116,7 +272,6 @@
           <!-- Strategic Links -->
           <div class="strategic-links">
             <div class="link-item">
-
               <app-svg-icon
                 class="nav-icon"
                 [path]="'assets/icon/hub_portfolios_vetor.svg'"
@@ -179,36 +334,24 @@
               </div>
             </div>
           </div>
-
-          <!-- Evaluations -->
-          <!-- <div class="evaluations-section">
-            <h4>Avaliações</h4>
-            <div class="evaluation-result">
-              <span class="result-label">Resultado:</span>
-              <span class="result-value">700</span>
-            </div>
-            <div class="evaluations-list">
-              <div *ngFor="let evaluation of evaluations" class="evaluation-item">
-                <app-svg-icon
-                  class="nav-icon"
-                  [path]="'assets/icon/metrica_vetor.svg'"
-                  [size]="18">
-                </app-svg-icon>
-                <span class="evaluation-text">
-                  {{evaluation.name}} (peso {{evaluation.weight}}%): {{evaluation.value}}
-                </span>
-              </div>
-            </div>
-          </div> -->
         </div>
       </div>
     </div>
   </div>
-   <app-form-modal-component
-      [isVisible]="showEditModal"
-      [config]="editPortfolioConfig"
-      (close)="closeEditModal()"
-      (save)="onSavePortfolio($event)"
-      (cancel)="closeEditModal()">
-    </app-form-modal-component>
+
+  <app-form-modal-component
+    [isVisible]="showEditModal"
+    [config]="editPortfolioConfig"
+    (close)="closeEditModal()"
+    (save)="onSavePortfolio($event)"
+    (cancel)="closeEditModal()">
+  </app-form-modal-component>
+
+  <app-form-modal-component
+    [isVisible]="showCancelModal"
+    [config]="cancelProjectConfig"
+    (close)="closeCancelModal()"
+    (save)="onCancelProject($event)"
+    (cancel)="closeCancelModal()">
+  </app-form-modal-component>
 </div>

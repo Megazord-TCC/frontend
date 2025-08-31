@@ -2,19 +2,20 @@ export interface Project {
   id?: number;
   name: string;
   description: string;
-  portfolio?: string | undefined;
-  startDate?: string;
-  endDate?: string;
+  portfolio?: any;
+  startDate: string;
+  endDate: string;
   status: ProjectStatusEnum;
-  projectManager?: number;
-  earnedValue?: number;
-  plannedValue?: number;
-  actualCost?: number;
-  budget?: number;
-  payback?: number;
-  disable?: boolean;
+  projectManager: number;
+  earnedValue: number;
+  plannedValue: number;
+  actualCost: number;
+  budget: number;
+  payback: number;
   createdAt?: string;
   lastModifiedAt?: string;
+  disabled?: boolean;
+  cancellationReason?: string;
 }
 
 export interface ProjectPageableResponse {
@@ -75,14 +76,29 @@ export interface Indicator {
   label: string;
   value: string;
   lastUpdate: string;
+  displayValue?: string;
+  isEditable?: boolean;
+  fieldName?: string;
+}
+
+export interface Portfolio {
+  id: number;
+  name: string;
+  description?: string;
+  createdAt: string;
+  lastModifiedAt: string;
+  status: "ATIVADO" | "CANCELADO";
+  statusColor: "green" | "gray";
 }
 
 export interface Objective {
-  id: string
+  id: number
+  strategyId: number
+  disabled: boolean
   name: string
-  linkedCriteria: number
-  activePortfolios: number
-  activeProjects: number
+  description?: string
+  createdAt: string
+  lastModifiedAt: string
   status: "ATIVADO" | "CANCELADO"
   statusColor: "green" | "gray"
 }
@@ -153,7 +169,7 @@ export interface Criterion {
   description?: string;
   criteriaGroupId: number;
   weight: number;
-  disabled?: boolean;
+  disabled: boolean;
   lastModifiedAt?: Date;
   lastModifiedBy?: User;
   createdAt?: Date;
@@ -217,4 +233,22 @@ export interface BreadcrumbItem {
   label: string;
   url: string;
   isActive: boolean;
+}
+
+export interface MetricCard {
+  title: string;
+  subtitle: string;
+  color: string;
+  value?: string;
+  icon: string;
+}
+
+export interface Risk {
+  code: number;
+  name: string;
+  probability: number;
+  impact: number;
+  severity: number;
+  resolvedOccurrences: number;
+  unresolvedOccurrences: number;
 }

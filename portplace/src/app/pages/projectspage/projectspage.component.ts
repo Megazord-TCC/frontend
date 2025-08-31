@@ -49,7 +49,7 @@ export class ProjectsComponent implements OnInit {
     payback: 0
   };
 
-createProjectConfig: FormModalConfig = {
+  createProjectConfig: FormModalConfig = {
     title: 'Cadastrar novo projeto',
     fields: [
       {

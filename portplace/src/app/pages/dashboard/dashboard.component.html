@@ -6,7 +6,7 @@
   <div *ngIf="!hasPortfolio" class="no-portfolio">
     <p>
       Nenhum portfólio em andamento.
-      <button class="link-btn" (click)="hasPortfolio = true">
+      <button class="link-btn" (click)="onHasPortfolioChange()">
         Acesse a página de Portfólios
       </button>
       e realize o cadastro.
@@ -145,107 +145,31 @@
       </div>
     </app-card>
 
-    <!-- Charts -->
     <div class="charts-grid">
-      <!-- Cost Chart -->
       <app-card class="chart-card">
-        <h3>Custo</h3>
+        <h3>Custo por Trimestre</h3>
         <div class="chart-container">
-          <div class="bar-chart">
-            <div class="quarter-group">
-              <div class="bars">
-                <div class="bar planned" style="height: 64px;"></div>
-                <div class="bar actual" style="height: 48px;"></div>
-              </div>
-              <span class="quarter-label">Q1</span>
-            </div>
-            <div class="quarter-group">
-              <div class="bars">
-                <div class="bar planned" style="height: 48px;"></div>
-                <div class="bar actual" style="height: 80px;"></div>
-              </div>
-              <span class="quarter-label">Q2</span>
-            </div>
-            <div class="quarter-group">
-              <div class="bars">
-                <div class="bar planned" style="height: 32px;"></div>
-                <div class="bar actual" style="height: 32px;"></div>
-              </div>
-              <span class="quarter-label">Q3</span>
-            </div>
-            <div class="quarter-group">
-              <div class="bars">
-                <div class="bar planned" style="height: 64px;"></div>
-                <div class="bar actual" style="height: 48px;"></div>
-              </div>
-              <span class="quarter-label">Q4</span>
-            </div>
-          </div>
-          <div class="chart-legend">
-            <div class="legend-item">
-              <div class="legend-color planned"></div>
-              <span>Custo planejado (R$)</span>
-            </div>
-            <div class="legend-item">
-              <div class="legend-color actual"></div>
-              <span>Custo real (R$)</span>
-            </div>
-          </div>
+          <canvas #costChart></canvas>
         </div>
       </app-card>
 
-      <!-- Bubble Chart -->
       <app-card class="chart-card">
-        <h3>Três riscos com maior severidade</h3>
-        <div class="bubble-chart-container">
-          <div class="bubble-chart">
-            <!-- Y-axis labels -->
-            <div class="y-axis">
-              <span>3</span>
-              <span>2</span>
-              <span>1</span>
-              <span>0</span>
-            </div>
+        <h3>Projetos: Payback vs Alinhamento Estratégico</h3>
+        <div class="chart-container">
+          <canvas #projectBubbleChart></canvas>
+        </div>
+        <div class="chart-description">
+          <p>O tamanho da bolha representa o valor do projeto. Eixo X: Payback em meses, Eixo Y: Alinhamento estratégico (1-10).</p>
+        </div>
+      </app-card>
 
-            <!-- Chart area -->
-            <div class="chart-area">
-              <!-- Risco 3 -->
-              <div class="bubble small red" style="left: 15%; bottom: 40%;">
-                <span>3</span>
-                <div class="bubble-label">Risco 3</div>
-              </div>
-
-              <!-- Risco 8 -->
-              <div class="bubble medium green" style="left: 50%; bottom: 65%;">
-                <span>8</span>
-                <div class="bubble-label">Risco 8</div>
-              </div>
-
-              <!-- Risco 6 -->
-              <div class="bubble large blue" style="left: 75%; bottom: 65%;">
-                <span>6</span>
-                <div class="bubble-label">Risco 6</div>
-              </div>
-            </div>
-
-            <!-- X-axis labels -->
-            <div class="x-axis">
-              <span>1</span>
-              <span>2</span>
-              <span>3</span>
-              <span>4</span>
-            </div>
-          </div>
-
-          <!-- Axis labels -->
-          <div class="axis-labels">
-            <div class="y-label">Impacto</div>
-            <div class="x-label">Probabilidade</div>
-          </div>
-
-          <div class="chart-description">
-            <p>O tamanho da bolha indica a severidade.</p>
-          </div>
+      <app-card class="chart-card">
+        <h3>Riscos: Impacto vs Probabilidade</h3>
+        <div class="chart-container">
+          <canvas #riskBubbleChart></canvas>
+        </div>
+        <div class="chart-description">
+          <p>O tamanho da bolha representa a severidade do risco. Eixo X: Probabilidade (1-5), Eixo Y: Impacto (1-5).</p>
         </div>
       </app-card>
     </div>
