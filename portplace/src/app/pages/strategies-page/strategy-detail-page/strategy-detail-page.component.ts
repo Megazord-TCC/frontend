@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BadgeComponent } from '../../../components/badge/badge.component';
 import { CardComponent } from '../../../components/card/card.component';
-import { CriteriaGroup, EvaluationGroup, Objective, Scenario,FormField, Criterion, ImportanceScale, CriteriaComparison, RoleEnum, User } from '../../../interface/interfacies';
+import { CriteriaGroup, EvaluationGroup, Objective, Scenario,FormField, Criterion, ImportanceScale, CriteriaComparison, RoleEnum, User, CriteriaGroupStatusEnum } from '../../../interface/interfacies';
 import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.component';
 import { FormModalComponentComponent } from '../../../components/form-modal-component/form-modal-component.component';
 import { CriteriaGroupService } from '../../../service/criteria-group.service';
@@ -65,106 +65,6 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
       lastModifiedAt: '2023-01-01T00:00:00Z'
     }
   ];
-
-  /*
-  criteriaGroups: CriteriaGroup[] = [
-    {
-      id: 1,
-      name: "Grupo de critério 1",
-      description: "Descrição do grupo 1",
-      disabled: false,
-      strategy: {
-        id: 1,
-        name: "Aumentar lucro V2",
-        description: "Estratégia para aumentar lucros",
-        disabled: false,
-        createdAt: new Date('2023-01-01'),
-        lastModifiedAt: new Date('2023-01-02'),
-        lastModifiedBy: 1 // ID do usuário
-      },
-      criteria: [
-        {
-          id: 1,
-          name: "Critério 1.1",
-          description: "Descrição do critério 1.1",
-          disabled: false,
-          createdAt: new Date('2023-01-01'),
-          lastModifiedAt: new Date('2023-01-01')
-        } as Criterion,
-        {
-          id: 2,
-          name: "Critério 1.2",
-          description: "Descrição do critério 1.2",
-          disabled: false,
-          createdAt: new Date('2023-01-01'),
-          lastModifiedAt: new Date('2023-01-01')
-        } as Criterion
-      ],
-      criteriaComparisons: [
-        {
-          id: 1,
-          comparedCriterion: { id: 1, name: "Critério 1.1" } as Criterion,
-          referenceCriterion: { id: 2, name: "Critério 1.2" } as Criterion,
-          importanceScale: ImportanceScale.MORE_IMPORTANT,
-          disabled: false,
-          createdAt: new Date('2023-01-01'),
-          lastModifiedAt: new Date('2023-01-01')
-        } as CriteriaComparison
-      ],
-      createdAt: new Date('2023-01-01'),
-      lastModifiedAt: new Date('2023-01-02'),
-      lastModifiedBy: { id: 1, name: "Admin", email: "admin@example.com", role: RoleEnum.PMO_ADM } as User
-    },
-    {
-      id: 2,
-      name: "Grupo de critério 2",
-      description: "Descrição do grupo 2",
-      disabled: false,
-      strategy: {
-        id: 1,
-        name: "Aumentar lucro V2",
-        description: "Estratégia para aumentar lucros",
-        disabled: false,
-        createdAt: new Date('2023-01-01'),
-        lastModifiedAt: new Date('2023-01-03'),
-        lastModifiedBy: 1 // ID do usuário
-      },
-      criteria: [
-        {
-          id: 3,
-          name: "Critério 2.1",
-          description: "Descrição do critério 2.1",
-          disabled: false,
-          createdAt: new Date('2023-01-01'),
-          lastModifiedAt: new Date('2023-01-01')
-        } as Criterion,
-        {
-          id: 4,
-          name: "Critério 2.2",
-          description: "Descrição do critério 2.2",
-          disabled: false,
-          createdAt: new Date('2023-01-01'),
-          lastModifiedAt: new Date('2023-01-01')
-        } as Criterion
-      ],
-      criteriaComparisons: [
-        {
-          id: 2,
-          comparedCriterion: { id: 3, name: "Critério 2.1" } as Criterion,
-          referenceCriterion: { id: 4, name: "Critério 2.2" } as Criterion,
-          importanceScale: ImportanceScale.EQUALLY_IMPORTANT,
-          disabled: false,
-          createdAt: new Date('2023-01-01'),
-          lastModifiedAt: new Date('2023-01-01')
-        } as CriteriaComparison
-      ],
-      createdAt: new Date('2023-01-01'),
-      lastModifiedAt: new Date('2023-01-03'),
-      lastModifiedBy: { id: 1, name: "Admin", email: "admin@example.com", role: RoleEnum.PMO_ADM } as User
-    }
-  ];
-
-  */
   evaluationGroups: EvaluationGroup[] = [
 
   ]
@@ -411,18 +311,15 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
       return acc;
     }, {} as any);
 
-    // Cria o objeto CriteriaGroup (ajuste conforme sua interface)
     const newGroup: CriteriaGroup = {
       name: groupData.name,
-      description: groupData.description,
-      disabled: false,
-      // Adicione outros campos obrigatórios se necessário
+      description: groupData.description
     };
 
-    // Chama o service passando o id da estratégia
+
     this.criterioService.createCriterio(newGroup, this.estrategiaId).subscribe({
       next: (createdGroup) => {
-        this.loadGruopCriteria(); // Atualiza a lista
+        this.loadGruopCriteria();
         this.closeCreateModal();
       },
       error: (err) => {
@@ -625,11 +522,29 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
     console.log('Group criteria comparisons:', group?.criteriaComparisonCount);
     return group?.criteriaComparisonCount || 0;
   }
-  getStatusLabelByDisabled(disabled: boolean): string {
-    return disabled ? 'Desativado' : 'Ativado';
+  getStatusLabelByDisabled(status?: CriteriaGroupStatusEnum): string {
+    if (!status) return 'Desconhecido';
+
+    switch (status) {
+      case CriteriaGroupStatusEnum.ACTIVE:
+        return 'Ativado';
+      case CriteriaGroupStatusEnum.INACTIVE:
+        return 'Desativado';
+      default:
+        return 'Desconhecido';
+    }
   }
-  getStatusColorByDisabled(disabled: boolean): string {
-    return disabled ? 'red' : 'green';
+  getStatusColorByDisabled(status?: CriteriaGroupStatusEnum): string {
+    if (!status) return 'gray';
+
+    switch (status) {
+      case CriteriaGroupStatusEnum.ACTIVE:
+        return 'green';
+      case CriteriaGroupStatusEnum.INACTIVE:
+        return 'red';
+      default:
+        return 'gray';
+    }
   }
 
 }

@@ -38,7 +38,7 @@
 
     <!-- Table -->
     <app-card class="table-card">
-      <div class="table-container">
+      <div class="table-container" *ngIf="!loadingStrategies; else loadingTemplate">
         <table class="strategies-table">
           <thead>
             <tr>
@@ -78,20 +78,26 @@
           <tbody>
             <tr *ngFor="let strategy of filteredStrategies"
                 class="table-row"
-                (click)="onStrategyClick(strategy.id)">
+                (click)="onStrategyClick(strategy.id!)">
               <td>
                 <button class="strategy-link">{{strategy.name}}</button>
               </td>
-              <td>{{strategy.activeObjectives}}</td>
+              <td>{{strategy.activeObjectivesCount || strategy.activeObjectives || 0}}</td>
               <td>
-                <app-badge [color]="strategy.statusColor">
-                  {{ strategy.status}}
+                <app-badge [color]="getStatusColor(strategy.status)">
+                  {{ getStatusLabel(strategy.status) }}
                 </app-badge>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
+
+      <ng-template #loadingTemplate>
+        <div class="loading-container">
+          <p>Carregando estratégias...</p>
+        </div>
+      </ng-template>
     </app-card>
 
     <!-- Pagination -->
@@ -109,3 +115,12 @@
     </div>
   </div>
 </div>
+
+<!-- Modal de Criação -->
+<app-form-modal-component
+  [isVisible]="showCreateModal"
+  [config]="createStrategyConfig"
+  (save)="onSaveStrategy($event)"
+  (close)="closeCreateModal()"
+  (cancel)="closeCreateModal()">
+</app-form-modal-component>

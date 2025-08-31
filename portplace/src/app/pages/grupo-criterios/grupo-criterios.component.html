@@ -15,7 +15,7 @@
           </app-svg-icon>
         </button>
         <h1>{{criteriaGroup?.name}}</h1>
-        <app-badge *ngIf="criteriaGroup" [color]="getStatusColorByDisabled(criteriaGroup.disabled)">{{getStatusLabelByDisabled(criteriaGroup.disabled)}}</app-badge>
+        <app-badge *ngIf="criteriaGroup" [color]="getStatusColorByDisabled(criteriaGroup.status)">{{getStatusLabelByDisabled(criteriaGroup.status)}}</app-badge>
       </div>
       <p class="strategy-description">{{criteriaGroup?.description}}</p>
       <div class="action-header">
