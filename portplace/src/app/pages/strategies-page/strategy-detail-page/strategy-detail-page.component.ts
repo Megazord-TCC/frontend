@@ -4,10 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BadgeComponent } from '../../../components/badge/badge.component';
 import { CardComponent } from '../../../components/card/card.component';
-import { CriteriaGroup, EvaluationGroup, Objective, Scenario,FormField, Criterion, ImportanceScale, CriteriaComparison, RoleEnum, User, CriteriaGroupStatusEnum } from '../../../interface/interfacies';
+import { CriteriaGroup, EvaluationGroup, Objective, Scenario, FormField, Criterion, ImportanceScale, CriteriaComparison, RoleEnum, User, CriteriaGroupStatusEnum, Strategy, StrategyStatusEnum, FormModalConfig } from '../../../interface/interfacies';
 import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.component';
 import { FormModalComponentComponent } from '../../../components/form-modal-component/form-modal-component.component';
 import { CriteriaGroupService } from '../../../service/criteria-group.service';
+import { EstrategiaService } from '../../../service/estrategia.service';
 import { firstValueFrom, retry, Subscription } from 'rxjs';
 import { EvaluationGroupsTabComponent } from '../../../components/evaluation-groups-tab/evaluation-groups-tab.component';
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
@@ -33,13 +34,14 @@ import { ScenarioTabComponent } from '../../../components/scenario-tab/scenario-
 })
 export class StrategyDetailPageComponent implements OnInit, OnDestroy {
   private routeSubscription?: Subscription;
-  strategy: any = {
-    id: '11',
-    name: 'Estratégia 2024', // Mudei para 2024 que é o que você mencionou
-    status: 'ATIVO',
-    description: 'Descrição da estratégia.',
-    lastUpdate: 'Última alteração realizada por Carlos Bentes em 01/01/2025 14:30'
+  strategy: Strategy = {
+    name: 'Carregando...',
+    description: 'Carregando descrição...'
   };
+
+  // Campos editáveis para binding com inputs
+  strategyName: string = '';
+  strategyDescription: string = '';
 
   objectives: Objective[] = [
     {
@@ -99,7 +101,50 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
     },
   ]
   showCreateModal = false;
+  showEditModal = false;
+  showCancelModal = false;
   loadingProjects = false;
+
+  // Configurações dos modais
+  editStrategyConfig: FormModalConfig = {
+    title: 'Editar estratégia',
+    fields: [
+      {
+        id: 'name',
+        label: 'Nome',
+        type: 'text',
+        value: '',
+        required: true,
+        placeholder: 'Digite o nome da estratégia'
+      },
+      {
+        id: 'description',
+        label: 'Descrição',
+        type: 'textarea',
+        value: '',
+        required: false,
+        placeholder: 'Digite a descrição da estratégia',
+        rows: 4
+      }
+    ],
+    validationMessage: 'Os campos marcados com * são obrigatórios.'
+  };
+
+  cancelStrategyConfig: FormModalConfig = {
+    title: 'Cancelar estratégia',
+    fields: [
+      {
+        id: 'reason',
+        label: 'Justificativa do cancelamento',
+        type: 'textarea',
+        value: '',
+        required: true,
+        placeholder: 'Digite o motivo do cancelamento...',
+        rows: 4
+      }
+    ],
+    validationMessage: 'A justificativa do cancelamento é obrigatória.'
+  };
 
   formConfigs: { [key: string]: any } = {
     objetivos: {
@@ -162,6 +207,7 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private criterioService: CriteriaGroupService,
+    private estrategiaService: EstrategiaService,
     private breadcrumbService: BreadcrumbService
   ) {}
 
@@ -174,17 +220,8 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
       // COMPONENTE PAI: Configurar breadcrumbs base
       console.log('📍 Componente pai: Strategy Detail recarregando');
 
-      // COMPONENTE PAI: Constrói breadcrumbs base UMA VEZ
-      this.breadcrumbService.setBreadcrumbs([
-        { label: 'Início', url: '/inicio', isActive: false },
-        { label: 'Estratégias', url: '/estrategias', isActive: false },
-        { label: this.strategy?.name || 'Estratégia 2024', url: `/estrategia/${this.estrategiaId}`, isActive: true }
-      ]);
-
-      // COMPONENTE PAI: Remove breadcrumbs filhos quando volta ao foco somente se necessário
-      const currentBreadcrumbs = this.breadcrumbService.getCurrentBreadcrumbs();
-      if (currentBreadcrumbs.length > 3) { // Só remove se tiver mais que [Início, Estratégias, Estratégia Atual]
-        this.breadcrumbService.removeChildrenAfter(`/estrategia/${this.estrategiaId}`);
+      if (this.estrategiaId) {
+        this.loadStrategyDetails(this.estrategiaId);
       }
 
       // Carregar dados
@@ -206,6 +243,7 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
     this.loadingProjects = true;
     try {
       const criteriaGroup = await firstValueFrom(this.criterioService.getAllCriterios(this.estrategiaId));
+      console.log('Grupo de critérios carregados:', criteriaGroup);
       this.filteredCriteriaGroups = criteriaGroup;
       this.criteriaGroups = criteriaGroup;
       this.loadingProjects = false;
@@ -214,6 +252,82 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
       console.error('Erro ao buscar grupo de criterios:', err);
       this.loadingProjects = false;
     }
+  }
+
+  loadStrategyDetails(strategyId: number): void {
+    this.estrategiaService.getStrategy(strategyId)
+      .pipe(retry(3))
+      .subscribe({
+        next: (strategy) => {
+          this.strategy = strategy;
+          this.syncFormValues();
+
+          // COMPONENTE PAI: Constrói breadcrumbs base UMA VEZ
+          this.breadcrumbService.setBreadcrumbs([
+            { label: 'Início', url: '/inicio', isActive: false },
+            { label: 'Estratégias', url: '/estrategias', isActive: false },
+            { label: strategy.name || 'Estratégia', url: `/estrategia/${this.estrategiaId}`, isActive: true }
+          ]);
+
+          // COMPONENTE PAI: Remove breadcrumbs filhos quando volta ao foco somente se necessário
+          const currentBreadcrumbs = this.breadcrumbService.getCurrentBreadcrumbs();
+          if (currentBreadcrumbs.length > 3) { // Só remove se tiver mais que [Início, Estratégias, Estratégia Atual]
+            this.breadcrumbService.removeChildrenAfter(`/estrategia/${this.estrategiaId}`);
+          }
+        },
+        error: (err) => {
+          console.error('Erro ao carregar detalhes da estratégia:', err);
+          this.router.navigate(['/estrategias']);
+        }
+      });
+  }
+
+  private syncFormValues(): void {
+    this.strategyName = this.strategy.name || '';
+    this.strategyDescription = this.strategy.description || '';
+  }
+
+  private sanitizeStrategyData(strategy: any): Strategy {
+    return {
+      id: strategy.id,
+      name: strategy.name || '',
+      description: strategy.description || '',
+      status: strategy.status || StrategyStatusEnum.ACTIVE,
+      activeObjectivesCount: strategy.activeObjectivesCount || 0,
+      disabled: strategy.disabled || false,
+      createdAt: strategy.createdAt,
+      lastModifiedAt: strategy.lastModifiedAt
+    };
+  }
+
+  // Métodos para salvar campos individuais
+  saveStrategyName(): void {
+    this.updateStrategyField('name', this.strategyName);
+  }
+
+  saveStrategyDescription(): void {
+    this.updateStrategyField('description', this.strategyDescription);
+  }
+
+  private updateStrategyField(fieldName: string, value: string): void {
+    const sanitizedStrategy = this.sanitizeStrategyData({
+      ...this.strategy,
+      [fieldName]: value
+    });
+
+    this.estrategiaService.updateStrategy(this.strategy.id!, sanitizedStrategy)
+      .pipe(retry(3))
+      .subscribe({
+        next: (updatedStrategy) => {
+          this.strategy = updatedStrategy;
+          this.syncFormValues();
+          console.log('Campo atualizado com sucesso');
+        },
+        error: (err) => {
+          console.error('Erro ao salvar:', err);
+          alert('Erro ao salvar. Tente novamente.');
+        }
+      });
   }
 
   goBack(): void {
@@ -502,25 +616,127 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
     this.router.navigate([`/estrategia`, this.estrategiaId, 'objetivo', objectiveId]);
   }
   editStrategy() {
-    console.log('Editar estratégia');
-    // Lógica para edição
+    this.openEditModal();
   }
 
   cancelStrategy() {
-    console.log('Cancelar estratégia');
-    // Lógica para cancelamento
+    this.openCancelModal();
   }
 
   deleteStrategy() {
-    console.log('Excluir estratégia');
-    // Lógica para exclusão
-    // Pode adicionar um modal de confirmação aqui
+    if (confirm('Tem certeza que deseja excluir esta estratégia? Esta ação não pode ser desfeita.')) {
+      this.estrategiaService.deleteStrategy(this.strategy.id!)
+        .pipe(retry(3))
+        .subscribe({
+          next: () => {
+            console.log('Estratégia deletada com sucesso');
+            alert('Estratégia deletada com sucesso');
+            this.router.navigate(['/estrategias']);
+          },
+          error: (err) => {
+            console.error('Erro ao deletar estratégia:', err);
+            alert('Erro ao deletar a estratégia. Tente novamente.');
+          }
+        });
+    }
+  }
+
+  // Métodos dos modais
+  openEditModal(): void {
+    this.editStrategyConfig.fields[0].value = this.strategy.name || '';
+    this.editStrategyConfig.fields[1].value = this.strategy.description || '';
+
+    this.editStrategyConfig.fields.forEach(field => {
+      field.hasError = false;
+      field.errorMessage = '';
+    });
+
+    this.showEditModal = true;
+  }
+
+  closeEditModal(): void {
+    this.showEditModal = false;
+  }
+
+  openCancelModal(): void {
+    this.cancelStrategyConfig.fields[0].value = '';
+    this.cancelStrategyConfig.fields.forEach(field => {
+      field.hasError = false;
+      field.errorMessage = '';
+    });
+    this.showCancelModal = true;
+  }
+
+  closeCancelModal(): void {
+    this.showCancelModal = false;
+  }
+
+  onSaveStrategyEdit(fields: FormField[]): void {
+    const strategyData = fields.reduce((acc, field) => {
+      acc[field.id] = field.value;
+      return acc;
+    }, {} as any);
+
+    const updatedStrategy = {
+      ...this.strategy,
+      name: strategyData.name,
+      description: strategyData.description
+    };
+
+    const sanitizedStrategy = this.sanitizeStrategyData(updatedStrategy);
+
+    console.log('Dados da estratégia a serem atualizados:', sanitizedStrategy);
+
+    this.estrategiaService.updateStrategy(this.strategy.id!, sanitizedStrategy)
+      .pipe(retry(3))
+      .subscribe({
+        next: (updatedStrategy) => {
+          console.log('Estratégia alterada:', updatedStrategy);
+          this.loadStrategyDetails(this.strategy.id!);
+          this.closeEditModal();
+        },
+        error: (err) => {
+          console.error('Erro ao alterar estratégia:', err);
+          console.error('Detalhes do erro:', err.error);
+        }
+      });
+  }
+
+  onCancelStrategy(fields: FormField[]): void {
+    const cancelReason = fields.find(f => f.id === 'reason')?.value || '';
+
+    const updatedStrategy = {
+      ...this.strategy,
+      status: StrategyStatusEnum.INACTIVE,
+      description: `${this.strategy.description || ''}\n\nRazão do cancelamento: ${cancelReason}`
+    };
+
+    const sanitizedStrategy = this.sanitizeStrategyData(updatedStrategy);
+
+    this.estrategiaService.updateStrategy(this.strategy.id!, sanitizedStrategy)
+      .pipe(retry(3))
+      .subscribe({
+        next: (updatedStrategy) => {
+          console.log('Estratégia cancelada com sucesso:', updatedStrategy);
+          this.closeCancelModal();
+          this.loadStrategyDetails(this.strategy.id!);
+          alert('Estratégia cancelada com sucesso');
+          setTimeout(() => {
+            this.router.navigate(['/estrategias']);
+          }, 1000);
+        },
+        error: (err) => {
+          console.error('Erro ao cancelar estratégia:', err);
+          console.error('Detalhes do erro:', err.error);
+          alert('Erro ao cancelar a estratégia. Tente novamente.');
+        }
+      });
   }
   getAvalicoesCoutntPorId(groupId: number): number {
     const group = this.criteriaGroups.find(g => g.id === groupId);
-    console.log('Group:', group);
-    console.log('Group criteria comparisons:', group?.criteriaComparisonCount);
-    return group?.criteriaComparisonCount || 0;
+    // console.log('Group:', group);
+    // console.log('Group criteria comparisons:', group?.relatedEvaluationGroupsCount);
+    return group?.relatedEvaluationGroupsCount || 0;
   }
   getStatusLabelByDisabled(status?: CriteriaGroupStatusEnum): string {
     if (!status) return 'Desconhecido';
@@ -534,6 +750,7 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
         return 'Desconhecido';
     }
   }
+
   getStatusColorByDisabled(status?: CriteriaGroupStatusEnum): string {
     if (!status) return 'gray';
 
@@ -541,6 +758,32 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
       case CriteriaGroupStatusEnum.ACTIVE:
         return 'green';
       case CriteriaGroupStatusEnum.INACTIVE:
+        return 'red';
+      default:
+        return 'gray';
+    }
+  }
+
+  getStrategyStatusLabel(status?: StrategyStatusEnum): string {
+    if (!status) return 'Desconhecido';
+
+    switch (status) {
+      case StrategyStatusEnum.ACTIVE:
+        return 'ATIVO';
+      case StrategyStatusEnum.INACTIVE:
+        return 'INATIVO';
+      default:
+        return 'Desconhecido';
+    }
+  }
+
+  getStrategyStatusColor(status?: StrategyStatusEnum): string {
+    if (!status) return 'gray';
+
+    switch (status) {
+      case StrategyStatusEnum.ACTIVE:
+        return 'green';
+      case StrategyStatusEnum.INACTIVE:
         return 'red';
       default:
         return 'gray';

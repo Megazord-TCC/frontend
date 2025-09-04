@@ -155,13 +155,14 @@ export interface CriteriaGroup {
   id?: number;
   name: string;
   description?: string;
-  criteriaIdList?: number[];
+  criteriaList?: Criterion[];
+  criteriaComparisons?: CriteriaComparison[];
   status?: CriteriaGroupStatusEnum;
   lastModifiedAt?: Date;
-  lastModifiedBy?: User;
   createdAt?: Date;
-  criteriaCount?: number;
-  criteriaComparisonCount?: number;
+  disabled?: boolean;
+  relatedObjectivesCount?: number;
+  relatedEvaluationGroupsCount?: number;
 }
 
 export enum CriteriaGroupStatusEnum {
@@ -182,16 +183,14 @@ export interface Criterion {
 }
 
 export interface Strategy {
-  id?: number; // Opcional para criação, obrigatório para leitura
+  id?: number;
   name: string;
   description?: string;
   status?: StrategyStatusEnum;
-  activeObjectivesCount?: number; // Campo do backend
+  activeObjectivesCount?: number;
   disabled?: boolean;
   createdAt?: Date;
   lastModifiedAt?: Date;
-
-  // Campos legados para compatibilidade
   activeObjectives?: number;
   statusColor?: string;
 }

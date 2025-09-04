@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CriteriaGroup, EvaluationGroup } from '../../interface/carlos-interfaces';
+import { CriteriaGroup, EvaluationGroup } from '../../interface/interfacies';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../environments/environment';
+import { CriteriaGroupService } from '../../service/criteria-group.service';
 import { firstValueFrom, map, Observable } from 'rxjs';
 import { Page } from '../../models/pagination-models';
 
@@ -20,6 +21,7 @@ export class EvaluationGroupCreateModal {
   @Output() close = new EventEmitter<void>();
 
   httpClient = inject(HttpClient);
+  criteriaGroupService = inject(CriteriaGroupService);
   route = inject(ActivatedRoute);
   router = inject(Router);
 
@@ -70,7 +72,7 @@ export class EvaluationGroupCreateModal {
       criteriaGroupId: Number(this.inputCriteriaGroupSelectedId),
       strategyId: this.strategyId
     }
-
+    console.log(body);
     let postEvaluationGroup$ = this.httpClient.post(evaluationGroupsRoute, body);
 
     postEvaluationGroup$.subscribe({
@@ -107,7 +109,7 @@ export class EvaluationGroupCreateModal {
   }
 
   async isFormValid(): Promise<boolean> {
-    return this.isNameFilled() 
+    return this.isNameFilled()
       && await this.isNameUnique()
       && this.isCriteriaGroupSelectedValid();
   }
@@ -133,10 +135,13 @@ export class EvaluationGroupCreateModal {
 
   doesSelectedCriteriaGroupHaveAtLeastOneCriteria(): boolean {
     let selectedCriteriaGroup = this.getSelectedCriteriaGroupObject();
-    let hasAtLeastOneCriteria = false;
+    let hasAtLeastOneCriteria = true;
 
-    if (selectedCriteriaGroup)
-      hasAtLeastOneCriteria = selectedCriteriaGroup.criteriaCount > 0;
+    console.log('criteriaCount:', selectedCriteriaGroup);
+    // if (selectedCriteriaGroup) {
+    //   hasAtLeastOneCriteria = (selectedCriteriaGroup.relatedObjectivesCount ?? 0) > 0;
+    //   console.log('criteriaCount:', selectedCriteriaGroup.relatedObjectivesCount);
+    // }
 
     this.errorMessage = hasAtLeastOneCriteria ? '' : 'O grupo de critérios selecionado não possui critérios. Acesse sua página e realize o cadastro.';
 
@@ -144,17 +149,24 @@ export class EvaluationGroupCreateModal {
   }
 
   doesSelectedCriteriaGroupHaveAllCriteriaComparisons(): boolean {
-    let selectedCriteriaGroup = this.getSelectedCriteriaGroupObject();
-    let totalCriteriaComparisons = selectedCriteriaGroup?.criteriaComparisonCount ?? 0;
-    let totalCriteriaComparisonsExpected = this.getTotalCriteriaComparisonsExpectedByCriteriaQuantity(selectedCriteriaGroup?.criteriaCount ?? 0);
+      let selectedCriteriaGroup = this.getSelectedCriteriaGroupObject();
+      console.log('selectedCriteriaGroup:', selectedCriteriaGroup);
 
-    if (totalCriteriaComparisons != totalCriteriaComparisonsExpected) {
-      this.errorMessage = 'Os critérios do grupo de critérios selecionado não foram totalmente comparados entre si. Acesse sua página e finalize a comparação. Ou, selecione outro grupo de critério.';
-      return false;
+      if (!selectedCriteriaGroup) {
+        this.errorMessage = 'Selecione um grupo de critérios válido.';
+        return false;
+      }
+
+      let totalCriteriaComparisons = selectedCriteriaGroup.relatedEvaluationGroupsCount ?? 0;
+      let totalCriteriaComparisonsExpected = this.getTotalCriteriaComparisonsExpectedByCriteriaQuantity(selectedCriteriaGroup.relatedObjectivesCount ?? 0);
+
+      if (totalCriteriaComparisons != totalCriteriaComparisonsExpected) {
+        this.errorMessage = 'Os critérios do grupo de critérios selecionado não foram totalmente comparados entre si. Acesse sua página e finalize a comparação. Ou, selecione outro grupo de critério.';
+        return false;
+      }
+
+      return true;
     }
-
-    return true;
-  }
 
   isCriteriaGroupSelectedValid(): boolean {
     return this.isCriteriaGroupSelected()
@@ -171,16 +183,19 @@ export class EvaluationGroupCreateModal {
   }
 
   getSelectedCriteriaGroupObject(): CriteriaGroup | undefined {
-    return this.inputCriteriaGroupsOptions.find(criteriaGroup => criteriaGroup.id == Number(this.inputCriteriaGroupSelectedId));
+    const selected = this.inputCriteriaGroupsOptions.find(criteriaGroup => criteriaGroup.id == Number(this.inputCriteriaGroupSelectedId));
+    console.log('getSelectedCriteriaGroupObject:', {
+      inputCriteriaGroupsOptions: this.inputCriteriaGroupsOptions,
+      inputCriteriaGroupSelectedId: this.inputCriteriaGroupSelectedId,
+      selected
+    });
+    return selected;
   }
 
   setInputCriteriaGroupOptions() {
-    let criteriaGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups`;
-    let getAllCriteriaGroups$ = this.httpClient.get<Page<CriteriaGroup>>(criteriaGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
-
-    getAllCriteriaGroups$.subscribe(criteriaGroups => {
+    this.criteriaGroupService.getAllCriterios(this.strategyId).subscribe(criteriaGroups => {
       this.inputCriteriaGroupsOptions = criteriaGroups;
-
+      console.log('this.inputCriteriaGroupsOptions', this.inputCriteriaGroupsOptions);
       if (!criteriaGroups.length) {
         this.errorMessage = 'Nenhum grupo de critérios foi cadastrado. Realize seu cadastro na página de critérios.';
         this.isSubmitButtonDisabled = true;
@@ -191,6 +206,6 @@ export class EvaluationGroupCreateModal {
   getTotalCriteriaComparisonsExpectedByCriteriaQuantity(criteriaQuantity: number): number {
     let n = criteriaQuantity;
 
-    return n * (n - 1) / 2 
+    return n * (n - 1) / 2
   }
 }

@@ -30,7 +30,6 @@ export class CriteriaGroupService {
   // TODO: Renomear para getAllCriteriaGroups ou getAllGrupoCriterios
   getAllCriterios( estrategiaId: number): Observable<CriteriaGroup[]> {
     const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups`;
-    console.log('URL:', url);
     return this.http.get<Page<CriteriaGroup>>(url, { headers: this.getHeaders(), params: { size: 1000 } })
         .pipe(map(page => page.content));
   }

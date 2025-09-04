@@ -142,7 +142,7 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
     try {
       const criteriaGroup = await firstValueFrom(this.criterioGroupService.getCriterioById(this.criteriaGroupId,this.estrategiaId));
       this.criteriaGroup = criteriaGroup;
-
+      console.log('Grupo de critérios carregado:', this.criteriaGroup);
       // COMPONENTE FILHO: Adiciona seu breadcrumb ao array do pai
       this.breadcrumbService.addChildBreadcrumb({
         label: criteriaGroup.name || `Grupo ${this.criteriaGroupId}`,

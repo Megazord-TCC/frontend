@@ -169,7 +169,6 @@ export class StrategiesPageComponent implements OnInit {
     // Validar dados antes de enviar
     const validationResult = this.validateStrategyData(strategyData);
     if (!validationResult.isValid) {
-      console.error('Dados inválidos:', validationResult.errors);
       return;
     }
 
@@ -178,11 +177,9 @@ export class StrategiesPageComponent implements OnInit {
       description: strategyData.description,
     };
 
-    console.log('Dados da estratégia sendo enviados:', newStrategy);
 
     this.estrategiaService.createStrategy(newStrategy).subscribe({
       next: (createdStrategy) => {
-        console.log('Estratégia criada:', createdStrategy);
         this.loadStrategies();
         this.closeCreateModal();
       },

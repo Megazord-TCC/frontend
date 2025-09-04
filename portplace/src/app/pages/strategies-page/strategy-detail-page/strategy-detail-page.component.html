@@ -14,31 +14,24 @@
             [size]="18">
           </app-svg-icon>
         </button>
-        <h1>{{strategy?.name}}</h1>
-        <app-badge color="green">{{strategy?.status}}</app-badge>
+        <h1>{{strategy.name}}</h1>
+        <app-badge [color]="getStrategyStatusColor(strategy.status)">{{getStrategyStatusLabel(strategy.status)}}</app-badge>
       </div>
-      <p class="strategy-description">{{strategy?.description}}</p>
+      <p class="strategy-description">{{strategy.description}}</p>
       <div class="action-header">
         <div class="action-buttons">
           <button class="action-btn" (click)="editStrategy()">
-
             Editar
           </button>
           <button class="action-btn cancel" (click)="cancelStrategy()">
-
             Cancelar
           </button>
           <button class="action-btn delete" (click)="deleteStrategy()">
-
             Excluir
           </button>
         </div>
-
-        <!-- <div class="last-update">
-            Última alteração realizada em {{strategy?.lastModifiedAt | date: 'dd/MM/yyyy HH:mm'}}.
-        </div> -->
         <div class="last-update">
-            Última alteração realizada em {{strategy?.lastUpdate | date: 'dd/MM/yyyy HH:mm'}}.
+            Última alteração realizada em {{strategy.lastModifiedAt | date: 'dd/MM/yyyy HH:mm'}}.
         </div>
       </div>
     </div>
@@ -305,7 +298,7 @@
                     </th>
                     <th>
                       <div class="header-cell">
-                        Avaliações realizadas
+                        Grupos de avaliações vinculados
                         <app-svg-icon
                           class="nav-icon"
                           [path]="'assets/icon/sort-alt.svg'"
@@ -377,5 +370,23 @@
     (close)="closeCreateModal()"
     (save)="onSaveByActiveTab($event)"
     (cancel)="closeCreateModal()">
-</app-form-modal-component>
+  </app-form-modal-component>
+
+  <!-- Modal de Edição -->
+  <app-form-modal-component
+    [isVisible]="showEditModal"
+    [config]="editStrategyConfig"
+    (close)="closeEditModal()"
+    (save)="onSaveStrategyEdit($event)"
+    (cancel)="closeEditModal()">
+  </app-form-modal-component>
+
+  <!-- Modal de Cancelamento -->
+  <app-form-modal-component
+    [isVisible]="showCancelModal"
+    [config]="cancelStrategyConfig"
+    (close)="closeCancelModal()"
+    (save)="onCancelStrategy($event)"
+    (cancel)="closeCancelModal()">
+  </app-form-modal-component>
 </div>

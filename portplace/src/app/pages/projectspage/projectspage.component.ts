@@ -9,8 +9,12 @@ import { SvgIconComponent } from '../../components/svg-icon/svg-icon.component';
 import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../service/breadcrumb.service';
 import { ProjetoService } from '../../service/projeto.service';
-import { retry } from 'rxjs';
+import { map, Observable, retry } from 'rxjs';
 import { FormModalComponentComponent } from '../../components/form-modal-component/form-modal-component.component';
+import { TableComponent } from '../../components/table/table.component';
+import { getActionButton, getColumns, getFilterButtons, getFilterText } from './projects-table-config';
+import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } from '../../models/pagination-models';
+import { mapProjectPageDtoToProjectTableRowPage } from "../../mappers/projects-mappers"
 
 @Component({
   selector: 'app-projectspage',
@@ -21,7 +25,8 @@ import { FormModalComponentComponent } from '../../components/form-modal-compone
     BadgeComponent,
     SvgIconComponent,
     BreadcrumbComponent,
-    FormModalComponentComponent
+    FormModalComponentComponent,
+    TableComponent
   ],
   templateUrl: './projectspage.component.html',
   styleUrl: './projectspage.component.scss'
@@ -33,6 +38,12 @@ export class ProjectsComponent implements OnInit {
   allProjects: Project[] = [];
   searchTerm = '';
   activeFilter = '';
+
+  filterButtons = getFilterButtons();
+  filterText = getFilterText();
+  columns = getColumns();
+  actionButton = getActionButton();
+
 
   newProject: Project = {
     name: '',
@@ -105,6 +116,14 @@ export class ProjectsComponent implements OnInit {
 
     this.loadProjects();
   }
+
+  // Usado pelo TableComponent.
+  // Recarrega a tabela de projetos, buscando os dados via requisição HTTP.
+  getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => (
+    this.projetoService.getProjectsPage(queryParams).pipe(
+      map(page => mapProjectPageDtoToProjectTableRowPage(page))
+    )
+  );
 
   loadProjects(): void {
     this.loadingProjects = true;
@@ -208,8 +227,13 @@ export class ProjectsComponent implements OnInit {
     this.Projects = filtered;
   }
 
-  onProjectClick(projectId: number): void {
-    this.router.navigate(['/projeto', projectId]);
+  onProjectClick(projectOrId: any): void {
+    const id = typeof projectOrId === 'object' && projectOrId !== null ? projectOrId.id : projectOrId;
+    if (id) {
+      this.router.navigate(['/projeto', id]);
+    } else {
+      console.warn('ID do projeto não encontrado:', projectOrId);
+    }
   }
 
   resetNewProject(): void {
@@ -393,4 +417,6 @@ export class ProjectsComponent implements OnInit {
         return 'gray';
     }
   }
+
+
 }
