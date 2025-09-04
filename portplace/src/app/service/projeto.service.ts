@@ -26,7 +26,7 @@ export class ProjetoService {
     return this.http.post<Project>(this.apiUrl, project, { headers: this.getHeaders() });
   }
 
-   getProjectsPage( queryParams?: PaginationQueryParams): Observable<Page<any>> {
+  getProjectsPage( queryParams?: PaginationQueryParams): Observable<Page<any>> {
       return this.http.get<Page<any>>(this.apiUrl, { params: queryParams?.getParamsInHttpParamsFormat() });
   }
 

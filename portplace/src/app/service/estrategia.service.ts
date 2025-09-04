@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { Strategy, StrategyStatusEnum } from '../interface/interfacies';
 import { environment } from '../environments/environment';
-import { Page } from '../models/pagination-models';
+import { Page, PaginationQueryParams } from '../models/pagination-models';
 
 @Injectable({
   providedIn: 'root'
@@ -54,6 +54,9 @@ export class EstrategiaService {
     });
   }
 
+  getProjectsPage( queryParams?: PaginationQueryParams): Observable<Page<any>> {
+      return this.http.get<Page<any>>(this.apiUrl, { params: queryParams?.getParamsInHttpParamsFormat() });
+  }
   // READ - Buscar todas as estratégias com filtros e paginação
   getStrategies(
     status?: StrategyStatusEnum[],

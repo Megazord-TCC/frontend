@@ -10,7 +10,12 @@ import { BreadcrumbService } from '../../service/breadcrumb.service';
 import { EstrategiaService } from '../../service/estrategia.service';
 import { FormModalComponentComponent } from '../../components/form-modal-component/form-modal-component.component';
 import { Strategy, StrategyStatusEnum, FormModalConfig, FormField } from '../../interface/interfacies';
-import { retry } from 'rxjs';
+import { Observable, retry, map } from 'rxjs';
+import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } from '../../models/pagination-models';
+import { mapStrategyPageDtoToStrategyTableRowPage } from '../../mappers/strategies-mappers';
+import { TableComponent } from '../../components/table/table.component';
+import { getFilterButtons, getFilterText, getColumns, getActionButton } from './strategies-table-config';
+
 
 @Component({
   selector: 'app-strategies-page',
@@ -21,12 +26,17 @@ import { retry } from 'rxjs';
     BadgeComponent,
     SvgIconComponent,
     BreadcrumbComponent,
-    FormModalComponentComponent
+    FormModalComponentComponent,
+    TableComponent
   ],
   templateUrl: './strategies-page.component.html',
   styleUrl: './strategies-page.component.scss'
 })
 export class StrategiesPageComponent implements OnInit {
+  filterButtons = getFilterButtons();
+  filterText = getFilterText();
+  columns = getColumns();
+  actionButton = getActionButton();
   private router = inject(Router);
   private breadcrumbService = inject(BreadcrumbService);
   private estrategiaService = inject(EstrategiaService);
@@ -87,6 +97,14 @@ export class StrategiesPageComponent implements OnInit {
     this.loadStrategies();
   }
 
+  // Usado pelo TableComponent.
+  // Recarrega a tabela de estratégias, buscando os dados via requisição HTTP.
+  getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => (
+    this.estrategiaService.getProjectsPage(queryParams).pipe(
+      map(page => mapStrategyPageDtoToStrategyTableRowPage(page))
+    )
+  );
+
   loadStrategies(): void {
     this.loadingStrategies = true;
     this.estrategiaService.getStrategies()
@@ -141,8 +159,18 @@ export class StrategiesPageComponent implements OnInit {
     this.filteredStrategies = filtered;
   }
 
-  onStrategyClick(strategyId: number): void {
-    this.router.navigate(['/estrategia', strategyId]);
+  onStrategyClick(strategyId: number | { id: number }): void {
+    let id: number | undefined;
+    if (typeof strategyId === 'object' && strategyId !== null && 'id' in strategyId) {
+      id = (strategyId as { id: number }).id;
+    } else if (typeof strategyId === 'number') {
+      id = strategyId;
+    }
+    if (id) {
+      this.router.navigate(['/estrategia', id]);
+    } else {
+      console.warn('ID da estratégia não encontrado:', strategyId);
+    }
   }
 
   openCreateModal(): void {
