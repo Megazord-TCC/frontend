@@ -1,0 +1,25 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)" (mousedown)="onOverlayMouseDown($event)">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header">
+            <h2>Aviso</h2>
+            <button class="close-btn" (click)="onClose()">
+                <i class="icon-x">✕</i>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+            <!-- Alert Message -->
+            <div class="alert-message">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>{{ text }}</span>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button class="btn-primary" (click)="onClose()">Entendi</button>
+        </div>
+    </div>
+</div>

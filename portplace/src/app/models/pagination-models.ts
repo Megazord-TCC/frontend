@@ -96,6 +96,14 @@ export class PaginationQueryParams {
 
         return params;
     }
+
+    static sortByThisIfNotSortedYet(sortBy: string, queryParams: PaginationQueryParams = new PaginationQueryParams()): PaginationQueryParams {
+        if (!queryParams.sortBy) {
+            queryParams.sortBy = sortBy;
+            queryParams.sortDir = 'asc';
+        }
+        return queryParams;
+    }
 }
 
 /**

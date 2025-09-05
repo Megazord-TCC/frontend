@@ -7,327 +7,343 @@ $border-color: #e2e8f0;
 $background-overlay: rgba(0, 0, 0, 0.5);
 $shadow-modal: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 
+.info-text {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 4px;
+    line-height: 1.4;
+}
+
 .disabled {
     opacity: 0.5 !important;
 }
 
 // Modal Overlay
 .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: $background-overlay;
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 16px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: $background-overlay;
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
 }
 
 // Modal Content
 .modal-content {
-  background: white;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: $shadow-modal;
-  animation: modalSlideIn 0.3s ease-out;
+    background: white;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: $shadow-modal;
+    animation: modalSlideIn 0.3s ease-out;
 
-  @keyframes modalSlideIn {
-    from {
-      opacity: 0;
-      transform: translateY(-20px) scale(0.95);
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px) scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
     }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
 }
 
 // Modal Header
 .modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 24px 24px 16px 24px;
-  border-bottom: 1px solid $border-color;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 24px 16px 24px;
+    border-bottom: 1px solid $border-color;
 
-  h2 {
-    font-size: 18px;
-    font-weight: 600;
-    color: $text-primary;
-    margin: 0;
-  }
-
-  .close-btn {
-    background: none;
-    border: none;
-    color: $text-secondary;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 6px;
-    transition: all 0.2s;
-    font-size: 16px;
-
-    &:hover {
-      background-color: #f1f5f9;
-      color: $text-primary;
+    h2 {
+        font-size: 18px;
+        font-weight: 600;
+        color: $text-primary;
+        margin: 0;
     }
 
-    &:focus {
-      outline: 2px solid $primary-color;
-      outline-offset: 2px;
+    .close-btn {
+        background: none;
+        border: none;
+        color: $text-secondary;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 6px;
+        transition: all 0.2s;
+        font-size: 16px;
+
+        &:hover {
+            background-color: #f1f5f9;
+            color: $text-primary;
+        }
+
+        &:focus {
+            outline: 2px solid $primary-color;
+            outline-offset: 2px;
+        }
     }
-  }
 }
 
 // Modal Body
 .modal-body {
-  padding: 24px;
+    padding: 24px;
 }
 
 // Validation Error
 .validation-error {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background-color: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: 8px;
-  margin-bottom: 24px;
-  animation: errorSlideIn 0.3s ease-out;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    animation: errorSlideIn 0.3s ease-out;
 
-  @keyframes errorSlideIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
+    @keyframes errorSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
-    to {
-      opacity: 1;
-      transform: translateY(0);
+
+    i {
+        color: $danger-color;
+        font-size: 16px;
     }
-  }
 
-  i {
-    color: $danger-color;
-    font-size: 16px;
-  }
-
-  span {
-    font-size: 14px;
-    color: #dc2626;
-    font-weight: 500;
-  }
+    span {
+        font-size: 14px;
+        color: #dc2626;
+        font-weight: 500;
+    }
 }
 
 // Form Fields
 .form-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-
-  label {
-    font-size: 14px;
-    font-weight: 500;
-    color: $text-primary;
     display: flex;
-    align-items: center;
-    gap: 4px;
+    flex-direction: column;
+    gap: 8px;
 
-    .required-asterisk {
-      color: $danger-color;
-      font-weight: 600;
-    }
-  }
-
-  input,
-  textarea,
-  select {
-    padding: 12px 16px;
-    border: 1px solid $border-color;
-    border-radius: 8px;
-    font-size: 14px;
-    transition: all 0.2s;
-    background-color: white;
-
-    &:focus {
-      outline: none;
-      border-color: $primary-color;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    .input-with-info {
+        display: flex;
+        flex-direction: column;
     }
 
-    &.error {
-      border-color: $danger-color;
-      background-color: #fef2f2;
+    label {
+        font-size: 14px;
+        font-weight: 500;
+        color: $text-primary;
+        display: flex;
+        align-items: center;
+        gap: 4px;
 
-      &:focus {
-        border-color: $danger-color;
-        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
-      }
+        .required-asterisk {
+            color: $danger-color;
+            font-weight: 600;
+        }
     }
 
-    &::placeholder {
-      color: #9ca3af;
-    }
-  }
+    input,
+    textarea,
+    select {
+        padding: 12px 16px;
+        border: 1px solid $border-color;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.2s;
+        background-color: white;
 
-  textarea {
-    resize: vertical;
-    min-height: 80px;
-    font-family: inherit;
-  }
+        &:focus {
+            outline: none;
+            border-color: $primary-color;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
 
-  .date-input-group {
-    position: relative;
+        &.error {
+            border-color: $danger-color;
+            background-color: #fef2f2;
 
-    input[type="date"] {
-      padding-right: 40px;
-    }
+            &:focus {
+                border-color: $danger-color;
+                box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+            }
+        }
 
-    .calendar-icon {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: $text-secondary;
-      pointer-events: none;
-      font-size: 16px;
-    }
-  }
-
-  .field-error {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: $danger-color;
-    font-size: 12px;
-    margin-top: 4px;
-
-    i {
-      font-size: 14px;
+        &::placeholder {
+            color: #9ca3af;
+        }
     }
 
-    span {
-      font-weight: 500;
+    textarea {
+        resize: vertical;
+        min-height: 80px;
+        font-family: inherit;
     }
-  }
+
+    .date-input-group {
+        position: relative;
+
+        input[type="date"] {
+            padding-right: 40px;
+        }
+
+        .calendar-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: $text-secondary;
+            pointer-events: none;
+            font-size: 16px;
+        }
+    }
+
+    .field-error {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: $danger-color;
+        font-size: 12px;
+        margin-top: 4px;
+
+        i {
+            font-size: 14px;
+        }
+
+        span {
+            font-weight: 500;
+        }
+    }
 }
+
+// O campo orçamento usará os estilos já definidos para input, label, erro, etc.
 
 // Modal Footer
 .modal-footer {
-  display: flex;
-  gap: 12px;
-  padding: 16px 24px 24px 24px;
-  border-top: 1px solid $border-color;
+    display: flex;
+    gap: 12px;
+    padding: 16px 24px 24px 24px;
+    border-top: 1px solid $border-color;
 
-  button {
-    flex: 1;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: 1px solid transparent;
+    button {
+        flex: 1;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid transparent;
 
-    &:focus {
-      outline: 2px solid $primary-color;
-      outline-offset: 2px;
+        &:focus {
+            outline: 2px solid $primary-color;
+            outline-offset: 2px;
+        }
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
     }
 
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  }
+    .btn-outline {
+        background: white;
+        border-color: $border-color;
+        color: $text-secondary;
 
-  .btn-outline {
-    background: white;
-    border-color: $border-color;
-    color: $text-secondary;
-
-    &:hover:not(:disabled) {
-      background-color: #f8fafc;
-      border-color: #cbd5e1;
-    }
-  }
-
-  .btn-primary {
-    background-color: $primary-color;
-    border-color: $primary-color;
-    color: white;
-
-    &:hover:not(:disabled) {
-      background-color: #2563eb;
-      border-color: #2563eb;
+        &:hover:not(:disabled) {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+        }
     }
 
-    &:disabled {
-      background-color: #9ca3af;
-      border-color: #9ca3af;
+    .btn-primary {
+        background-color: $primary-color;
+        border-color: $primary-color;
+        color: white;
+
+        &:hover:not(:disabled) {
+            background-color: #2563eb;
+            border-color: #2563eb;
+        }
+
+        &:disabled {
+            background-color: #9ca3af;
+            border-color: #9ca3af;
+        }
     }
-  }
 }
 
 // Responsive Design
 @media (max-width: 640px) {
-  .modal-content {
-    margin: 16px;
-    max-width: calc(100vw - 32px);
-  }
-
-  .modal-header,
-  .modal-body,
-  .modal-footer {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-
-  .modal-footer {
-    flex-direction: column;
-
-    button {
-      width: 100%;
+    .modal-content {
+        margin: 16px;
+        max-width: calc(100vw - 32px);
     }
-  }
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .modal-footer {
+        flex-direction: column;
+
+        button {
+            width: 100%;
+        }
+    }
 }
 
 // Accessibility
 @media (prefers-reduced-motion: reduce) {
-  .modal-content {
-    animation: none;
-  }
+    .modal-content {
+        animation: none;
+    }
 
-  .validation-error {
-    animation: none;
-  }
+    .validation-error {
+        animation: none;
+    }
 }
 
 // High contrast mode
 @media (prefers-contrast: high) {
-  .modal-content {
-    border: 2px solid $text-primary;
-  }
+    .modal-content {
+        border: 2px solid $text-primary;
+    }
 
-  .validation-error {
-    border: 2px solid $danger-color;
-  }
+    .validation-error {
+        border: 2px solid $danger-color;
+    }
 
-  input.error,
-  textarea.error {
-    border: 2px solid $danger-color;
-  }
+    input.error,
+    textarea.error {
+        border: 2px solid $danger-color;
+    }
 }

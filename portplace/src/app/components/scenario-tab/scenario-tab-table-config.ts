@@ -1,4 +1,3 @@
-import { ScenarioStatusEnum } from "../../interface/carlos-scenario-dtos";
 import { ActionButton, BadgeConfiguration, InputFilter, TableColumn } from "../table/table-contracts";
 
 // IMPORTANTE: A instância dos objetos foram feitos dessa maneira (utilizando "new" ao invés de
@@ -48,7 +47,7 @@ export const getColumns = (): TableColumn[] => {
     columns.push(column);
 
     column = new TableColumn();
-    column.label = 'Orçamento';
+    column.label = 'Orçamento (R$)';
     column.order = 2;
     column.isSortable = true;
     column.frontendAttributeName = 'budget';

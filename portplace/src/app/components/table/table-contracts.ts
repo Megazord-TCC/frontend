@@ -13,8 +13,25 @@ export class InputFilter {
     queryParam: QueryParam = { name: '', value: '' };
 }
 
-export class SelectButton {
-    selectOptions: { name: string, value: string }[] = [];
+export class SelectButtonOptionSelected {
+    // É o dado impresso na linha. Ex: Scenario, se for uma tabela de cenários.
+    row: any;
+
+    // Permite identificar qual a coluna se trata. Ex: atributo 'inclusionStatus' de 'Scenario', se for uma tabela de cenários.
+    column = new TableColumn();
+
+    // Valor atual <select> da linha e coluna definida pelos outros atributos desta classe.
+    value = '';
+}
+
+export class SelectButtonConfiguration {
+    // options: representa as opções exibidas quando clica no <select>.
+    // label: é o rótulo de cada opção exibida.
+    // value: é o valor entendido pelo sistema quando uma opção é selecionada.
+    // hidden: se for true o usuário não pode selecionar esta opção (mas, o sistema poderá). 
+    options: { label: string, value: string, hidden: boolean }[] = [];
+
+    disabled = false;
 }
 
 /**
@@ -66,7 +83,7 @@ export class TableColumn {
     frontendAttributeName = '';
     backendAttributeName = '';
     isClickableMainColumn = false;
-    selectButton?: SelectButton;
+    selectButtonConfiguration?: SelectButtonConfiguration;
     badgeConfiguration: BadgeConfiguration[] = [];
 }
 
