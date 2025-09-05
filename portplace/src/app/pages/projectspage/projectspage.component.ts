@@ -247,13 +247,13 @@ export class ProjectsComponent implements OnInit {
       return acc;
     }, {} as any);
 
-    const newProject: Project = {
+    const newProject = {
       name: projectData.name,
       description: projectData.description,
       portfolio: undefined  ,
       startDate: projectData.startDate,
       endDate: projectData.endDate,
-      status: ProjectStatusEnum.CANDIDATE,
+      status: 'IN_ANALYSIS', // O status só é definido pelo front quando é pedido pra cancelar. IN_ANALYSIS e IN_PROGRESS deveria ser calculado pelo back.
       projectManager: 1,
       earnedValue: 0,
       plannedValue: 0,

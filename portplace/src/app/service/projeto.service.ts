@@ -21,7 +21,7 @@ export class ProjetoService {
   }
 
   // Cadastrar novo projeto (POST)
-  createProject(project: Project): Observable<Project> {
+  createProject(project: any): Observable<Project> {
     return this.http.post<Project>(this.apiUrl, project, { headers: this.getHeaders() });
   }
 

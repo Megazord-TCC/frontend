@@ -1,10 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { SvgIconComponent } from '../svg-icon/svg-icon.component';
 import { CardComponent } from '../card/card.component';
 import { BadgeComponent } from '../badge/badge.component';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ActionButton, CurrentlySortedColumn, InputFilter, TableColumn } from './table-contracts';
+import { ActionButton, CurrentlySortedColumn, InputFilter, SelectButtonOptionSelected, TableColumn } from './table-contracts';
 import { TablePaginationComponent } from './table-pagination/table-pagination.component';
 import { TableFilterButtonsComponent } from './table-filter-buttons/table-filter-buttons.component';
 import { TableActionTextFilterComponent } from './table-action-text-filter/table-action-text-filter.component';
@@ -55,6 +55,10 @@ export class TableComponent {
     // Esse evento só é emitido se o `Input() actionButton` for definido.
     @Output() actionButtonClick = new EventEmitter<void>();
 
+    // Evento emitido quando um valor dum <select> é selecionado dentro duma linha da tabela.
+    // Só é exibido o <select> quando o TableColumn foi configurado com o atributo SelectButton.
+    @Output() selectChange = new EventEmitter<SelectButtonOptionSelected>();
+
     // Contém dados de paginação retornados pelo service.
     // Para acessar a lista de objetos, usar 'page.content'.
     // Essa lista será por exemplo `User[]`, se o service retornar uma lista de usuários.
@@ -68,13 +72,88 @@ export class TableComponent {
     // Se nenhuma coluna estiver sendo utilizada para ordenar, então esse atributo será undefined.
     activeSortedColumn?: CurrentlySortedColumn;
 
+    // Contém os valores atuais de todos selects da tabela.
+    // É necessário isso aqui pra conseguir definir os valores iniciais de cada select.
+    selectButtonOptionsSelected: SelectButtonOptionSelected[] = [];
+
+    changeDetectorRef = inject(ChangeDetectorRef);
+
     ngOnInit() {
         this.columns.sort((a, b) => a.order - b.order);
         this.sendHttpGetRequestAndPopulateTable();
     }
 
+    disableAllTableSelectButtons() {
+        this.columns.forEach(column => {
+            if (column.selectButtonConfiguration) {
+                column.selectButtonConfiguration.disabled = true;
+            }
+        });
+    }
+
+    enableAllTableSelectButtons() {
+        this.columns.forEach(column => {
+            if (column.selectButtonConfiguration) {
+                column.selectButtonConfiguration.disabled = false;
+            }
+        });
+    }
+
+    setSelectButtonValues() {
+        let options: SelectButtonOptionSelected[] = [];
+        let rows = this.page?.content ?? [];
+        let columnsWithSelectButton = this.columns.filter(column => !!column.selectButtonConfiguration);
+
+        rows.forEach(row => {
+            columnsWithSelectButton.forEach(column => {
+                let option = new SelectButtonOptionSelected();
+                option.column = column;
+                option.row = row;
+                option.value = row[column.frontendAttributeName];
+                options.push(option);
+            });
+        });
+
+        this.selectButtonOptionsSelected = options;
+    }
+
+    isSelectButton(frontendAttributeName: string): boolean {
+        return this.columns.some(column => 
+            (column.frontendAttributeName == frontendAttributeName) 
+            && (column.selectButtonConfiguration)
+        );
+    }
+
+    getSelectButtonValue(row: any, frontendAttributeName: string): string {
+        return this.getSelectButton(row, frontendAttributeName)?.value ?? '';
+    }
+
+    getSelectButtonDisabled(row: any, frontendAttributeName: string): boolean {
+        return this.getSelectButton(row, frontendAttributeName)?.column.selectButtonConfiguration?.disabled ?? false;
+    }
+
+    getSelectButtonOptions(row: any, frontendAttributeName: string): { label: string, value: string, hidden: boolean }[] {
+        return this.getSelectButton(row, frontendAttributeName)?.column.selectButtonConfiguration?.options ?? [];
+    }
+
+    getSelectButton(row: any, frontendAttributeName: string): SelectButtonOptionSelected | undefined {
+        return this.selectButtonOptionsSelected.find(option => 
+            (option.row == row) && (option.column.frontendAttributeName == frontendAttributeName)
+        );
+    }
+
+    onChangeSelectedValue(event: any, row: any, attributeName: string) {
+        let column = this.columns.find(column => column.frontendAttributeName === attributeName);
+        
+        if (column)
+            this.selectChange.emit({ value: event?.target?.value, row, column });
+    }
+
     sendHttpGetRequestAndPopulateTable() {
-        this.dataRetrievalMethodRef(this.queryParams).subscribe(page => this.page = page);
+        this.dataRetrievalMethodRef(this.queryParams).subscribe(page => { 
+            this.page = page;
+            this.setSelectButtonValues();
+        });
     }
 
     getDesiredAndExistingColumnsToPrint(): TableColumn[] {

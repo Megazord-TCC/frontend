@@ -29,19 +29,45 @@
                 <!-- Variável "row" será do tipo 'Usuario' se o service retorna usuários paginados, por exemplo. -->
                 <tr *ngFor="let row of page?.content" class="table-row">
                     <td *ngFor="let attributeName of getDesiredAndExistingAttributeNamesToPrint()">
-                        <span *ngIf="isClickableMainColumn(attributeName); else badgeStyle">
+                        <span *ngIf="isClickableMainColumn(attributeName); else selectWithBadge">
                             <button class="link" (click)="mainColumnRowClick.emit(row);">
                                 {{ row[attributeName] }}
                             </button>
                         </span>
-                        <ng-template #badgeStyle>
-                            <app-badge *ngIf="hasBadgeStyle(attributeName); else rowValueHasNoStyle"
+                        <ng-template #selectWithBadge>
+                            <app-badge *ngIf="hasBadgeStyle(attributeName) && isSelectButton(attributeName); else selectWithoutBadge"
+                                [color]="getBadgeColor(row, attributeName)">
+                                <select class="select-no-style"
+                                    [disabled]="getSelectButtonDisabled(row, attributeName)"
+                                    (change)="onChangeSelectedValue($event, row, attributeName)">
+                                    <option class="option-no-style" *ngFor="let option of getSelectButtonOptions(row, attributeName)"
+                                        [value]="option.value" [hidden]="option.hidden" 
+                                        [selected]="getSelectButtonValue(row, attributeName) == option.value">
+                                        {{ option.label }}
+                                    </option>
+                                </select>
+                            </app-badge>
+                        </ng-template>
+                        <ng-template #selectWithoutBadge>
+                            <select *ngIf="isSelectButton(attributeName); else badge"
+                                class="select-with-style"
+                                [disabled]="getSelectButtonDisabled(row, attributeName)"
+                                (change)="onChangeSelectedValue($event, row, attributeName)">
+                                <option *ngFor="let option of getSelectButtonOptions(row, attributeName)"
+                                    [value]="option.value" [hidden]="option.hidden"
+                                    [selected]="getSelectButtonValue(row, attributeName) == option.value">
+                                    {{ option.label }}
+                                </option>
+                            </select>
+                        </ng-template>
+                        <ng-template #badge>
+                            <app-badge *ngIf="hasBadgeStyle(attributeName); else noBadge"
                                 [color]="getBadgeColor(row, attributeName)">
                                 {{ row[attributeName] }}
                             </app-badge>
                         </ng-template>
 
-                        <ng-template #rowValueHasNoStyle>{{ row[attributeName] }}</ng-template>
+                        <ng-template #noBadge>{{ row[attributeName] }}</ng-template>
                     </td>
                 </tr>
             </tbody>

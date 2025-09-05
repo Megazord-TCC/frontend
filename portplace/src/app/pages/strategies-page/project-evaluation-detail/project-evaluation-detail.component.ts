@@ -171,13 +171,13 @@ export class ProjectEvaluationDetailComponent implements OnInit, OnDestroy {
       // 1. Buscar grupo de avaliação para obter criteriaGroupId
       const evaluationGroupRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroupId}`;
       const evaluationGroup = await firstValueFrom(
-        this.httpClient.get<EvaluationGroup>(evaluationGroupRoute)
+        this.httpClient.get<any>(evaluationGroupRoute)
       );
 
       console.log('📊 Grupo de avaliação encontrado:', evaluationGroup);
 
       // 2. Buscar critérios do grupo usando criteriaGroupId
-      const criteriaRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups/${evaluationGroup.criteriaGroupId}/criteria`;
+      const criteriaRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups/${evaluationGroup?.criteriaGroup?.id}/criteria`;
       const criteria = await firstValueFrom(
         this.httpClient.get<Page<Criterion>>(criteriaRoute, { params: { size: 1000 } }).pipe(map(page => page.content))
       );
@@ -187,7 +187,7 @@ export class ProjectEvaluationDetailComponent implements OnInit, OnDestroy {
       // 3. Buscar avaliações existentes para este projeto
       const evaluationsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroupId}/evaluations`;
       const evaluations = await firstValueFrom(
-        this.httpClient.get<Page<Evaluation>>(evaluationsRoute, { params: { size: 1000 } }).pipe(map(page => page.content))
+        this.httpClient.get<Page<any>>(evaluationsRoute, { params: { size: 1000 } }).pipe(map(page => page.content))
       );
 
       console.log('⭐ Avaliações encontradas:', evaluations);
@@ -195,7 +195,7 @@ export class ProjectEvaluationDetailComponent implements OnInit, OnDestroy {
       // 4. Combinar critérios com avaliações existentes - CORRIGIDO: ATRIBUIR AO this.criteriaEvaluations
       this.criteriaEvaluations = criteria.map(criterion => {
         const evaluation = evaluations.find(e =>
-          e.criterionId === criterion.id && this.project && e.projectId === this.project.id
+          e.criterionId === criterion.id && this.project && e?.project?.id === this.project.id
         );
         return {
           id: criterion.id,

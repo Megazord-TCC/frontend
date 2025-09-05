@@ -1,178 +1,316 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { CardComponent } from '../../../components/card/card.component';
-import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.component';
-import { EvaluationGroupEditModal } from '../../../components/evaluation-group-edit-modal/evaluation-group-edit-modal.component';
-import { ProjectEvaluationCreateModal } from '../../../components/evaluation-project-create-modal/evaluation-project-create-modal.component';
-import { HttpClient } from '@angular/common/http';
-import { CriteriaGroup, EvaluationGroup, EvaluationGroupView, ProjectRanking, Scenario, ScenarioProject } from '../../../interface/carlos-interfaces';
-import { Subscription } from 'rxjs';
-import { EvaluationGroupDeleteModal } from '../../../components/evaluation-group-delete-modal/evaluation-group-delete-modal.component';
+import { ActivatedRoute, ParamMap } from '@angular/router';
+import { debounceTime, forkJoin, map, Observable, of, Subject, Subscription, switchMap, tap } from 'rxjs';
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../../service/breadcrumb.service';
+import { ActionButtons, PageHeaderComponent } from '../../../components/page-header/page-header.component';
 import { ScenarioService } from '../../../service/scenario-service';
+import { mapScenarioRankingsPageDtoToScenarioProjectsPage, mapScenarioStatusEnumToText, mapScenarioStatusToBadgeStatusColor } from '../../../mappers/scenario-mappers';
+import { EstrategiaService } from '../../../service/estrategia.service';
+import { Strategy } from '../../../interface/interfacies';
+import { getActionButton, getColumns, getFilterText, getPortfolioCategorySelectButtonConfigurations } from './scenario-detail-table-config';
+import { TableComponent } from '../../../components/table/table.component';
+import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } from '../../../models/pagination-models';
+import { ActionButton, SelectButtonOptionSelected } from '../../../components/table/table-contracts';
+import { ScenarioRankingStatusEnum, ScenarioReadDTO, ScenarioStatusEnum } from '../../../interface/carlos-scenario-dtos';
+import { ProjectInclusionStatusChangeHandler } from './project-inclusion-status-change-handler';
+import { ScenarioEditModal } from '../../../components/scenario-edit-modal/scenario-edit-modal.component';
+import { ScenarioDeleteModal } from '../../../components/scenario-delete-modal/scenario-delete-modal.component';
+import { formatToBRL, handleScenarioBudgetKeyDown, parseFormatedBRLToNumber } from '../../../helpers/money-helper';
+import { WarningInformationModalComponent } from '../../../components/warning-information-modal/warning-information-modal.component';
+import { TooltipComponent } from '../../../components/tooltip/tooltip.component';
+import { CancelScenarioModalComponent } from '../../../components/cancel-scenario-modal/cancel-scenario-modal.component';
+import { ScenarioAuthorizationModalComponent } from '../../../components/scenario-authorization-modal/scenario-authorization-modal.component';
 
 @Component({
     selector: 'app-scenario-detail-page',
     imports: [
         CommonModule,
         FormsModule,
-        CardComponent,
-        SvgIconComponent,
-        EvaluationGroupEditModal,
-        ProjectEvaluationCreateModal,
-        EvaluationGroupDeleteModal,
-        BreadcrumbComponent
+        BreadcrumbComponent,
+        PageHeaderComponent,
+        TableComponent,
+        ScenarioEditModal,
+        ScenarioDeleteModal,
+        WarningInformationModalComponent,
+        TooltipComponent,
+        CancelScenarioModalComponent,
+        ScenarioAuthorizationModalComponent
     ],
     templateUrl: './scenario-detail-page.component.html',
     styleUrl: './scenario-detail-page.component.scss'
 })
 export class ScenarioDetailPageComponent {
-    // private routeSubscription?: Subscription;
+    @ViewChild(TableComponent) tableComponent?: TableComponent;
+    @ViewChild(ScenarioEditModal) editModal?: ScenarioEditModal;
 
-    // httpClient = inject(HttpClient);
-    // route = inject(ActivatedRoute);
-    // router = inject(Router);
-    // breadcrumbService = inject(BreadcrumbService);
-    // scenarioService = inject(ScenarioService);
+    strategyId = 0;
+    strategy?: Strategy;
 
-    // strategyId = -1;
-    // scenarioId = -1;
+    // Variáveis do cenário
+    scenarioId = 0;
+    name = '...';
+    description = '...';
+    statusBadge = { text: '...', color: 'blue' };
+    goBackButtonPathToNavigate = '';
+    lastUpdate?: Date;
+    budget = '0,00';
+    extraKeyValuePairInfos = [
+        { key: 'Portfólio', value: 'Dado não informado pelo backend.', tooltip: 'Configura categorias e destino dos projetos após a autorização do cenário.' },
+        { key: 'Grupo de avaliação', value: '...', tooltip: 'Define quais projetos serão analisados neste cenário, além do valor estratégico de cada um.' }
+    ];
+    scenarioDTO: ScenarioReadDTO | undefined;
+    visibleActionButtons: ActionButtons[] = ['edit'];
 
-    // scenario: Scenario | undefined;
+    allProjectsBudget = '...';
+    allIncludedProjectsBudget = '...';
 
-    // filteredScenarioProjects: ScenarioProject[] = [];
+    routeSubscription?: Subscription;
 
-    // searchTerm = '';
+    filterText = getFilterText();
+    columns = getColumns();
+    actionButton: ActionButton | undefined;
 
-    // showCreateModal = false;
-    // showEditModal = false;
-    // showDeleteModal = false;
+    cancelAllActions = false;
 
-    // ngOnInit(): void {
-    //     // Escutar mudanças nos parâmetros da rota para recarregar quando voltar
-    //     this.routeSubscription = this.route.paramMap.subscribe(params => {
-    //         this.strategyId = Number(params.get('estrategiaId'));
-    //         this.scenarioId = Number(params.get('cenarioId'));
+    route = inject(ActivatedRoute);
+    breadcrumbService = inject(BreadcrumbService);
+    scenarioService = inject(ScenarioService);
+    strategyService = inject(EstrategiaService);
 
-    //         this.setCurrentScenarioByHttpRequest();
-    //     });
-    // }
+    isScenarioEditModalVisible = false;
+    isScenarioDeleteModalVisible = false;
+    isScenarioCancelModalVisible = false;
+    isScenarioAuthorizationModalVisible = false;
+    isWarningInformationModalVisible = false;
+    hasWarningInformationModalAlreadyDisplayed = false;
 
-    // ngOnDestroy(): void {
-    //     if (this.routeSubscription) {
-    //         this.routeSubscription.unsubscribe();
-    //     }
-    // }
+    private sendBudgetUpdateRequestThenRepopulateTableSubject = new Subject<void>();
 
-    // setCurrentScenarioByHttpRequest() {
-    //     this.scenarioService.getScenarioDetailsById(this.scenarioId).subscribe(scenario => {
-    //         this.scenario = scenario;
+    ngOnInit(): void {
+        this.routeSubscription = this.route.paramMap.subscribe(params => {
+            this.setVariablesByRouteParams(params);
+            this.setGoBackButtonPathToNavigate();
+            this.loadScenarioByIdAndStrategyByIdAndSetupBreadcrumbs();
+            this.setupBudgetUpdateSubject();
+        });
+    }
 
-    //         if (scenario)
-    //             this.addChildBreadcrumb(scenario);
-    //     });
-    // }
+    ngOnDestroy(): void {
+        this.routeSubscription?.unsubscribe();
+    }
 
-    // addChildBreadcrumb(scenario: Scenario) {
-    //     this.breadcrumbService.addChildBreadcrumb({
-    //         label: scenario.name,
-    //         url: `/estrategia/${this.strategyId}/cenario/${this.scenarioId}`,
-    //         isActive: true
-    //     });
-    // }
+    setupPageByScenarioStatus() {
+        switch (this.scenarioDTO?.status) {
+            case ScenarioStatusEnum.CANCELLED:
+                this.visibleActionButtons = ['edit', 'delete'];
+                this.cancelAllActions = true;
+                this.actionButton = undefined;
+                this.tableComponent?.disableAllTableSelectButtons();
+                break;
+            case ScenarioStatusEnum.AUTHORIZED:
+                this.visibleActionButtons = ['edit'];
+                this.cancelAllActions = true;
+                this.actionButton = undefined;
+                this.tableComponent?.disableAllTableSelectButtons();
+                break;
+            default:
+                this.tableComponent?.enableAllTableSelectButtons();
+                this.cancelAllActions = false;
+                this.actionButton = getActionButton();
+                this.visibleActionButtons = ['edit', 'delete', 'cancel'];
+        }
+    }
 
-    // getManyEvaluationGroupView(evaluationGroups: EvaluationGroup[], criteriaGroups: CriteriaGroup[]): EvaluationGroupView[] {
-    //     return evaluationGroups.map(evaluationGroup => ({
-    //         ...evaluationGroup,
-    //         criteriaGroup: criteriaGroups.find(criteriaGroup => criteriaGroup.id == evaluationGroup.criteriaGroupId)
-    //     }));
-    // }
+    loadPortfolioCategoriesOptions() {
+        // TODO: Colocar o id do portfólio correto, quando backend tiver essa entidade
+        this.scenarioService.getPortfolioCategoriesByPortfolioId(0).subscribe(categories => {
+            let column = this.columns.find(column => column.label == 'Categoria');
+            if (!column) return;
 
-    // goToStrategiesPage() {
-    //     this.router.navigate(['/estrategias']);
-    // }
+            column.selectButtonConfiguration = getPortfolioCategorySelectButtonConfigurations();
+            let config = column.selectButtonConfiguration;
 
-    // goToHomePage() {
-    //     this.router.navigate(['/inicio']);
-    // }
+            categories.forEach(category =>
+                config.options.push({
+                    label: category.name,
+                    value: category.id.toString(),
+                    hidden: false
+                })
+            );
+        });
+    }
 
-    // goBack(): void {
-    //     // Remover o breadcrumb do grupo de avaliação antes de navegar
-    //     this.breadcrumbService.removeBreadcrumbByUrl(`/estrategia/${this.strategyId}/cenario/${this.scenarioId}`);
-    //     this.router.navigateByUrl(`estrategia/${this.strategyId}`);
-    // }
+    onScenarioCancelled(): void {
+        this.isScenarioCancelModalVisible = false;
+        this.loadScenarioByIdAndStrategyByIdAndSetupBreadcrumbs();
+    }
 
-    // // Modal de criação de avaliação de projeto
-    // openCreateModal() {
-    //     this.showCreateModal = true;
-    // }
+    getProjectInclusionStatusChangeHandler(): ProjectInclusionStatusChangeHandler {
+        return new ProjectInclusionStatusChangeHandler(this.strategyId, this.scenarioId, this.scenarioService);
+    }
 
-    // closeCreateModal(): void {
-    //     this.showCreateModal = false;
-    // }
+    tryChangeScenarioProjectCategory(optionSelected: SelectButtonOptionSelected): Observable<void> {
+        // TODO: Chamar método service que atualiza a categoria dum scenario ranking.
+        return of(undefined);
+    }
 
-    // onProjectEvaluationCreated(): void {
-    //     this.setProjectRankingsByHttpRequest(); // Recarrega a lista
-    // }
+    onSelectChange(optionSelected: SelectButtonOptionSelected) {
+        let frontendAttributeName = optionSelected.column.frontendAttributeName;
+        let httpCall$: Observable<void> | undefined = undefined;
 
-    // // Modal de edição do grupo de avaliação
-    // openEditModal() {
-    //     this.showEditModal = true;
-    // }
+        // Conferindo qual é o <select>, pois nesta tabela há 2 (<select> para status e outro para categoria)
+        // e fazendo tratamento diferenciado com base nisso
+        if (frontendAttributeName == 'inclusionStatus') {
+            httpCall$ = this.getProjectInclusionStatusChangeHandler().tryChangeInclusionStatus(optionSelected);
+        } else if (frontendAttributeName == 'portfolioCategoryId') {
+            httpCall$ = this.tryChangeScenarioProjectCategory(optionSelected);
+        }
 
-    // closeEditModal(): void {
-    //     this.showEditModal = false;
-    // }
+        // Recarrega tabela pra mostrar valores atualizados após alterações do usuário.
+        httpCall$?.subscribe(_ => {
+            this.tableComponent?.sendHttpGetRequestAndPopulateTable();
+            this.loadScenarioByIdAndStrategyByIdAndSetupBreadcrumbs();
+        });
+    }
 
-    // onEvaluationGroupUpdated(): void {
-    //     this.setCurrentEvaluationGroupByHttpRequest(); // Recarrega os dados
-    // }
+    // Usado pelo TableComponent.
+    // Recarrega a tabela de projetos do cenário, buscando os dados via requisição HTTP.
+    getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => (
+        this.scenarioService.getScenarioProjects(this.strategyId, this.scenarioId, queryParams).pipe(
+            map(page => (mapScenarioRankingsPageDtoToScenarioProjectsPage(page)))
+        )
+    );
 
-    // // Modal de exclusão do grupo de avaliação - CORRIGIDO
-    // openDeleteModal(): void {
+    loadScenarioByIdAndStrategyByIdAndSetupBreadcrumbs() {
+        // forkJoin: executa código do 'subscribe' quando TODAS as requisições terminarem.
+        // Isso é importante pois o setupBreadCrumbs utiliza dados de ambas requisições.
+        forkJoin([
+            this.scenarioService.getScenarioById(this.strategyId, this.scenarioId),
+            this.strategyService.getStrategyById(this.strategyId)
+        ]).subscribe(([scenario, strategy]) => {
+            this.setScenarioRelatedVariables(scenario);
+            this.scenarioDTO = scenario;
+            this.strategy = strategy;
+            this.setupBreadcrumbs();
+            this.loadPortfolioCategoriesOptions();
+            this.setupPageByScenarioStatus();
+        })
+    }
 
-    //     this.showDeleteModal = true;
-    // }
+    setScenarioRelatedVariables(scenarioDTO: any) {
+        if (!scenarioDTO) return;
 
-    // closeDeleteModal(): void {
+        this.name = scenarioDTO.name;
+        this.description = scenarioDTO.description;
+        this.statusBadge = {
+            text: mapScenarioStatusEnumToText(scenarioDTO.status),
+            color: mapScenarioStatusToBadgeStatusColor(scenarioDTO.status)
+        };
+        this.lastUpdate = scenarioDTO.lastModifiedAt ? new Date(scenarioDTO.lastModifiedAt) : new Date(scenarioDTO.createdAt);
+        this.budget = formatToBRL(scenarioDTO.budget);
 
-    //     this.showDeleteModal = false;
-    // }
+        this.allProjectsBudget = formatToBRL(this.calculateAllProjectsBudget(scenarioDTO));
+        this.allIncludedProjectsBudget = formatToBRL(this.calculateAllIncludedProjectsBudget(scenarioDTO));
 
-    // onEvaluationGroupDeleted(): void {
+        let extraKeyValuePairInfos = [...this.extraKeyValuePairInfos];
+        extraKeyValuePairInfos[1].value = scenarioDTO?.evaluationGroup?.name ?? 'Erro';
+        this.extraKeyValuePairInfos = extraKeyValuePairInfos;
+    }
 
-    //     // Redirecionar para a página de estratégias após exclusão
-    //     this.router.navigateByUrl(`estrategia/${this.strategyId}`);
-    // }
+    calculateAllIncludedProjectsBudget(scenarioDto: any): number {
+        let scenario: ScenarioReadDTO = scenarioDto as ScenarioReadDTO;
+        return scenario.scenarioRankings
+            .filter(ranking =>
+                ranking.status === ScenarioRankingStatusEnum.MANUALLY_INCLUDED
+                || ranking.status === ScenarioRankingStatusEnum.INCLUDED
+            )
+            .map(ranking => ranking.project?.budget ?? 0).reduce((a, b) => a + b, 0);
+    }
 
-    // // Método para abrir modal de avaliação individual do projeto
-    // openEvaluationModal(projectRanking: ProjectRanking) {
-    //     console.log('Redirecionando para avaliação do projeto:', projectRanking);
-    //     console.log('Dados do projeto:', {
-    //         projectId: projectRanking.projectId,
-    //         name: projectRanking.name,
-    //         position: projectRanking.position,
-    //         totalScore: projectRanking.totalScore
-    //     });
-    // }
+    calculateAllProjectsBudget(scenarioDto: any): number {
+        let scenario: ScenarioReadDTO = scenarioDto as ScenarioReadDTO;
+        return scenario.scenarioRankings.map(ranking => ranking.project?.budget ?? 0).reduce((a, b) => a + b, 0);
+    }
 
-    // // Método para filtrar projetos com base na busca
-    // onSearchChange(): void {
-    //     if (!this.searchTerm.trim()) {
-    //         this.filteredProjectRankings = this.projectRankings;
-    //     } else {
-    //         this.filteredProjectRankings = this.projectRankings.filter(project =>
-    //             project.name?.toLowerCase().includes(this.searchTerm.toLowerCase())
-    //         );
-    //     }
-    // }
-    // formatScoreBR(score: number): string {
-    //     if (score == null || score === undefined || isNaN(score)) {
-    //         return '0,00';
-    //     }
-    //     return score.toFixed(2).replace('.', ',');
-    // }
+    setVariablesByRouteParams(params: ParamMap) {
+        this.scenarioId = Number(params.get('cenarioId'));
+        this.strategyId = Number(params.get('estrategiaId'));
+    }
+
+    setGoBackButtonPathToNavigate() {
+        this.goBackButtonPathToNavigate = `/estrategia/${this.strategyId}`;
+    }
+
+    setupBreadcrumbs() {
+        this.breadcrumbService.setBreadcrumbs([
+            { label: 'Início', url: '/inicio', isActive: false },
+            { label: 'Estratégias', url: '/estrategias', isActive: false },
+            { label: this.strategy?.name ?? '...', url: `/estrategia/${this.strategyId}`, isActive: false },
+            { label: this.name, url: `/estrategia/${this.strategyId}/cenario/${this.scenarioId}`, isActive: true },
+        ]);
+    }
+
+    // Configura o subject para atualizar o orçamento
+    // Ele evita que múltiplas requisições sejam feitas em um curto período de tempo
+    // Também atualiza a tabela de projetos do cenário
+    setupBudgetUpdateSubject() {
+        this.sendBudgetUpdateRequestThenRepopulateTableSubject
+            .pipe(
+                debounceTime(1000), // espera 500ms após o último keydown
+                tap(_ => this.updateScenarioBudgetByHttpRequest().subscribe(
+                    _ => this.tableComponent?.sendHttpGetRequestAndPopulateTable()
+                ))
+            )
+            .subscribe();
+    }
+
+    updateScenarioBudgetByHttpRequest(): Observable<void> {
+        // Converte para número
+        const budgetNumber = parseFormatedBRLToNumber(this.budget);
+        // Atualiza apenas o budget
+        // TODO: Chamar o novo endpoint só de atualização de budget de cenário, quando o backend
+        // o criar.
+        return this.scenarioService.updateScenario(this.strategyId, this.scenarioId, {
+            name: this.name,
+            description: this.description,
+            budget: budgetNumber,
+            status: this.scenarioDTO?.status ?? ScenarioStatusEnum.WAITING_AUTHORIZATION
+        });
+    }
+
+    onBudgetClick() {
+        if (this.hasWarningInformationModalAlreadyDisplayed) return;
+
+        this.isWarningInformationModalVisible = true;
+    }
+
+    onWarningInformationModalClose() {
+        this.hasWarningInformationModalAlreadyDisplayed = true;
+        this.isWarningInformationModalVisible = false;
+    }
+
+    onBudgetKeyDown(event: KeyboardEvent) {
+        handleScenarioBudgetKeyDown(
+            event,
+            () => this.budget,
+            v => this.budget = v
+        );
+
+        this.sendBudgetUpdateRequestThenRepopulateTableSubject.next();
+    }
+
+    openEditModal() {
+        this.isScenarioEditModalVisible = true;
+        this.editModal?.restartForm();
+    }
+
+    onCloseEditModal() {
+        this.isScenarioEditModalVisible = false;
+        this.loadScenarioByIdAndStrategyByIdAndSetupBreadcrumbs();
+        this.tableComponent?.sendHttpGetRequestAndPopulateTable();
+    }
+
 }

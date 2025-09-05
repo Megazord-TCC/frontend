@@ -1,10 +1,18 @@
 import { ProjectReadDTO } from "./carlos-project-dtos";
+import { EvaluationGroup } from "./interfacies";
+
+export class ScenarioUpdateDTO {
+    name = '';
+    description = '';
+    budget = 0;
+    status = ScenarioStatusEnum.WAITING_AUTHORIZATION;
+}
 
 export enum ScenarioRankingStatusEnum {
-    INCLUDED,
-    MANUALLY_INCLUDED,
-    MANUALLY_EXCLUDED,
-    EXCLUDED
+    INCLUDED = 'INCLUDED',
+    MANUALLY_INCLUDED = 'MANUALLY_INCLUDED',
+    MANUALLY_EXCLUDED = 'MANUALLY_EXCLUDED',
+    EXCLUDED = 'EXCLUDED'
 }
 
 export interface ScenarioRankingReadDTO {
@@ -19,9 +27,9 @@ export interface ScenarioRankingReadDTO {
 }
 
 export enum ScenarioStatusEnum {
-    WAITING_AUTHORIZATION,
-    AUTHORIZED,
-    CANCELLED,
+    WAITING_AUTHORIZATION = 'WAITING_AUTHORIZATION',
+    AUTHORIZED = 'AUTHORIZED',
+    CANCELLED = 'CANCELLED',
 }
 
 export interface ScenarioReadDTO {
@@ -34,6 +42,6 @@ export interface ScenarioReadDTO {
     createdAt: Date;
     lastModifiedAt: Date;
     strategyId: number;
-    evaluationGroupId: number;
+    evaluationGroup: EvaluationGroup;
     scenarioRankings: ScenarioRankingReadDTO[];
 }

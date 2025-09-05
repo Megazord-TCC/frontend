@@ -14,7 +14,7 @@ export enum ScenarioStatus {
 export interface ScenariosTableRow {
     id: number;
     name: string;
-    budget: number;
+    budget: string;
     includedProjectsQuantity: number;
     status: string;
     evaluationGroupName: string;
@@ -34,8 +34,8 @@ export enum ProjectStatus {
     CANCELED,
 }
 
-export interface ScenarioProject {
-    id: number;
+export interface ScenarioProjectRow {
+    scenarioRankingId: number;
     currentOrder: number;
     initialOrder: number;
     projectId: number;
@@ -46,6 +46,20 @@ export interface ScenarioProject {
     categoryId: number;
     estimatedDurationMonths: number;
     projectStatus: ProjectStatus
+}
+
+
+export interface ScenarioProject {
+    scenarioRankingId: number;
+    currentOrder: number; // Backend: calculatedPosition
+    initialOrder: number;
+    projectName: string;
+    inclusionStatus: string; // Backend: status
+    strategicValue: number; // Backend: totalScore
+    estimatedCost: string; // Backend: budget
+    portfolioCategoryId: string; // Backend: category (backend não implementado)
+    durationMonths: string;
+    projectStatus: string;
 }
 
 export interface Scenario {

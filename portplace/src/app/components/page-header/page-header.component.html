@@ -1,0 +1,25 @@
+<div class="strategy-header">
+    <div class="header-top">
+        <button *ngIf="goBackButtonPathToNavigate" class="back-btn" (click)="router.navigate([goBackButtonPathToNavigate])">
+            <app-svg-icon class="nav-icon" [path]="'assets/icon/voltar_vetor.svg'" [size]="18">
+            </app-svg-icon>
+        </button>
+        <h1>{{ title }}</h1>
+        <app-badge *ngIf="statusBadge" [color]="statusBadge.color">{{ statusBadge.text }}</app-badge>
+    </div>
+    <p *ngIf="description" class="strategy-description">{{ description }}</p>
+    <p *ngFor="let info of extraKeyValuePairInfos" class="strategy-description">
+        {{ info.key }}: <span class="info-value">{{ info.value }}</span>
+        <app-tooltip *ngIf="info.tooltip" [text]="info.tooltip"></app-tooltip>
+    </p>
+    <div class="action-header">
+        <div *ngIf="visibleActionButtons.length" class="action-buttons">
+            <button *ngIf="visibleActionButtons.includes('edit')" class="action-btn" (click)="editClick.emit()">Editar</button>
+            <button *ngIf="visibleActionButtons.includes('cancel')" class="action-btn cancel" (click)="cancelClick.emit()">Cancelar</button>
+            <button *ngIf="visibleActionButtons.includes('delete')" class="action-btn delete" (click)="deleteClick.emit()">Excluir</button>
+        </div>
+        <div *ngIf="lastUpdate" class="last-update">
+            Última alteração realizada em {{ lastUpdate | date: 'dd/MM/yyyy HH:mm' }}.
+        </div>
+    </div>
+</div>

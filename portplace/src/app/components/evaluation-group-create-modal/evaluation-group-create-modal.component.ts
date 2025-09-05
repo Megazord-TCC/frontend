@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { firstValueFrom, map, Observable } from 'rxjs';
 import { Page } from '../../models/pagination-models';
+import { CriteriaGroupService } from '../../service/criteria-group.service';
 
 @Component({
   selector: 'app-evaluation-group-create-modal',
@@ -22,6 +23,7 @@ export class EvaluationGroupCreateModal {
   httpClient = inject(HttpClient);
   route = inject(ActivatedRoute);
   router = inject(Router);
+  criteriaGroupService = inject(CriteriaGroupService);
 
   strategyId = -1;
 
@@ -131,22 +133,19 @@ export class EvaluationGroupCreateModal {
     return isUnique;
   }
 
-  doesSelectedCriteriaGroupHaveAtLeastOneCriteria(): boolean {
-    let selectedCriteriaGroup = this.getSelectedCriteriaGroupObject();
-    let hasAtLeastOneCriteria = false;
-
-    if (selectedCriteriaGroup)
-      hasAtLeastOneCriteria = selectedCriteriaGroup.criteriaCount > 0;
+  doesSelectedCriteriaGroupHaveAtLeastOneCriteria(selectedCriteriaGroup: any): boolean {
+    let criteriaCount = selectedCriteriaGroup?.criteriaList?.length ?? 0;
+    let hasAtLeastOneCriteria = criteriaCount > 0;
 
     this.errorMessage = hasAtLeastOneCriteria ? '' : 'O grupo de critérios selecionado não possui critérios. Acesse sua página e realize o cadastro.';
 
     return hasAtLeastOneCriteria;
   }
 
-  doesSelectedCriteriaGroupHaveAllCriteriaComparisons(): boolean {
-    let selectedCriteriaGroup = this.getSelectedCriteriaGroupObject();
-    let totalCriteriaComparisons = selectedCriteriaGroup?.criteriaComparisonCount ?? 0;
-    let totalCriteriaComparisonsExpected = this.getTotalCriteriaComparisonsExpectedByCriteriaQuantity(selectedCriteriaGroup?.criteriaCount ?? 0);
+  doesSelectedCriteriaGroupHaveAllCriteriaComparisons(selectedCriteriaGroup: any): boolean {
+    let criteriaCount = selectedCriteriaGroup?.criteriaList?.length ?? 0;
+    let totalCriteriaComparisons = selectedCriteriaGroup?.criteriaComparisons?.length ?? 0;
+    let totalCriteriaComparisonsExpected = this.getTotalCriteriaComparisonsExpectedByCriteriaQuantity(criteriaCount);
 
     if (totalCriteriaComparisons != totalCriteriaComparisonsExpected) {
       this.errorMessage = 'Os critérios do grupo de critérios selecionado não foram totalmente comparados entre si. Acesse sua página e finalize a comparação. Ou, selecione outro grupo de critério.';
@@ -156,10 +155,19 @@ export class EvaluationGroupCreateModal {
     return true;
   }
 
-  isCriteriaGroupSelectedValid(): boolean {
-    return this.isCriteriaGroupSelected()
-      && this.doesSelectedCriteriaGroupHaveAtLeastOneCriteria()
-      && this.doesSelectedCriteriaGroupHaveAllCriteriaComparisons();
+  async isCriteriaGroupSelectedValid(): Promise<boolean> {
+    let isValid = this.isCriteriaGroupSelected();
+
+    let selectedCriteriaGroup = await firstValueFrom(this.criteriaGroupService.getCriterioById(Number(this.inputCriteriaGroupSelectedId), this.strategyId));
+
+    if (!selectedCriteriaGroup) {
+        this.errorMessage = 'Ocorreu um erro inesperado. Tente novamente mais tarde.';
+        return false;
+    }
+
+    return isValid
+      && this.doesSelectedCriteriaGroupHaveAtLeastOneCriteria(selectedCriteriaGroup)
+      && this.doesSelectedCriteriaGroupHaveAllCriteriaComparisons(selectedCriteriaGroup);
   }
 
   isCriteriaGroupSelected(): boolean {

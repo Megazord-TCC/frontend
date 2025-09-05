@@ -1,0 +1,55 @@
+.tooltip-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #e7e7e7;
+    color: #8d8d8d;
+    font-size: 12px;
+    cursor: pointer;
+    position: relative;
+    margin-left: 6px;
+    transition: background 0.2s;
+
+    &:hover {
+        color: white;
+        background: #475569;
+    }
+
+    .tooltip-text {
+        visibility: hidden;
+        opacity: 0;
+        width: 180px;
+        background: #1e293b;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 7px 10px;
+        position: absolute;
+        z-index: 10;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        transition: opacity 0.2s;
+
+        &::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: #1e293b transparent transparent transparent;
+        }
+    }
+
+    &:hover .tooltip-text {
+        visibility: visible;
+        opacity: 1;
+    }
+}
