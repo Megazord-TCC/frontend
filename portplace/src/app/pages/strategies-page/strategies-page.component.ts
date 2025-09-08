@@ -94,7 +94,6 @@ export class StrategiesPageComponent implements OnInit {
       this.breadcrumbService.removeChildrenAfter('/estrategias');
     }
 
-    this.loadStrategies();
   }
 
   // Usado pelo TableComponent.
@@ -105,27 +104,27 @@ export class StrategiesPageComponent implements OnInit {
     )
   );
 
-  loadStrategies(): void {
-    this.loadingStrategies = true;
-    this.estrategiaService.getStrategies()
-      .pipe(retry(3))
-      .subscribe({
-        next: (response) => {
-          console.log('Estratégias carregadas:', response);
-          this.allStrategies = response.content;
-          this.strategies = response.content;
-          this.filteredStrategies = [...this.strategies];
-          this.loadingStrategies = false;
-        },
-        error: (err) => {
-          console.error('Erro ao carregar estratégias:', err);
-          this.allStrategies = [];
-          this.strategies = [];
-          this.filteredStrategies = [];
-          this.loadingStrategies = false;
-        }
-      });
-  }
+  // loadStrategies(): void {
+  //   this.loadingStrategies = true;
+  //   this.estrategiaService.getStrategies()
+  //     .pipe(retry(3))
+  //     .subscribe({
+  //       next: (response) => {
+  //         console.log('Estratégias carregadas:', response);
+  //         this.allStrategies = response.content;
+  //         this.strategies = response.content;
+  //         this.filteredStrategies = [...this.strategies];
+  //         this.loadingStrategies = false;
+  //       },
+  //       error: (err) => {
+  //         console.error('Erro ao carregar estratégias:', err);
+  //         this.allStrategies = [];
+  //         this.strategies = [];
+  //         this.filteredStrategies = [];
+  //         this.loadingStrategies = false;
+  //       }
+  //     });
+  // }
 
   onFilterChange(filter: string): void {
     this.activeFilter = this.activeFilter === filter ? '' : filter;
@@ -208,7 +207,7 @@ export class StrategiesPageComponent implements OnInit {
 
     this.estrategiaService.createStrategy(newStrategy).subscribe({
       next: (createdStrategy) => {
-        this.loadStrategies();
+
         this.closeCreateModal();
       },
       error: (err) => {

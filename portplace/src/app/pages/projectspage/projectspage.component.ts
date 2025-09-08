@@ -113,8 +113,6 @@ export class ProjectsComponent implements OnInit {
 
     // Remover breadcrumbs filhos quando retorna para esta página
     this.breadcrumbService.removeChildrenAfter('/projetos');
-
-    this.loadProjects();
   }
 
   // Usado pelo TableComponent.
@@ -125,29 +123,7 @@ export class ProjectsComponent implements OnInit {
     )
   );
 
-  loadProjects(): void {
-    this.loadingProjects = true;
-    this.projetoService.getAllProjects()
-    .pipe(retry(5))
-    .subscribe({
-      next: (response: ProjectPageableResponse) => {
-        console.log('Resposta paginada da API:', response);
-        console.log(`Total de elementos: ${response.totalElements}`);
-        console.log(`Página atual: ${response.number + 1} de ${response.totalPages}`);
 
-        // Extrair projetos da resposta paginada
-        this.allProjects = response.content;
-        this.Projects = response.content;
-        this.loadingProjects = false;
-      },
-      error: (err) => {
-        console.error('Erro ao buscar projetos:', err);
-        this.allProjects = [];
-        this.Projects = [];
-        this.loadingProjects = false;
-      }
-    });
-  }
 
   createProject(): void {
     console.log('Dados do projeto sendo enviados:', this.newProject);
@@ -155,7 +131,6 @@ export class ProjectsComponent implements OnInit {
     this.projetoService.createProject(this.newProject).subscribe({
       next: (createdProject) => {
         console.log('Projeto criado:', createdProject);
-        this.loadProjects();
         this.resetNewProject();
       },
       error: (err) => {
@@ -172,8 +147,6 @@ export class ProjectsComponent implements OnInit {
     }
     this.projetoService.updateProject(project.id, project).subscribe({
       next: (updatedProject) => {
-        console.log('Projeto atualizado:', updatedProject);
-        this.loadProjects();
       },
       error: (err) => {
         console.error('Erro ao atualizar projeto:', err);
@@ -184,8 +157,7 @@ export class ProjectsComponent implements OnInit {
   deleteProject(projectId: number): void {
     this.projetoService.deleteProject(projectId).subscribe({
       next: () => {
-        console.log('Projeto deletado!');
-        this.loadProjects();
+
       },
       error: (err) => {
         console.error('Erro ao deletar projeto:', err);
@@ -301,8 +273,6 @@ export class ProjectsComponent implements OnInit {
 
     this.projetoService.createProject(newProject).subscribe({
       next: (createdProject) => {
-        console.log('Projeto criado:', createdProject);
-        this.loadProjects();
         this.resetNewProject();
         this.closeCreateModal();
       },
