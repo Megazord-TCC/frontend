@@ -5,7 +5,7 @@ import { BadgeComponent } from '../../components/badge/badge.component';
 import { CardComponent } from '../../components/card/card.component';
 import { FormModalComponentComponent } from '../../components/form-modal-component/form-modal-component.component';
 import { SvgIconComponent } from '../../components/svg-icon/svg-icon.component';
-import { CriteriaComparison, CriteriaGroup, Criterion, ImportanceScale, Objective, RoleEnum, User } from '../../interface/interfacies';
+import { CriteriaComparison, CriteriaGroup, CriteriaGroupStatusEnum, Criterion, ImportanceScale, Objective, RoleEnum, User } from '../../interface/interfacies';
 import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom, Subscription } from 'rxjs';
 import { CriterioService } from '../../service/criterio.service';
@@ -142,7 +142,7 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
     try {
       const criteriaGroup = await firstValueFrom(this.criterioGroupService.getCriterioById(this.criteriaGroupId,this.estrategiaId));
       this.criteriaGroup = criteriaGroup;
-
+      console.log('Grupo de critérios carregado:', this.criteriaGroup);
       // COMPONENTE FILHO: Adiciona seu breadcrumb ao array do pai
       this.breadcrumbService.addChildBreadcrumb({
         label: criteriaGroup.name || `Grupo ${this.criteriaGroupId}`,
@@ -161,11 +161,29 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
     this.router.navigate([`/estrategia`, this.estrategiaId]);
   }
 
-  getStatusLabelByDisabled(disabled: boolean): string {
-    return disabled ? 'Desativado' : 'Ativado';
+  getStatusLabelByDisabled(status?: CriteriaGroupStatusEnum): string {
+    if (!status) return 'Desconhecido';
+
+    switch (status) {
+      case CriteriaGroupStatusEnum.ACTIVE:
+        return 'Ativado';
+      case CriteriaGroupStatusEnum.INACTIVE:
+        return 'Desativado';
+      default:
+        return 'Desconhecido';
+    }
   }
-  getStatusColorByDisabled(disabled: boolean): string {
-    return disabled ? 'red' : 'green';
+  getStatusColorByDisabled(status?: CriteriaGroupStatusEnum): string {
+    if (!status) return 'gray';
+
+    switch (status) {
+      case CriteriaGroupStatusEnum.ACTIVE:
+        return 'green';
+      case CriteriaGroupStatusEnum.INACTIVE:
+        return 'red';
+      default:
+        return 'gray';
+    }
   }
   editCriteriaGroup() {
     if (this.criteriaGroup) {

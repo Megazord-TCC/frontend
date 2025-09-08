@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Project, ProjectPageableResponse } from '../interface/interfacies';
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
+import { Page, PaginationQueryParams } from '../models/pagination-models';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +24,10 @@ export class ProjetoService {
   // Cadastrar novo projeto (POST)
   createProject(project: any): Observable<Project> {
     return this.http.post<Project>(this.apiUrl, project, { headers: this.getHeaders() });
+  }
+
+  getProjectsPage( queryParams?: PaginationQueryParams): Observable<Page<any>> {
+      return this.http.get<Page<any>>(this.apiUrl, { params: queryParams?.getParamsInHttpParamsFormat() });
   }
 
   // Buscar todos os projetos (GET)

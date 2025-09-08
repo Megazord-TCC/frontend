@@ -47,7 +47,7 @@ export class ProjectDetailpageComponent implements OnInit {
     portfolio: undefined,
     startDate: '',
     endDate: '',
-    status: ProjectStatusEnum.CANDIDATE,
+    status: ProjectStatusEnum.IN_ANALYSIS,
     projectManager: 1,
     earnedValue: 0,
     plannedValue: 0,
@@ -210,7 +210,7 @@ export class ProjectDetailpageComponent implements OnInit {
       description: project.description || '',
       startDate: project.startDate || '',
       endDate: project.endDate || '',
-      status: project.status || ProjectStatusEnum.CANDIDATE,
+      status: project.status || ProjectStatusEnum.IN_ANALYSIS,
       projectManager: Number(project.projectManager) || 1,
       earnedValue: Number(project.earnedValue) || 0,
       plannedValue: Number(project.plannedValue) || 0,
@@ -267,7 +267,7 @@ export class ProjectDetailpageComponent implements OnInit {
       portfolio: undefined,
       startDate: '',
       endDate: '',
-      status: ProjectStatusEnum.CANDIDATE,
+      status: ProjectStatusEnum.IN_ANALYSIS,
       projectManager: 1,
       earnedValue: 0,
       plannedValue: 0,
@@ -342,18 +342,9 @@ export class ProjectDetailpageComponent implements OnInit {
   onCancelProject(fields: FormField[]): void {
     const cancelReason = fields.find(f => f.id === 'reason')?.value || '';
 
-    const cancelData = {
-      projectId: this.project.id,
-      reason: cancelReason,
-      status: ProjectStatusEnum.FINISHED,
-      cancelledDate: new Date().toISOString()
-    };
-
-    console.log('Cancelando projeto:', cancelData);
-
     const updatedProject = {
       ...this.project,
-      status: ProjectStatusEnum.FINISHED,
+      status: ProjectStatusEnum.CANCELLED,
       cancellationReason: cancelReason
     };
 

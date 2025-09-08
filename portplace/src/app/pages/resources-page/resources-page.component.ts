@@ -105,21 +105,6 @@ export class ResourcesPageComponent implements OnInit {
       return acc;
     }, {} as any);
 
-    const newProject: Project = {
-      name: projectData.name,
-      description: projectData.description,
-      portfolio: undefined  ,
-      startDate: projectData.startDate,
-      endDate: projectData.endDate,
-      status: ProjectStatusEnum.CANDIDATE,
-      projectManager: 1,
-      earnedValue: 0,
-      plannedValue: 0,
-      actualCost: 0,
-      budget: 0,
-      payback: 0
-    };
-
     // this.projetoService.createProject(newProject).subscribe({
     //   next: (createdProject) => {
     //     console.log('Projeto criado:', createdProject);
@@ -141,12 +126,13 @@ export class ResourcesPageComponent implements OnInit {
     let filtered = [...this.allResources];
 
     if (this.activeFilter) {
-      const filterMap: { [key: string]: ProjectStatusEnum } = {
-        'em-analise': ProjectStatusEnum.CANDIDATE,
-        'em-planejamento': ProjectStatusEnum.PLANNING,
-        'em-andamento': ProjectStatusEnum.IN_PROGRESS,
-        'finalizado': ProjectStatusEnum.FINISHED
-      };
+        const filterMap: { [key: string]: ProjectStatusEnum } = {
+          'em-analise': ProjectStatusEnum.IN_ANALYSIS,
+          'cancelado': ProjectStatusEnum.CANCELLED,
+          'em-andamento': ProjectStatusEnum.IN_PROGRESS,
+          'finalizado': ProjectStatusEnum.COMPLETED
+        };
+
 
       filtered = filtered.filter(project =>
         project.status === filterMap[this.activeFilter]
@@ -175,13 +161,13 @@ export class ResourcesPageComponent implements OnInit {
       status = ProjectStatusEnum[status as keyof typeof ProjectStatusEnum];
     }
     switch (status) {
-      case ProjectStatusEnum.CANDIDATE:
+      case ProjectStatusEnum.IN_ANALYSIS:
         return 'EM ANÁLISE';
-      case ProjectStatusEnum.PLANNING:
-        return 'EM PLANEJAMENTO';
+      case ProjectStatusEnum.CANCELLED:
+        return 'CANCELADO';
       case ProjectStatusEnum.IN_PROGRESS:
         return 'EM ANDAMENTO';
-      case ProjectStatusEnum.FINISHED:
+      case ProjectStatusEnum.COMPLETED:
         return 'FINALIZADO';
       default:
         return '';
@@ -192,14 +178,14 @@ export class ResourcesPageComponent implements OnInit {
     if (typeof status === 'string') {
       status = ProjectStatusEnum[status as keyof typeof ProjectStatusEnum];
     }
-    switch (status) {
-      case ProjectStatusEnum.CANDIDATE:
+     switch (status) {
+      case ProjectStatusEnum.IN_ANALYSIS:
         return 'yellow';
-      case ProjectStatusEnum.PLANNING:
-        return 'blue';
       case ProjectStatusEnum.IN_PROGRESS:
+        return 'blue';
+      case ProjectStatusEnum.COMPLETED:
         return 'green';
-      case ProjectStatusEnum.FINISHED:
+      case ProjectStatusEnum.CANCELLED:
         return 'red';
       default:
         return 'gray';

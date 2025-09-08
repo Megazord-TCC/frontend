@@ -48,10 +48,10 @@ export interface ProjectPageableResponse {
 }
 
 export enum ProjectStatusEnum {
-  CANDIDATE = 'CANDIDATE',
-  PLANNING = 'PLANNING',
+  IN_ANALYSIS = 'IN_ANALYSIS',
   IN_PROGRESS = 'IN_PROGRESS',
-  FINISHED = 'FINISHED'
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED'
 }
 
 export interface Evaluation {
@@ -155,12 +155,19 @@ export interface CriteriaGroup {
   id?: number;
   name: string;
   description?: string;
-  disabled: boolean;
+  criteriaList?: Criterion[];
+  criteriaComparisons?: CriteriaComparison[];
+  status?: CriteriaGroupStatusEnum;
   lastModifiedAt?: Date;
-  lastModifiedBy?: User;
   createdAt?: Date;
-  criteriaCount?: number;
-  criteriaComparisonCount?: number;
+  disabled?: boolean;
+  relatedObjectivesCount?: number;
+  relatedEvaluationGroupsCount?: number;
+}
+
+export enum CriteriaGroupStatusEnum {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE'
 }
 
 export interface Criterion {
@@ -176,11 +183,21 @@ export interface Criterion {
 }
 
 export interface Strategy {
-  id: string;
+  id?: number;
   name: string;
-  activeObjectives: number;
-  status: string;
-  statusColor: string;
+  description?: string;
+  status?: StrategyStatusEnum;
+  activeObjectivesCount?: number;
+  disabled?: boolean;
+  createdAt?: Date;
+  lastModifiedAt?: Date;
+  activeObjectives?: number;
+  statusColor?: string;
+}
+
+export enum StrategyStatusEnum {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE'
 }
 
 export interface CriteriaComparison {
@@ -251,4 +268,22 @@ export interface Risk {
   severity: number;
   resolvedOccurrences: number;
   unresolvedOccurrences: number;
+}
+
+// Interfaces para tratamento de erros da API
+export interface ApiError {
+  status: number;
+  message: string;
+  path: string;
+  method: string;
+  timestamp: string;
+  errors?: ValidationError[];
+}
+
+export interface ValidationError {
+  field?: string;
+  rejectedValue?: any;
+  defaultMessage?: string;
+  code?: string;
+  objectName?: string;
 }

@@ -10,8 +10,6 @@ import { Page } from '../models/pagination-models';
 })
 export class CriteriaGroupService {
 
-  private apiUrl = `${environment.apiUrl}/Criterios`;
-
   constructor(private http: HttpClient) { }
 
   // Headers com Content-Type JSON
@@ -25,14 +23,13 @@ export class CriteriaGroupService {
   // Cadastrar novo projeto (POST)
   createCriterio(criterio: CriteriaGroup, estrategiaId: number): Observable<CriteriaGroup> {
     const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups`;
-    return this.http.post<CriteriaGroup>(url,criterio, { headers: this.getHeaders() });
+    return this.http.post<CriteriaGroup>(url, criterio, { headers: this.getHeaders() });
   }
 
   // Buscar todos os grupo de critérios (GET)
   // TODO: Renomear para getAllCriteriaGroups ou getAllGrupoCriterios
   getAllCriterios( estrategiaId: number): Observable<CriteriaGroup[]> {
     const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups`;
-    console.log('URL:', url);
     return this.http.get<Page<CriteriaGroup>>(url, { headers: this.getHeaders(), params: { size: 1000 } })
         .pipe(map(page => page.content));
   }
