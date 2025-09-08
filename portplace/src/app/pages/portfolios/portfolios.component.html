@@ -1,151 +1,24 @@
-<div class="portfolios-container">
-  <!-- Breadcrumb -->
-  <app-breadcrumb></app-breadcrumb>
+<div class="detail-layout">
 
-  <!-- Header -->
-  <div class="page-header">
-    <h1>Portfólios</h1>
-    <p>Gerencie os portfólios da organização.</p>
-  </div>
+    <div class="detail-content">
+        <app-breadcrumb></app-breadcrumb>
 
-  <!-- Filters and Actions -->
-  <div class="filters-section">
-    <div class="filters-left">
-      <div class="filter-label">
-        <i class="icon-filter"></i>
-        <span>Filtros:</span>
-      </div>
-      <div class="filter-buttons">
-        <button
-          class="filter-btn"
-          [class.active]="activeFilter === 'empty'"
-          (click)="onFilterChange('empty')">
-          <div class="filter-indicator blue"></div>
-          Vazio
-        </button>
-        <button
-          class="filter-btn"
-          [class.active]="activeFilter === 'inProgress'"
-          (click)="onFilterChange('inProgress')">
-          <div class="filter-indicator blue"></div>
-          Em andamento
-        </button>
-        <button
-          class="filter-btn"
-          [class.active]="activeFilter === 'finished'"
-          (click)="onFilterChange('finished')">
-          Finalizado
-        </button>
-      </div>
-    </div>
+        <app-page-header 
+            title="Portfólios" 
+            description="Gerencie os portfólios da organização."
+            goBackButtonPathToNavigate="/inicio">
+        </app-page-header>
 
-     <!-- Filters -->
-    <div class="filters-section">
-      <div class="filters-left">
-        <button class="btn-primary" (click)="openCreateModal()">
-          <i class="icon-plus">+</i>
-          Cadastrar
-        </button>
-
-      </div>
-
-      <div class="actions-right">
-        <div class="search-container">
-
-          <app-svg-icon
-            class="nav-icon"
-            [path]="'assets/icon/search_vetor.svg'"
-            [size]="18">
-          </app-svg-icon>
-          <input
-            type="text"
-            placeholder="Buscar pelo nome da estratégia"
-            [(ngModel)]="searchTerm"
-            (input)="onSearchChange()">
+        <div class="tab-content">
+            <app-table 
+                [dataRetrievalMethodRef]="this.getDataForTableComponent" 
+                [filterText]="filterText"
+                [filterButtons]="filterButtons"
+                [columns]="columns" 
+                [actionButton]="actionButton" 
+                (mainColumnRowClick)="openPortfolio($event)"
+                (actionButtonClick)="openCreateModal()">
+            </app-table>
         </div>
-      </div>
     </div>
-  </div>
-
-  <!-- Table -->
-  <app-card class="table-card">
-    <div class="table-container">
-      <table class="portfolios-table">
-        <thead>
-          <tr>
-            <th>
-              <div class="header-cell">
-                Nome do portfólio
-                <i class="icon-sort"></i>
-              </div>
-            </th>
-            <th>
-              <div class="header-cell">
-                Orçamento
-                <i class="icon-sort"></i>
-              </div>
-            </th>
-            <th>
-              <div class="header-cell">
-                Proj. em andamento
-                <i class="icon-sort"></i>
-              </div>
-            </th>
-            <th>
-              <div class="header-cell">
-                Proj. concluídos
-                <i class="icon-sort"></i>
-              </div>
-            </th>
-            <th>
-              <div class="header-cell">
-                Proj. cancelados
-                <i class="icon-sort"></i>
-              </div>
-            </th>
-            <th>
-              <div class="header-cell">
-                Status
-                <i class="icon-sort"></i>
-              </div>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let portfolio of portfolios" class="table-row" (click)="onPortfolioClick(portfolio.id)">
-            <td>
-              <button class="portfolio-link">{{portfolio.name}}</button>
-            </td>
-            <td>{{portfolio.budget}}</td>
-            <td>{{portfolio.inProgress}}</td>
-            <td>{{portfolio.completed}}</td>
-            <td>{{portfolio.cancelled}}</td>
-            <td>
-              <app-badge [color]="portfolio.statusColor">{{portfolio.status}}</app-badge>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </app-card>
-
-  <!-- Pagination -->
-  <div class="pagination">
-    <p class="pagination-info">Mostrando 1 a 2 de 2 registros</p>
-    <div class="pagination-controls">
-      <button class="pagination-btn" disabled>
-        <i class="icon-chevron-left"></i>
-      </button>
-      <button class="pagination-btn active">1</button>
-      <button class="pagination-btn" disabled>
-        <i class="icon-chevron-right"></i>
-      </button>
-    </div>
-  </div>
-
-  <!-- Modal -->
-  <app-portfolio-modal
-    *ngIf="showModal"
-    (close)="closeModal()">
-  </app-portfolio-modal>
 </div>

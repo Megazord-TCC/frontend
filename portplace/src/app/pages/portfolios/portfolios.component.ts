@@ -2,124 +2,68 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { BadgeComponent } from '../../components/badge/badge.component';
-import { CardComponent } from '../../components/card/card.component';
-import { PortfolioModalComponent } from '../../components/portfolio-modal/portfolio-modal.component';
-import { SvgIconComponent } from '../../components/svg-icon/svg-icon.component';
 import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../service/breadcrumb.service';
-type BadgeColor = 'gray' | 'green' | 'blue' | 'red' | 'yellow';
-interface Portfolio {
-  id: number;
-  name: string;
-  budget: string;
-  inProgress: number;
-  completed: number;
-  cancelled: number;
-  status: string;
-  statusColor: BadgeColor;
-}
+import { PageHeaderComponent } from '../../components/page-header/page-header.component';
+import { TableComponent } from '../../components/table/table.component';
+import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } from '../../models/pagination-models';
+import { map, Observable } from 'rxjs';
+import { PortfolioService } from '../../service/portfolio-service';
+import { mapPortfolioDTOPageToPortfolioTableRowPage } from '../../mappers/portfolio-mapper';
+import { getActionButton, getColumns, getFilterButtons, getFilterText } from './portfolio-table-config';
+import { PortfolioTableRow } from '../../interface/carlos-portfolio-interfaces';
 
 @Component({
-  selector: 'app-portfolios',
-  templateUrl: './portfolios.component.html',
-  styleUrls: ['./portfolios.component.scss'],
-   imports: [
-    CommonModule,
-    FormsModule,
-    CardComponent,
-    BadgeComponent,
-    PortfolioModalComponent,
-    SvgIconComponent,
-    BreadcrumbComponent
-  ],
+    selector: 'app-portfolios',
+    templateUrl: './portfolios.component.html',
+    styleUrls: ['./portfolios.component.scss'],
+    imports: [
+        CommonModule,
+        FormsModule,
+        BreadcrumbComponent,
+        PageHeaderComponent,
+        TableComponent
+    ],
 })
 export class PortfoliosComponent implements OnInit {
-  private router = inject(Router);
-  private breadcrumbService = inject(BreadcrumbService);
+    private router = inject(Router);
+    private breadcrumbService = inject(BreadcrumbService);
+    private portfolioService = inject(PortfolioService);
 
-  showModal = false;
-  activeFilter = 'all';
-  searchTerm = '';
+    showCreateModal = false;
 
-  portfolios: Portfolio[] = [
-    {
-      id: 1,
-      name: 'Portfólio 1',
-      budget: 'R$ 1.000,00',
-      inProgress: 3,
-      completed: 4,
-      cancelled: 6,
-      status: 'VAZIO',
-      statusColor: 'gray'
-    },
-    {
-      id: 2,
-      name: 'Portfólio 2',
-      budget: 'R$ 1.000,00',
-      inProgress: 2,
-      completed: 5,
-      cancelled: 2,
-      status: 'EM ANDAMENTO',
-      statusColor: 'green'
-    }
-  ];
+    filterButtons = getFilterButtons();
+    filterText = getFilterText();
+    columns = getColumns();
+    actionButton = getActionButton();
 
-  ngOnInit(): void {
-    // COMPONENTE PAI: Configurar breadcrumbs base e remover filhos
-    this.breadcrumbService.setBreadcrumbs([
-      {
-        label: 'Início',
-        url: '/inicio',
-        isActive: false
-      },
-      {
-        label: 'Portfólios',
-        url: '/portfolios',
-        isActive: true
-      }
-    ]);
-
-    // COMPONENTE PAI: Remove qualquer breadcrumb filho que possa existir
-    this.breadcrumbService.removeChildrenAfter('/portfolios');
-  }
-
-  onFilterChange(filter: string): void {
-    this.activeFilter = filter;
-  }
-  onSearchChange(): void {
-    this.applyFilters();
-  }
-  openCreateModal(): void {
-    // Implementar modal de criação
-  }
-  applyFilters(): void {
-    let filtered = [...this.portfolios];
-
-    if (this.activeFilter) {
-      filtered = filtered.filter(strategy =>
-        strategy.status.toLowerCase() === this.activeFilter.toLowerCase()
-      );
+    ngOnInit(): void {
+        this.setupBreadcrumbs();
     }
 
-    if (this.searchTerm) {
-      filtered = filtered.filter(strategy =>
-        strategy.name.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
+    setupBreadcrumbs(): void {
+        this.breadcrumbService.setBreadcrumbs([
+            { label: 'Início', url: '/inicio', isActive: false },
+            { label: 'Portfólios', url: '/portfolios', isActive: true }
+        ]);
+
+        this.breadcrumbService.removeChildrenAfter('/portfolios');
     }
 
-    this.portfolios = filtered;
-  }
+    openCreateModal(): void {
+        // this.showCreateModal = true;
+        // this.createModal.restartForm();
+    }
 
-  onPortfolioClick(portfolioId: number): void {
-    this.router.navigate(['/portfolio', portfolioId]);
-  }
+    openPortfolio(row: PortfolioTableRow) {
+        this.router.navigate(['/portfolio', row.id]);
+    }
 
-  openModal(): void {
-    this.showModal = true;
-  }
-
-  closeModal(): void {
-    this.showModal = false;
-  }
+    // Usado pelo TableComponent.
+    // Recarrega a tabela de cenários, buscando os dados via requisição HTTP.
+    getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => (
+        this.portfolioService.getAllPortfolios(queryParams).pipe(
+            map(page => (mapPortfolioDTOPageToPortfolioTableRowPage(page)))
+        )
+    );
 }
