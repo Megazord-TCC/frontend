@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
-import { Observable, of } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import { Page, PaginationQueryParams } from '../models/pagination-models';
 import { PortfolioDTO, PortfolioDTOStatus } from '../interface/carlos-portfolio-interfaces';
 
@@ -15,12 +15,16 @@ export class PortfolioService {
         return new HttpHeaders({ 'Content-Type': 'application/json', 'Accept': 'application/json' });
     }
 
-    private getPortfoliosUrl(strategyId: number): string {
-        return `${environment.apiUrl}/strategies/${strategyId}/scenarios`;
+    private getPortfolioUrl(): string {
+        return `${environment.apiUrl}/portfolios`;
+    }
+
+    private getPortfolioDetailUrl(portfolioId: number): string {
+        return `${this.getPortfolioUrl()}/${portfolioId}`;
     }
 
     // GET - Buscar todos portfólios
-    getAllPortfolios(queryParams?: PaginationQueryParams): Observable<Page<PortfolioDTO>> {
+    getPortfoliosPage(queryParams?: PaginationQueryParams): Observable<Page<PortfolioDTO>> {
         // TODO: Chamar endpoint GET-ALL portfolios, quando ele for criado
         return of({
             content: [
@@ -78,5 +82,27 @@ export class PortfolioService {
             first: true,
             empty: false,
         });
+    }
+
+    // POST - Criar um novo portfólio
+    createPortfolio(name: string, description: string): Observable<number> {
+        const url = this.getPortfolioUrl();
+        const body = { name: name, description: description };
+        return this.http.post<{ id: number }>(url, body, { headers: this.getHeaders() })
+            .pipe(map(response => response.id));
+    }
+
+    // GET - Conferir se o nome do portfólio já existe. O nome tem que ser exatamente igual e por completo.
+    getPortfolioByExactName(portfolioName: string): Observable<PortfolioDTO | undefined> {
+        let queryParams = new PaginationQueryParams();
+        queryParams.filterTextQueryParam = { name: 'searchQuery', value: portfolioName };
+
+        return this.getPortfoliosPage(queryParams).pipe(
+            map(page =>  page.content as PortfolioDTO[]),
+            map(portfolios => {
+                let portfolioWithExactName = portfolios.find(portfolio => portfolio.name == portfolioName);
+                return !!portfolioWithExactName ? portfolioWithExactName : undefined;
+            })
+        );
     }
 }

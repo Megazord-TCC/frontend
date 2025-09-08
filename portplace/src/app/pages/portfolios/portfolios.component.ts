@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
@@ -12,6 +12,7 @@ import { PortfolioService } from '../../service/portfolio-service';
 import { mapPortfolioDTOPageToPortfolioTableRowPage } from '../../mappers/portfolio-mapper';
 import { getActionButton, getColumns, getFilterButtons, getFilterText } from './portfolio-table-config';
 import { PortfolioTableRow } from '../../interface/carlos-portfolio-interfaces';
+import { PortfolioCreateModal } from '../../components/portfolio-create-modal/portfolio-create-modal.component';
 
 @Component({
     selector: 'app-portfolios',
@@ -22,10 +23,13 @@ import { PortfolioTableRow } from '../../interface/carlos-portfolio-interfaces';
         FormsModule,
         BreadcrumbComponent,
         PageHeaderComponent,
-        TableComponent
+        TableComponent,
+        PortfolioCreateModal
     ],
 })
 export class PortfoliosComponent implements OnInit {
+    @ViewChild(PortfolioCreateModal) createModal!: PortfolioCreateModal;
+
     private router = inject(Router);
     private breadcrumbService = inject(BreadcrumbService);
     private portfolioService = inject(PortfolioService);
@@ -51,8 +55,8 @@ export class PortfoliosComponent implements OnInit {
     }
 
     openCreateModal(): void {
-        // this.showCreateModal = true;
-        // this.createModal.restartForm();
+        this.showCreateModal = true;
+        this.createModal.restartForm();
     }
 
     openPortfolio(row: PortfolioTableRow) {
@@ -62,7 +66,7 @@ export class PortfoliosComponent implements OnInit {
     // Usado pelo TableComponent.
     // Recarrega a tabela de cenários, buscando os dados via requisição HTTP.
     getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => (
-        this.portfolioService.getAllPortfolios(queryParams).pipe(
+        this.portfolioService.getPortfoliosPage(queryParams).pipe(
             map(page => (mapPortfolioDTOPageToPortfolioTableRowPage(page)))
         )
     );
