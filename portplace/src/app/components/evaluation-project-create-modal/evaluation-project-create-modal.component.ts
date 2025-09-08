@@ -6,6 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { environment } from '../../environments/environment';
 import { firstValueFrom, forkJoin, map } from 'rxjs';
 import { Page } from '../../models/pagination-models';
+import { EvaluationGroup } from '../../interface/carlos-interfaces';
 
 @Component({
   selector: 'app-project-evaluation-create-modal',
@@ -15,7 +16,7 @@ import { Page } from '../../models/pagination-models';
 })
 export class ProjectEvaluationCreateModal {
   @Input() isVisible = false;
-  @Input() evaluationGroup: any;
+  @Input() evaluationGroup!: EvaluationGroup;
 
   @Output() close = new EventEmitter<void>();
   @Output() created = new EventEmitter<void>();
@@ -75,17 +76,17 @@ export class ProjectEvaluationCreateModal {
     }
 
     // Verificar se temos o criteriaGroupId no evaluationGroup
-    if (!this.evaluationGroup?.criteriaGroupId) {
+    if (!this.evaluationGroup?.criteriaGroup.id) {
       console.log('❌ Erro: criteriaGroupId não encontrado no grupo de avaliação');
       this.errorMessage = 'Erro: grupo de critérios não encontrado no grupo de avaliação.';
       return;
     }
 
-    console.log('📋 Criteria Group ID:', this.evaluationGroup.criteriaGroupId);
+    console.log('📋 Criteria Group ID:', this.evaluationGroup.criteriaGroup.id);
 
     try {
       // Buscar critérios do grupo de critérios
-      const criteriaRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups/${this.evaluationGroup.criteriaGroupId}/criteria`;
+      const criteriaRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups/${this.evaluationGroup.criteriaGroup.id}/criteria`;
       console.log('🔍 Buscando critérios na rota:', criteriaRoute);
 
       const getCriteria$ = this.httpClient.get<Page<any>>(criteriaRoute, { params: { size: 1000 } }).pipe(map(page => page.content));

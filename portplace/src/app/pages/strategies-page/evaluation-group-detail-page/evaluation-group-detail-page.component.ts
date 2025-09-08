@@ -8,7 +8,7 @@ import { EvaluationGroupEditModal } from '../../../components/evaluation-group-e
 import { ProjectEvaluationCreateModal } from '../../../components/evaluation-project-create-modal/evaluation-project-create-modal.component';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { CriteriaGroup, EvaluationGroup, EvaluationGroupView, ProjectRanking } from '../../../interface/carlos-interfaces';
+import { CriteriaGroup, EvaluationGroup, ProjectRanking } from '../../../interface/carlos-interfaces';
 import { forkJoin, map, Subscription } from 'rxjs';
 import { EvaluationGroupDeleteModal } from '../../../components/evaluation-group-delete-modal/evaluation-group-delete-modal.component';
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
@@ -41,7 +41,7 @@ export class EvaluationGroupDetailPageComponent implements OnInit, OnDestroy {
   strategyId = -1;
   evaluationGroupId = -1;
 
-  evaluationGroup: EvaluationGroupView | undefined;
+  evaluationGroup: EvaluationGroup | undefined;
 
   projectRankings: ProjectRanking[] = [];
   filteredProjectRankings: ProjectRanking[] = [];
@@ -81,35 +81,20 @@ export class EvaluationGroupDetailPageComponent implements OnInit, OnDestroy {
 
   setCurrentEvaluationGroupByHttpRequest() {
     let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups`;
-    let criteriaGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups`;
 
-    let getAllEvaluationGroups$ = this.httpClient.get<Page<EvaluationGroup>>(evaluationGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
-    let getAllCriteriaGroups$ = this.httpClient.get<Page<CriteriaGroup>>(criteriaGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
+    this.httpClient.get<Page<EvaluationGroup>>(evaluationGroupsRoute, { params: { size: 1000 } })
+        .pipe(map(page => page.content))
+        .subscribe(evaluationGroups => {
+            this.evaluationGroup = evaluationGroups.find(evaluationGroup => evaluationGroup.id == this.evaluationGroupId);
 
-    forkJoin({ evaluationGroups: getAllEvaluationGroups$, criteriaGroups: getAllCriteriaGroups$ })
-      .pipe(
-        map(({ evaluationGroups, criteriaGroups }) => this.getManyEvaluationGroupView(evaluationGroups, criteriaGroups)),
-        map(evaluationGroups => evaluationGroups.find(evaluationGroup => evaluationGroup.id == this.evaluationGroupId))
-      )
-      .subscribe(evaluationGroup => {
-        this.evaluationGroup = evaluationGroup;
-
-        // Usar addChildBreadcrumb para adicionar breadcrumb filho
-        if (evaluationGroup) {
-          this.breadcrumbService.addChildBreadcrumb({
-            label: evaluationGroup.name,
-            url: `/estrategia/${this.strategyId}/grupo-avaliacao/${this.evaluationGroupId}`,
-            isActive: true
-          });
-        }
-      });
-  }
-
-  getManyEvaluationGroupView(evaluationGroups: EvaluationGroup[], criteriaGroups: CriteriaGroup[]): EvaluationGroupView[] {
-      return evaluationGroups.map(evaluationGroup => ({
-          ...evaluationGroup,
-          criteriaGroup: criteriaGroups.find(criteriaGroup => criteriaGroup.id == evaluationGroup.criteriaGroupId)
-      }));
+            // Usar addChildBreadcrumb para adicionar breadcrumb filho
+            if (this.evaluationGroup)
+            this.breadcrumbService.addChildBreadcrumb({
+                label: this.evaluationGroup.name,
+                url: `/estrategia/${this.strategyId}/grupo-avaliacao/${this.evaluationGroupId}`,
+                isActive: true
+            });
+        });
   }
 
   setProjectRankingsByHttpRequest() {

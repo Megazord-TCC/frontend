@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
-import { EvaluationGroupView } from '../../interface/carlos-interfaces';
+import { EvaluationGroup } from '../../interface/carlos-interfaces';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from '../../environments/environment';
@@ -13,7 +13,7 @@ import { environment } from '../../environments/environment';
 })
 export class EvaluationGroupDeleteModal {
   @Input() isVisible = false;
-  @Input() evaluationGroup: EvaluationGroupView | undefined;
+  @Input() evaluationGroup: EvaluationGroup | undefined;
 
   @Output() close = new EventEmitter<void>();
   @Output() deleted = new EventEmitter<void>();

@@ -83,7 +83,7 @@ export interface EvaluationGroup {
     id: number;
     name: string;
     description: string;
-    criteriaGroupId: number;
+    criteriaGroup: CriteriaGroup;
     evaluations?: Evaluation[];
     disabled: number;
     createdAt?: Date;
@@ -142,10 +142,6 @@ export const ImportanceScaleValues: Record<ImportanceScale, { value: number, rec
   [ImportanceScale.LESS_IMPORTANT]: { value: 1 / 3.0, reciprocal: 3.0 },
   [ImportanceScale.MUCH_LESS_IMPORTANT]: { value: 1 / 6.0, reciprocal: 6.0 }
 };
-
-export interface EvaluationGroupView extends EvaluationGroup {
-  criteriaGroup: CriteriaGroup | undefined
-}
 
 export interface Evaluation {
     id: string;

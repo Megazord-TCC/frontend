@@ -12,6 +12,9 @@ import { BreadcrumbService } from '../../../service/breadcrumb.service';
 import { Project, ProjectPageableResponse, ProjectStatusEnum } from '../../../interface/interfacies';
 import { ProjetoService } from '../../../service/projeto.service';
 import { retry } from 'rxjs';
+import { PageHeaderComponent } from '../../../components/page-header/page-header.component';
+import { PortfolioDetailHeaderComponent } from '../portfolio-detail-header/portfolio-detail-header.component';
+import { PortfolioSummaryTabComponent } from '../portfolio-summary-tab/portfolio-summary-tab.component';
 
 interface Portfolio {
   id: number;
@@ -62,7 +65,8 @@ interface Category {
     CardComponent,
     BadgeComponent,
     SvgIconComponent,
-    BreadcrumbComponent
+    PortfolioDetailHeaderComponent,
+    PortfolioSummaryTabComponent
   ],
   standalone: true
 })
@@ -85,29 +89,6 @@ export class PortfolioDetailComponent implements OnInit {
   activeFilter = '';
 
   editingRisk: Risk | null = null;
-
-  // projects: Project[] = [
-  //   {
-  //     id: 1,
-  //     name: 'Projeto 1',
-  //     budget: 'R$ 1.000,00',
-  //     ev: 'R$ 10.000,00',
-  //     pv: 'R$ 11.000,00',
-  //     startDate: '01/01/2025',
-  //     endDate: '10/05/2025',
-  //     status: 'EM ANDAMENTO'
-  //   },
-  //   {
-  //     id: 2,
-  //     name: 'Projeto 2',
-  //     budget: 'R$ 1.000,00',
-  //     ev: 'R$ 150.000,00',
-  //     pv: '130.000,00',
-  //     startDate: '03/01/2025',
-  //     endDate: '20/06/2025',
-  //     status: 'EM ANDAMENTO'
-  //   }
-  // ];
 
   risks: Risk[] = [
     {

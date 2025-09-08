@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CriteriaGroup, EvaluationGroup, EvaluationGroupView } from '../../interface/carlos-interfaces';
+import { CriteriaGroup, EvaluationGroup } from '../../interface/carlos-interfaces';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from '../../environments/environment';
@@ -16,7 +16,7 @@ import { Page } from '../../models/pagination-models';
 })
 export class EvaluationGroupEditModal {
   @Input() isVisible = false;
-  @Input() evaluationGroup: EvaluationGroupView | undefined;
+  @Input() evaluationGroup: EvaluationGroup | undefined;
 
   @Output() close = new EventEmitter<void>();
   @Output() updated = new EventEmitter<void>();
@@ -52,7 +52,7 @@ export class EvaluationGroupEditModal {
     if (this.evaluationGroup) {
       this.inputName = this.evaluationGroup.name || '';
       this.inputDescription = this.evaluationGroup.description || '';
-      this.inputCriteriaGroupSelectedId = this.evaluationGroup.criteriaGroupId?.toString() || '';
+      this.inputCriteriaGroupSelectedId = this.evaluationGroup.criteriaGroup.id.toString() || '';
     }
   }
 

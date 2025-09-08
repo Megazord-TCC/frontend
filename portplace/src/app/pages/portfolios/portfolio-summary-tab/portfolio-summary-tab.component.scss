@@ -1,0 +1,44 @@
+// Tab Panel
+.tab-panel {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0 0 0.75rem 0.75rem;
+    min-height: 400px;
+    padding: 1.5rem;
+
+    h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1e293b;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .tab-description {
+        color: #64748b;
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+        font-family: 'Roboto', sans-serif;
+    }
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    justify-content: center;
+
+    .metric-card {
+        padding: 16px;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .tab-panel {
+        padding: 1rem;
+    }
+}
