@@ -11,7 +11,6 @@ import {
   CriteriaGroup,
   Evaluation,
   EvaluationGroup,
-  EvaluationGroupView,
   Project
 } from '../../../interface/carlos-interfaces';
 import { forkJoin, map, firstValueFrom, Subscription } from 'rxjs';
@@ -59,7 +58,7 @@ export class ProjectEvaluationDetailComponent implements OnInit, OnDestroy {
 
   // Dados carregados
   project: Project | undefined;
-  evaluationGroup: EvaluationGroupView | undefined;
+  evaluationGroup: EvaluationGroup | undefined;
   criteriaEvaluations: CriteriaEvaluation[] = [];
 
   // Estados do componente
@@ -131,37 +130,11 @@ export class ProjectEvaluationDetailComponent implements OnInit, OnDestroy {
 
     console.log('🔍 Buscando grupo de avaliação e critérios...');
 
-    const getAllEvaluationGroups$ = this.httpClient.get<Page<EvaluationGroup>>(evaluationGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
-    const getAllCriteriaGroups$ = this.httpClient.get<Page<CriteriaGroup>>(criteriaGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
-
-    forkJoin({
-      evaluationGroups: getAllEvaluationGroups$,
-      criteriaGroups: getAllCriteriaGroups$
-    })
-      .pipe(
-        map(({ evaluationGroups, criteriaGroups }) =>
-          this.getManyEvaluationGroupView(evaluationGroups, criteriaGroups)
-        ),
-        map(evaluationGroups =>
-          evaluationGroups.find(evaluationGroup => evaluationGroup.id == this.evaluationGroupId)
-        )
-      )
-      .subscribe({
-        next: (evaluationGroup) => {
-          console.log('✅ Grupo de avaliação carregado:', evaluationGroup);
-          this.evaluationGroup = evaluationGroup;
-        },
-        error: (error) => {
-          console.error('❌ Erro ao carregar grupo de avaliação:', error);
-        }
-      });
-  }
-
-  getManyEvaluationGroupView(evaluationGroups: EvaluationGroup[], criteriaGroups: CriteriaGroup[]): EvaluationGroupView[] {
-    return evaluationGroups.map(evaluationGroup => ({
-      ...evaluationGroup,
-      criteriaGroup: criteriaGroups.find(criteriaGroup => criteriaGroup.id == evaluationGroup.criteriaGroupId)
-    }));
+    this.httpClient.get<Page<EvaluationGroup>>(evaluationGroupsRoute, { params: { size: 1000 } })
+        .pipe(map(page => page.content))
+        .subscribe(evaluationGroups => {
+            this.evaluationGroup = evaluationGroups.find(evaluationGroup => evaluationGroup.id == this.evaluationGroupId);
+        });
   }
 
   async loadCriteriaEvaluations(): Promise<void> {
