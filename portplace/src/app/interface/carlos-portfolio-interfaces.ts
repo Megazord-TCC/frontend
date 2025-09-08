@@ -28,9 +28,32 @@ export enum PortfolioDTOStatus {
 export class PortfolioDTO {
     id = 0;
     name = '';
+    description = '';
     budget = 0;
     projectsInProgress = 0;
     projectsCompleted = 0;
     projectsCancelled = 0;
+    createdAt = new Date();
+    lastModifiedAt?: Date;
+    cancellationReason?: string;
     status?: PortfolioDTOStatus;
+}
+
+export enum PortfolioProgressStatus {
+    BEHIND_SCHEDULE = 'Atrasado',
+    ON_TRACK = 'Dentro do prazo',
+}
+
+export enum PortfolioCostStatus {
+    OVER_BUDGET = 'Acima do planejado',
+    WITHIN_BUDGET = 'Dentro do planejado'
+}
+
+export class PortfolioSummaryTab {
+    portfolioId = 0;
+    budget = '0,00';
+    costStatus?: PortfolioCostStatus;
+    progressStatus?: PortfolioProgressStatus;
+    strategyName = '...';
+    responsibleUserNames: string[] = [];
 }

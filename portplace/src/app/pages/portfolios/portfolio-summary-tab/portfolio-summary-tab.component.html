@@ -1,0 +1,9 @@
+<div class="tab-panel">
+    <h3>Resumo do portfólio</h3>
+
+    <div class="metrics-grid">
+        <app-card *ngFor="let card of cards" class="metric-card">
+            <app-metric-card [card]="card"></app-metric-card>
+        </app-card>
+    </div>
+</div>

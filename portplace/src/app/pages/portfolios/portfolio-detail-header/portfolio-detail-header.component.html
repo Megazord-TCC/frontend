@@ -1,0 +1,13 @@
+<app-breadcrumb></app-breadcrumb>
+    
+<app-page-header 
+    [title]="name" 
+    [description]="description" 
+    [statusBadge]="statusBadge"
+    goBackButtonPathToNavigate="/portfolios" 
+    [visibleActionButtons]="visibleActionButtons"
+    [lastUpdate]="lastUpdate"
+    (editClick)="isPortfolioEditModalVisible = true" 
+    (deleteClick)="isPortfolioDeleteModalVisible = true"
+    (cancelClick)="isPortfolioCancelModalVisible = true">
+</app-page-header>

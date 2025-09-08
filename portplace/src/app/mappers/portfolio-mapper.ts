@@ -2,7 +2,17 @@ import { formatToBRL } from "../helpers/money-helper";
 import { PortfolioDTO, PortfolioDTOStatus, PortfolioTableRow, PortfolioTableRowStatus } from "../interface/carlos-portfolio-interfaces";
 import { Page } from "../models/pagination-models";
 
-export function mapPortfolioStatusToText(status: PortfolioDTOStatus | undefined): PortfolioTableRowStatus {
+export const mapPortfolioDTOStatusToBadgeStatusColor = (status?: PortfolioDTOStatus): string => {
+    switch(status) {
+        case PortfolioDTOStatus.VAZIO: return 'blue'
+        case PortfolioDTOStatus.EM_ANDAMENTO: return 'yellow';
+        case PortfolioDTOStatus.FINALIZADO: return 'green';
+        case PortfolioDTOStatus.CANCELADO: return 'gray';
+        default: return 'blue';
+    }
+}
+
+export function mapPortfolioDTOStatusToText(status: PortfolioDTOStatus | undefined): PortfolioTableRowStatus {
     switch(status) {
         case PortfolioDTOStatus.VAZIO: return PortfolioTableRowStatus.VAZIO;
         case PortfolioDTOStatus.EM_ANDAMENTO: return PortfolioTableRowStatus.EM_ANDAMENTO;
@@ -20,7 +30,7 @@ export function mapPortfolioDTOToPortfolioTableRow(dto: PortfolioDTO): Portfolio
     row.projectsInProgress = dto.projectsInProgress;
     row.projectsCompleted = dto.projectsCompleted;
     row.projectsCancelled = dto.projectsCancelled;
-    row.status = mapPortfolioStatusToText(dto.status);
+    row.status = mapPortfolioDTOStatusToText(dto.status);
     return row;
 }
 
