@@ -125,20 +125,20 @@ export class ProjectsComponent implements OnInit {
 
 
 
-  createProject(): void {
-    console.log('Dados do projeto sendo enviados:', this.newProject);
+  // createProject(): void {
+  //   console.log('Dados do projeto sendo enviados:', this.newProject);
 
-    this.projetoService.createProject(this.newProject).subscribe({
-      next: (createdProject) => {
-        console.log('Projeto criado:', createdProject);
-        this.resetNewProject();
-      },
-      error: (err) => {
-        console.error('Erro completo ao criar projeto:', err);
-        this.handleApiError(err);
-      }
-    });
-  }
+  //   this.projetoService.createProject(this.newProject).subscribe({
+  //     next: (createdProject) => {
+  //       console.log('Projeto criado:', createdProject);
+  //       this.resetNewProject();
+  //     },
+  //     error: (err) => {
+  //       console.error('Erro completo ao criar projeto:', err);
+  //       this.handleApiError(err);
+  //     }
+  //   });
+  // }
 
   updateProject(project: Project): void {
     if (!project.id) {

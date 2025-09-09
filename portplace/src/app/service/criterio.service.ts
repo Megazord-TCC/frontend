@@ -23,6 +23,9 @@ export class CriterioService {
   getCriteriaPage(estrategiaId:number, groupId: number, queryParams?: PaginationQueryParams): Observable<Page<any>> {
       return this.http.get<Page<any>>(`${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${groupId}/criteria`, { params: queryParams?.getParamsInHttpParamsFormat() });
   }
+  getCriteriaObjectivesPage(estrategiaId:number, groupId: number, queryParams?: PaginationQueryParams): Observable<Page<any>> {
+      return this.http.get<Page<any>>(`${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${groupId}/criteria`, { params: queryParams?.getParamsInHttpParamsFormat() });
+  }
   // BUSCA DE TODOS OS CRITÉRIOS
   getAllCriterios(estrategiaId: number, groupId: number): Observable<Criterion[]> {
     const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${groupId}/criteria`;

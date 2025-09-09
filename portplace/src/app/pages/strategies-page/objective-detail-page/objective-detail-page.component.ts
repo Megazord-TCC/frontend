@@ -14,6 +14,11 @@ import { Project } from '../../../interface/carlos-interfaces';
 import { BreadcrumbService } from '../../../service/breadcrumb.service';
 import { StrategiaObjetivoService } from '../../../service/strategia-objetivo.service';
 import { CriterioService } from '../../../service/criterio.service';
+import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } from '../../../models/pagination-models';
+import { map, Observable } from 'rxjs';
+import { mapCriterionPageDtoToCriterionTableRowPage } from '../../../mappers/criterion-mappers';
+import { TableComponent } from '../../../components/table/table.component';
+import { getColumns as getCriterionColumns, getFilterButtons as getCriterionFilterButtons, getFilterText as getCriterionFilterText, getActionButton as getCriterionActionButton } from '../../grupo-criterios/criteria-table-config';
 
 @Component({
   selector: 'app-objective-detail-page',
@@ -25,7 +30,8 @@ import { CriterioService } from '../../../service/criterio.service';
     SvgIconComponent,
     BreadcrumbComponent,
     FormModalComponentComponent,
-    EvaluationGroupsTabComponent
+    EvaluationGroupsTabComponent,
+    TableComponent
   ],
   templateUrl: './objective-detail-page.component.html',
   styleUrl: './objective-detail-page.component.scss'
@@ -52,6 +58,13 @@ export class ObjectiveDetailPageComponent implements OnInit {
   filteredPortfolios: Objective[] = [];
   allProjetos: Objective[] = [];
   filteredProjetos: Objective[] = [];
+
+  // Propriedades para o app-table de critérios
+  criterionColumns = getCriterionColumns();
+  criterionFilterButtons = getCriterionFilterButtons();
+  criterionFilterText = getCriterionFilterText();
+  criterionActionButton = getCriterionActionButton();
+  criteriaGroupId = 0;
 
   objective?: Objective;
   showEditModal = false;
@@ -83,6 +96,11 @@ export class ObjectiveDetailPageComponent implements OnInit {
     });
   }
 
+  getDataForCriteriaTable: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => {
+    return this.criterioService.getCriteriaObjectivesPage(this.estrategiaId, this.objectiveId, queryParams).pipe(
+      map((page: Page<any>) => mapCriterionPageDtoToCriterionTableRowPage(page))
+    );
+  };
   async loadObjective(): Promise<void> {
     try {
       const obj = await this.objetivoService.getObjectiveById(this.estrategiaId, this.objectiveId).toPromise();
@@ -126,9 +144,21 @@ export class ObjectiveDetailPageComponent implements OnInit {
     );
     this.filteredProjetos = filtered;
   }
-  openCriteriaGroup(criteriaGroupId?: number): void {
-    this.router.navigate([`/estrategia`, this.estrategiaId, 'grupo-criterio', criteriaGroupId]);
+  openCriteria(criteriaId?: number): void {
+    let id: number | undefined;
+    if (typeof criteriaId === 'object' && criteriaId !== null && 'id' in criteriaId) {
+      id = (criteriaId as { id: number }).id;
+    } else if (typeof criteriaId === 'number') {
+      id = criteriaId;
+    }
+    if (id) {
+      this.router.navigate([`/estrategia`, this.estrategiaId, 'grupo-criterio', this.criteriaGroupId,'criterio',id]);
+    } else {
+      console.warn('ID da estratégia não encontrado:', criteriaId);
+    }
+
   }
+
   getStatusColorByDisabled(disabled: boolean): string {
     return disabled ? 'red' : 'green';
   }

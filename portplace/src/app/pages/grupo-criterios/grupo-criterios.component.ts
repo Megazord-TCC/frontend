@@ -109,12 +109,6 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
   criterionFilterText = getCriterionFilterText();
   criterionActionButton = getCriterionActionButton();
 
-  // Método de busca para o app-table de critérios
-  getDataForCriteriaTable: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => {
-    return this.criterioService.getCriteriaPage(this.estrategiaId, this.criteriaGroupId, queryParams).pipe(
-      map((page: Page<any>) => mapCriterionPageDtoToCriterionTableRowPage(page))
-    );
-  };
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -145,6 +139,12 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Método de busca para o app-table de critérios
+  getDataForCriteriaTable: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => {
+    return this.criterioService.getCriteriaPage(this.estrategiaId, this.criteriaGroupId, queryParams).pipe(
+      map((page: Page<any>) => mapCriterionPageDtoToCriterionTableRowPage(page))
+    );
+  };
 
 
   async loadGruopCriteriaById(): Promise<void> {

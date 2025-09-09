@@ -144,7 +144,7 @@
 
                 <tr *ngFor="let criteria of filteredCriterios" class="table-row">
                   <td>
-                    <button class="link" (click)="openCriteriaGroup(criteria.id)">
+                    <button class="link" (click)="openCriteria(criteria.id)">
                       {{criteria.name}}
                     </button>
                   </td>
@@ -158,8 +158,14 @@
           </div>
         </app-card>
 
-
-
+          <app-table
+            [dataRetrievalMethodRef]="getDataForCriteriaTable"
+            [filterButtons]="criterionFilterButtons"
+            [filterText]="criterionFilterText"
+            [columns]="criterionColumns"
+            [actionButton]="criterionActionButton"
+            (mainColumnRowClick)="openCriteria($event)">
+          </app-table>
       </div>
 
       <!-- Grupos de Avaliações Tab -->
