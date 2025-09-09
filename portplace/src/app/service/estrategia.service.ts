@@ -54,8 +54,8 @@ export class EstrategiaService {
     });
   }
 
-  getProjectsPage( queryParams?: PaginationQueryParams): Observable<Page<any>> {
-      return this.http.get<Page<any>>(this.apiUrl, { params: queryParams?.getParamsInHttpParamsFormat() });
+  getStrategiesPage( queryParams?: PaginationQueryParams): Observable<Page<any>> {
+    return this.http.get<Page<any>>(this.apiUrl, { params: queryParams?.getParamsInHttpParamsFormat() });
   }
   // READ - Buscar todas as estratégias com filtros e paginação
   getStrategies(

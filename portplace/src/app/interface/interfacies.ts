@@ -1,3 +1,20 @@
+
+
+export interface StrategicObjective {
+  id: number;
+  name: string;
+  description?: string;
+  status: string;
+  strategyId: number;
+  criteriaCount: number;
+  activePortfolioCount: number;
+  activeProjectsCount: number;
+  disabled: boolean;
+  createdAt?: string;
+  lastModifiedAt?: string;
+  // evaluationGroups?: any[];
+  // objectives?: any[];
+}
 export interface Project {
   id?: number;
   name: string;
@@ -92,15 +109,18 @@ export interface Portfolio {
 }
 
 export interface Objective {
-  id: number
-  strategyId: number
-  disabled: boolean
-  name: string
-  description?: string
-  createdAt: string
-  lastModifiedAt: string
-  status: "ATIVADO" | "CANCELADO"
-  statusColor: "green" | "gray"
+  id: number;
+  name: string;
+  description?: string;
+  status: string;
+  strategyId: number;
+  criteriaCount: number;
+  activePortfolioCount: number;
+  activeProjectsCount: number;
+  disabled: boolean;
+  createdAt?: string;
+  lastModifiedAt?: string;
+  statusColor: 'green' | 'gray' | 'red';
 }
 
 export interface Objectives {

@@ -1,3 +1,8 @@
+import { TableComponent } from '../../components/table/table.component';
+import { getColumns as getCriterionColumns, getFilterButtons as getCriterionFilterButtons, getFilterText as getCriterionFilterText, getActionButton as getCriterionActionButton } from './criteria-table-config';
+import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } from '../../models/pagination-models';
+import { Observable, map } from 'rxjs';
+import { mapCriterionPageDtoToCriterionTableRowPage } from '../../mappers/criterion-mappers';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -22,7 +27,8 @@ import { BreadcrumbService } from '../../service/breadcrumb.service';
     BadgeComponent,
     SvgIconComponent,
     BreadcrumbComponent,
-    FormModalComponentComponent
+    FormModalComponentComponent,
+    TableComponent
   ],
   templateUrl: './grupo-criterios.component.html',
   styleUrl: './grupo-criterios.component.scss'
@@ -31,9 +37,9 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
   private routeSubscription?: Subscription;
 
   createFormConfig: any = {
-  // Defina aqui a configuração do formulário conforme sua necessidade
-  title: 'Cadastrar critérios',
-  fields: [
+    // Defina aqui a configuração do formulário conforme sua necessidade
+    title: 'Cadastrar critérios',
+    fields: [
       { id: 'name', label: 'Nome', type: 'text', value: '', required: true, placeholder: 'Digite o nome' },
       { id: 'description', label: 'Descrição', type: 'textarea', value: '', required: false, placeholder: 'Digite a descrição', rows: 4 }
     ],
@@ -97,6 +103,18 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
   filteredCriteriaGroups: Criterion[] = []
   criteriaGroup?: CriteriaGroup;
   searchTerm = '';
+  // Propriedades para o app-table de critérios
+  criterionColumns = getCriterionColumns();
+  criterionFilterButtons = getCriterionFilterButtons();
+  criterionFilterText = getCriterionFilterText();
+  criterionActionButton = getCriterionActionButton();
+
+  // Método de busca para o app-table de critérios
+  getDataForCriteriaTable: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => {
+    return this.criterioService.getCriteriaPage(this.estrategiaId, this.criteriaGroupId, queryParams).pipe(
+      map((page: Page<any>) => mapCriterionPageDtoToCriterionTableRowPage(page))
+    );
+  };
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -110,12 +128,12 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
       const estrategiaIdParam = params.get('estrategiaId');
       this.estrategiaId = estrategiaIdParam ? Number(estrategiaIdParam) : 0;
       const grupoIdParam = params.get('grupoId');
-      this.criteriaGroupId = grupoIdParam ? Number(grupoIdParam) : 0;
+      this.criteriaGroupId = grupoIdParam ? Number(grupoIdParam) : 0;""
 
       // COMPONENTE FILHO: Simplesmente carrega dados e adiciona seu breadcrumb
       console.log('📍 Componente filho: Grupo de Critérios inicializando/recarregando');
 
-      this.loadCriteria();
+
       this.loadGruopCriteriaById();
     });
   }
@@ -127,17 +145,8 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
     }
   }
 
-  async loadCriteria(): Promise<void> {
-    this.loadingProjects = true;
-    try {
-      const criteriaGroup = await firstValueFrom(this.criterioService.getAllCriterios(this.estrategiaId, this.criteriaGroupId));
-      this.filteredCriteriaGroups = criteriaGroup;
-      this.criteriaGroups = criteriaGroup;
-      this.loadingProjects = false;
-    } catch (err) {
-      this.loadingProjects = false;
-    }
-  }
+
+
   async loadGruopCriteriaById(): Promise<void> {
     try {
       const criteriaGroup = await firstValueFrom(this.criterioGroupService.getCriterioById(this.criteriaGroupId,this.estrategiaId));
@@ -217,7 +226,17 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
     this.filteredCriteriaGroups = filtered;
   }
   openCriteria(criteriaId?: number): void {
-    this.router.navigate([`/estrategia`, this.estrategiaId, 'grupo-criterio', this.criteriaGroupId,'criterio',criteriaId]);
+    let id: number | undefined;
+    if (typeof criteriaId === 'object' && criteriaId !== null && 'id' in criteriaId) {
+      id = (criteriaId as { id: number }).id;
+    } else if (typeof criteriaId === 'number') {
+      id = criteriaId;
+    }
+    if (id) {
+      this.router.navigate([`/estrategia`, this.estrategiaId, 'grupo-criterio', this.criteriaGroupId,'criterio',id]);
+    } else {
+      console.warn('ID da estratégia não encontrado:', criteriaId);
+    }
 
   }
   closeCreateModal(): void {
@@ -240,7 +259,7 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
       // Criação de critério
       this.criterioService.createCriterio(groupData, this.estrategiaId, this.criteriaGroupId).subscribe({
         next: () => {
-          this.loadCriteria();
+
           this.closeCreateModal();
           this.resetFormFields(this.createFormConfig);
         },

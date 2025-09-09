@@ -28,17 +28,17 @@ import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } fro
 export class TableComponent {
     // Método que o TableComponent usará para buscar os dados via requisição HTTP.
     @Input({ required: true }) dataRetrievalMethodRef!: DataRetrievalMethodForTableComponent;
-    
+
     // Informa qual é o campo de filtro de texto que deve ser exibido.
     @Input({ required: true }) filterText!: InputFilter;
-    
+
     // Informa quais são as colunas que devem ser exibidas na tabela.
     @Input({ required: true }) columns: TableColumn[] = [];
-    
+
     // Informa quais são os botões de filtro que devem ser exibidos.
     // Se for array vazio, então nenhum botão de filtro será exibido.
     @Input() filterButtons: InputFilter[] = [];
-    
+
     // Informa qual botão de ação deve ser exibido.
     // Esse botão de ação emitirá evento `actionButtonClick` quando for clicado.
     // Esse botão pode ser usado para o componente pai abrir uma modal, por exemplo.
@@ -73,6 +73,14 @@ export class TableComponent {
         this.sendHttpGetRequestAndPopulateTable();
     }
 
+    getCellValue(row: any, column: TableColumn): string {
+        const value = row[column.frontendAttributeName];
+        if (column.formatter) {
+            return column.formatter(value, row);
+        }
+        return value != null ? value.toString() : '';
+    }
+
     sendHttpGetRequestAndPopulateTable() {
         this.dataRetrievalMethodRef(this.queryParams).subscribe(page => this.page = page);
     }
@@ -80,7 +88,7 @@ export class TableComponent {
     getDesiredAndExistingColumnsToPrint(): TableColumn[] {
         // TODO: Futuramente adicionar lógica que confere se as colunas pedem atributos
         // que realmente existem no retorno do service, pra não acabar imprimindo colunas a mais
-        // (isso é possível se o programador usar este componente da maneira errada). 
+        // (isso é possível se o programador usar este componente da maneira errada).
         // Fazer algo similar ao feito em getDesiredAndExistingAttributeNamesToPrint().
         // Precisa ordenar segundo o atributo 'ordem' também.
         return this.columns;
@@ -89,11 +97,11 @@ export class TableComponent {
     /**
      * Retorna os atributos que desejamos imprimir que realmente existem no objeto retornado pelo service.
      * Isso evita imprimir colunas sem nada.
-     * 
+     *
      * Por exemplo, imagine que o service retorna um objeto `page.content` do tipo `Usuario` com os atributos `id`, e `nome`,
      * sendo que queremos imprimir os atributos `name` e `description`. No caso, `description` não existe no `page.content`,
      * sendo assim esse método só retorna o nome do atributo `name`.
-     * 
+     *
      * É importante que os atributos estejam ordenados, por isso esse método também aplica ordenação conforme definido em
      * `TableColumn.order`.
      */
@@ -113,7 +121,7 @@ export class TableComponent {
 
     /**
      * Retorna os atributos que nós queremos imprimir.
-     * Ex: queremos imprimir na tabela os atributos `id` e `name` do objeto `Usuario`. 
+     * Ex: queremos imprimir na tabela os atributos `id` e `name` do objeto `Usuario`.
      * > Obs: este método não se importa se esses atributos realmente existem em `Usuario`, apenas indica que queremos imprimí-los.
      */
     getDesiredAttributes(): { attributeName: string, attributeOrder: number }[] {
@@ -138,14 +146,14 @@ export class TableComponent {
     }
 
     isClickableMainColumn(frontendAttributeName: string): boolean {
-        return this.columns.some(column => 
+        return this.columns.some(column =>
             column.frontendAttributeName == frontendAttributeName
             && column.isClickableMainColumn
         );
     }
 
     hasBadgeStyle(frontendAttributeName: string): boolean {
-        return this.columns.some(column => 
+        return this.columns.some(column =>
             column.frontendAttributeName == frontendAttributeName
             && column.badgeConfiguration.length
         );
@@ -158,7 +166,7 @@ export class TableComponent {
         if (!column)
             return defaultColor;
 
-        let matchingBadgeConfig = column.badgeConfiguration.find(badgeConfig => 
+        let matchingBadgeConfig = column.badgeConfiguration.find(badgeConfig =>
             badgeConfig.triggeringValues.some(value => value == row[frontendAttributeName])
         );
 
@@ -200,4 +208,7 @@ export class TableComponent {
         return this.activeSortedColumn?.frontendAttributeName == column.frontendAttributeName;
     }
 
+    refresh() {
+        this.sendHttpGetRequestAndPopulateTable();
+    }
 }

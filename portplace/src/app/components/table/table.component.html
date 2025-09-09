@@ -1,5 +1,5 @@
 <!-- Filter buttons -->
-<app-table-filter-buttons *ngIf="filterButtons.length" [queryParams]="queryParams" [filterButtons]="filterButtons" 
+<app-table-filter-buttons *ngIf="filterButtons.length" [queryParams]="queryParams" [filterButtons]="filterButtons"
     (filterButtonClick)="sendHttpGetRequestAndPopulateTable()">
 </app-table-filter-buttons>
 
@@ -28,20 +28,19 @@
             <tbody>
                 <!-- Variável "row" será do tipo 'Usuario' se o service retorna usuários paginados, por exemplo. -->
                 <tr *ngFor="let row of page?.content" class="table-row">
-                    <td *ngFor="let attributeName of getDesiredAndExistingAttributeNamesToPrint()">
-                        <span *ngIf="isClickableMainColumn(attributeName); else badgeStyle">
+                    <td *ngFor="let attributeName of getDesiredAndExistingAttributeNamesToPrint(); let colIdx = index">
+                        <ng-container *ngIf="isClickableMainColumn(attributeName); else badgeStyle">
                             <button class="link" (click)="mainColumnRowClick.emit(row);">
-                                {{ row[attributeName] }}
+                                {{ getCellValue(row, columns[colIdx]) }}
                             </button>
-                        </span>
+                        </ng-container>
                         <ng-template #badgeStyle>
                             <app-badge *ngIf="hasBadgeStyle(attributeName); else rowValueHasNoStyle"
                                 [color]="getBadgeColor(row, attributeName)">
-                                {{ row[attributeName] }}
+                                {{ getCellValue(row, columns[colIdx]) }}
                             </app-badge>
                         </ng-template>
-
-                        <ng-template #rowValueHasNoStyle>{{ row[attributeName] }}</ng-template>
+                        <ng-template #rowValueHasNoStyle>{{ getCellValue(row, columns[colIdx]) }}</ng-template>
                     </td>
                 </tr>
             </tbody>
@@ -50,6 +49,6 @@
 </app-card>
 
 <!-- Pagination -->
-<app-table-pagination [page]="page" [queryParams]="queryParams" 
+<app-table-pagination [page]="page" [queryParams]="queryParams"
     (paginationChange)="sendHttpGetRequestAndPopulateTable()">
 </app-table-pagination>

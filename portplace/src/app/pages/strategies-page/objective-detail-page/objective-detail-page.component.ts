@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BadgeComponent } from '../../../components/badge/badge.component';
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
@@ -8,8 +8,12 @@ import { EvaluationGroupsTabComponent } from '../../../components/evaluation-gro
 import { FormModalComponentComponent } from '../../../components/form-modal-component/form-modal-component.component';
 import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.component';
 import { Objective, CriteriaGroup, EvaluationGroup, Scenario, Criterion, Portfolio } from '../../../interface/interfacies';
-import { Router } from '@angular/router';
+import { StrategyStatusEnum } from '../../../interface/interfacies';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Project } from '../../../interface/carlos-interfaces';
+import { BreadcrumbService } from '../../../service/breadcrumb.service';
+import { StrategiaObjetivoService } from '../../../service/strategia-objetivo.service';
+import { CriterioService } from '../../../service/criterio.service';
 
 @Component({
   selector: 'app-objective-detail-page',
@@ -26,7 +30,7 @@ import { Project } from '../../../interface/carlos-interfaces';
   templateUrl: './objective-detail-page.component.html',
   styleUrl: './objective-detail-page.component.scss'
 })
-export class ObjectiveDetailPageComponent {
+export class ObjectiveDetailPageComponent implements OnInit {
   loadingCriteria = false;
   loadingPortfolios = false;
   loadingProjects = false;
@@ -40,6 +44,7 @@ export class ObjectiveDetailPageComponent {
   scenarioSearchTerm = ""
   searchTerm = '';
   estrategiaId:number = 0;
+  objectiveId:number = 0;
   // Filtered arrays
   allCriterios: Criterion[] = [];
   filteredCriterios: Criterion[] = [];
@@ -48,19 +53,57 @@ export class ObjectiveDetailPageComponent {
   allProjetos: Objective[] = [];
   filteredProjetos: Objective[] = [];
 
-   objective: Objective ={
-    id: 1,
-    name: 'Aumentar lucro',
-    disabled: false,
-    description: 'Aumentar o lucro da empresa em 20%',
-    strategyId: 1,
-    status: 'ATIVADO',
-    statusColor: 'green',
-    createdAt: '2023-01-01T00:00:00Z',
-    lastModifiedAt: '2023-01-01T00:00:00Z'
-  };
+  objective?: Objective;
+  showEditModal = false;
+  showDeleteModal = false;
 
-  constructor ( private router: Router){}
+
+  constructor (
+    private router: Router,
+    private route: ActivatedRoute,
+    private breadcrumbService: BreadcrumbService,
+    private objetivoService: StrategiaObjetivoService,
+    private criterioService: CriterioService
+  ){}
+
+  ngOnInit(): void {
+    this.route.paramMap.subscribe(params => {
+      const estrategiaIdParam = params.get('estrategiaId');
+      this.estrategiaId = estrategiaIdParam ? Number(estrategiaIdParam) : 0;
+      const objectiveIdParam = params.get('objetivoId');
+      this.objectiveId = objectiveIdParam ? Number(objectiveIdParam) : 0;
+      this.loadObjective();
+      this.loadCriterios();
+      // Se quiser, adicione loadPortfolios/loadProjetos
+      this.breadcrumbService.addChildBreadcrumb({
+        label: `Objetivo ${this.objectiveId}`,
+        url: `/estrategia/${this.estrategiaId}/objetivo/${this.objectiveId}`,
+        isActive: true
+      });
+    });
+  }
+
+  async loadObjective(): Promise<void> {
+    try {
+      const obj = await this.objetivoService.getObjectiveById(this.estrategiaId, this.objectiveId).toPromise();
+      this.objective = obj;
+    } catch (err) {
+      console.error('Erro ao buscar objetivo:', err);
+    }
+  }
+
+  async loadCriterios(): Promise<void> {
+    this.loadingCriteria = true;
+    try {
+      const criterios = await this.criterioService.getAllCriterios(this.estrategiaId, this.objectiveId).toPromise();
+      this.allCriterios = criterios || [];
+      this.filteredCriterios = criterios || [];
+      this.loadingCriteria = false;
+    } catch (err) {
+      this.loadingCriteria = false;
+      console.error('Erro ao buscar critérios:', err);
+    }
+  }
 
   onSearchCriterio(): void {
     let filtered = [...this.allCriterios];
@@ -93,7 +136,9 @@ export class ObjectiveDetailPageComponent {
     return disabled ? 'Cancelado' : 'Ativado';
   }
   goBack(): void {
-    this.router.navigate(['/estrategias']);
+    // Remove o breadcrumb do objetivo antes de navegar
+    this.breadcrumbService.removeBreadcrumbByUrl(`/estrategia/${this.estrategiaId}/objetivo/${this.objectiveId}`);
+    this.router.navigate([`/estrategia`, this.estrategiaId]);
   }
   editObjective() {
     console.log('Editar objetivo');
@@ -118,12 +163,27 @@ export class ObjectiveDetailPageComponent {
     console.log("Opening scenario modal", scenario)
     // Implementar modal de cenário
   }
-  openPortfolio(portfolio?: Portfolio): void {
+  openPortfolio(portfolio?: number): void {
     console.log("Opening portfolio modal", portfolio)
     // Implementar modal de portfólio
   }
   openProjeto(projeto?: Project): void {
     console.log("Opening projeto modal", projeto)
     // Implementar modal de projeto
+  }
+  openEditModal(): void {
+    this.showEditModal = true;
+  }
+
+  closeEditModal(): void {
+    this.showEditModal = false;
+  }
+
+  openDeleteModal(): void {
+    this.showDeleteModal = true;
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal = false;
   }
 }
