@@ -1,39 +1,36 @@
-import { ActionButton, BadgeConfiguration, InputFilter, TableColumn } from "../../components/table/table-contracts";
-import { PortfolioDTOStatus, PortfolioTableRowStatus } from "../../interface/carlos-portfolio-interfaces";
+import { BadgeConfiguration, InputFilter, TableColumn } from "../../../components/table/table-contracts";
+import { PortfolioProjectTableRowProjectStatus, ProjectStatusEnumDTO2 } from "../../../interface/carlos-project-dtos";
 
 // IMPORTANTE: A instância dos objetos foram feitos dessa maneira (utilizando "new" ao invés de
 // object literal) para permitir que novos atributos possam ser adicionados nas classes de 
 // configuração (ex: TableColumn) sem que quebre código antigo.
 
+
 // Os nomes dos métodos estão bem genéricos pra facilitar a cópia deste arquivo para configurar
 // outros componentes.
-
-export const getActionButton = (): ActionButton => {
-    return new ActionButton();
-}
 
 const getBadgeConfigurations = (): BadgeConfiguration[] => {
     let badgeConfigs: BadgeConfiguration[] = [];
     let badgeConfig: BadgeConfiguration;
     
     badgeConfig = new BadgeConfiguration();
-    badgeConfig.color = 'green';
-    badgeConfig.triggeringValues = [PortfolioTableRowStatus.FINALIZADO];
+    badgeConfig.color = 'blue';
+    badgeConfig.triggeringValues = [PortfolioProjectTableRowProjectStatus.COMPLETED];
     badgeConfigs.push(badgeConfig);
 
     badgeConfig = new BadgeConfiguration();
     badgeConfig.color = 'gray';
-    badgeConfig.triggeringValues = [PortfolioTableRowStatus.CANCELADO];
+    badgeConfig.triggeringValues = [PortfolioProjectTableRowProjectStatus.CANCELLED];
     badgeConfigs.push(badgeConfig);
 
     badgeConfig = new BadgeConfiguration();
     badgeConfig.color = 'yellow';
-    badgeConfig.triggeringValues = [PortfolioTableRowStatus.EM_ANDAMENTO];
+    badgeConfig.triggeringValues = [PortfolioProjectTableRowProjectStatus.IN_ANALYSIS];
     badgeConfigs.push(badgeConfig);
 
     badgeConfig = new BadgeConfiguration();
-    badgeConfig.color = 'blue';
-    badgeConfig.triggeringValues = [PortfolioTableRowStatus.VAZIO];
+    badgeConfig.color = 'green';
+    badgeConfig.triggeringValues = [PortfolioProjectTableRowProjectStatus.IN_PROGRESS];
     badgeConfigs.push(badgeConfig);
 
     return badgeConfigs;
@@ -44,7 +41,7 @@ export const getColumns = (): TableColumn[] => {
     let column: TableColumn;
 
     column = new TableColumn();
-    column.label = 'Nome do portfólio';
+    column.label = 'Nome';
     column.order = 1;
     column.isSortable = true;
     column.frontendAttributeName = 'name';
@@ -61,32 +58,40 @@ export const getColumns = (): TableColumn[] => {
     columns.push(column);
 
     column = new TableColumn();
-    column.label = 'Proj. em andamento';
+    column.label = 'EV (R$)';
     column.order = 3;
     column.isSortable = true;
-    column.frontendAttributeName = 'projectsInProgress';
-    column.backendAttributeName = 'inProgressProjectsCount';
+    column.frontendAttributeName = 'earnedValue';
+    column.backendAttributeName = 'earnedValue';
     columns.push(column);
 
     column = new TableColumn();
-    column.label = 'Proj. concluídos';
+    column.label = 'PV (R$)';
     column.order = 4;
     column.isSortable = true;
-    column.frontendAttributeName = 'projectsCompleted';
-    column.backendAttributeName = 'completedProjectsCount';
+    column.frontendAttributeName = 'plannedValue';
+    column.backendAttributeName = 'plannedValue';
     columns.push(column);
 
     column = new TableColumn();
-    column.label = 'Proj. cancelados';
-    column.order = 4;
+    column.label = 'Início planejado';
+    column.order = 5;
     column.isSortable = true;
-    column.frontendAttributeName = 'projectsCancelled';
-    column.backendAttributeName = 'cancelledProjectsCount';
+    column.frontendAttributeName = 'startDate';
+    column.backendAttributeName = 'startDate';
+    columns.push(column);
+
+    column = new TableColumn();
+    column.label = 'Fim planejado';
+    column.order = 6;
+    column.isSortable = true;
+    column.frontendAttributeName = 'endDate';
+    column.backendAttributeName = 'endDate';
     columns.push(column);
 
     column = new TableColumn();
     column.label = 'Status';
-    column.order = 5;
+    column.order = 7;
     column.isSortable = true;
     column.frontendAttributeName = 'status';
     column.backendAttributeName = 'status';
@@ -98,7 +103,7 @@ export const getColumns = (): TableColumn[] => {
 
 export const getFilterText = (): InputFilter => {
     let input = new InputFilter();
-    input.label = 'Buscar pelo nome do portfólio';
+    input.label = 'Buscar pelo nome do projeto';
     input.queryParam = { name: 'searchQuery', value: '' };
     return input;
 }; 
@@ -108,23 +113,23 @@ export const getFilterButtons = (): InputFilter[] => {
     let input: InputFilter;
 
     input = new InputFilter();
-    input.label = 'Vazio';
-    input.queryParam = { name: 'status', value: PortfolioDTOStatus.VAZIO };
-    inputs.push(input);
-
-    input = new InputFilter();
-    input.label = 'Em andamento';
-    input.queryParam = { name: 'status', value: PortfolioDTOStatus.EM_ANDAMENTO };
+    input.label = 'Cancelado';
+    input.queryParam = { name: 'status', value: ProjectStatusEnumDTO2.CANCELLED };
     inputs.push(input);
 
     input = new InputFilter();
     input.label = 'Finalizado';
-    input.queryParam = { name: 'status', value: PortfolioDTOStatus.FINALIZADO };
+    input.queryParam = { name: 'status', value: ProjectStatusEnumDTO2.COMPLETED };
     inputs.push(input);
 
     input = new InputFilter();
-    input.label = 'Cancelado';
-    input.queryParam = { name: 'status', value: PortfolioDTOStatus.CANCELADO };
+    input.label = 'Em análise';
+    input.queryParam = { name: 'status', value: ProjectStatusEnumDTO2.IN_ANALYSIS };
+    inputs.push(input);
+
+    input = new InputFilter();
+    input.label = 'Em andamento';
+    input.queryParam = { name: 'status', value: ProjectStatusEnumDTO2.IN_PROGRESS };
     inputs.push(input);
 
     return inputs;

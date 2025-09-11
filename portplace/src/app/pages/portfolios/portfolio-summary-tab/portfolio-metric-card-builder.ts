@@ -1,13 +1,8 @@
-import { firstValueFrom } from "rxjs";
+import { firstValueFrom, map } from "rxjs";
 import { PortfolioCostStatus, PortfolioProgressStatus, PortfolioSummaryTab } from "../../../interface/carlos-portfolio-interfaces";
 import { PortfolioService } from "../../../service/portfolio-service";
 import { MetricCard } from "../../../components/metric-card/metric-card.component";
-import { formatToBRL } from "../../../helpers/money-helper";
-
-//   metricCards: MetricCard[] = [
-//     { title: 'Estratégia 1', subtitle: 'Estratégia ativa', color: 'purple', icon:'assets/icon/estrategia_vetor.svg' },
-//     { title: 'Gabriel Martins', subtitle: 'Responsável', color: 'none', icon:'assets/icon/user_vetor.svg  ' }
-//   ];
+import { mapPortfolioReadDTOToPortfolioSummaryTab } from "../../../mappers/portfolio-mapper";
 
 export class PortfolioMetricCardBuilder {
     cards: MetricCard[] = [];
@@ -17,7 +12,10 @@ export class PortfolioMetricCardBuilder {
     constructor(private portfolioService: PortfolioService) {}
 
     async fromGetRequestById(portfolioId: number): Promise<PortfolioMetricCardBuilder> {
-        this.portfolio = await firstValueFrom(this.portfolioService.getPortfolioSummaryTabById(portfolioId));
+        let portfolioById$ = this.portfolioService.getPortfolioById(portfolioId)
+            .pipe(map(portfolio => mapPortfolioReadDTOToPortfolioSummaryTab(portfolio)));
+
+        this.portfolio = await firstValueFrom(portfolioById$);
         return this;
     }
 
@@ -70,25 +68,6 @@ export class PortfolioMetricCardBuilder {
         this.cards.push(card);
         return this;
     }
-
-    // withScheduleStatus(): PortfolioMetricCardBuilder {
-    //     this.metricCards[0].title = status;
-    //     this.metricCards[0].color = status === 'Dentro do prazo' ? 'green' : (status === 'No prazo' ? 'yellow' : 'red');
-    //     return this;
-    // }
-
-    // withProjectStatus(status: string): PortfolioMetricCardBuilder {
-    //     this.metricCards[1].title = status;
-    //     this.metricCards[1].color = status === 'Ativo do planejado' ? 'green' : (status === 'Atrasado' ? 'red' : 'yellow');
-    //     return this;
-    // }
-
-    // withPortfolioStatus(status: string): PortfolioMetricCardBuilder {
-    //     this.metricCards[2].title = status;
-    //     this.metricCards[2].color = status === 'Estratégia 1' ? 'purple' : 'none';
-    //     return this;
-    // }
-
 
     build(): MetricCard[] {
         return this.cards;

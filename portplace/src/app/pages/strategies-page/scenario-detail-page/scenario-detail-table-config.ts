@@ -68,7 +68,9 @@ export const getColumns = (): TableColumn[] => {
     column = new TableColumn();
     column.label = 'Ordem atual';
     column.order = 1;
+    column.isSortable = true;
     column.frontendAttributeName = 'currentOrder';
+    column.backendAttributeName = 'currentPosition';
     columns.push(column);
 
     column = new TableColumn();
@@ -114,7 +116,7 @@ export const getColumns = (): TableColumn[] => {
     columns.push(column);
 
     column = new TableColumn();
-    column.label = 'Custo planejado (R$)';
+    column.label = 'Orçamento planejado (R$)';
     column.order = 7;
     column.isSortable = true;
     column.frontendAttributeName = 'estimatedCost';

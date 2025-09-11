@@ -1,0 +1,22 @@
+<div class="tab-panel">
+    <h3>Categorias do portfólio</h3>
+    <p class="tab-description">
+        Informe quais categorias podem ser designadas aos projetos durante a análise de um cenário de avaliação.
+    </p>    
+
+    <app-table
+        [dataRetrievalMethodRef]="this.getDataForTableComponent" 
+        [filterText]="filterText"
+        [columns]="columns" 
+        [actionButton]="actionButton" 
+        (mainColumnRowClick)="selectedCategoryId = $event?.id ?? 0"
+        (actionButtonClick)="showCreateModal = true">
+    </app-table>
+</div>
+<app-category-create-modal *ngIf="showCreateModal" [portfolioId]="portfolioId" (close)="showCreateModal = false"
+    (categoryCreated)="tableComponent?.sendHttpGetRequestAndPopulateTable(); showCreateModal = false;">
+</app-category-create-modal>
+<app-category-edit-delete-modal *ngIf="selectedCategoryId" [portfolioId]="portfolioId" 
+    [categoryId]="selectedCategoryId" (close)="selectedCategoryId = 0" 
+    (categoryUpdatedOrDeleted)="tableComponent?.sendHttpGetRequestAndPopulateTable(); selectedCategoryId = 0;">
+</app-category-edit-delete-modal>

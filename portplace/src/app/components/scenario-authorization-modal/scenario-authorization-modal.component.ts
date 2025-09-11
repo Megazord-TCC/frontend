@@ -6,6 +6,7 @@ import { ScenarioService } from '../../service/scenario-service';
 import { ScenarioRankingStatusEnum, ScenarioReadDTO, ScenarioStatusEnum } from '../../interface/carlos-scenario-dtos';
 import { ProjectReadDTO } from '../../interface/carlos-project-dtos';
 import { formatToBRL } from '../../helpers/money-helper';
+import { PortfolioService } from '../../service/portfolio-service';
 
 @Component({
     selector: 'app-scenario-authorization-modal',
@@ -20,11 +21,12 @@ export class ScenarioAuthorizationModalComponent {
     route = inject(ActivatedRoute);
     router = inject(Router);
     scenarioService = inject(ScenarioService);
+    portfolioService = inject(PortfolioService);
 
     scenario?: ScenarioReadDTO;
 
     scenarioRankingStatusEnum = ScenarioRankingStatusEnum;
-    
+
     strategyId = 0;
     scenarioId = 0;
 
@@ -46,7 +48,7 @@ export class ScenarioAuthorizationModalComponent {
     async ngOnInit() {
         this.strategyId = Number(this.route.snapshot.paramMap.get('estrategiaId'));
         this.scenarioId = Number(this.route.snapshot.paramMap.get('cenarioId'));
-        
+
 
         this.scenarioService.getScenarioById(this.strategyId, this.scenarioId).subscribe({
             next: scenario => {
@@ -58,11 +60,16 @@ export class ScenarioAuthorizationModalComponent {
     }
 
     chooseCorrectPanelToShowAndButtonConfigurations() {
-        // TODO: Colocar o id real do portfólio quando for feito no backend
-        this.scenarioService.getProjectsNamesByPortfolioId(0).subscribe({
-            next: projects => { 
+        let portfolioId = this.scenario?.portfolio?.id;
+        if (!portfolioId) {
+            this.errorMessage = 'Ocorreu um erro inesperado. Tente novamente mais tarde.';
+            return;
+        }
+
+        this.portfolioService.getProjectNamesByPortfolioId(portfolioId).subscribe({
+            next: projects => {
                 if (this.isThereAtLeastOneProjectIncluded()) {
-                    if (!this.isThereAtLeastOneProjectWithoutCategory()) {
+                    if (this.isThereAtLeastOneProjectWithoutCategory()) {
                         this.currentModalPage = 'categoryWarning';
                         this.isCancelButtonVisible = false;
                         this.confirmButtonLabel = 'Entendi';
@@ -76,7 +83,7 @@ export class ScenarioAuthorizationModalComponent {
                         project => !this.getIncludedProjects().some(includedProject => includedProject.id == project.id)
                     );
 
-                    if (this.projectsInPortfolioNotIncludedInScenario.length)
+                    if (this.projectsInPortfolioNotIncludedInScenario.length || this.getIsScenarioBudgetLowerThanAllIncludedProjectsBudget())
                         this.confirmButtonLabel = 'Continuar';
                     else
                         this.confirmButtonLabel = 'Autorizar cenário';
@@ -121,8 +128,8 @@ export class ScenarioAuthorizationModalComponent {
         if (!this.scenario) return [];
 
         return this.scenario.scenarioRankings
-            .filter(ranking => 
-                ranking.status == ScenarioRankingStatusEnum.INCLUDED || 
+            .filter(ranking =>
+                ranking.status == ScenarioRankingStatusEnum.INCLUDED ||
                 ranking.status == ScenarioRankingStatusEnum.MANUALLY_INCLUDED)
             .map(ranking => ranking.project);
     }
@@ -130,8 +137,15 @@ export class ScenarioAuthorizationModalComponent {
     getIncludedProjectsWithoutCategory(): ProjectReadDTO[] {
         if (!this.scenario) return [];
 
-        // TODO: Futuramente colocar filtro que só retorna quem não tem categorias.
-        return this.getIncludedProjects();
+        let x = this.scenario.scenarioRankings
+            .filter(ranking =>
+                ranking.status == ScenarioRankingStatusEnum.INCLUDED ||
+                ranking.status == ScenarioRankingStatusEnum.MANUALLY_INCLUDED)
+            .filter(ranking => !ranking.portfolioCategory)
+            .map(ranking => ranking.project);
+
+        console.log(x);
+        return x;
     }
 
     onOverlayClick(event: MouseEvent): void {
@@ -163,19 +177,25 @@ export class ScenarioAuthorizationModalComponent {
             return;
         }
 
-        if (this.currentModalPage === 'includedProjects' && this.projectsInPortfolioNotIncludedInScenario.length) {
-            this.currentModalPage = 'projectsToExclude';
-            this.isSubmitButtonDisabled = true;
-            this.agreeWithProjectRemoval = false;
-
-            if (this.getIsScenarioBudgetLowerThanAllIncludedProjectsBudget())
-                this.confirmButtonLabel = 'Continuar';
-            else
+        if (this.currentModalPage === 'includedProjects') {
+            if (this.projectsInPortfolioNotIncludedInScenario.length) {
+                this.currentModalPage = 'projectsToExclude';
+                this.isSubmitButtonDisabled = true;
+                this.agreeWithProjectRemoval = false;
+                if (this.getIsScenarioBudgetLowerThanAllIncludedProjectsBudget())
+                    this.confirmButtonLabel = 'Continuar';
+                else 
+                    this.confirmButtonLabel = 'Autorizar cenário';
+                return;
+            }
+            if (this.getIsScenarioBudgetLowerThanAllIncludedProjectsBudget()) {
+                this.currentModalPage = 'overbudgetWarning';
                 this.confirmButtonLabel = 'Autorizar cenário';
-
-            return;
+                this.isSubmitButtonDisabled = true;
+                this.agreeWithProjectRemoval = false;
+                return;
+            }
         }
-
         if (this.currentModalPage === 'projectsToExclude' && this.getIsScenarioBudgetLowerThanAllIncludedProjectsBudget()) {
             this.currentModalPage = 'overbudgetWarning';
             this.confirmButtonLabel = 'Autorizar cenário';
@@ -204,22 +224,8 @@ export class ScenarioAuthorizationModalComponent {
     }
 
     sendScenarioAuthorizationHttpRequest() {
-        // TODO: Fazer o request de AUTORIZAÇÃO quando gabriel criar o endpoint
-        if (!this.scenario) {
-            this.isSubmitButtonDisabled = true;
-            this.errorMessage = 'Ocorreu um erro. Tente novamente mais tarde.';
-            return;
-        }
-
-        let body = {
-            name: this.scenario.name,
-            description: this.scenario.description,
-            budget: this.scenario.budget,
-            status: ScenarioStatusEnum.AUTHORIZED
-        };
-
         this.scenarioService
-            .updateScenario(this.strategyId, this.scenarioId, body)
+            .authorizeCenario(this.strategyId, this.scenarioId)
             .subscribe({
                 next: _ => this.scenarioAuthorized.emit(),
                 error: _ => {

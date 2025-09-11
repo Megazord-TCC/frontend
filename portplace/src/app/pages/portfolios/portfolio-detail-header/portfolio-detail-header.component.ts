@@ -7,9 +7,12 @@ import { BreadcrumbService } from '../../../service/breadcrumb.service';
 import { Subscription } from 'rxjs';
 import { ActionButtons, PageHeaderComponent } from '../../../components/page-header/page-header.component';
 import { PortfolioService } from '../../../service/portfolio-service';
-import { PortfolioDTO, PortfolioDTOStatus } from '../../../interface/carlos-portfolio-interfaces';
+import { PortfolioDTOStatus, PortfolioReadDTO } from '../../../interface/carlos-portfolio-interfaces';
 import { mapPortfolioDTOStatusToBadgeStatusColor, mapPortfolioDTOStatusToText } from '../../../mappers/portfolio-mapper';
 import { formatToBRL } from '../../../helpers/money-helper';
+import { PortfolioEditModalComponent } from '../../../components/portfolio-edit-modal/portfolio-edit-modal.component';
+import { PortfolioCancelModalComponent } from '../../../components/portfolio-cancel-modal/portfolio-cancel-modal.component';
+import { PortfolioDeleteModalComponent } from '../../../components/portfolio-delete-modal/portfolio-delete-modal.component';
 
 @Component({
     selector: 'app-portfolio-detail-header',
@@ -19,7 +22,10 @@ import { formatToBRL } from '../../../helpers/money-helper';
         CommonModule,
         FormsModule,
         BreadcrumbComponent,
-        PageHeaderComponent
+        PageHeaderComponent,
+        PortfolioEditModalComponent,
+        PortfolioCancelModalComponent,
+        PortfolioDeleteModalComponent
     ],
     standalone: true
 })
@@ -34,10 +40,10 @@ export class PortfolioDetailHeaderComponent {
     statusBadge = { text: '...', color: 'blue' };
     lastUpdate?: Date;
     budget = '0,00';
-    scenarioDTO: PortfolioDTO | undefined;
+    scenarioDTO?: PortfolioReadDTO;
     visibleActionButtons: ActionButtons[] = ['edit'];
 
-    portfolioDTO?: PortfolioDTO;
+    portfolioDTO?: PortfolioReadDTO;
 
     routeSubscription?: Subscription;
 

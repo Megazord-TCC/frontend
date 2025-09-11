@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-import { debounceTime, forkJoin, map, Observable, of, Subject, Subscription, switchMap, tap } from 'rxjs';
+import { debounceTime, forkJoin, map, Observable, of, Subject, Subscription, tap } from 'rxjs';
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../../service/breadcrumb.service';
 import { ActionButtons, PageHeaderComponent } from '../../../components/page-header/page-header.component';
@@ -23,6 +23,9 @@ import { WarningInformationModalComponent } from '../../../components/warning-in
 import { TooltipComponent } from '../../../components/tooltip/tooltip.component';
 import { CancelScenarioModalComponent } from '../../../components/cancel-scenario-modal/cancel-scenario-modal.component';
 import { ScenarioAuthorizationModalComponent } from '../../../components/scenario-authorization-modal/scenario-authorization-modal.component';
+import { PortfolioService } from '../../../service/portfolio-service';
+import { CategoryService } from '../../../service/category-service';
+import { ProjectCategoryChangeHandler } from './project-category-change-handler';
 
 @Component({
     selector: 'app-scenario-detail-page',
@@ -58,7 +61,7 @@ export class ScenarioDetailPageComponent {
     lastUpdate?: Date;
     budget = '0,00';
     extraKeyValuePairInfos = [
-        { key: 'Portfólio', value: 'Dado não informado pelo backend.', tooltip: 'Configura categorias e destino dos projetos após a autorização do cenário.' },
+        { key: 'Portfólio', value: '...', tooltip: 'Configura categorias e destino dos projetos após a autorização do cenário.' },
         { key: 'Grupo de avaliação', value: '...', tooltip: 'Define quais projetos serão analisados neste cenário, além do valor estratégico de cada um.' }
     ];
     scenarioDTO: ScenarioReadDTO | undefined;
@@ -79,6 +82,7 @@ export class ScenarioDetailPageComponent {
     breadcrumbService = inject(BreadcrumbService);
     scenarioService = inject(ScenarioService);
     strategyService = inject(EstrategiaService);
+    categoryService = inject(CategoryService);
 
     isScenarioEditModalVisible = false;
     isScenarioDeleteModalVisible = false;
@@ -125,8 +129,10 @@ export class ScenarioDetailPageComponent {
     }
 
     loadPortfolioCategoriesOptions() {
-        // TODO: Colocar o id do portfólio correto, quando backend tiver essa entidade
-        this.scenarioService.getPortfolioCategoriesByPortfolioId(0).subscribe(categories => {
+        let portfolioId = this.scenarioDTO?.portfolio?.id;
+        if (!portfolioId) return;
+
+        this.categoryService.getAllCategoriesByPortfolioId(portfolioId).subscribe(categories => {
             let column = this.columns.find(column => column.label == 'Categoria');
             if (!column) return;
 
@@ -152,9 +158,8 @@ export class ScenarioDetailPageComponent {
         return new ProjectInclusionStatusChangeHandler(this.strategyId, this.scenarioId, this.scenarioService);
     }
 
-    tryChangeScenarioProjectCategory(optionSelected: SelectButtonOptionSelected): Observable<void> {
-        // TODO: Chamar método service que atualiza a categoria dum scenario ranking.
-        return of(undefined);
+    getProjectCategoryChangeHandler(): ProjectCategoryChangeHandler {
+        return new ProjectCategoryChangeHandler(this.strategyId, this.scenarioId, this.scenarioService);
     }
 
     onSelectChange(optionSelected: SelectButtonOptionSelected) {
@@ -166,7 +171,7 @@ export class ScenarioDetailPageComponent {
         if (frontendAttributeName == 'inclusionStatus') {
             httpCall$ = this.getProjectInclusionStatusChangeHandler().tryChangeInclusionStatus(optionSelected);
         } else if (frontendAttributeName == 'portfolioCategoryId') {
-            httpCall$ = this.tryChangeScenarioProjectCategory(optionSelected);
+            httpCall$ = this.getProjectCategoryChangeHandler().changeCategory(optionSelected);
         }
 
         // Recarrega tabela pra mostrar valores atualizados após alterações do usuário.
@@ -216,6 +221,7 @@ export class ScenarioDetailPageComponent {
         this.allIncludedProjectsBudget = formatToBRL(this.calculateAllIncludedProjectsBudget(scenarioDTO));
 
         let extraKeyValuePairInfos = [...this.extraKeyValuePairInfos];
+        extraKeyValuePairInfos[0].value = scenarioDTO?.portfolio?.name ?? 'Erro';
         extraKeyValuePairInfos[1].value = scenarioDTO?.evaluationGroup?.name ?? 'Erro';
         this.extraKeyValuePairInfos = extraKeyValuePairInfos;
     }

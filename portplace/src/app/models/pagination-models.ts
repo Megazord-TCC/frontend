@@ -104,6 +104,10 @@ export class PaginationQueryParams {
         }
         return queryParams;
     }
+
+    isAnyFilterApplied(): boolean {
+        return !!(this.filterButtonQueryParam || this.filterTextQueryParam);
+    }
 }
 
 /**

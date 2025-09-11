@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { filter, map, Observable, of } from 'rxjs';
@@ -6,6 +6,7 @@ import { EvaluationGroup, Portfolio, ProjectInclusionStatus, ProjectStatus, Scen
 import { Page, PaginationQueryParams } from '../models/pagination-models';
 import { ScenarioRankingStatusEnum, ScenarioReadDTO, ScenarioUpdateDTO } from '../interface/carlos-scenario-dtos';
 import { ProjectReadDTO } from '../interface/carlos-project-dtos';
+import { PortfolioDTOStatus, PortfolioListReadDTO } from '../interface/carlos-portfolio-interfaces';
 
 @Injectable({
     providedIn: 'root'
@@ -28,6 +29,10 @@ export class ScenarioService {
         return `${this.getScenariosUrl(strategyId)}/${scenarioId}/rankings`;
     }
 
+    private getPortfolioUrl(): string {
+        return `${environment.apiUrl}/portfolios`;
+    }
+
     // UPDATE - Realizar inclusão/remoção de projetos no cenário por meio da alteração de status (parâmetro 'status')
     updateScenarioRanking(strategyId: number, scenarioId: number, rankingId: number): Observable<void> {
         const url = `${this.getScenarioProjectsUrl(strategyId, scenarioId)}/${rankingId}`;
@@ -38,6 +43,12 @@ export class ScenarioService {
     updateScenario(strategyId: number, scenarioId: number, body: ScenarioUpdateDTO): Observable<void> {
         const url = `${this.getScenariosUrl(strategyId)}/${scenarioId}`;
         return this.http.put<void>(url, body, { headers: this.getHeaders() });
+    }
+
+    // POST - Autoriza um cenário em aguardo de autorização
+    authorizeCenario(strategyId: number, scenarioId: number): Observable<void> {
+        const url = `${this.getScenariosUrl(strategyId)}/${scenarioId}/authorize`;
+        return this.http.post<void>(url, undefined, { headers: this.getHeaders() });
     }
 
     // GET - Retorna a lista de projetos de um cenário, informando se foi incluído/removido
@@ -59,10 +70,24 @@ export class ScenarioService {
         return this.http.get<any>(url);
     }
 
-    // UPDATE - Atualiza status de inclusão dum projeto num cenário. Ex: "Incluído" para "Removido (manual)"
     updateProjectInclusionStatus(strategyId: number, scenarioId: number, rankingId: number, status: ScenarioRankingStatusEnum): Observable<any> {
         const url = `${this.getScenarioProjectsUrl(strategyId, scenarioId)}/${rankingId}`;
         return this.http.put<any>(url, { status }, { headers: this.getHeaders() });
+    }
+
+    // Utilizado para atualizar a categoria do projeto do cenário.
+    // O status não deveria precisar ser informado, pois não está sendo alterado.
+    // Se quiser atualizar o status, utilizar updateProjectInclusionStatus.
+    updateScenarioProject(
+        strategyId: number, 
+        scenarioId: number, 
+        rankingId: number, 
+        status: ScenarioRankingStatusEnum,
+        categoryId: number
+    ): Observable<any> {
+        const url = `${this.getScenarioProjectsUrl(strategyId, scenarioId)}/${rankingId}`;
+        let body = { status, portfolioCategoryId: categoryId };
+        return this.http.put<any>(url, body, { headers: this.getHeaders() });
     }
 
     deleteScenario(strategyId: number, scenarioId: number): Observable<void> {
@@ -86,7 +111,7 @@ export class ScenarioService {
             budget: budget,
             evaluationGroupId: Number(evaluationGroupId),
             strategyId: Number(strategyId),
-            // portfolioId: Number(portfolioId) TODO: Remover comentário quando backend aceitar esse atributo
+            portfolioId: Number(portfolioId)
         };
         return this.http.post<{ id: number }>(url, body, { headers: this.getHeaders() }).pipe(map(response => response.id));
     }
@@ -108,20 +133,30 @@ export class ScenarioService {
         );
     }
 
-    // TODO: Este método deveria estar no service de portfólios
+    // GET - Buscar todos portfólios não cancelados
+    // Obs: não foi chamado o método de PortfolioService pra evitar dependência circular entre services.
+    getAllPortfoliosNotCancelled(): Observable<PortfolioListReadDTO[]> {
+        const url = this.getPortfolioUrl();
+
+        let params = new HttpParams()
+            .set('size', '100000')
+            .append('status', PortfolioDTOStatus.EM_ANDAMENTO)
+            .append('status', PortfolioDTOStatus.FINALIZADO)
+            .append('status', PortfolioDTOStatus.VAZIO);
+
+        return this.http.get<Page<PortfolioListReadDTO>>(url, { params })
+            .pipe(map(page => page.content as PortfolioListReadDTO[]));
+    }
+
     // GET - Buscar todos portfólios
-    getAllPortfolios(): Observable<Portfolio[]> {
-        // TODO: Chamar endpoint GET-ALL portfolios, quando ele for criado
-        return of([
-            {
-                id: 0,
-                name: 'Portfolio 1'
-            },
-            {
-                id: 1,
-                name: 'Portfolio 2'
-            }
-        ]);
+    // Obs: não foi chamado o método de PortfolioService pra evitar dependência circular entre services.
+    getAllPortfolios(): Observable<PortfolioListReadDTO[]> {
+        const url = this.getPortfolioUrl();
+
+        let params = new HttpParams().set('size', '100000');
+
+        return this.http.get<Page<PortfolioListReadDTO>>(url, { params })
+            .pipe(map(page => page.content as PortfolioListReadDTO[]));
     }
 
     // TODO: Este método deveria estar no service de portfólios
@@ -132,36 +167,6 @@ export class ScenarioService {
             id: portfolioId,
             name: `Portfolio ${portfolioId + 1}`
         });
-    }
-
-    // TODO: Mover este método pro service de portfólio ou de projeto
-    // GET - Busca nomes dos projetos de um portfólio específico
-    getProjectsNamesByPortfolioId(portfolioId: number): Observable<{ id: number, name: string }[]> {
-        // TODO: Chamar endpoint GET-PROJECTS por ID, quando ele for criado
-        return of([
-            {
-                id: 0,
-                name: 'Projeto 1'
-            },
-            {
-                id: 1,
-                name: 'Projeto 2'
-            }
-        ]);
-    }
-
-    getPortfolioCategoriesByPortfolioId(portfolioId: number): Observable<{ id: number, name: string }[]> {
-        // TODO: Chamar endpoint GET-PORTFOLIO-CATEGORIES por ID, quando ele for criado
-        return of([
-            {
-                id: 0,
-                name: 'Categoria 1'
-            },
-            {
-                id: 1,
-                name: 'Categoria 2'
-            }
-        ]);
     }
 
     // TODO: Este método deveria estar num outro service, quem sabe 'evaluation-group-service' ou 'evaluation-service'

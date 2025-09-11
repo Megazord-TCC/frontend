@@ -13,7 +13,7 @@ import { environment } from '../../environments/environment';
 })
 export class EvaluationGroupDeleteModal {
   @Input() isVisible = false;
-  @Input() evaluationGroup: EvaluationGroup | undefined;
+  @Input({ required: true }) evaluationGroup?: EvaluationGroup;
 
   @Output() close = new EventEmitter<void>();
   @Output() deleted = new EventEmitter<void>();

@@ -93,8 +93,8 @@ export class ScenarioEditModal {
             name: this.inputName,
             description: this.inputDescription,
             budget: scenario.budget,
-            status: scenario.status
-            // portfolioId: Number(this.inputPortfolioSelectedId) // TODO: Remover comentário quando backend aceitar esse atributo
+            status: scenario.status,
+            // portfolioId: scenario?.portfolio?.id ?? 0 // O DTO do backend não aceita o portfolioId e dá erro.
         };
 
         this.scenarioService

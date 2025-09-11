@@ -16,7 +16,7 @@ import { EvaluationGroup } from '../../interface/carlos-interfaces';
 })
 export class ProjectEvaluationCreateModal {
   @Input() isVisible = false;
-  @Input() evaluationGroup!: EvaluationGroup;
+  @Input({ required: true }) evaluationGroup?: EvaluationGroup;
 
   @Output() close = new EventEmitter<void>();
   @Output() created = new EventEmitter<void>();

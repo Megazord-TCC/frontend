@@ -1,3 +1,5 @@
+import { PortfolioCategoryReadDTO } from "./carlos-category-interfaces";
+import { PortfolioReadDTO } from "./carlos-portfolio-interfaces";
 import { ProjectReadDTO } from "./carlos-project-dtos";
 import { EvaluationGroup } from "./interfacies";
 
@@ -24,6 +26,7 @@ export interface ScenarioRankingReadDTO {
     disabled: boolean;
     createdAt: Date;
     lastModifiedAt: Date;
+    portfolioCategory?: PortfolioCategoryReadDTO;
 }
 
 export enum ScenarioStatusEnum {
@@ -44,4 +47,5 @@ export interface ScenarioReadDTO {
     strategyId: number;
     evaluationGroup: EvaluationGroup;
     scenarioRankings: ScenarioRankingReadDTO[];
+    portfolio?: PortfolioReadDTO;
 }

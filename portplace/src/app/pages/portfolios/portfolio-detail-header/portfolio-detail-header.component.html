@@ -11,3 +11,22 @@
     (deleteClick)="isPortfolioDeleteModalVisible = true"
     (cancelClick)="isPortfolioCancelModalVisible = true">
 </app-page-header>
+
+<app-portfolio-edit-modal *ngIf="isPortfolioEditModalVisible" 
+    (close)="isPortfolioEditModalVisible = false"
+    (portfolioEdited)="isPortfolioEditModalVisible = false; loadPortfolioDTO()">
+</app-portfolio-edit-modal>
+
+<app-portfolio-delete-modal *ngIf="isPortfolioDeleteModalVisible"
+    (close)="isPortfolioDeleteModalVisible = false"
+    (delete)="isPortfolioDeleteModalVisible = false">
+</app-portfolio-delete-modal>
+
+<!-- <app-warning-information-modal *ngIf="isWarningInformationModalVisible" (close)="onWarningInformationModalClose()"
+    text="Ao alterar o orçamento, todas as inclusões de projetos serão recalculadas, desfazendo alterações manuais.">
+</app-warning-information-modal> -->
+
+<app-portfolio-cancel-modal *ngIf="isPortfolioCancelModalVisible"
+    (close)="isPortfolioCancelModalVisible = false"
+    (portfolioCancelled)="isPortfolioCancelModalVisible = false; loadPortfolioDTO()">
+</app-portfolio-cancel-modal>

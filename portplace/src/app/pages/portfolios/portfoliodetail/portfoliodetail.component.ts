@@ -15,6 +15,8 @@ import { retry } from 'rxjs';
 import { PageHeaderComponent } from '../../../components/page-header/page-header.component';
 import { PortfolioDetailHeaderComponent } from '../portfolio-detail-header/portfolio-detail-header.component';
 import { PortfolioSummaryTabComponent } from '../portfolio-summary-tab/portfolio-summary-tab.component';
+import { PortfolioCategoryTabComponent } from '../portfolio-category-tab/portfolio-category-tab.component';
+import { PortfolioProjectsTabComponent } from '../portfolio-projects-tab/portfolio-projects-tab.component';
 
 interface Portfolio {
   id: number;
@@ -66,7 +68,9 @@ interface Category {
     BadgeComponent,
     SvgIconComponent,
     PortfolioDetailHeaderComponent,
-    PortfolioSummaryTabComponent
+    PortfolioSummaryTabComponent,
+    PortfolioCategoryTabComponent,
+    PortfolioProjectsTabComponent
   ],
   standalone: true
 })

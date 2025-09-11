@@ -59,7 +59,7 @@
 
             <p>
                 Ao autorizar o cenário <b>{{ scenario?.name ?? '...' }}</b>, 
-                o portfólio <b>Dado não informado pelo backend</b> passará a conter os seguintes projetos:
+                o portfólio <b>{{ scenario?.portfolio?.name ?? '...' }}</b> passará a conter os seguintes projetos:
             </p>
 
             <ul>
@@ -80,7 +80,7 @@
             </div>
 
             <p>
-                O portfólio <b>Dado não informado pelo backend</b> continha os seguintes projetos, 
+                O portfólio <b>{{ scenario?.portfolio?.name ?? '...' }}</b> continha os seguintes projetos, 
                 mas eles não foram incluídos no cenário atual:
             </p>
 
