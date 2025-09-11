@@ -1,3 +1,7 @@
+import { ProjectReadDTO } from "./carlos-project-dtos";
+import { StrategyReadDTO } from "./carlos-strategy-dtos";
+import { UserGetResponseDTO } from "./carlos-user-dtos";
+
 export enum PortfolioTableRowStatus {
     VAZIO = 'VAZIO',
     EM_ANDAMENTO = 'EM ANDAMENTO',
@@ -25,18 +29,27 @@ export enum PortfolioDTOStatus {
     // provavelmente será apenas um status 'calculado'.
 }
 
-export class PortfolioDTO {
+export enum PortfolioDTOHealthEnum {
+    RED = 'RED',
+    YELLOW = 'YELLOW',
+    GREEN = 'GREEN'
+}
+
+export class PortfolioReadDTO {
     id = 0;
     name = '';
     description = '';
     budget = 0;
-    projectsInProgress = 0;
-    projectsCompleted = 0;
-    projectsCancelled = 0;
+    status?: PortfolioDTOStatus;
+    projects: ProjectReadDTO[] = [];
+    strategy?: StrategyReadDTO;
+    owners: UserGetResponseDTO[] = [];
+    scheduleHealth?: PortfolioDTOHealthEnum;
+    budgetHealth?: PortfolioDTOHealthEnum;
+    createdBy = '';
+    lastModifiedBy = '';
     createdAt = new Date();
     lastModifiedAt?: Date;
-    cancellationReason?: string;
-    status?: PortfolioDTOStatus;
 }
 
 export enum PortfolioProgressStatus {
@@ -56,4 +69,19 @@ export class PortfolioSummaryTab {
     progressStatus?: PortfolioProgressStatus;
     strategyName = '...';
     responsibleUserNames: string[] = [];
+}
+
+export class PortfolioListReadDTO {
+    id = 0;
+    name = '';
+    budget = 0;
+    status?: PortfolioDTOStatus;
+    inProgressProjectsCount = 0;
+    completedProjectsCount = 0;
+    cancelledProjectsCount = 0;
+}
+
+export class PortfolioUpdateDTO {
+    name = '';
+    description = '';
 }

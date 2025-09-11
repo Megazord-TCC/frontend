@@ -8,7 +8,6 @@ import { environment } from '../../environments/environment';
 import { CriteriaGroupService } from '../../service/criteria-group.service';
 import { firstValueFrom, map, Observable } from 'rxjs';
 import { Page } from '../../models/pagination-models';
-import { CriteriaGroupService } from '../../service/criteria-group.service';
 
 @Component({
   selector: 'app-evaluation-group-create-modal',
@@ -25,7 +24,6 @@ export class EvaluationGroupCreateModal {
   criteriaGroupService = inject(CriteriaGroupService);
   route = inject(ActivatedRoute);
   router = inject(Router);
-  criteriaGroupService = inject(CriteriaGroupService);
 
   strategyId = -1;
 
@@ -136,7 +134,7 @@ export class EvaluationGroupCreateModal {
   }
 
   doesSelectedCriteriaGroupHaveAtLeastOneCriteria(selectedCriteriaGroup: any): boolean {
-    let criteriaCount = selectedCriteriaGroup?.criteriaList?.length ?? 0;
+    let criteriaCount = selectedCriteriaGroup?.criteria?.length ?? 0;
     let hasAtLeastOneCriteria = criteriaCount > 0;
 
     this.errorMessage = hasAtLeastOneCriteria ? '' : 'O grupo de critérios selecionado não possui critérios. Acesse sua página e realize o cadastro.';
@@ -145,7 +143,7 @@ export class EvaluationGroupCreateModal {
   }
 
   doesSelectedCriteriaGroupHaveAllCriteriaComparisons(selectedCriteriaGroup: any): boolean {
-    let criteriaCount = selectedCriteriaGroup?.criteriaList?.length ?? 0;
+    let criteriaCount = selectedCriteriaGroup?.criteria?.length ?? 0;
     let totalCriteriaComparisons = selectedCriteriaGroup?.criteriaComparisons?.length ?? 0;
     let totalCriteriaComparisonsExpected = this.getTotalCriteriaComparisonsExpectedByCriteriaQuantity(criteriaCount);
 

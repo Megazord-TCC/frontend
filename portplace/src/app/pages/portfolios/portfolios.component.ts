@@ -28,7 +28,7 @@ import { PortfolioCreateModal } from '../../components/portfolio-create-modal/po
     ],
 })
 export class PortfoliosComponent implements OnInit {
-    @ViewChild(PortfolioCreateModal) createModal!: PortfolioCreateModal;
+    @ViewChild(PortfolioCreateModal) createModal?: PortfolioCreateModal;
 
     private router = inject(Router);
     private breadcrumbService = inject(BreadcrumbService);
@@ -56,7 +56,7 @@ export class PortfoliosComponent implements OnInit {
 
     openCreateModal(): void {
         this.showCreateModal = true;
-        this.createModal.restartForm();
+        this.createModal?.restartForm();
     }
 
     openPortfolio(row: PortfolioTableRow) {

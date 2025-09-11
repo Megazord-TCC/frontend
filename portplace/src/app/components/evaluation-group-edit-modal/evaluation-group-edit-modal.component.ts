@@ -16,7 +16,7 @@ import { Page } from '../../models/pagination-models';
 })
 export class EvaluationGroupEditModal {
   @Input() isVisible = false;
-  @Input() evaluationGroup: EvaluationGroup | undefined;
+  @Input({ required: true }) evaluationGroup?: EvaluationGroup;
 
   @Output() close = new EventEmitter<void>();
   @Output() updated = new EventEmitter<void>();

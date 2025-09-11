@@ -182,7 +182,7 @@ export class ScenarioCreateModal {
     }
 
     setInputPortfolioOptions() {
-        this.scenarioService.getAllPortfolios().subscribe(portfolios => {
+        this.scenarioService.getAllPortfoliosNotCancelled().subscribe(portfolios => {
             this.inputPortfolioOptions = portfolios;
 
             if (!portfolios.length) {

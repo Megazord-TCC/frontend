@@ -30,7 +30,7 @@ export const  mapScenarioDtoToScenarioTableRow = (dto: any): ScenariosTableRow =
         budget: formatToBRL(dto.budget),
         includedProjectsQuantity: dto.scenarioRankings.length,
         status: mapScenarioStatusEnumToText(dto.status),
-        evaluationGroupName: 'Backend não retornou este valor'
+        evaluationGroupName: dto.evaluationGroup?.name ?? '...',
     };
 }
 
@@ -71,13 +71,13 @@ export const mapProjectStatusEnumToText = (projectStatusEnum: any): string => {
 export const mapScenarioRankingDtoToScenarioProject = (scenarioRankingDto: any): ScenarioProject => {
     return {
         scenarioRankingId: scenarioRankingDto.id,
-        currentOrder: -1,
+        currentOrder: scenarioRankingDto.currentPosition,
         initialOrder: scenarioRankingDto.calculatedPosition,
         projectName: scenarioRankingDto?.project?.name ?? 'Erro',
         inclusionStatus: scenarioRankingDto.status,
         strategicValue: scenarioRankingDto.totalScore,
         estimatedCost: formatToBRL(scenarioRankingDto.project.budget),
-        portfolioCategoryId: '', // Backend não implementado
+        portfolioCategoryId: scenarioRankingDto?.portfolioCategory?.id ?? '',
         durationMonths: getProjectDurationMonthsText(scenarioRankingDto.project),
         projectStatus: mapProjectStatusEnumToText(scenarioRankingDto.project.status),
     };
