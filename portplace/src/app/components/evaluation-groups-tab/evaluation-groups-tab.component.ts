@@ -15,6 +15,8 @@ import { mapCriteriaGroupPageDtoToCriteriaGroupTableRowPage } from '../../mapper
 import { TableComponent } from '../table/table.component';
 import { get } from 'http';
 import { getActionButton, getEvaluationColumns, getEvaluationFilterButtons, getEvaluationFilterText } from './evaluation-groups-table.config';
+import { EvaluationService } from '../../service/evaluation.service';
+import { mapEvaluationGroupPageDtoToEvaluationGroupTableRowPage } from '../../mappers/evaluation-mappers';
 
 @Component({
   selector: 'app-evaluation-groups-tab',
@@ -38,7 +40,10 @@ export class EvaluationGroupsTabComponent {
     httpClient = inject(HttpClient);
     route = inject(ActivatedRoute);
     router = inject(Router);
-    constructor(private criterioService: CriteriaGroupService) {}
+    constructor(
+      private criterioService: CriteriaGroupService,
+      private evaluationService: EvaluationService
+    ) {}
     evaluationGroups: EvaluationGroupView[] = [];
     filteredEvaluationGroups: EvaluationGroupView[] = [];
 
@@ -84,9 +89,12 @@ export class EvaluationGroupsTabComponent {
     }
 
     getDataForEvaluationTable: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => {
-      return this.criterioService.getCriteriaGroupPage(this.strategyId, queryParams).pipe(
-        map(page => mapCriteriaGroupPageDtoToCriteriaGroupTableRowPage(page))
-      );
+        return this.evaluationService.getEvaluationGroupsPage(this.strategyId, queryParams).pipe(
+            map(page => {
+                console.log('[LOG] Retorno da API getEvaluationGroupsPage:', page);
+                return mapEvaluationGroupPageDtoToEvaluationGroupTableRowPage(page);
+            })
+        );
     };
     setEvaluationGroupsByHttpRequest() {
         let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups`;
@@ -95,6 +103,8 @@ export class EvaluationGroupsTabComponent {
         let getAllEvaluationGroups$ = this.httpClient.get<Page<EvaluationGroup>>(evaluationGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
         let getAllCriteriaGroups$ = this.httpClient.get<Page<CriteriaGroup>>(criteriaGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
 
+        console.log("getAllEvaluationGroups$:", getAllEvaluationGroups$);
+        console.log("getAllCriteriaGroups$:", getAllCriteriaGroups$);
         forkJoin({ evaluationGroups: getAllEvaluationGroups$, criteriaGroups: getAllCriteriaGroups$ })
             .pipe(map(({ evaluationGroups, criteriaGroups }) => this.getManyEvaluationGroupView(evaluationGroups, criteriaGroups)))
             .subscribe(evaluationGroups => {

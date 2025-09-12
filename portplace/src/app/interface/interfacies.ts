@@ -1,3 +1,17 @@
+export interface EvaluationGroupView {
+  id: number;
+  name: string;
+  description: string;
+  status: string;
+  statusText: string;
+  disabled: boolean;
+  createdAt: string;
+  lastModifiedAt: string;
+  criteriaGroup?: CriteriaGroup;
+  evaluations: any[]; // Ajuste para o tipo correto se houver
+  statusColor: 'green' | 'gray' | 'red';
+  // lastUpdatedBy?: any; // Descomente e ajuste se necessário
+}
 
 
 export interface StrategicObjective {
@@ -158,7 +172,7 @@ export interface EvaluationGroup {
 }
 
 export interface EvaluationGroupView extends EvaluationGroup {
-  criteriaGroup?: CriteriaGroup;
+  // criteriaGroup?: CriteriaGroup; // Removido para evitar duplicidade
 }
 
 export interface Scenario {

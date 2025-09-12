@@ -15,8 +15,8 @@ export const getEvaluationColumns = (): TableColumn[] => {
   column.label = 'Nome da avaliação';
   column.order = 1;
   column.isSortable = true;
-  column.frontendAttributeName = 'evaluationName';
-  column.backendAttributeName = 'evaluationName';
+  column.frontendAttributeName = 'name';
+  column.backendAttributeName = 'name';
   column.isClickableMainColumn = true;
   columns.push(column);
 
@@ -25,8 +25,8 @@ export const getEvaluationColumns = (): TableColumn[] => {
   column.label = 'Grupo de critérios';
   column.order = 2;
   column.isSortable = true;
-  column.frontendAttributeName = 'criteriaGroupName';
-  column.backendAttributeName = 'criteriaGroupName';
+  column.frontendAttributeName = 'criteriaGroup';
+  column.backendAttributeName = 'criteriaGroup';
   columns.push(column);
 
   return columns;
