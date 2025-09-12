@@ -48,7 +48,7 @@ export class EstrategiaService {
 
   // DELETE - Deletar estratégia permanentemente (hard delete)
   deleteStrategy(strategyId: number): Observable<void> {
-    const url = `${this.apiUrl}/${strategyId}/hard-delete`;
+    const url = `${this.apiUrl}/${strategyId}`;
     return this.http.delete<void>(url, {
       headers: this.getHeaders()
     });

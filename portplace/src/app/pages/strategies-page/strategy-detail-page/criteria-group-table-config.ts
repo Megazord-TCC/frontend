@@ -1,4 +1,4 @@
-import { ActionButton, BadgeConfiguration, InputFilter, TableColumn } from '../../components/table/table-contracts';
+import { ActionButton, BadgeConfiguration, InputFilter, TableColumn } from '../../../components/table/table-contracts';
 
 export const getActionButton = (): ActionButton => {
   return new ActionButton();
@@ -37,20 +37,20 @@ export const getColumns = (): TableColumn[] => {
 
   // Descrição
   column = new TableColumn();
-  column.label = 'Descrição';
+  column.label = 'Objetivos vinculados';
   column.order = 2;
-  column.isSortable = false;
-  column.frontendAttributeName = 'description';
-  column.backendAttributeName = 'description';
+  column.isSortable = true;
+  column.frontendAttributeName = 'objectives';
+  column.backendAttributeName = 'objectives';
   columns.push(column);
 
-  // Objetivos ativos
+  // Avaliações realizadas
   column = new TableColumn();
-  column.label = 'Objetivos ativos';
+  column.label = 'Avaliações realizadas';
   column.order = 3;
   column.isSortable = true;
-  column.frontendAttributeName = 'activeObjectivesCount';
-  column.backendAttributeName = 'activeObjectivesCount';
+  column.frontendAttributeName = 'completedEvaluationsCount';
+  column.backendAttributeName = 'completedEvaluationsCount';
   columns.push(column);
 
   // Status

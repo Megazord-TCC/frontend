@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CriteriaGroup, EvaluationGroup } from '../../interface/interfacies';
 import { HttpClient } from '@angular/common/http';
@@ -8,6 +8,7 @@ import { environment } from '../../environments/environment';
 import { CriteriaGroupService } from '../../service/criteria-group.service';
 import { firstValueFrom, map, Observable } from 'rxjs';
 import { Page } from '../../models/pagination-models';
+import { TableComponent } from '../table/table.component';
 
 @Component({
   selector: 'app-evaluation-group-create-modal',
@@ -17,8 +18,8 @@ import { Page } from '../../models/pagination-models';
 })
 export class EvaluationGroupCreateModal {
   @Input() isVisible = false;
-
   @Output() close = new EventEmitter<void>();
+  @Output() saved = new EventEmitter<void>();
 
   httpClient = inject(HttpClient);
   criteriaGroupService = inject(CriteriaGroupService);
@@ -74,7 +75,7 @@ export class EvaluationGroupCreateModal {
     }
     console.log(body);
     let postEvaluationGroup$ = this.httpClient.post(evaluationGroupsRoute, body);
-
+    this.saved.emit();
     postEvaluationGroup$.subscribe({
       error: () => this.errorMessage = 'Ocorreu um erro inesperado. Tente novamente mais tarde.',
       complete: () => this.goToEvaluationGroupDetailPage()
@@ -159,7 +160,8 @@ export class EvaluationGroupCreateModal {
 
       let totalCriteriaComparisons = selectedCriteriaGroup.relatedEvaluationGroupsCount ?? 0;
       let totalCriteriaComparisonsExpected = this.getTotalCriteriaComparisonsExpectedByCriteriaQuantity(selectedCriteriaGroup.relatedObjectivesCount ?? 0);
-
+      console.log('totalCriteriaComparisons:', totalCriteriaComparisons);
+      console.log('totalCriteriaComparisonsExpected:', totalCriteriaComparisonsExpected);
       if (totalCriteriaComparisons != totalCriteriaComparisonsExpected) {
         this.errorMessage = 'Os critérios do grupo de critérios selecionado não foram totalmente comparados entre si. Acesse sua página e finalize a comparação. Ou, selecione outro grupo de critério.';
         return false;

@@ -32,25 +32,6 @@ import { BreadcrumbService } from '../../../service/breadcrumb.service';
 export class CriterioComponent implements OnInit, OnDestroy {
   private routeSubscription?: Subscription;
 
-  deleteFormConfig: any = {
-    title: 'Cancelar grupo de critérios',
-    fields: [
-      {
-        id: 'justification',
-        label: 'Justificativa do cancelamento ',
-        type: 'textarea',
-        value: '',
-        required: true,
-        placeholder: 'Digite a justificativa para o cancelamento',
-        rows: 4
-      }
-    ],
-    validationMessage: 'Os campos marcados com * são obrigatórios.',
-    buttons: [
-      { id: 'cancel', label: 'Cancelar', type: 'button', variant: 'secondary' },
-      { id: 'confirm', label: 'Confirmar Cancelamento', type: 'submit', variant: 'danger' }
-    ]
-  };
 
   editFormConfig: any = {
     title: 'Editar grupo de critérios',
@@ -147,6 +128,7 @@ export class CriterioComponent implements OnInit, OnDestroy {
       this.criteriaGroupId = grupoIdParam ? Number(grupoIdParam) : 0;
       const criteriaId = params.get('criterioId');
       this.criteriaId = criteriaId ? Number(criteriaId) : 0;
+
 
       // COMPONENTE NETO: Simplesmente carrega dados e adiciona seu breadcrumb
       console.log('📍 Componente neto: Critério inicializando/recarregando');
@@ -620,16 +602,12 @@ export class CriterioComponent implements OnInit, OnDestroy {
       alert(this.getDeleteErrorMessage());
       return;
     }
-    this.showDeleteModal = true;
   }
 
   closeEditModal(): void {
     this.showEditModal = false;
   }
 
-  closeDeleteModal(): void {
-    this.showDeleteModal = false;
-  }
 
   onSaveByActiveTab(fields: any[]): void {
     const criterioData = fields.reduce((acc, field) => {
@@ -659,8 +637,6 @@ export class CriterioComponent implements OnInit, OnDestroy {
         this.criterioService.deleteCriterio(this.criteria.id, this.estrategiaId, this.criteriaGroupId).subscribe({
           next: () => {
             this.loadCriteria();
-            this.closeDeleteModal();
-            this.resetFormFields(this.deleteFormConfig);
             this.router.navigate([`/estrategia`, this.estrategiaId, 'grupo-criterio', this.criteriaGroupId]);
           },
           error: (err) => {
