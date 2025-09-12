@@ -14,7 +14,7 @@
           </app-svg-icon>
         </button>
         <h1>{{project?.name}}</h1>
-  <app-badge [color]="getProjectStatusColor(project!.status)">{{project?.status}}</app-badge>
+  <app-badge [color]="getProjectStatusColor(project!.status)">{{getProjectStatusEnumToText(project?.status)}}</app-badge>
       </div>
       <p class="project-description">{{project?.description}}</p>
 

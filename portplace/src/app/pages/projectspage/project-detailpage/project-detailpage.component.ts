@@ -29,7 +29,7 @@ export class ProjectDetailpageComponent implements OnInit {
   formTouched = false;
   project: Project | null = null;
 
- 
+
   earnedValue: number = 0;
   plannedValue: number = 0;
   actualCost: number = 0;
@@ -184,11 +184,11 @@ export class ProjectDetailpageComponent implements OnInit {
 
   onSaveProjeto(): void {
     if (!this.project) return;
-    // Função utilitária para formatar data dd/MM/yyyy
+
     function formatDateBR(dateStr?: string): string {
       if (!dateStr) return '';
       const date = new Date(dateStr);
-      if (isNaN(date.getTime())) return dateStr; // já está formatada
+      if (isNaN(date.getTime())) return dateStr;
       const day = String(date.getDate()).padStart(2, '0');
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const year = date.getFullYear();
@@ -208,6 +208,7 @@ export class ProjectDetailpageComponent implements OnInit {
       endDate: formatDateBR(this.project.endDate)
     };
 
+    console.log('Dados do projeto a serem salvos:', updatedProject);
     this.projetoService.updateProject(this.project.id, updatedProject)
       .pipe(retry(5))
       .subscribe({
@@ -257,10 +258,10 @@ export class ProjectDetailpageComponent implements OnInit {
       .subscribe({
         next: (projectDto) => {
           const project = mapProjectDtoToProject(projectDto);
-          // Aplica a cor do status
-          (project as any).statusColor = this.getProjectStatusColor(project.status);
-          console.log('Detalhes do projeto:', project);
-          this.project = project;
+
+
+          console.log('Detalhes do projeto:', projectDto);
+          this.project = projectDto;
           this.syncFormValues();
           this.breadcrumbService.addChildBreadcrumb({
             label: project.name || `Projeto ${projectId}`,
@@ -361,10 +362,9 @@ export class ProjectDetailpageComponent implements OnInit {
     .pipe(retry(3))
     .subscribe({
       next: (updatedProject) => {
-        console.log('Projeto cancelado com sucesso:', updatedProject);
+
         this.closeCancelModal();
         this.loadProjectDetails(this.project!.id);
-        alert('Projeto cancelado com sucesso');
         setTimeout(() => {
           this.router.navigate(['/projetos']);
         }, 1000);
@@ -376,7 +376,15 @@ export class ProjectDetailpageComponent implements OnInit {
       }
     });
   }
-
+  getProjectStatusEnumToText = (statusEnum: any): string => {
+    switch (statusEnum) {
+        case "IN_ANALYSIS": return "EM ANÁLISE";
+        case "CANCELLED": return "CANCELADO";
+        case "IN_PROGRESS": return "EM ANDAMENTO";
+        case "COMPLETED": return "FINALIZADO";
+        default: return "SEM STATUS";
+    }
+}
 
   getProjectStatusColor(status: string): string {
     switch (status) {
