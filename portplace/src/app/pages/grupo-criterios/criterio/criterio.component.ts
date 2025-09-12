@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom, Subscription } from 'rxjs';
 import { CriterioService } from '../../../service/criterio.service';
-import { Criterion, ImportanceScale, CriteriaComparison } from '../../../interface/interfacies';
+import { Criterion, ImportanceScale, CriteriaComparison, Objective } from '../../../interface/interfacies';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BadgeComponent } from '../../../components/badge/badge.component';
@@ -32,7 +32,6 @@ import { BreadcrumbService } from '../../../service/breadcrumb.service';
 export class CriterioComponent implements OnInit, OnDestroy {
   private routeSubscription?: Subscription;
 
-
   editFormConfig: any = {
     title: 'Editar grupo de critérios',
     fields: [
@@ -52,6 +51,32 @@ export class CriterioComponent implements OnInit, OnDestroy {
         required: false,
         placeholder: 'Digite a descrição',
         rows: 4
+      }
+    ],
+    validationMessage: 'Os campos marcados com * são obrigatórios.',
+    buttons: [
+      { id: 'cancel', label: 'Cancelar', type: 'button', variant: 'secondary' },
+      { id: 'save', label: 'Salvar', type: 'submit', variant: 'primary' }
+    ]
+  };
+
+  objectiveFormConfig: any = {
+    title: 'Cadastrar novo vínculo a objetivo',
+    fields: [
+      {
+        id: 'objectiveId',
+        label: 'Objetivo a ser vinculado ao critério',
+        type: 'select',
+        value: '',
+        required: true,
+        placeholder: 'Selecione um objetivo',
+        options: [],
+        customValidation: (value: any) => {
+          if (this.isObjectiveAlreadyLinked(value)) {
+            return 'Todos objetivos já foram vinculados a este critério.';
+          }
+          return null;
+        }
       }
     ],
     validationMessage: 'Os campos marcados com * são obrigatórios.',
@@ -97,16 +122,22 @@ export class CriterioComponent implements OnInit, OnDestroy {
 
   showEditModal = false;
   showDeleteModal = false;
+  showObjectiveModal = false;
   estrategiaId!: number;
   criteriaGroupId!: number;
   criteriaId!: number;
   loadingCriterios = false;
+  loadingObjectives = false;
   criteriaGroups: Criterion[] = []
   filteredCriteriaGroups: Criterion[] = []
   activeTab = "diretas"
   criteria?: Criterion;
   searchTerm = '';
   existingComparisons: CriteriaComparison[] = [];
+
+  // Dados dos objetivos
+  allObjectives: Objective[] = [];
+  linkedObjectives: Objective[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -129,10 +160,6 @@ export class CriterioComponent implements OnInit, OnDestroy {
       const criteriaId = params.get('criterioId');
       this.criteriaId = criteriaId ? Number(criteriaId) : 0;
 
-
-      // COMPONENTE NETO: Simplesmente carrega dados e adiciona seu breadcrumb
-      console.log('📍 Componente neto: Critério inicializando/recarregando');
-
       console.log('🔄 === INICIALIZANDO/RECARREGANDO COMPONENTE ===');
       console.log('  - Estratégia ID:', this.estrategiaId);
       console.log('  - Grupo ID:', this.criteriaGroupId);
@@ -142,6 +169,7 @@ export class CriterioComponent implements OnInit, OnDestroy {
       await this.loadCriteria();
       await this.loadAllGroupCriteria();
       await this.loadExistingComparisons();
+      await this.loadObjectives();
     });
   }
 
@@ -166,11 +194,15 @@ export class CriterioComponent implements OnInit, OnDestroy {
     this.filteredCriteriaGroups = [];
     this.existingComparisons = [];
     this.comparisonValues = {};
+    this.allObjectives = [];
+    this.linkedObjectives = [];
 
     // Resetar flags
     this.loadingCriterios = false;
+    this.loadingObjectives = false;
     this.showEditModal = false;
     this.showDeleteModal = false;
+    this.showObjectiveModal = false;
 
     // Limpar filtros
     this.searchTerm = '';
@@ -229,6 +261,141 @@ export class CriterioComponent implements OnInit, OnDestroy {
       console.error('Erro ao carregar avaliações:', err);
       this.existingComparisons = [];
       this.initializeComparisonValues();
+    }
+  }
+
+  // CARREGAR OBJETIVOS
+  async loadObjectives(): Promise<void> {
+    this.loadingObjectives = true;
+    try {
+      console.log('🎯 Implemente aqui a chamada ao service para carregar todos os objetivos da estratégia');
+      // const allObjectives = await firstValueFrom(this.objectiveService.getAllObjectives(this.estrategiaId));
+      // this.allObjectives = allObjectives;
+
+      console.log('🔗 Implemente aqui a chamada ao service para carregar objetivos vinculados ao critério');
+      // const linkedObjectives = await firstValueFrom(this.objectiveService.getLinkedObjectives(this.criteriaId, this.estrategiaId));
+      // this.linkedObjectives = linkedObjectives;
+
+      // SIMULAÇÃO TEMPORÁRIA PARA TESTE
+      this.allObjectives = [
+        { id: 1, name: 'Aumentar lucro', description: 'Aumentar lucro da empresa' },
+        { id: 2, name: 'Capacitar empregados', description: 'Capacitar empregados da empresa' },
+        { id: 3, name: 'Obter novos clientes', description: 'Obter novos clientes para a empresa' }
+      ] as Objective[];
+
+      this.linkedObjectives = [
+        { id: 1, name: 'Aumentar lucro', description: 'Aumentar lucro da empresa' },
+        { id: 2, name: 'Capacitar empregados', description: 'Capacitar empregados da empresa' }
+      ] as Objective[];
+
+      this.updateObjectiveFormOptions();
+    } catch (err) {
+      console.error('Erro ao carregar objetivos:', err);
+      this.allObjectives = [];
+      this.linkedObjectives = [];
+    } finally {
+      this.loadingObjectives = false;
+    }
+  }
+
+  // ATUALIZAR OPÇÕES DO FORMULÁRIO DE OBJETIVOS
+  updateObjectiveFormOptions(): void {
+    const availableObjectives = this.allObjectives.filter(obj =>
+      !this.linkedObjectives.some(linked => linked.id === obj.id)
+    );
+
+    const objectiveField = this.objectiveFormConfig.fields.find((field: any) => field.id === 'objectiveId');
+    if (objectiveField) {
+      objectiveField.options = availableObjectives.map(obj => ({
+        value: obj.id,
+        label: obj.name
+      }));
+    }
+  }
+
+  // VERIFICAR SE OBJETIVO JÁ ESTÁ VINCULADO
+  isObjectiveAlreadyLinked(objectiveId: number): boolean {
+    if (!objectiveId) return false;
+    return this.linkedObjectives.some(obj => obj.id === objectiveId);
+  }
+
+  // ABRIR MODAL DE OBJETIVOS
+  openObjectiveModal(): void {
+    this.updateObjectiveFormOptions();
+
+    const availableObjectives = this.allObjectives.filter(obj =>
+      !this.linkedObjectives.some(linked => linked.id === obj.id)
+    );
+
+    if (availableObjectives.length === 0) {
+      alert('Todos os objetivos já foram vinculados a este critério ou não há objetivos cadastrados na estratégia atual.');
+      return;
+    }
+
+    // Atualizar título do modal
+    this.objectiveFormConfig.title = `Cadastrar novo vínculo a objetivo`;
+
+    // Limpar campo
+    const objectiveField = this.objectiveFormConfig.fields.find((field: any) => field.id === 'objectiveId');
+    if (objectiveField) {
+      objectiveField.value = '';
+    }
+
+    this.showObjectiveModal = true;
+  }
+
+  // FECHAR MODAL DE OBJETIVOS
+  closeObjectiveModal(): void {
+    this.showObjectiveModal = false;
+  }
+
+  // SALVAR VÍNCULO DE OBJETIVO
+  async onSaveObjectiveLink(fields: any[]): Promise<void> {
+    const objectiveId = fields.find(field => field.id === 'objectiveId')?.value;
+
+    if (!objectiveId) {
+      alert('Selecione um objetivo para vincular.');
+      return;
+    }
+
+    try {
+      console.log('🔗 Implemente aqui a chamada ao service para vincular objetivo ao critério');
+      console.log('Dados:', { criteriaId: this.criteriaId, objectiveId, estrategiaId: this.estrategiaId });
+
+      // await firstValueFrom(this.objectiveService.linkObjectiveToCriteria(this.criteriaId, objectiveId, this.estrategiaId));
+
+      // Recarregar dados após salvar
+      await this.loadObjectives();
+      this.closeObjectiveModal();
+
+      console.log('✅ Objetivo vinculado com sucesso');
+    } catch (error) {
+      console.error('❌ Erro ao vincular objetivo:', error);
+      alert('Erro ao vincular objetivo. Tente novamente.');
+    }
+  }
+
+  // REMOVER VÍNCULO DE OBJETIVO
+  async removeObjectiveLink(objectiveId: number): Promise<void> {
+    const objective = this.linkedObjectives.find(obj => obj.id === objectiveId);
+    if (!objective) return;
+
+    const confirmed = confirm(`Tem certeza que deseja remover o vínculo com o objetivo "${objective.name}"?`);
+    if (!confirmed) return;
+
+    try {
+      console.log('🗑️ Implemente aqui a chamada ao service para remover vínculo do objetivo');
+      console.log('Dados:', { criteriaId: this.criteriaId, objectiveId, estrategiaId: this.estrategiaId });
+
+      // await firstValueFrom(this.objectiveService.unlinkObjectiveFromCriteria(this.criteriaId, objectiveId, this.estrategiaId));
+
+      // Recarregar dados após remover
+      await this.loadObjectives();
+
+      console.log('✅ Vínculo removido com sucesso');
+    } catch (error) {
+      console.error('❌ Erro ao remover vínculo:', error);
+      alert('Erro ao remover vínculo. Tente novamente.');
     }
   }
 
@@ -376,6 +543,7 @@ export class CriterioComponent implements OnInit, OnDestroy {
     // Chamar o método de mudança de importância
     this.onImportanceChange(criteria, otherCriteria);
   }
+
   async onImportanceChange(criteria: Criterion, otherCriteria: Criterion): Promise<void> {
     if (!criteria?.id || !otherCriteria?.id) {
       console.error('❌ IDs inválidos:', criteria?.id, otherCriteria?.id);
@@ -486,8 +654,6 @@ export class CriterioComponent implements OnInit, OnDestroy {
         }
       }
 
-
-
     } catch (error) {
       this.comparisonValues[criteria.id][otherCriteria.id] = '';
       alert('Erro ao salvar comparação. Tente novamente.');
@@ -595,7 +761,6 @@ export class CriterioComponent implements OnInit, OnDestroy {
   }
 
   deleteCriteria() {
-    
     const canDelete = this.canDeleteCriteria();
 
     if (!canDelete) {
@@ -618,7 +783,6 @@ export class CriterioComponent implements OnInit, OnDestroy {
   closeEditModal(): void {
     this.showEditModal = false;
   }
-
 
   onSaveByActiveTab(fields: any[]): void {
     const criterioData = fields.reduce((acc, field) => {
@@ -706,13 +870,17 @@ export class CriterioComponent implements OnInit, OnDestroy {
     return item.criteria.id;
   }
 
+  trackByObjectiveId(index: number, item: Objective): number {
+    return item.id;
+  }
+
   // Método para verificar se os dados estão prontos para renderizar
   isDataReady(): boolean {
     return !this.loadingCriterios &&
-           !!this.criteria &&
-           !!this.criteria.id &&
-           !!this.comparisonValues[this.criteria.id] &&
-           this.filteredCriteriaGroups.length > 0;
+          !!this.criteria &&
+          !!this.criteria.id &&
+          !!this.comparisonValues[this.criteria.id] &&
+          this.filteredCriteriaGroups.length > 0;
   }
 
   // Método auxiliar para garantir que criteria existe (Type Guard)

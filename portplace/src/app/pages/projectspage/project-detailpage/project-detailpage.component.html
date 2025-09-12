@@ -14,13 +14,14 @@
           </app-svg-icon>
         </button>
         <h1>{{project?.name}}</h1>
-        <app-badge [color]="project?.statusColor">{{project?.status}}</app-badge>
+  <app-badge [color]="getProjectStatusColor(project!.status)">{{project?.status}}</app-badge>
       </div>
       <p class="project-description">{{project?.description}}</p>
 
       <div class="project-dates">
         <span>Início planejado: {{project?.startDate}}</span>
         <span>Fim planejado: {{project?.endDate}}</span>
+        <span *ngIf="project?.roi">ROI: {{project?.roi | number:'1.2-2'}}%</span>
       </div>
 
       <div class="header-actions">
@@ -49,7 +50,7 @@
           Excluir
         </button>
       </div>
-      <p class="last-update">{{project?.lastUpdate}}</p>
+      <p class="last-update">{{project?.lastModifiedAt}}</p>
     </div>
 
     <!-- Tabs -->
@@ -89,7 +90,7 @@
             <strong>Campos calculados:</strong> São atualizados automaticamente com base nos valores editáveis.
           </p>
 
-      
+
           <div class="indicators-grid">
             <!-- Valor Agregado (EV) -->
             <div class="indicator-item">
@@ -98,19 +99,12 @@
                 <input
                   type="number"
                   [(ngModel)]="earnedValue"
+                  (ngModelChange)="onInputChange()"
                   class="indicator-input"
                   step="0.01"
                   min="0"
                   [value]="earnedValue || 0"
                   placeholder="Digite o valor agregado">
-                <button class="save-btn" (click)="saveEarnedValue()">
-                  <app-svg-icon
-                    class="nav-icon"
-                    [path]="'assets/icon/salvar_vetor.svg'"
-                    [size]="18">
-                  </app-svg-icon>
-                  Salvar
-                </button>
               </div>
               <p class="last-update-text">Valor atual: {{formatCurrency(earnedValue || 0)}}</p>
             </div>
@@ -122,19 +116,12 @@
                 <input
                   type="number"
                   [(ngModel)]="plannedValue"
+                  (ngModelChange)="onInputChange()"
                   class="indicator-input"
                   step="0.01"
                   min="0"
                   [value]="plannedValue || 0"
                   placeholder="Digite o valor planejado">
-                <button class="save-btn" (click)="savePlannedValue()">
-                  <app-svg-icon
-                    class="nav-icon"
-                    [path]="'assets/icon/salvar_vetor.svg'"
-                    [size]="18">
-                  </app-svg-icon>
-                  Salvar
-                </button>
               </div>
               <p class="last-update-text">Valor atual: {{formatCurrency(plannedValue || 0)}}</p>
             </div>
@@ -146,19 +133,12 @@
                 <input
                   type="number"
                   [(ngModel)]="actualCost"
+                  (ngModelChange)="onInputChange()"
                   class="indicator-input"
                   step="0.01"
                   min="0"
                   [value]="actualCost || 0"
                   placeholder="Digite o custo real">
-                <button class="save-btn" (click)="saveActualCost()">
-                  <app-svg-icon
-                    class="nav-icon"
-                    [path]="'assets/icon/salvar_vetor.svg'"
-                    [size]="18">
-                  </app-svg-icon>
-                  Salvar
-                </button>
               </div>
               <p class="last-update-text">Valor atual: {{formatCurrency(actualCost || 0)}}</p>
             </div>
@@ -169,22 +149,15 @@
               <div class="indicator-input-group">
                 <input
                   type="number"
-                  [(ngModel)]="budget"
+                  [(ngModel)]="budgetAtCompletion"
+                  (ngModelChange)="onInputChange()"
                   class="indicator-input"
                   step="0.01"
                   min="0"
-                  [value]="budget || 0"
+                  [value]="budgetAtCompletion || 0"
                   placeholder="Digite o orçamento">
-                <button class="save-btn" (click)="saveBudget()">
-                  <app-svg-icon
-                    class="nav-icon"
-                    [path]="'assets/icon/salvar_vetor.svg'"
-                    [size]="18">
-                  </app-svg-icon>
-                  Salvar
-                </button>
               </div>
-              <p class="last-update-text">Valor atual: {{formatCurrency(budget || 0)}}</p>
+              <p class="last-update-text">Valor atual: {{formatCurrency(budgetAtCompletion || 0)}}</p>
             </div>
 
             <!-- Payback -->
@@ -194,26 +167,29 @@
                 <input
                   type="number"
                   [(ngModel)]="payback"
+                  (ngModelChange)="onInputChange()"
                   class="indicator-input"
                   step="0.1"
                   min="0"
                   [value]="payback || 0"
                   placeholder="Digite o payback em anos">
-                <button class="save-btn" (click)="savePayback()">
-                  <app-svg-icon
-                    class="nav-icon"
-                    [path]="'assets/icon/salvar_vetor.svg'"
-                    [size]="18">
-                  </app-svg-icon>
-                  Salvar
-                </button>
               </div>
               <p class="last-update-text">Valor atual: {{payback || 0}} anos</p>
             </div>
 
           </div>
 
-
+          <!-- Botão único para salvar todos os indicadores -->
+          <button class="save-btn"
+                  [disabled]="!formTouched"
+                  (click)="onSaveProjeto()">
+            <app-svg-icon
+              class="nav-icon"
+              [path]="'assets/icon/salvar_vetor.svg'"
+              [size]="18">
+            </app-svg-icon>
+            Salvar indicadores
+          </button>
           <div class="strategic-links">
             <!-- CPI -->
             <div class="link-item">
@@ -324,7 +300,7 @@
           <div class="objectives-section">
             <h4>Objetivos</h4>
             <div class="objectives-list">
-              <div *ngFor="let objective of objectives" class="objective-item">
+              <div *ngFor="let objective of project?.strategicObjectives" class="objective-item">
                 <app-svg-icon
                   class="nav-icon"
                   [path]="'assets/icon/p_vetor.svg'"
@@ -343,7 +319,7 @@
     [isVisible]="showEditModal"
     [config]="editPortfolioConfig"
     (close)="closeEditModal()"
-    (save)="onSavePortfolio($event)"
+    (save)="onSaveProjeto()"
     (cancel)="closeEditModal()">
   </app-form-modal-component>
 

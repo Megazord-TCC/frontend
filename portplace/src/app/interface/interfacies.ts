@@ -30,23 +30,33 @@ export interface StrategicObjective {
   // objectives?: any[];
 }
 export interface Project {
-  id?: number;
+  id: number;
   name: string;
   description: string;
-  portfolio?: any;
-  startDate: string;
-  endDate: string;
-  status: ProjectStatusEnum;
-  projectManager: number;
-  earnedValue: number;
-  plannedValue: number;
-  actualCost: number;
-  budget: number;
+  status: string;
   payback: number;
-  createdAt?: string;
-  lastModifiedAt?: string;
-  disabled?: boolean;
-  cancellationReason?: string;
+  roi: number;
+  startDate: string; // dd/MM/yyyy
+  endDate: string;   // dd/MM/yyyy
+  plannedValue: number;
+  earnedValue: number;
+  actualCost: number;
+  budgetAtCompletion: number;
+  percentComplete: number;
+  costPerformanceIndex: number;
+  schedulePerformanceIndex: number;
+  estimateAtCompletion: number;
+  estimateToComplete: number;
+  portfolioCategory?: any; // Ajuste para o tipo correto se houver
+  portfolioName?: string;
+  strategyName?: string;
+  scenarioRankingScore?: number;
+  priorityInPortfolio?: number;
+  strategicObjectives?: any[]; // Ajuste para o tipo correto se houver
+  evaluations?: any[]; // Ajuste para o tipo correto se houver
+  createdAt: string; // dd/MM/yyyy HH:mm:ss
+  lastModifiedAt: string; // dd/MM/yyyy HH:mm:ss
+  disabled: boolean;
 }
 
 export interface ProjectPageableResponse {

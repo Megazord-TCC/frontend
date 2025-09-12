@@ -277,7 +277,7 @@
               <tbody>
                 <tr *ngFor="let project of Projects" class="table-row">
                   <td class="project-name">{{project.name}}</td>
-                  <td>{{project.budget || 'não definido' }}</td>
+                  <td>{{project.budgetAtCompletion || 'não definido' }}</td>
                   <td>{{ project.earnedValue || 'não definido' }}</td>
                   <td>{{ project.plannedValue || 'não definido' }}</td>
                   <td>{{project.startDate || 'não definido' }}</td>

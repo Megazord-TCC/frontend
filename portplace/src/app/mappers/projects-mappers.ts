@@ -1,4 +1,38 @@
 import { Page } from "../models/pagination-models";
+import { Project } from '../interface/interfacies';
+
+// Mapper para converter o DTO do backend para o modelo Project
+export function mapProjectDtoToProject(dto: any): Project {
+  return {
+    id: dto.id,
+    name: dto.name,
+    description: dto.description,
+    status: mapProjectStatusEnumToText(dto.status),
+    payback: dto.payback,
+    roi: dto.roi,
+    startDate: dto.startDate,
+    endDate: dto.endDate,
+    plannedValue: dto.plannedValue,
+    earnedValue: dto.earnedValue,
+    actualCost: dto.actualCost,
+    budgetAtCompletion: dto.budgetAtCompletion,
+    percentComplete: dto.percentComplete,
+    costPerformanceIndex: dto.costPerformanceIndex,
+    schedulePerformanceIndex: dto.schedulePerformanceIndex,
+    estimateAtCompletion: dto.estimateAtCompletion,
+    estimateToComplete: dto.estimateToComplete,
+    portfolioCategory: dto.portfolioCategory,
+    portfolioName: dto.portfolioName,
+    strategyName: dto.strategyName,
+    scenarioRankingScore: dto.scenarioRankingScore,
+    priorityInPortfolio: dto.priorityInPortfolio,
+    strategicObjectives: dto.strategicObjectives,
+    evaluations: dto.evaluations,
+    createdAt: dto.createdAt,
+    lastModifiedAt: dto.lastModifiedAt,
+    disabled: dto.disabled
+  };
+}
 
 // Tipo para a linha da tabela de projetos (ajuste conforme necessário)
 export interface ProjectTableRow {
@@ -24,25 +58,12 @@ export const mapProjectStatusEnumToText = (statusEnum: any): string => {
     }
 }
 
-// Mapeia um ProjectReadDTO para ProjectTableRow
-export const mapProjectDtoToProjectTableRow = (dto: any): ProjectTableRow => {
-    return {
-        id: dto.id,
-        name: dto.name,
-        portfolio: dto.portfolio ? (dto.portfolio.name || dto.portfolio) : '',
-        budget: dto.budget,
-        earnedValue: dto.earnedValue,
-        plannedValue: dto.plannedValue,
-        startDate: dto.startDate,
-        endDate: dto.endDate,
-        status: mapProjectStatusEnumToText(dto.status)
-    };
-}
+
 
 // Mapeia uma página de ProjectReadDTO para Page<ProjectTableRow>
 export const mapProjectPageDtoToProjectTableRowPage = (pageDto: any): Page<ProjectTableRow> => {
     return {
         ...pageDto,
-        content: pageDto.content.map((projectDTO: any) => mapProjectDtoToProjectTableRow(projectDTO))
+        content: pageDto.content.map((projectDTO: any) => mapProjectDtoToProject(projectDTO))
     };
 }

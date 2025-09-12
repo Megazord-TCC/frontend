@@ -14,7 +14,7 @@ import { FormModalComponentComponent } from '../../components/form-modal-compone
 import { TableComponent } from '../../components/table/table.component';
 import { getActionButton, getColumns, getFilterButtons, getFilterText } from './projects-table-config';
 import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } from '../../models/pagination-models';
-import { mapScenarioPageDtoToScenariosTableRowPage } from "../../mappers/scenario-mappers"
+import { mapProjectPageDtoToProjectTableRowPage } from "../../mappers/projects-mappers"
 
 @Component({
   selector: 'app-projectspage',
@@ -45,19 +45,34 @@ export class ProjectsComponent implements OnInit {
   actionButton = getActionButton();
 
 
-  newProject: Project = {
+   newProject: Project = {
+    id: 0,
     name: '',
     description: '',
-    portfolio: undefined  ,
+    status: ProjectStatusEnum.IN_ANALYSIS,
+    payback: 0,
+    roi: 0,
     startDate: '',
     endDate: '',
-    status: ProjectStatusEnum.IN_ANALYSIS,
-    projectManager: 1,
-    earnedValue: 0,
     plannedValue: 0,
+    earnedValue: 0,
     actualCost: 0,
-    budget: 0,
-    payback: 0
+    budgetAtCompletion: 0,
+    percentComplete: 0,
+    costPerformanceIndex: 0,
+    schedulePerformanceIndex: 0,
+    estimateAtCompletion: 0,
+    estimateToComplete: 0,
+    portfolioCategory: undefined,
+    portfolioName: '',
+    strategyName: '',
+    scenarioRankingScore: 0,
+    priorityInPortfolio: 0,
+    strategicObjectives: [],
+    evaluations: [],
+    createdAt: '',
+    lastModifiedAt: '',
+    disabled: false
   };
 
   createProjectConfig: FormModalConfig = {
@@ -121,7 +136,7 @@ export class ProjectsComponent implements OnInit {
     // Recarrega a tabela de projetos, buscando os dados via requisição HTTP.
   getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => (
       this.projetoService.getProjectsPage(queryParams).pipe(
-          map(page => (mapScenarioPageDtoToScenariosTableRowPage(page)))
+          map(page => (mapProjectPageDtoToProjectTableRowPage(page)))
       )
   );
 
@@ -228,24 +243,50 @@ export class ProjectsComponent implements OnInit {
   }
 
   onProjectClick(projectId: number): void {
-    this.router.navigate(['/projeto', projectId]);
+    let id: number | undefined;
+    if (typeof projectId === 'object' && projectId !== null && 'id' in projectId) {
+      id = (projectId as { id: number }).id;
+    } else if (typeof projectId === 'number') {
+      id = projectId;
+    }
+    if (id) {
+      this.router.navigate(['/projeto', id]);
+    } else {
+      console.warn('ID da estratégia não encontrado:', projectId);
+    }
   }
 
   resetNewProject(): void {
     this.newProject = {
-      name: '',
-      description: '',
-      portfolio: undefined  ,
-      startDate: '',
-      endDate: '',
-      status: ProjectStatusEnum.IN_ANALYSIS,
-      projectManager: 1,
-      earnedValue: 0,
-      plannedValue: 0,
-      actualCost: 0,
-      budget: 0,
-      payback: 0
-    };
+        id: 0,
+        name: '',
+        description: '',
+        status: ProjectStatusEnum.IN_ANALYSIS,
+        payback: 0,
+        roi: 0,
+        startDate: '',
+        endDate: '',
+        plannedValue: 0,
+        earnedValue: 0,
+        actualCost: 0,
+        budgetAtCompletion: 0,
+        percentComplete: 0,
+        costPerformanceIndex: 0,
+        schedulePerformanceIndex: 0,
+        estimateAtCompletion: 0,
+        estimateToComplete: 0,
+        portfolioCategory: undefined,
+        portfolioName: '',
+        strategyName: '',
+        scenarioRankingScore: 0,
+        priorityInPortfolio: 0,
+        strategicObjectives: [],
+        evaluations: [],
+        createdAt: '',
+        lastModifiedAt: '',
+        disabled: false
+      };
+
   }
 
   openCreateModal(): void {
@@ -263,33 +304,43 @@ export class ProjectsComponent implements OnInit {
   }
 
   onSaveProject(fields: FormField[]): void {
-    // Process form data
     const projectData = fields.reduce((acc, field) => {
       acc[field.id] = field.value;
       return acc;
     }, {} as any);
 
-    // Validar dados antes de enviar
     const validationResult = this.validateProjectData(projectData);
     if (!validationResult.isValid) {
       console.error('Dados inválidos:', validationResult.errors);
-      // Aqui você pode mostrar os erros no formulário
+
       return;
     }
 
-    const newProject: Project = {
+
+    // Monta apenas os campos esperados pelo backend
+
+    // Função utilitária para formatar data dd/MM/yyyy
+    function formatDateBR(dateStr?: string): string {
+      if (!dateStr) return '';
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return dateStr; // já está formatada
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+
+    const newProject = {
       name: projectData.name,
       description: projectData.description,
-      portfolio: undefined,
-      startDate: projectData.startDate,
-      endDate: projectData.endDate,
       status: ProjectStatusEnum.IN_ANALYSIS,
-      projectManager: 1,
+      payback:  0,
       earnedValue: 0,
       plannedValue: 0,
       actualCost: 0,
-      budget: 0,
-      payback: 0
+      budgetAtCompletion: 0,
+      startDate: formatDateBR(projectData.startDate),
+      endDate: formatDateBR(projectData.endDate)
     };
 
     console.log('Dados do projeto sendo enviados:', newProject);

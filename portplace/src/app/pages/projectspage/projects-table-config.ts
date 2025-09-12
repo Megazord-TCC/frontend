@@ -48,28 +48,45 @@ export const getColumns = (): TableColumn[] => {
     columns.push(column);
 
     column = new TableColumn();
-    column.label = 'Orçamento';
+    column.label = 'EV';
     column.order = 2;
     column.isSortable = true;
-    column.frontendAttributeName = 'budget';
-    column.backendAttributeName = 'budget';
+    column.frontendAttributeName = 'earnedValue';
+    column.backendAttributeName = 'earnedValue';
     columns.push(column);
 
     column = new TableColumn();
-    column.label = 'Grupo de avaliação';
+    column.label = 'PV';
     column.order = 3;
-    column.frontendAttributeName = 'evaluationGroupName';
+    column.isSortable = true;
+    column.frontendAttributeName = 'plannedValue';
+    column.backendAttributeName = 'plannedValue';
     columns.push(column);
 
     column = new TableColumn();
-    column.label = 'Projetos incluídos';
+    column.label = 'Portfólio';
     column.order = 4;
-    column.frontendAttributeName = 'includedProjectsQuantity';
+    column.frontendAttributeName = 'portfolioName';
+    column.backendAttributeName = 'portfolioName';
+    columns.push(column);
+
+    column = new TableColumn();
+    column.label = 'Início planejado';
+    column.order = 5;
+    column.frontendAttributeName = 'startDate';
+    column.backendAttributeName = 'startDate';
+    columns.push(column);
+
+    column = new TableColumn();
+    column.label = 'Fim planejado';
+    column.order = 6;
+    column.frontendAttributeName = 'endDate';
+    column.backendAttributeName = 'endDate';
     columns.push(column);
 
     column = new TableColumn();
     column.label = 'Status';
-    column.order = 5;
+    column.order = 7;
     column.isSortable = true;
     column.frontendAttributeName = 'status';
     column.backendAttributeName = 'status';

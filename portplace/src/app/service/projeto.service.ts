@@ -22,7 +22,7 @@ export class ProjetoService {
   }
 
   // Cadastrar novo projeto (POST)
-  createProject(project: Project): Observable<Project> {
+  createProject(project: Partial<Project>): Observable<Project> {
     return this.http.post<Project>(this.apiUrl, project, { headers: this.getHeaders() });
   }
 
@@ -41,7 +41,7 @@ export class ProjetoService {
   }
 
   // Atualizar projeto (PUT)
-  updateProject(id: number, project: Project): Observable<Project> {
+  updateProject(id: number, project: Partial<Project>): Observable<Project> {
     return this.http.put<Project>(`${this.apiUrl}/${id}`, project, { headers: this.getHeaders() });
   }
 
