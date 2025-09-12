@@ -52,7 +52,7 @@ export class PortfolioMetricCardBuilder {
 
     withBudget(): PortfolioMetricCardBuilder {
         let card = new MetricCard();
-        card.title = this.portfolio?.budget ?? '...';
+        card.title = `R$ ${this.portfolio?.budget ?? '0,00'}`;
         card.subtitle = 'Orçamento';
         card.iconPath = 'assets/icon/porco_vetor.svg';
         this.cards.push(card);

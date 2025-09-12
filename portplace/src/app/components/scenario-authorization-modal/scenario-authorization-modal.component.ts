@@ -110,7 +110,7 @@ export class ScenarioAuthorizationModalComponent {
     }
 
     getIncludedProjectsBudgetSum(): number {
-        return this.getIncludedProjects().reduce((sum, project) => sum + (project.budget || 0), 0);
+        return this.getIncludedProjects().reduce((sum, project) => sum + (project.budgetAtCompletion || 0), 0);
     }
 
     getTotalIncludedProjectsBudgetFormattedToBRL(): string {

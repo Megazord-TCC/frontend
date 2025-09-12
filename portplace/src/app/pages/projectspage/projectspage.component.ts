@@ -15,6 +15,7 @@ import { TableComponent } from '../../components/table/table.component';
 import { getActionButton, getColumns, getFilterButtons, getFilterText } from './projects-table-config';
 import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } from '../../models/pagination-models';
 import { mapScenarioPageDtoToScenariosTableRowPage } from "../../mappers/scenario-mappers"
+import { formatDateFromYYYYMMDDWithHyphenToDDMMYYYYWithSlash } from '../../helpers/date-helper';
 
 @Component({
   selector: 'app-projectspage',
@@ -120,9 +121,9 @@ export class ProjectsComponent implements OnInit {
   // Usado pelo TableComponent.
     // Recarrega a tabela de projetos, buscando os dados via requisição HTTP.
   getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => (
-      this.projetoService.getProjectsPage(queryParams).pipe(
-          map(page => (mapScenarioPageDtoToScenariosTableRowPage(page)))
-      )
+      this.projetoService.getProjectsPage(queryParams)
+    // Se quiser mapear o DTO do backend pra outro objeto diferente no front, faça um mapeamento tipo esse abaixo.
+    //   .pipe(map(page => (mapScenarioPageDtoToScenariosTableRowPage(page))))
   );
 
   loadProjects(): void {
@@ -277,18 +278,18 @@ export class ProjectsComponent implements OnInit {
       return;
     }
 
-    const newProject: Project = {
+    const newProject: any = {
       name: projectData.name,
       description: projectData.description,
       portfolio: undefined,
-      startDate: projectData.startDate,
-      endDate: projectData.endDate,
+      startDate: formatDateFromYYYYMMDDWithHyphenToDDMMYYYYWithSlash(projectData.startDate),
+      endDate: formatDateFromYYYYMMDDWithHyphenToDDMMYYYYWithSlash(projectData.endDate),
       status: ProjectStatusEnum.IN_ANALYSIS,
       projectManager: 1,
       earnedValue: 0,
       plannedValue: 0,
       actualCost: 0,
-      budget: 0,
+      budgetAtCompletion: 0,
       payback: 0
     };
 

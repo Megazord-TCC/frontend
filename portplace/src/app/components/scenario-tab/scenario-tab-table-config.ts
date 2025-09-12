@@ -51,7 +51,7 @@ export const getColumns = (): TableColumn[] => {
     column.order = 2;
     column.isSortable = true;
     column.frontendAttributeName = 'budget';
-    column.backendAttributeName = 'budget';
+    column.backendAttributeName = 'budgetAtCompletion';
     columns.push(column);
 
     column = new TableColumn();

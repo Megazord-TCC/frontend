@@ -86,7 +86,7 @@ export function mapProjectReadDTO2PageToPortfolioProjectTableRowPage(page: Page<
         content: page.content.map(project => ({
             id: project.id,
             name: project.name,
-            budget: formatToBRL(project.budget),
+            budget: formatToBRL(project.budgetAtCompletion),
             status: mapProjectStatusEnumDTO2ToPortfolioProjectTableRowProjectStatus(project.status),
             startDate: project.startDate ?? 'Erro',
             endDate: project.endDate ?? 'Erro',

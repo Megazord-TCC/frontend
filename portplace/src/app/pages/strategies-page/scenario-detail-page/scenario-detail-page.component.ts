@@ -233,12 +233,12 @@ export class ScenarioDetailPageComponent {
                 ranking.status === ScenarioRankingStatusEnum.MANUALLY_INCLUDED
                 || ranking.status === ScenarioRankingStatusEnum.INCLUDED
             )
-            .map(ranking => ranking.project?.budget ?? 0).reduce((a, b) => a + b, 0);
+            .map(ranking => ranking.project?.budgetAtCompletion ?? 0).reduce((a, b) => a + b, 0);
     }
 
     calculateAllProjectsBudget(scenarioDto: any): number {
         let scenario: ScenarioReadDTO = scenarioDto as ScenarioReadDTO;
-        return scenario.scenarioRankings.map(ranking => ranking.project?.budget ?? 0).reduce((a, b) => a + b, 0);
+        return scenario.scenarioRankings.map(ranking => ranking.project?.budgetAtCompletion ?? 0).reduce((a, b) => a + b, 0);
     }
 
     setVariablesByRouteParams(params: ParamMap) {
