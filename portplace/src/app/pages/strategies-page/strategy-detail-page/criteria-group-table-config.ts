@@ -27,7 +27,7 @@ export const getColumns = (): TableColumn[] => {
 
   // Nome da estratégia
   column = new TableColumn();
-  column.label = 'Nome da estratégia';
+  column.label = 'Nome do grupo';
   column.order = 1;
   column.isSortable = true;
   column.frontendAttributeName = 'name';
@@ -40,17 +40,17 @@ export const getColumns = (): TableColumn[] => {
   column.label = 'Objetivos vinculados';
   column.order = 2;
   column.isSortable = true;
-  column.frontendAttributeName = 'objectives';
-  column.backendAttributeName = 'objectives';
+  column.frontendAttributeName = 'relatedObjectivesCount';
+  column.backendAttributeName = 'relatedObjectivesCount';
   columns.push(column);
 
-  // Avaliações realizadas
+  // Avaliações vinculadas
   column = new TableColumn();
-  column.label = 'Avaliações realizadas';
+  column.label = 'Avaliações vinculadas';
   column.order = 3;
   column.isSortable = true;
-  column.frontendAttributeName = 'completedEvaluationsCount';
-  column.backendAttributeName = 'completedEvaluationsCount';
+  column.frontendAttributeName = 'relatedEvaluationGroupsCount';
+  column.backendAttributeName = 'relatedEvaluationGroupsCount';
   columns.push(column);
 
   // Status

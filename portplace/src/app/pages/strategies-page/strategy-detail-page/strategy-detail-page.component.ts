@@ -1,5 +1,5 @@
 import { TableComponent } from '../../../components/table/table.component';
-import { getColumns as getCriteriaColumns, getFilterButtons as getCriteriaFilterButtons, getFilterText as getCriteriaFilterText, getActionButton as getCriteriaActionButton } from './strategy-detail-table-config';
+import { getColumns as getCriteriaColumns, getFilterButtons as getCriteriaFilterButtons, getFilterText as getCriteriaFilterText, getActionButton as getCriteriaActionButton } from './criteria-group-table-config';
 import { getColumns as getObjectivesColumns, getFilterButtons as getObjectivesFilterButtons, getFilterText as getObjectivesFilterText, getActionButton as getObjectivesActionButton } from './objectives-table-config';
 import { mapObjectivePageDtoToObjectiveTableRowPage } from '../../../mappers/objectives-mappers';
 import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } from '../../../models/pagination-models';
@@ -206,7 +206,10 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
  // Método de busca para o app-table de grupos de critérios
   getDataForCriteriaGroupsTable: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => {
     return this.criterioService.getCriteriaGroupPage(this.strategy.id!, queryParams).pipe(
-      map(page => mapCriteriaGroupPageDtoToCriteriaGroupTableRowPage(page))
+      map(page => {
+        console.log('[LOG] Retorno da API getCriteriaGroupPage:', page);
+        return mapCriteriaGroupPageDtoToCriteriaGroupTableRowPage(page);
+      })
     );
   };
 //  // Método de busca para o app-table de grupos de objetivos

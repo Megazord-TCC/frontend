@@ -24,7 +24,7 @@ export const mapCriterionDtoToCriterionTableRow = (dto: any): CriterionTableRow 
     disabled: dto.disabled,
     createdAt: dto.createdAt,
     lastModifiedAt: dto.lastModifiedAt,
-    strategicObjectives: dto.strategicObjectives
+    strategicObjectives: dto.strategicObjectives.name
   };
 }
 

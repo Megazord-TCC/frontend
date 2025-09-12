@@ -486,11 +486,9 @@ export class CriterioComponent implements OnInit, OnDestroy {
         }
       }
 
-      console.log(`🏁 === FIM DA MUDANÇA ===\n`);
+
 
     } catch (error) {
-      console.error('❌ ERRO ao salvar:', error);
-      // Reverter valor em caso de erro
       this.comparisonValues[criteria.id][otherCriteria.id] = '';
       alert('Erro ao salvar comparação. Tente novamente.');
     }
@@ -498,6 +496,7 @@ export class CriterioComponent implements OnInit, OnDestroy {
 
   // Verificar se critério pode ser excluído
   canDeleteCriteria(): boolean {
+    console.log('Verificando se pode excluir critério:', this.criteria);
     if (!this.criteria) return false;
 
     // Verificar se o critério tem comparações (como comparador ou como referência)
@@ -596,11 +595,23 @@ export class CriterioComponent implements OnInit, OnDestroy {
   }
 
   deleteCriteria() {
-    // Verificar se pode deletar antes de tentar
-    if (!this.canDeleteCriteria()) {
-      // Mostrar mensagem de erro do navegador
+    
+    const canDelete = this.canDeleteCriteria();
+
+    if (!canDelete) {
       alert(this.getDeleteErrorMessage());
       return;
+    }
+    if (this.criteria) {
+      this.criterioService.deleteCriterio(this.criteria.id, this.estrategiaId, this.criteriaGroupId).subscribe({
+        next: () => {
+          this.loadCriteria();
+          this.router.navigate([`/estrategia`, this.estrategiaId, 'grupo-criterio', this.criteriaGroupId]);
+        },
+        error: (err) => {
+          console.error('Erro ao excluir critério:', err);
+        }
+      });
     }
   }
 

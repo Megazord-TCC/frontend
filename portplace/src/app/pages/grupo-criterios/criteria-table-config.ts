@@ -25,9 +25,9 @@ export const getColumns = (): TableColumn[] => {
   let columns: TableColumn[] = [];
   let column: TableColumn;
 
-  // Nome da estratégia
+  // Nome do critério
   column = new TableColumn();
-  column.label = 'Nome da estratégia';
+  column.label = 'Nome do critério';
   column.order = 1;
   column.isSortable = true;
   column.frontendAttributeName = 'name';
@@ -35,32 +35,23 @@ export const getColumns = (): TableColumn[] => {
   column.isClickableMainColumn = true;
   columns.push(column);
 
-  // Descrição
+  // Probabilidade
   column = new TableColumn();
-  column.label = 'Descrição';
+  column.label = 'Probabilidade';
   column.order = 2;
   column.isSortable = false;
-  column.frontendAttributeName = 'description';
-  column.backendAttributeName = 'description';
+  column.frontendAttributeName = 'weight';
+  column.backendAttributeName = 'weight';
+  column.formatter = (value: any) => formatWeightAsPercentage(value);
   columns.push(column);
 
-  // Objetivos ativos
+  // Objetivos vinculados
   column = new TableColumn();
-  column.label = 'Objetivos ativos';
+  column.label = 'Objetivos vinculados';
   column.order = 3;
   column.isSortable = true;
-  column.frontendAttributeName = 'activeObjectivesCount';
-  column.backendAttributeName = 'activeObjectivesCount';
-  columns.push(column);
-
-  // Status
-  column = new TableColumn();
-  column.label = 'Status';
-  column.order = 4;
-  column.isSortable = true;
-  column.frontendAttributeName = 'status';
-  column.backendAttributeName = 'status';
-  column.badgeConfiguration = getBadgeConfigurations();
+  column.frontendAttributeName = 'strategicObjectives';
+  column.backendAttributeName = 'strategicObjectives';
   columns.push(column);
 
   return columns;
@@ -89,3 +80,12 @@ export const getFilterButtons = (): InputFilter[] => {
 
   return inputs;
 };
+function formatWeightAsPercentage(weight: number | null | undefined): string {
+  if (weight == null || isNaN(weight)) {
+    return '0%';
+  }
+  const percentage = Math.round(weight * 100);
+  const clampedPercentage = Math.max(0, Math.min(100, percentage));
+  return clampedPercentage + '%';
+}
+
