@@ -1,5 +1,5 @@
 <!-- Filter buttons -->
-<app-table-filter-buttons *ngIf="filterButtons.length" [queryParams]="queryParams" [filterButtons]="filterButtons" 
+<app-table-filter-buttons *ngIf="filterButtons.length" [queryParams]="queryParams" [filterButtons]="filterButtons"
     (filterButtonClick)="sendHttpGetRequestAndPopulateTable()">
 </app-table-filter-buttons>
 
@@ -28,10 +28,10 @@
             <tbody>
                 <!-- Variável "row" será do tipo 'Usuario' se o service retorna usuários paginados, por exemplo. -->
                 <tr *ngFor="let row of page?.content" class="table-row">
-                    <td *ngFor="let attributeName of getDesiredAndExistingAttributeNamesToPrint()">
+                    <td *ngFor="let attributeName of getDesiredAndExistingAttributeNamesToPrint(); let colIdx = index">
                         <span *ngIf="isClickableMainColumn(attributeName); else selectWithBadge">
                             <button class="link" (click)="mainColumnRowClick.emit(row);">
-                                {{ row[attributeName] }}
+                                {{ getCellValue(row, columns[colIdx]) }}
                             </button>
                         </span>
                         <ng-template #selectWithBadge>
@@ -66,8 +66,7 @@
                                 {{ row[attributeName] }}
                             </app-badge>
                         </ng-template>
-
-                        <ng-template #noBadge>{{ row[attributeName] }}</ng-template>
+                        <ng-template #noBadge>{{ getCellValue(row, columns[colIdx]) }}</ng-template>
                     </td>
                 </tr>
             </tbody>
@@ -76,6 +75,6 @@
 </app-card>
 
 <!-- Pagination -->
-<app-table-pagination [page]="page" [queryParams]="queryParams" 
+<app-table-pagination [page]="page" [queryParams]="queryParams"
     (paginationChange)="sendHttpGetRequestAndPopulateTable()">
 </app-table-pagination>

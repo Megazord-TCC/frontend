@@ -1,3 +1,34 @@
+export interface EvaluationGroupView {
+  id: number;
+  name: string;
+  description: string;
+  status: string;
+  statusText: string;
+  disabled: boolean;
+  createdAt: string;
+  lastModifiedAt: string;
+  criteriaGroup?: CriteriaGroup;
+  evaluations: any[]; // Ajuste para o tipo correto se houver
+  statusColor: 'green' | 'gray' | 'red';
+  // lastUpdatedBy?: any; // Descomente e ajuste se necessário
+}
+
+
+export interface StrategicObjective {
+  id: number;
+  name: string;
+  description?: string;
+  status: string;
+  strategyId: number;
+  criteriaCount: number;
+  activePortfolioCount: number;
+  activeProjectsCount: number;
+  disabled: boolean;
+  createdAt?: string;
+  lastModifiedAt?: string;
+  // evaluationGroups?: any[];
+  // objectives?: any[];
+}
 export interface Project {
   id?: number;
   name: string;
@@ -92,15 +123,18 @@ export interface Portfolio {
 }
 
 export interface Objective {
-  id: number
-  strategyId: number
-  disabled: boolean
-  name: string
-  description?: string
-  createdAt: string
-  lastModifiedAt: string
-  status: "ATIVADO" | "CANCELADO"
-  statusColor: "green" | "gray"
+  id: number;
+  name: string;
+  description?: string;
+  status: string;
+  strategyId: number;
+  criteriaCount: number;
+  activePortfolioCount: number;
+  activeProjectsCount: number;
+  disabled: boolean;
+  createdAt?: string;
+  lastModifiedAt?: string;
+  statusColor: 'green' | 'gray' | 'red';
 }
 
 export interface Objectives {
@@ -138,7 +172,7 @@ export interface EvaluationGroup {
 }
 
 export interface EvaluationGroupView extends EvaluationGroup {
-  criteriaGroup?: CriteriaGroup;
+  // criteriaGroup?: CriteriaGroup; // Removido para evitar duplicidade
 }
 
 export interface Scenario {

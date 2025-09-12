@@ -38,7 +38,6 @@ export const getColumns = (): TableColumn[] => {
     let columns: TableColumn[] = [];
     let column: TableColumn;
 
-    // Nome do projeto
     column = new TableColumn();
     column.label = 'Nome do projeto';
     column.order = 1;
@@ -48,64 +47,29 @@ export const getColumns = (): TableColumn[] => {
     column.isClickableMainColumn = true;
     columns.push(column);
 
-    // Portfólio
-    column = new TableColumn();
-    column.label = 'Portfólio';
-    column.order = 2;
-    column.isSortable = true;
-    column.frontendAttributeName = 'portfolio';
-    column.backendAttributeName = 'portfolio';
-    columns.push(column);
-
-    // Orçamento
     column = new TableColumn();
     column.label = 'Orçamento';
-    column.order = 3;
+    column.order = 2;
     column.isSortable = true;
     column.frontendAttributeName = 'budget';
     column.backendAttributeName = 'budget';
     columns.push(column);
 
-    // EV
     column = new TableColumn();
-    column.label = 'EV';
+    column.label = 'Grupo de avaliação';
+    column.order = 3;
+    column.frontendAttributeName = 'evaluationGroupName';
+    columns.push(column);
+
+    column = new TableColumn();
+    column.label = 'Projetos incluídos';
     column.order = 4;
-    column.isSortable = true;
-    column.frontendAttributeName = 'earnedValue';
-    column.backendAttributeName = 'earnedValue';
+    column.frontendAttributeName = 'includedProjectsQuantity';
     columns.push(column);
 
-    // PV
-    column = new TableColumn();
-    column.label = 'PV';
-    column.order = 5;
-    column.isSortable = true;
-    column.frontendAttributeName = 'plannedValue';
-    column.backendAttributeName = 'plannedValue';
-    columns.push(column);
-
-    // Início planejado
-    column = new TableColumn();
-    column.label = 'Início planejado';
-    column.order = 6;
-    column.isSortable = true;
-    column.frontendAttributeName = 'startDate';
-    column.backendAttributeName = 'startDate';
-    columns.push(column);
-
-    // Fim planejado
-    column = new TableColumn();
-    column.label = 'Fim planejado';
-    column.order = 7;
-    column.isSortable = true;
-    column.frontendAttributeName = 'endDate';
-    column.backendAttributeName = 'endDate';
-    columns.push(column);
-
-    // Status
     column = new TableColumn();
     column.label = 'Status';
-    column.order = 8;
+    column.order = 5;
     column.isSortable = true;
     column.frontendAttributeName = 'status';
     column.backendAttributeName = 'status';

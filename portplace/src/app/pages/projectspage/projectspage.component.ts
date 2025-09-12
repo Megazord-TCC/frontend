@@ -14,7 +14,7 @@ import { FormModalComponentComponent } from '../../components/form-modal-compone
 import { TableComponent } from '../../components/table/table.component';
 import { getActionButton, getColumns, getFilterButtons, getFilterText } from './projects-table-config';
 import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } from '../../models/pagination-models';
-import { mapProjectPageDtoToProjectTableRowPage } from "../../mappers/projects-mappers"
+import { mapScenarioPageDtoToScenariosTableRowPage } from "../../mappers/scenario-mappers"
 
 @Component({
   selector: 'app-projectspage',
@@ -113,17 +113,41 @@ export class ProjectsComponent implements OnInit {
 
     // Remover breadcrumbs filhos quando retorna para esta página
     this.breadcrumbService.removeChildrenAfter('/projetos');
+
+    this.loadProjects();
   }
 
   // Usado pelo TableComponent.
-  // Recarrega a tabela de projetos, buscando os dados via requisição HTTP.
+    // Recarrega a tabela de projetos, buscando os dados via requisição HTTP.
   getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => (
-    this.projetoService.getProjectsPage(queryParams).pipe(
-      map(page => mapProjectPageDtoToProjectTableRowPage(page))
-    )
+      this.projetoService.getProjectsPage(queryParams).pipe(
+          map(page => (mapScenarioPageDtoToScenariosTableRowPage(page)))
+      )
   );
 
+  loadProjects(): void {
+    this.loadingProjects = true;
+    this.projetoService.getAllProjects()
+    .pipe(retry(5))
+    .subscribe({
+      next: (response: ProjectPageableResponse) => {
+        console.log('Resposta paginada da API:', response);
+        console.log(`Total de elementos: ${response.totalElements}`);
+        console.log(`Página atual: ${response.number + 1} de ${response.totalPages}`);
 
+        // Extrair projetos da resposta paginada
+        this.allProjects = response.content;
+        this.Projects = response.content;
+        this.loadingProjects = false;
+      },
+      error: (err) => {
+        console.error('Erro ao buscar projetos:', err);
+        this.allProjects = [];
+        this.Projects = [];
+        this.loadingProjects = false;
+      }
+    });
+  }
 
   createProject(): void {
     console.log('Dados do projeto sendo enviados:', this.newProject);
@@ -131,6 +155,7 @@ export class ProjectsComponent implements OnInit {
     this.projetoService.createProject(this.newProject).subscribe({
       next: (createdProject) => {
         console.log('Projeto criado:', createdProject);
+        this.loadProjects();
         this.resetNewProject();
       },
       error: (err) => {
@@ -147,6 +172,8 @@ export class ProjectsComponent implements OnInit {
     }
     this.projetoService.updateProject(project.id, project).subscribe({
       next: (updatedProject) => {
+        console.log('Projeto atualizado:', updatedProject);
+        this.loadProjects();
       },
       error: (err) => {
         console.error('Erro ao atualizar projeto:', err);
@@ -157,7 +184,8 @@ export class ProjectsComponent implements OnInit {
   deleteProject(projectId: number): void {
     this.projetoService.deleteProject(projectId).subscribe({
       next: () => {
-
+        console.log('Projeto deletado!');
+        this.loadProjects();
       },
       error: (err) => {
         console.error('Erro ao deletar projeto:', err);
@@ -199,13 +227,8 @@ export class ProjectsComponent implements OnInit {
     this.Projects = filtered;
   }
 
-  onProjectClick(projectOrId: any): void {
-    const id = typeof projectOrId === 'object' && projectOrId !== null ? projectOrId.id : projectOrId;
-    if (id) {
-      this.router.navigate(['/projeto', id]);
-    } else {
-      console.warn('ID do projeto não encontrado:', projectOrId);
-    }
+  onProjectClick(projectId: number): void {
+    this.router.navigate(['/projeto', projectId]);
   }
 
   resetNewProject(): void {
@@ -273,6 +296,8 @@ export class ProjectsComponent implements OnInit {
 
     this.projetoService.createProject(newProject).subscribe({
       next: (createdProject) => {
+        console.log('Projeto criado:', createdProject);
+        this.loadProjects();
         this.resetNewProject();
         this.closeCreateModal();
       },

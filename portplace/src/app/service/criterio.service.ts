@@ -3,7 +3,7 @@ import { environment } from '../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { Criterion } from '../interface/interfacies';
-import { Page } from '../models/pagination-models';
+import { Page, PaginationQueryParams } from '../models/pagination-models';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +20,12 @@ export class CriterioService {
     });
   }
 
+  getCriteriaPage(estrategiaId:number, groupId: number, queryParams?: PaginationQueryParams): Observable<Page<any>> {
+      return this.http.get<Page<any>>(`${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${groupId}/criteria`, { params: queryParams?.getParamsInHttpParamsFormat() });
+  }
+  getCriteriaObjectivesPage(estrategiaId:number, groupId: number, queryParams?: PaginationQueryParams): Observable<Page<any>> {
+      return this.http.get<Page<any>>(`${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${groupId}/criteria`, { params: queryParams?.getParamsInHttpParamsFormat() });
+  }
   // BUSCA DE TODOS OS CRITÉRIOS
   getAllCriterios(estrategiaId: number, groupId: number): Observable<Criterion[]> {
     const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${groupId}/criteria`;

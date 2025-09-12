@@ -1,5 +1,10 @@
+import { TableComponent } from '../../../components/table/table.component';
+import { getColumns as getCriteriaColumns, getFilterButtons as getCriteriaFilterButtons, getFilterText as getCriteriaFilterText, getActionButton as getCriteriaActionButton } from './criteria-group-table-config';
+import { getColumns as getObjectivesColumns, getFilterButtons as getObjectivesFilterButtons, getFilterText as getObjectivesFilterText, getActionButton as getObjectivesActionButton } from './objectives-table-config';
+import { mapObjectivePageDtoToObjectiveTableRowPage } from '../../../mappers/objectives-mappers';
+import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } from '../../../models/pagination-models';
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BadgeComponent } from '../../../components/badge/badge.component';
@@ -9,11 +14,13 @@ import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.componen
 import { FormModalComponentComponent } from '../../../components/form-modal-component/form-modal-component.component';
 import { CriteriaGroupService } from '../../../service/criteria-group.service';
 import { EstrategiaService } from '../../../service/estrategia.service';
-import { firstValueFrom, retry, Subscription } from 'rxjs';
+import { StrategiaObjetivoService } from '../../../service/strategia-objetivo.service';
+import { firstValueFrom, map, Observable, retry, Subscription } from 'rxjs';
 import { EvaluationGroupsTabComponent } from '../../../components/evaluation-groups-tab/evaluation-groups-tab.component';
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../../service/breadcrumb.service';
 import { ScenarioTabComponent } from '../../../components/scenario-tab/scenario-tab.component';
+import { mapCriteriaGroupPageDtoToCriteriaGroupTableRowPage } from '../../../mappers/criteria-group-mappers';
 
 
 @Component({
@@ -27,12 +34,29 @@ import { ScenarioTabComponent } from '../../../components/scenario-tab/scenario-
     BreadcrumbComponent,
     FormModalComponentComponent,
     EvaluationGroupsTabComponent,
-    ScenarioTabComponent
+    ScenarioTabComponent,
+    TableComponent
   ],
   templateUrl: './strategy-detail-page.component.html',
   styleUrl: './strategy-detail-page.component.scss'
 })
 export class StrategyDetailPageComponent implements OnInit, OnDestroy {
+  @ViewChild('objectivesTableComponent') objectivesTableComponent!: TableComponent;
+  @ViewChild('criteriaTableComponent') criteriaTableComponent!: TableComponent;
+
+  // Propriedades para o app-table de grupos de critérios
+  criteriaColumns = getCriteriaColumns();
+  criteriaFilterButtons = getCriteriaFilterButtons();
+  criteriaFilterText = getCriteriaFilterText();
+  criteriaActionButton = getCriteriaActionButton();
+
+  // Propriedades para o app-table de objetivos
+  objectivesColumns = getObjectivesColumns();
+  objectivesFilterButtons = getObjectivesFilterButtons();
+  objectivesFilterText = getObjectivesFilterText();
+  objectivesActionButton = getObjectivesActionButton();
+
+
   private routeSubscription?: Subscription;
   strategy: Strategy = {
     name: 'Carregando...',
@@ -43,63 +67,7 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
   strategyName: string = '';
   strategyDescription: string = '';
 
-  objectives: Objective[] = [
-    {
-      id: 1,
-      name: 'Aumentar lucro',
-      disabled: false,
-      description: 'Aumentar o lucro da empresa em 20%',
-      strategyId: 1,
-      status: 'ATIVADO',
-      statusColor: 'green',
-      createdAt: '2023-01-01T00:00:00Z',
-      lastModifiedAt: '2023-01-01T00:00:00Z'
-    },
-    {
-      id: 2,
-      name: 'Capacitar empregados',
-      disabled: false,
-      description: 'Capacitar os empregados da empresa',
-      strategyId: 1,
-      status: 'CANCELADO',
-      statusColor: 'gray',
-      createdAt: '2023-01-01T00:00:00Z',
-      lastModifiedAt: '2023-01-01T00:00:00Z'
-    }
-  ];
-  evaluationGroups: EvaluationGroup[] = [
 
-  ]
-
-  scenarios: Scenario[] = [
-    {
-      id: "1",
-      name: "CAIXA libera empréstimo",
-      budget: "R$ 1.000.000,00",
-      evaluation: "Avaliação 2",
-      selectedProjects: 8,
-      status: "AGUARDANDO AUTORIZAÇÃO",
-      statusColor: "yellow",
-    },
-    {
-      id: "2",
-      name: "CAIXA não libera empréstimo",
-      budget: "R$ 500.000,00",
-      evaluation: "Avaliação 2",
-      selectedProjects: 3,
-      status: "AUTORIZADO",
-      statusColor: "green",
-    },
-    {
-      id: "3",
-      name: "Contratos 2026 não são fechados",
-      budget: "R$ 200.000,00",
-      evaluation: "Avaliação 1",
-      selectedProjects: 2,
-      status: "CANCELADO",
-      statusColor: "gray",
-    },
-  ]
   showCreateModal = false;
   showEditModal = false;
   showCancelModal = false;
@@ -208,7 +176,8 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
     private router: Router,
     private criterioService: CriteriaGroupService,
     private estrategiaService: EstrategiaService,
-    private breadcrumbService: BreadcrumbService
+    private breadcrumbService: BreadcrumbService,
+    private objetivoService: StrategiaObjetivoService
   ) {}
 
   ngOnInit(): void {
@@ -224,11 +193,6 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
         this.loadStrategyDetails(this.estrategiaId);
       }
 
-      // Carregar dados
-      this.filteredObjectives = [...this.objectives];
-      this.loadGruopCriteria();
-      this.filteredEvaluationGroups = [...this.evaluationGroups];
-      this.filteredScenarios = [...this.scenarios];
     });
   }
 
@@ -239,20 +203,24 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  async loadGruopCriteria(): Promise<void> {
-    this.loadingProjects = true;
-    try {
-      const criteriaGroup = await firstValueFrom(this.criterioService.getAllCriterios(this.estrategiaId));
-      console.log('Grupo de critérios carregados:', criteriaGroup);
-      this.filteredCriteriaGroups = criteriaGroup;
-      this.criteriaGroups = criteriaGroup;
-      this.loadingProjects = false;
+ // Método de busca para o app-table de grupos de critérios
+  getDataForCriteriaGroupsTable: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => {
+    return this.criterioService.getCriteriaGroupPage(this.strategy.id!, queryParams).pipe(
+      map(page => {
+        console.log('[LOG] Retorno da API getCriteriaGroupPage:', page);
+        return mapCriteriaGroupPageDtoToCriteriaGroupTableRowPage(page);
+      })
+    );
+  };
+//  // Método de busca para o app-table de grupos de objetivos
+  getDataForObjetivesTable: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams) => {
+    return this.objetivoService.getObjectivesPage(this.strategy.id!, queryParams).pipe(
+      map(page => mapObjectivePageDtoToObjectiveTableRowPage(page))
+    );
+  };
 
-    } catch (err) {
-      console.error('Erro ao buscar grupo de criterios:', err);
-      this.loadingProjects = false;
-    }
-  }
+
+
 
   loadStrategyDetails(strategyId: number): void {
     this.estrategiaService.getStrategy(strategyId)
@@ -262,7 +230,6 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
           this.strategy = strategy;
           this.syncFormValues();
 
-          // COMPONENTE PAI: Constrói breadcrumbs base UMA VEZ
           this.breadcrumbService.setBreadcrumbs([
             { label: 'Início', url: '/inicio', isActive: false },
             { label: 'Estratégias', url: '/estrategias', isActive: false },
@@ -353,7 +320,7 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
     this.criterioService.createCriterio(newGroup, this.estrategiaId).subscribe({
       next: (createdGroup) => {
 
-        this.loadGruopCriteria();
+
         this.closeCreateModal();
       },
       error: (err) => {
@@ -370,7 +337,7 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
     }
     this.criterioService.updateCriterio(group.id, this.estrategiaId, group).subscribe({
       next: (updatedGroup) => {
-        this.loadGruopCriteria();
+
       },
       error: (err) => {
         console.error('Erro ao atualizar grupo de critérios:', err);
@@ -382,7 +349,6 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
   deleteEstrategia(groupId: number): void {
     this.criterioService.deleteCriterio(groupId, this.estrategiaId).subscribe({
       next: () => {
-        this.loadGruopCriteria();
       },
       error: (err) => {
         console.error('Erro ao deletar grupo de critérios:', err);
@@ -416,7 +382,17 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
       acc[field.id] = field.value;
       return acc;
     }, {} as any);
-    this.closeCreateModal();
+    this.objetivoService.createObjective(this.strategy.id!, data).subscribe({
+      next: () => {
+        this.closeCreateModal();
+        if (this.objectivesTableComponent) {
+          this.objectivesTableComponent.refresh();
+        }
+      },
+      error: (err) => {
+        console.error('Erro ao criar objetivo:', err);
+      }
+    });
   }
 
   onSaveCriteriaGroup(fields: any[]): void {
@@ -433,8 +409,10 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
 
     this.criterioService.createCriterio(newGroup, this.estrategiaId).subscribe({
       next: (createdGroup) => {
-        this.loadGruopCriteria();
         this.closeCreateModal();
+        if (this.criteriaTableComponent) {
+          this.criteriaTableComponent.refresh();
+        }
       },
       error: (err) => {
         console.error('Erro ao criar grupo de critérios:', err);
@@ -458,13 +436,7 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
     this.closeCreateModal();
   }
 
-  onSearchObjectives(): void {
-    let filtered = [...this.objectives];
-    filtered = filtered.filter(objective =>
-      objective.name.toLowerCase().includes(this.objectiveSearchTerm.toLowerCase())
-    );
-    this.filteredObjectives = filtered;
-  }
+
 
   onSearchCriterios(): void {
     let filtered = [...this.criteriaGroups];
@@ -474,21 +446,7 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
     this.filteredCriteriaGroups = filtered;
   }
 
-  onSearchAvaliacoes(): void {
-    let filtered = [...this.evaluationGroups];
-    filtered = filtered.filter(avaliacao =>
-      avaliacao.name.toLowerCase().includes(this.evaluationSearchTerm.toLowerCase())
-    );
-    this.filteredEvaluationGroups = filtered;
-  }
 
-  onSearchCenarios(): void {
-    let filtered = [...this.scenarios];
-    filtered = filtered.filter(cenario =>
-      cenario.name.toLowerCase().includes(this.scenarioSearchTerm.toLowerCase())
-    );
-    this.filteredScenarios = filtered;
-  }
 
   closeCreateModal(): void {
     this.showCreateModal = false;
@@ -511,65 +469,28 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
     this.filteredCriteriaGroups = filtered
   }
 
-  openCriteriaGroup(criteriaGroupId?: number): void {
-    this.router.navigate([`/estrategia`, this.estrategiaId, 'grupo-criterio', criteriaGroupId]);
-
-  }
-
-  // Evaluation methods
-  onEvaluationSearchChange(): void {
-    this.onSearchAvaliacoes()
-  }
-
-  applyEvaluationFilters(): void {
-    let filtered = [...this.evaluationGroups]
-
-    if (this.evaluationSearchTerm) {
-      filtered = filtered.filter(
-        (evaluation) =>
-          evaluation.name.toLowerCase().includes(this.evaluationSearchTerm.toLowerCase())
-      )
+  openCriteriaGroup(criteriaGroupId: number | { id: number }): void {
+    let id: number | undefined;
+    if (typeof criteriaGroupId === 'object' && criteriaGroupId !== null && 'id' in criteriaGroupId) {
+      id = (criteriaGroupId as { id: number }).id;
+    } else if (typeof criteriaGroupId === 'number') {
+      id = criteriaGroupId;
     }
-
-    this.filteredEvaluationGroups = filtered
+    if (id) {
+      this.router.navigate([`/estrategia`, this.estrategiaId, 'grupo-criterio', id]);
+    } else {
+      console.warn('ID da estratégia não encontrado:', criteriaGroupId);
+    }
   }
+
+
+
 
   openEvaluationModal(evaluation?: EvaluationGroup): void {
     console.log("Opening evaluation modal", evaluation)
     // Implementar modal de avaliação
   }
 
-  // Scenario methods
-  onScenarioFilterChange(filter: string): void {
-    this.scenarioFilter = this.scenarioFilter === filter ? "" : filter
-    this.applyScenarioFilters()
-  }
-
-  onScenarioSearchChange(): void {
-    this.applyScenarioFilters()
-  }
-
-  applyScenarioFilters(): void {
-    let filtered = [...this.scenarios]
-
-    if (this.scenarioFilter) {
-      filtered = filtered.filter((scenario) => {
-        const status = scenario.status.toLowerCase()
-        if (this.scenarioFilter === "aguardando") {
-          return status.includes("aguardando")
-        }
-        return status.includes(this.scenarioFilter.toLowerCase())
-      })
-    }
-
-    if (this.scenarioSearchTerm) {
-      filtered = filtered.filter((scenario) =>
-        scenario.name.toLowerCase().includes(this.scenarioSearchTerm.toLowerCase()),
-      )
-    }
-
-    this.filteredScenarios = filtered
-  }
 
   openScenarioModal(scenario?: Scenario): void {
     console.log("Opening scenario modal", scenario)
@@ -585,32 +506,6 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
     return tabNames[tab] || tab;
   }
 
-  onObjectiveFilterChange(filter: string): void {
-    this.objectiveFilter = this.objectiveFilter === filter ? '' : filter;
-    this.applyObjectiveFilters();
-  }
-
-  onObjectiveSearchChange(): void {
-    this.onSearchObjectives();
-  }
-
-  applyObjectiveFilters(): void {
-    let filtered = [...this.objectives];
-
-    if (this.objectiveFilter) {
-      filtered = filtered.filter(objective =>
-        objective.status.toLowerCase() === this.objectiveFilter.toLowerCase()
-      );
-    }
-
-    if (this.objectiveSearchTerm) {
-      filtered = filtered.filter(objective =>
-        objective.name.toLowerCase().includes(this.objectiveSearchTerm.toLowerCase())
-      );
-    }
-
-    this.filteredObjectives = filtered;
-  }
 
   openObjectiveModal(objectiveId?: number): void {
     this.router.navigate([`/estrategia`, this.estrategiaId, 'objetivo', objectiveId]);

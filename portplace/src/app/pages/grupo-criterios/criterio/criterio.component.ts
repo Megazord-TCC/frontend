@@ -32,25 +32,6 @@ import { BreadcrumbService } from '../../../service/breadcrumb.service';
 export class CriterioComponent implements OnInit, OnDestroy {
   private routeSubscription?: Subscription;
 
-  deleteFormConfig: any = {
-    title: 'Cancelar grupo de critérios',
-    fields: [
-      {
-        id: 'justification',
-        label: 'Justificativa do cancelamento ',
-        type: 'textarea',
-        value: '',
-        required: true,
-        placeholder: 'Digite a justificativa para o cancelamento',
-        rows: 4
-      }
-    ],
-    validationMessage: 'Os campos marcados com * são obrigatórios.',
-    buttons: [
-      { id: 'cancel', label: 'Cancelar', type: 'button', variant: 'secondary' },
-      { id: 'confirm', label: 'Confirmar Cancelamento', type: 'submit', variant: 'danger' }
-    ]
-  };
 
   editFormConfig: any = {
     title: 'Editar grupo de critérios',
@@ -147,6 +128,7 @@ export class CriterioComponent implements OnInit, OnDestroy {
       this.criteriaGroupId = grupoIdParam ? Number(grupoIdParam) : 0;
       const criteriaId = params.get('criterioId');
       this.criteriaId = criteriaId ? Number(criteriaId) : 0;
+
 
       // COMPONENTE NETO: Simplesmente carrega dados e adiciona seu breadcrumb
       console.log('📍 Componente neto: Critério inicializando/recarregando');
@@ -504,11 +486,9 @@ export class CriterioComponent implements OnInit, OnDestroy {
         }
       }
 
-      console.log(`🏁 === FIM DA MUDANÇA ===\n`);
+
 
     } catch (error) {
-      console.error('❌ ERRO ao salvar:', error);
-      // Reverter valor em caso de erro
       this.comparisonValues[criteria.id][otherCriteria.id] = '';
       alert('Erro ao salvar comparação. Tente novamente.');
     }
@@ -516,6 +496,7 @@ export class CriterioComponent implements OnInit, OnDestroy {
 
   // Verificar se critério pode ser excluído
   canDeleteCriteria(): boolean {
+    console.log('Verificando se pode excluir critério:', this.criteria);
     if (!this.criteria) return false;
 
     // Verificar se o critério tem comparações (como comparador ou como referência)
@@ -614,22 +595,30 @@ export class CriterioComponent implements OnInit, OnDestroy {
   }
 
   deleteCriteria() {
-    // Verificar se pode deletar antes de tentar
-    if (!this.canDeleteCriteria()) {
-      // Mostrar mensagem de erro do navegador
+    
+    const canDelete = this.canDeleteCriteria();
+
+    if (!canDelete) {
       alert(this.getDeleteErrorMessage());
       return;
     }
-    this.showDeleteModal = true;
+    if (this.criteria) {
+      this.criterioService.deleteCriterio(this.criteria.id, this.estrategiaId, this.criteriaGroupId).subscribe({
+        next: () => {
+          this.loadCriteria();
+          this.router.navigate([`/estrategia`, this.estrategiaId, 'grupo-criterio', this.criteriaGroupId]);
+        },
+        error: (err) => {
+          console.error('Erro ao excluir critério:', err);
+        }
+      });
+    }
   }
 
   closeEditModal(): void {
     this.showEditModal = false;
   }
 
-  closeDeleteModal(): void {
-    this.showDeleteModal = false;
-  }
 
   onSaveByActiveTab(fields: any[]): void {
     const criterioData = fields.reduce((acc, field) => {
@@ -659,8 +648,6 @@ export class CriterioComponent implements OnInit, OnDestroy {
         this.criterioService.deleteCriterio(this.criteria.id, this.estrategiaId, this.criteriaGroupId).subscribe({
           next: () => {
             this.loadCriteria();
-            this.closeDeleteModal();
-            this.resetFormFields(this.deleteFormConfig);
             this.router.navigate([`/estrategia`, this.estrategiaId, 'grupo-criterio', this.criteriaGroupId]);
           },
           error: (err) => {

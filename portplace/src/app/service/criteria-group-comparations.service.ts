@@ -3,7 +3,7 @@ import { environment } from '../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { CriteriaComparison } from '../interface/interfacies';
-import { Page } from '../models/pagination-models';
+import { Page, PaginationQueryParams } from '../models/pagination-models';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +17,9 @@ export class GrupoCriterioService {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
     });
+  }
+  getCriteriaGroupPage(estrategiaId:number, queryParams?: PaginationQueryParams): Observable<Page<any>> {
+      return this.http.get<Page<any>>(`${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups`, { params: queryParams?.getParamsInHttpParamsFormat() });
   }
 
   // BUSCA DE TODOS OS GRUPOS DE CRITÉRIOS
