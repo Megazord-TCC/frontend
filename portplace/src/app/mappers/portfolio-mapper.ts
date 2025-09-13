@@ -45,16 +45,18 @@ export function mapPortfolioDTOPageToPortfolioTableRowPage(portfolioPage: Page<P
 
 export function mapPortfolioDTOHealthEnumToPortfolioCostStatus(dtoHealth?: string): PortfolioCostStatus | undefined {
     switch(dtoHealth) {
-        case PortfolioDTOHealthEnum.GREEN: return PortfolioCostStatus.WITHIN_BUDGET;
+        case PortfolioDTOHealthEnum.YELLOW:
         case PortfolioDTOHealthEnum.RED: return PortfolioCostStatus.OVER_BUDGET;
+        case PortfolioDTOHealthEnum.GREEN: return PortfolioCostStatus.WITHIN_BUDGET;
         default: return undefined;
     }
 }
 
 export function mapPortfolioDTOHealthEnumToPortfolioProgressStatus(dtoHealth?: string): PortfolioProgressStatus | undefined {
     switch(dtoHealth) {
-        case PortfolioDTOHealthEnum.GREEN: return PortfolioProgressStatus.ON_TRACK;
+        case PortfolioDTOHealthEnum.YELLOW:
         case PortfolioDTOHealthEnum.RED: return PortfolioProgressStatus.BEHIND_SCHEDULE;
+        case PortfolioDTOHealthEnum.GREEN: return PortfolioProgressStatus.ON_TRACK;
         default: return undefined;
     }
 }
@@ -86,7 +88,7 @@ export function mapProjectReadDTO2PageToPortfolioProjectTableRowPage(page: Page<
         content: page.content.map(project => ({
             id: project.id,
             name: project.name,
-            budget: formatToBRL(project.budgetAtCompletion),
+            budget: formatToBRL(project.estimateAtCompletion),
             status: mapProjectStatusEnumDTO2ToPortfolioProjectTableRowProjectStatus(project.status),
             startDate: project.startDate ?? 'Erro',
             endDate: project.endDate ?? 'Erro',

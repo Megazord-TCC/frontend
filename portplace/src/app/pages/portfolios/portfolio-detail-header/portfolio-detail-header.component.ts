@@ -13,6 +13,7 @@ import { formatToBRL } from '../../../helpers/money-helper';
 import { PortfolioEditModalComponent } from '../../../components/portfolio-edit-modal/portfolio-edit-modal.component';
 import { PortfolioCancelModalComponent } from '../../../components/portfolio-cancel-modal/portfolio-cancel-modal.component';
 import { PortfolioDeleteModalComponent } from '../../../components/portfolio-delete-modal/portfolio-delete-modal.component';
+import { getDateObjectFromDDMMYYYYHHMMSS } from '../../../helpers/date-helper';
 
 @Component({
     selector: 'app-portfolio-detail-header',
@@ -42,6 +43,7 @@ export class PortfolioDetailHeaderComponent {
     budget = '0,00';
     scenarioDTO?: PortfolioReadDTO;
     visibleActionButtons: ActionButtons[] = ['edit'];
+    cancellationReason = '';
 
     portfolioDTO?: PortfolioReadDTO;
 
@@ -80,8 +82,11 @@ export class PortfolioDetailHeaderComponent {
             text: mapPortfolioDTOStatusToText(this.portfolioDTO.status),
             color: mapPortfolioDTOStatusToBadgeStatusColor(this.portfolioDTO.status)
         };
-        this.lastUpdate = this.portfolioDTO.lastModifiedAt ? new Date(this.portfolioDTO.lastModifiedAt) : new Date(this.portfolioDTO.createdAt);
+        this.lastUpdate = this.portfolioDTO.lastModifiedAt ? 
+            getDateObjectFromDDMMYYYYHHMMSS(this.portfolioDTO.lastModifiedAt) : 
+            getDateObjectFromDDMMYYYYHHMMSS(this.portfolioDTO.createdAt);
         this.budget = formatToBRL(this.portfolioDTO.budget);
+        this.cancellationReason = this.portfolioDTO.cancellationReason;
     }
 
     setupBreadcrumbs() {
@@ -93,16 +98,19 @@ export class PortfolioDetailHeaderComponent {
     }
 
     setupPageByPortfolioStatus() {
-        this.portfolioService.isPortfolioRelatedToAnyScenario(this.portfolioId).subscribe(isRelatedToAnyScenario => {
-            let buttons: ActionButtons[] = ['edit'];
-            
-            if (this.portfolioDTO?.status != PortfolioDTOStatus.CANCELADO)
-                buttons.push('cancel');
-            
-            if (!isRelatedToAnyScenario)
-                buttons.push('delete');
+        let buttons: ActionButtons[] = ['edit'];
 
+        if (!this.portfolioDTO) {
             this.visibleActionButtons = buttons;
-        });
+            return;
+        }
+
+        if (this.portfolioDTO.status != PortfolioDTOStatus.CANCELADO)
+            buttons.push('cancel');
+
+        if (this.portfolioDTO.canBeDeleted)
+            buttons.push('delete');
+
+        this.visibleActionButtons = buttons;
     }
 }

@@ -39,11 +39,19 @@ export class PortfolioProjectsTabComponent {
 
     doesNotHaveProjects = false;
 
-    scenarioName = 'Erro';
+    scenarioName = '...';
 
     async ngOnInit() {
         this.routeSubscription = this.route.paramMap.subscribe(async params => {
             this.portfolioId = Number(params.get('id'));
+            this.loadLastScenarioRelatedToPortfolio();
+        });
+    }
+
+    loadLastScenarioRelatedToPortfolio() {
+        this.portfolioService.getPortfolioById(this.portfolioId).subscribe({
+            next: portfolio => this.scenarioName = portfolio.activeScenarioName || 'Erro',
+            error: _ => { this.scenarioName = 'Erro'; }
         });
     }
 

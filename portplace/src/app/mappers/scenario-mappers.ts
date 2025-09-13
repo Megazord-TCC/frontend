@@ -1,6 +1,7 @@
 import { getMonthFromDateFormatDDMMYYYY, getYearFromDateFormatDDMMYYYY } from "../helpers/date-helper";
 import { formatToBRL } from "../helpers/money-helper";
 import { ScenarioProject, ScenariosTableRow } from "../interface/carlos-interfaces";
+import { ScenarioRankingStatusEnum, ScenarioReadDTO, ScenarioStatusEnum } from "../interface/carlos-scenario-dtos";
 import { Page } from "../models/pagination-models";
 
 export const mapScenarioStatusToBadgeStatusColor = (scenarioStatusEnum: string): string => {
@@ -24,12 +25,12 @@ export const mapScenarioStatusEnumToText = (scenarioStatusEnum: any): string => 
 
 // Mapeia um objeto DTO retornado pelo backend (que representa um cenário) para o objeto exibido
 // na tabela da aba de cenários da tela de estratégia específica.
-export const  mapScenarioDtoToScenarioTableRow = (dto: any): ScenariosTableRow => {
+export const  mapScenarioDtoToScenarioTableRow = (dto: ScenarioReadDTO): ScenariosTableRow => {
     return {
         id: dto.id,
         name: dto.name,
         budget: formatToBRL(dto.budget),
-        includedProjectsQuantity: dto.scenarioRankings.length,
+        includedProjectsQuantity: dto.scenarioRankings.filter(ranking => ranking.status == ScenarioRankingStatusEnum.INCLUDED).length,
         status: mapScenarioStatusEnumToText(dto.status),
         evaluationGroupName: dto.evaluationGroup?.name ?? '...',
     };
@@ -41,7 +42,7 @@ export const  mapScenarioDtoToScenarioTableRow = (dto: any): ScenariosTableRow =
 export const mapScenarioPageDtoToScenariosTableRowPage = (pageDto: any): Page<ScenariosTableRow> => {
     return {
         ...pageDto, 
-        content: pageDto.content.map((scenarioDTO: any) => (mapScenarioDtoToScenarioTableRow(scenarioDTO)))
+        content: pageDto.content.map((scenarioDTO: ScenarioReadDTO) => (mapScenarioDtoToScenarioTableRow(scenarioDTO)))
     };
 }
 
@@ -79,7 +80,7 @@ export const mapScenarioRankingDtoToScenarioProject = (scenarioRankingDto: any):
         projectName: scenarioRankingDto?.project?.name ?? 'Erro',
         inclusionStatus: scenarioRankingDto.status,
         strategicValue: scenarioRankingDto.totalScore,
-        estimatedCost: formatToBRL(scenarioRankingDto.project.budgetAtCompletion ?? 0),
+        estimatedCost: formatToBRL(scenarioRankingDto.project.estimateAtCompletion ?? 0),
         portfolioCategoryId: scenarioRankingDto?.portfolioCategory?.id ?? '',
         durationMonths: getProjectDurationMonthsText(scenarioRankingDto.project),
         projectStatus: mapProjectStatusEnumToText(scenarioRankingDto.project.status),

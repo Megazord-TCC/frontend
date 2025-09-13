@@ -48,8 +48,11 @@ export class PortfolioReadDTO {
     budgetHealth?: PortfolioDTOHealthEnum;
     createdBy = '';
     lastModifiedBy = '';
-    createdAt = new Date();
-    lastModifiedAt?: Date;
+    createdAt = '';
+    lastModifiedAt?: '';
+    canBeDeleted = false;
+    activeScenarioName = '';
+    cancellationReason = '';
 }
 
 export enum PortfolioProgressStatus {
@@ -84,4 +87,8 @@ export class PortfolioListReadDTO {
 export class PortfolioUpdateDTO {
     name = '';
     description = '';
+}
+
+export class PortfolioCancelationPatchDTO {
+    cancellationReason = '';
 }

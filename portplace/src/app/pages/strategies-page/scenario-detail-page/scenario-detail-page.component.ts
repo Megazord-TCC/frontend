@@ -26,6 +26,7 @@ import { ScenarioAuthorizationModalComponent } from '../../../components/scenari
 import { PortfolioService } from '../../../service/portfolio-service';
 import { CategoryService } from '../../../service/category-service';
 import { ProjectCategoryChangeHandler } from './project-category-change-handler';
+import { getDateObjectFromDDMMYYYYHHMMSS } from '../../../helpers/date-helper';
 
 @Component({
     selector: 'app-scenario-detail-page',
@@ -214,7 +215,10 @@ export class ScenarioDetailPageComponent {
             text: mapScenarioStatusEnumToText(scenarioDTO.status),
             color: mapScenarioStatusToBadgeStatusColor(scenarioDTO.status)
         };
-        this.lastUpdate = scenarioDTO.lastModifiedAt ? new Date(scenarioDTO.lastModifiedAt) : new Date(scenarioDTO.createdAt);
+        this.lastUpdate = scenarioDTO.lastModifiedAt ? 
+            getDateObjectFromDDMMYYYYHHMMSS(scenarioDTO.lastModifiedAt): 
+            getDateObjectFromDDMMYYYYHHMMSS(scenarioDTO.createdAt);
+
         this.budget = formatToBRL(scenarioDTO.budget);
 
         this.allProjectsBudget = formatToBRL(this.calculateAllProjectsBudget(scenarioDTO));
@@ -233,12 +237,12 @@ export class ScenarioDetailPageComponent {
                 ranking.status === ScenarioRankingStatusEnum.MANUALLY_INCLUDED
                 || ranking.status === ScenarioRankingStatusEnum.INCLUDED
             )
-            .map(ranking => ranking.project?.budgetAtCompletion ?? 0).reduce((a, b) => a + b, 0);
+            .map(ranking => ranking.project.estimateAtCompletion ?? 0).reduce((a, b) => a + b, 0);
     }
 
     calculateAllProjectsBudget(scenarioDto: any): number {
         let scenario: ScenarioReadDTO = scenarioDto as ScenarioReadDTO;
-        return scenario.scenarioRankings.map(ranking => ranking.project?.budgetAtCompletion ?? 0).reduce((a, b) => a + b, 0);
+        return scenario.scenarioRankings.map(ranking => ranking.project.estimateAtCompletion ?? 0).reduce((a, b) => a + b, 0);
     }
 
     setVariablesByRouteParams(params: ParamMap) {

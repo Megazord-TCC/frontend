@@ -15,3 +15,11 @@ export function getMonthFromDateFormatDDMMYYYY(dateString: string, separator = '
     const [day, month, year] = dateString.split(separator);
     return Number(month);
 }
+
+// Transforma de "DD/MM/YYYY HH:MM:SS" para objeto Date
+export function getDateObjectFromDDMMYYYYHHMMSS(dateString: string): Date {
+    const [datePart, timePart] = dateString.split(' ');
+    const [day, month, year] = datePart.split('/').map(part => Number(part));
+    const [hours, minutes, seconds] = timePart.split(':').map(part => Number(part));
+    return new Date(year, month - 1, day, hours, minutes, seconds);
+}

@@ -12,6 +12,7 @@
         {{ info.key }}: <span class="info-value">{{ info.value }}</span>
         <app-tooltip *ngIf="info.tooltip" [text]="info.tooltip"></app-tooltip>
     </p>
+    <p *ngIf="cancellationReason" class="strategy-description">Motivo de cancelamento: {{ cancellationReason }}</p>
     <div class="action-header">
         <div *ngIf="visibleActionButtons.length" class="action-buttons">
             <button *ngIf="visibleActionButtons.includes('edit')" class="action-btn" (click)="editClick.emit()">Editar</button>

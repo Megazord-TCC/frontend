@@ -31,6 +31,7 @@ export interface ProjectReadDTO {
     createdAt: Date;
     lastModifiedAt: Date;
     disabled: boolean;
+    estimateAtCompletion: number;
 }
 
 export enum PortfolioProjectTableRowProjectStatus {
@@ -78,4 +79,5 @@ export class ProjectReadDTO2 {
     createdAt?: Date;
     lastModifiedAt?: Date;
     disabled = false;
+    estimateAtCompletion = 0;
 }
