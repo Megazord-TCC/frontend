@@ -46,7 +46,7 @@ export class CriterioService {
   }
 
   // EDIÇÃO DE CRITÉRIO
-  updateCriterio(criterioId: number, criterio: Criterion, estrategiaId: number, groupId: number): Observable<Criterion> {
+  updateCriterio(criterioId: number, criterio: any, estrategiaId: number, groupId: number): Observable<Criterion> {
     const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${groupId}/criteria/${criterioId}`;
     return this.http.put<Criterion>(url, criterio, { headers: this.getHeaders() });
   }

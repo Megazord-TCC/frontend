@@ -260,11 +260,11 @@
               <p>Carregando objetivos...</p>
             </div>
 
-            <div *ngIf="!loadingObjectives && linkedObjectives.length === 0" class="empty-objectives">
+            <div *ngIf="!loadingObjectives && (!linkedObjectives || linkedObjectives.length === 0)" class="empty-objectives">
               <p>Nenhum objetivo vinculado a este critério.</p>
             </div>
 
-            <div *ngIf="!loadingObjectives && linkedObjectives.length > 0" class="objectives-list">
+            <div *ngIf="!loadingObjectives && linkedObjectives && linkedObjectives.length > 0" class="objectives-list">
               <div *ngFor="let objective of linkedObjectives; trackBy: trackByObjectiveId" class="objective-item">
                 <div class="objective-content">
                   <span class="objective-name">{{objective.name}}</span>
@@ -295,11 +295,10 @@
   </app-form-modal-component>
 
   <!-- Modal de Objetivos -->
-  <app-form-modal-component
+  <objectives-modal
     [isVisible]="showObjectiveModal"
-    [config]="objectiveFormConfig"
+    [linkedObjectives]="linkedObjectives"
     (close)="closeObjectiveModal()"
-    (save)="onSaveObjectiveLink($event)"
-    (cancel)="closeObjectiveModal()">
-  </app-form-modal-component>
+    (saved)="onSaveObjectiveLink($event)">
+  </objectives-modal>
 </div>

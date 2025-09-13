@@ -33,7 +33,6 @@ export class EvaluationGroupDeleteModal {
 
   ngOnChanges() {
     if (this.isVisible) {
-      console.log('🗑️ Modal de exclusão aberto para:', this.evaluationGroup);
       this.clearMessages();
     }
   }
@@ -54,12 +53,14 @@ export class EvaluationGroupDeleteModal {
 
   async onDelete(): Promise<void> {
     if (!this.evaluationGroup || !this.evaluationGroup.id) {
-      console.log('❌ Grupo de avaliação não encontrado');
       this.errorMessage = 'Erro: grupo de avaliação não encontrado.';
       return;
     }
+    if (this.evaluationGroup.evaluations && this.evaluationGroup.evaluations.length > 0) {
+      this.errorMessage = 'Não é possível excluir este grupo pois existem avaliações associadas a ele.';
+      return;
+    }
 
-    console.log('🗑️ Iniciando exclusão do grupo:', this.evaluationGroup.name);
 
     this.isDeleteButtonDisabled = true;
     this.isDeleting = true;
@@ -67,30 +68,15 @@ export class EvaluationGroupDeleteModal {
 
     try {
       const evaluationGroupRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroup.id}`;
-      console.log('🔍 URL de exclusão:', evaluationGroupRoute);
 
       const deleteEvaluationGroup$ = this.httpClient.delete(evaluationGroupRoute);
 
       deleteEvaluationGroup$.subscribe({
         next: (response) => {
-          console.log('✅ Grupo de avaliação excluído com sucesso:', response);
           this.deleted.emit();
           this.onClose();
         },
         error: (error) => {
-          console.error('❌ Erro ao excluir grupo de avaliação:', error);
-
-          // Mensagens de erro específicas baseadas no status
-          if (error.status === 409) {
-            this.errorMessage = 'Não é possível excluir este grupo pois existem avaliações associadas a ele.';
-          } else if (error.status === 404) {
-            this.errorMessage = 'Grupo de avaliação não encontrado.';
-          } else if (error.status === 403) {
-            this.errorMessage = 'Você não tem permissão para excluir este grupo.';
-          } else {
-            this.errorMessage = 'Ocorreu um erro inesperado ao excluir. Tente novamente mais tarde.';
-          }
-
           this.isDeleteButtonDisabled = false;
           this.isDeleting = false;
         }
@@ -108,12 +94,6 @@ export class EvaluationGroupDeleteModal {
     this.errorMessage = '';
     this.isDeleteButtonDisabled = false;
     this.isDeleting = false;
-  }
-
-  hasEvaluations(): boolean {
-    // Aqui você pode adicionar lógica para verificar se o grupo tem avaliações
-    // Por enquanto, assumindo que sempre pode haver avaliações
-    return true;
   }
 
   getConfirmationMessage(): string {

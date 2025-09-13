@@ -100,10 +100,10 @@ export class EvaluationGroupDetailPageComponent implements OnInit, OnDestroy {
   setProjectRankingsByHttpRequest() {
     let projectRankingsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroupId}/ranking`;
     let getAllProjectRankings$ =  this.httpClient.get<ProjectRanking[]>(projectRankingsRoute);
-
     getAllProjectRankings$.subscribe(projectRankings => {
       this.projectRankings = projectRankings;
       this.filteredProjectRankings = projectRankings;
+      console.log('📍 Retorno dos rankings de projetos:', projectRankings);
     });
   }
 

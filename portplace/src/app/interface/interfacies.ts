@@ -53,10 +53,21 @@ export interface Project {
   scenarioRankingScore?: number;
   priorityInPortfolio?: number;
   strategicObjectives?: any[]; // Ajuste para o tipo correto se houver
-  evaluations?: any[]; // Ajuste para o tipo correto se houver
+  evaluations?: Evaluation[]; // Ajuste para o tipo correto se houver
   createdAt: string; // dd/MM/yyyy HH:mm:ss
   lastModifiedAt: string; // dd/MM/yyyy HH:mm:ss
   disabled: boolean;
+}
+
+export interface Evaluation {
+  id: number;
+  score: number;
+  project: Project;
+  criterionId: number;
+  evaluationGroupId?: string;
+  lastModifiedAt?: string;
+  createdAt?: string;
+  disabled?: boolean;
 }
 
 export interface ProjectPageableResponse {
@@ -224,6 +235,7 @@ export interface Criterion {
   lastModifiedAt?: Date;
   lastModifiedBy?: User;
   createdAt?: Date;
+  strategicObjectives?: Objective[];
 }
 
 export interface Strategy {

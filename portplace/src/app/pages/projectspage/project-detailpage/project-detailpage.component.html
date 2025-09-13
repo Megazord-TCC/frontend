@@ -80,9 +80,9 @@
         </button>
       </div>
 
-      <!-- Tab Content -->
+
       <div class="tab-content">
-        <!-- Indicadores Tab -->
+
         <div *ngIf="activeTab === 'indicadores'" class="tab-panel">
           <h3>Indicadores</h3>
           <p class="tab-description">
@@ -179,7 +179,6 @@
 
           </div>
 
-          <!-- Botão único para salvar todos os indicadores -->
           <button class="save-btn"
                   [disabled]="!formTouched"
                   (click)="onSaveProjeto()">
@@ -254,8 +253,7 @@
                 [size]="24">
               </app-svg-icon>
               <div class="link-info">
-                <span class="link-title">Portfólio 1</span>
-                <span class="link-subtitle">Portfólio</span>
+                <span class="link-title">{{project?.portfolioName || "Sem valor"}}</span>
               </div>
             </div>
 
@@ -266,8 +264,8 @@
                 [size]="24">
               </app-svg-icon>
               <div class="link-info">
-                <span class="link-title">Estratégia 1</span>
-                <span class="link-subtitle">Estratégia</span>
+                <span class="link-title">{{project?.strategyName || "Sem valor"}}</span>
+                <span class="link-subtitle">Estratégias vinculada</span>
               </div>
             </div>
 
@@ -279,7 +277,7 @@
               </app-svg-icon>
               <div class="link-info">
                 <span class="link-title">700/1000</span>
-                <span class="link-subtitle">Valor estratégico</span>
+                <span class="link-subtitle">{{project?.scenarioRankingScore || "Sem valor"}}</span>
               </div>
             </div>
 
@@ -291,7 +289,7 @@
               </app-svg-icon>
               <div class="link-info">
                 <span class="link-title">1°/15</span>
-                <span class="link-subtitle">Prioridade no portfólio</span>
+                <span class="link-subtitle">{{project?.priorityInPortfolio || "Sem valor"}}</span>
               </div>
             </div>
           </div>
@@ -319,7 +317,7 @@
     [isVisible]="showEditModal"
     [config]="editPortfolioConfig"
     (close)="closeEditModal()"
-    (save)="onSaveProjeto()"
+    (save)="updateProjectField($event)"
     (cancel)="closeEditModal()">
   </app-form-modal-component>
 

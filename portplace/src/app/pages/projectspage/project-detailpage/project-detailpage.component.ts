@@ -1,9 +1,10 @@
+
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BadgeComponent } from "../../../components/badge/badge.component";
 import { FormsModule } from '@angular/forms';
-import { FormField, FormModalConfig, Objectives, Project, ProjectStatusEnum } from '../../../interface/interfacies';
+import { FormField, FormModalConfig, Objectives, Project, ProjectRanking, ProjectStatusEnum } from '../../../interface/interfacies';
 import { mapProjectDtoToProject } from '../../../mappers/projects-mappers';
 import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.component';
 import { ProjetoService } from '../../../service/projeto.service';
@@ -11,6 +12,8 @@ import { retry } from 'rxjs';
 import { FormModalComponentComponent } from '../../../components/form-modal-component/form-modal-component.component';
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../../service/breadcrumb.service';
+import { environment } from '../../../environments/environment';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-project-detailpage',
@@ -118,6 +121,10 @@ export class ProjectDetailpageComponent implements OnInit {
   activeTab = 'indicadores';
   showCancelModal = false;
   showEditModal = false;
+  strategyId = -1;
+  projectRankings: any;
+  httpClient = inject(HttpClient);
+  evaluationGroupId = -1;
 
   constructor(
     private route: ActivatedRoute,
@@ -128,10 +135,13 @@ export class ProjectDetailpageComponent implements OnInit {
 
   ngOnInit(): void {
     const projectIdParam = this.route.snapshot.paramMap.get('id');
+    this.strategyId = Number(this.route.snapshot.paramMap.get('estrategiaId'));
+    this.evaluationGroupId = Number(this.route.snapshot.paramMap.get('grupoAvaliacaoId'));
     const projectId = projectIdParam ? Number(projectIdParam) : null;
     if (projectId) {
       this.loadProjectDetails(projectId);
     }
+    this.getProjectRankings();
   }
 
   get cpi(): string {
@@ -210,8 +220,8 @@ export class ProjectDetailpageComponent implements OnInit {
 
     console.log('Dados do projeto a serem salvos:', updatedProject);
     this.projetoService.updateProject(this.project.id, updatedProject)
-      .pipe(retry(5))
-      .subscribe({
+    .pipe(retry(5))
+    .subscribe({
         next: (createdProject) => {
           this.project = createdProject;
           this.syncFormValues();
@@ -225,31 +235,63 @@ export class ProjectDetailpageComponent implements OnInit {
 
 
 
-  private updateProjectField(fieldName: keyof Project, value: any): void {
+  updateProjectField(fields: FormField[]): void {
     if (!this.project) return;
-    const sanitizedProject = { ...this.project, [fieldName]: value };
-    this.projetoService.updateProject(this.project.id, sanitizedProject)
+
+    // Utiliza os valores dos fields recebidos para atualizar o projeto
+    const fieldMap: { [key: string]: any } = {};
+    fields.forEach(field => {
+      fieldMap[field.id] = field.value;
+    });
+
+    function formatDateBR(dateStr?: string): string {
+      if (!dateStr) return '';
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return dateStr;
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+
+    const updatedProject = {
+      name: fieldMap['name'] !== undefined ? fieldMap['name'] : this.project.name,
+      description: fieldMap['description'] !== undefined ? fieldMap['description'] : this.project.description,
+      status: this.project.status,
+      earnedValue: this.earnedValue,
+      plannedValue: this.plannedValue,
+      actualCost: this.actualCost,
+      budgetAtCompletion: this.budgetAtCompletion,
+      payback: this.payback,
+      startDate: formatDateBR(this.project.startDate),
+      endDate: formatDateBR(this.project.endDate)
+    };
+
+    this.projetoService.updateProject(this.project.id, updatedProject)
       .pipe(retry(3))
       .subscribe({
         next: (updatedProject) => {
           this.project = updatedProject;
+          this.syncFormValues();
         },
         error: (err) => {
           alert('Erro ao salvar. Tente novamente.');
         }
       });
-  }
+      this.showEditModal = false;
+    }
 
-  private syncFormValues(): void {
-    if (!this.project) return;
-    this.earnedValue = this.project.earnedValue || 0;
-    this.plannedValue = this.project.plannedValue || 0;
-    this.actualCost = this.project.actualCost || 0;
+    private syncFormValues(): void {
+      if (!this.project) return;
+      this.earnedValue = this.project.earnedValue || 0;
+      this.plannedValue = this.project.plannedValue || 0;
+      this.actualCost = this.project.actualCost || 0;
     this.budgetAtCompletion = this.project.budgetAtCompletion || 0;
     this.payback = this.project.payback || 0;
     this.roi = this.project.roi || 0;
     this.startDate = this.project.startDate || '';
     this.endDate = this.project.endDate || '';
+
   }
 
   loadProjectDetails(projectId: number): void {
@@ -284,6 +326,16 @@ export class ProjectDetailpageComponent implements OnInit {
     this.activeTab = tab;
   }
 
+  // Busca rankings de projetos para uma estratégia e evaluation group
+  getProjectRankings(): void {
+
+    const projectRankingsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroupId}/ranking`;
+    const getAllProjectRankings$ = this.httpClient.get<ProjectRanking[]>(projectRankingsRoute);
+    getAllProjectRankings$.subscribe(projectRankings => {
+      this.projectRankings = projectRankings;
+      console.log('📍 Retorno dos rankings de projetos:', projectRankings);
+    });
+  }
   resetNewProject(): void {
     this.newProject = {
       id: 0,
@@ -320,13 +372,22 @@ export class ProjectDetailpageComponent implements OnInit {
     if (!this.project) return;
     this.editPortfolioConfig.fields[0].value = this.project.name;
     this.editPortfolioConfig.fields[1].value = this.project.description || '';
-
     this.editPortfolioConfig.fields.forEach(field => {
       field.hasError = false;
       field.errorMessage = '';
     });
-
     this.showEditModal = true;
+  }
+  getProjectScore() {
+
+    if (!this.project || !Array.isArray(this.project.evaluations)) return 'Sem valor if';
+    const evaluation = this.project.evaluations.find((ev: any) => ev && ev.project.id === this.project!.id);
+
+    return evaluation && typeof evaluation.score === 'number' ? evaluation.score : 'Sem valor';
+  }
+  onSaveEditPortfolio(fields: FormField[]): void {
+    this.updateProjectField(fields);
+    this.closeEditModal();
   }
 
   closeEditModal(): void {
