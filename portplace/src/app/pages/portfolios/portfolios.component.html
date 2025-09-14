@@ -2,24 +2,16 @@
 
     <div class="detail-content">
         <app-breadcrumb></app-breadcrumb>
-
-        <app-page-header 
-            title="Portfólios" 
-            description="Gerencie os portfólios da organização."
-            goBackButtonPathToNavigate="/inicio">
-        </app-page-header>
-
-        <div class="tab-content">
-            <app-table 
-                [dataRetrievalMethodRef]="this.getDataForTableComponent" 
-                [filterText]="filterText"
-                [filterButtons]="filterButtons"
-                [columns]="columns" 
-                [actionButton]="actionButton" 
-                (mainColumnRowClick)="openPortfolio($event)"
-                (actionButtonClick)="openCreateModal()">
-            </app-table>
+        <!-- Header -->
+        <div class="page-header">
+            <h1>Portfólios</h1>
+            <p>Gerencie os portfólios da organização.</p>
         </div>
+
+        <app-table [dataRetrievalMethodRef]="this.getDataForTableComponent" [filterText]="filterText"
+            [filterButtons]="filterButtons" [columns]="columns" [actionButton]="actionButton"
+            (mainColumnRowClick)="openPortfolio($event)" (actionButtonClick)="openCreateModal()">
+        </app-table>
     </div>
 </div>
 <app-portfolio-create-modal *ngIf="showCreateModal" (close)="showCreateModal = false">

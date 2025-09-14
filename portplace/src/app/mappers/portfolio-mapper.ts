@@ -94,6 +94,7 @@ export function mapProjectReadDTO2PageToPortfolioProjectTableRowPage(page: Page<
             endDate: project.endDate ?? 'Erro',
             plannedValue: formatToBRL(project.plannedValue),
             earnedValue: formatToBRL(project.earnedValue),
+            categoryName: project.portfolioCategory?.name ?? 'Erro',
         }))
     };
 }

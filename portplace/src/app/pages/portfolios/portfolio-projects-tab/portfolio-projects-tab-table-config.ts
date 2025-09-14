@@ -50,8 +50,16 @@ export const getColumns = (): TableColumn[] => {
     columns.push(column);
 
     column = new TableColumn();
-    column.label = 'Orçamento (R$)';
+    column.label = 'Categoria';
     column.order = 2;
+    // column.isSortable = true; // Comentado pois backend não permite ordenação
+    column.frontendAttributeName = 'categoryName';
+    // column.backendAttributeName = 'portfolioCategory';
+    columns.push(column);
+
+    column = new TableColumn();
+    column.label = 'Orçamento (R$)';
+    column.order = 3;
     // column.isSortable = true; // Comentado pois backend não permite ordenação
     column.frontendAttributeName = 'budget';
     // column.backendAttributeName = 'estimateAtCompletion';
@@ -59,7 +67,7 @@ export const getColumns = (): TableColumn[] => {
 
     column = new TableColumn();
     column.label = 'EV (R$)';
-    column.order = 3;
+    column.order = 4;
     column.isSortable = true;
     column.frontendAttributeName = 'earnedValue';
     column.backendAttributeName = 'earnedValue';
@@ -67,7 +75,7 @@ export const getColumns = (): TableColumn[] => {
 
     column = new TableColumn();
     column.label = 'PV (R$)';
-    column.order = 4;
+    column.order = 5;
     column.isSortable = true;
     column.frontendAttributeName = 'plannedValue';
     column.backendAttributeName = 'plannedValue';
@@ -75,7 +83,7 @@ export const getColumns = (): TableColumn[] => {
 
     column = new TableColumn();
     column.label = 'Início planejado';
-    column.order = 5;
+    column.order = 6;
     column.isSortable = true;
     column.frontendAttributeName = 'startDate';
     column.backendAttributeName = 'startDate';
@@ -83,7 +91,7 @@ export const getColumns = (): TableColumn[] => {
 
     column = new TableColumn();
     column.label = 'Fim planejado';
-    column.order = 6;
+    column.order = 7;
     column.isSortable = true;
     column.frontendAttributeName = 'endDate';
     column.backendAttributeName = 'endDate';
@@ -91,7 +99,7 @@ export const getColumns = (): TableColumn[] => {
 
     column = new TableColumn();
     column.label = 'Status';
-    column.order = 7;
+    column.order = 8;
     column.isSortable = true;
     column.frontendAttributeName = 'status';
     column.backendAttributeName = 'status';

@@ -259,6 +259,8 @@ export class TableComponent {
     }
 
     onColumnHeaderClick(column: TableColumn): void {
+        console.log('ABCDEFG: ', this.columns);
+
         if (!column.isSortable)
             return;
 
@@ -292,5 +294,9 @@ export class TableComponent {
 
     refresh() {
         this.sendHttpGetRequestAndPopulateTable();
+    }
+
+    emitMainColumnRowClickIfIsMainColumn(attributeName: string, row: any) {
+        if (this.isClickableMainColumn(attributeName)) this.mainColumnRowClick.emit(row);
     }
 }

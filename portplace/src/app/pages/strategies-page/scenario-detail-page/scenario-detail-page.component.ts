@@ -136,20 +136,25 @@ export class ScenarioDetailPageComponent {
         let portfolioId = this.scenarioDTO?.portfolio?.id;
         if (!portfolioId) return;
 
-        this.categoryService.getAllCategoriesByPortfolioId(portfolioId).subscribe(categories => {
-            let column = this.columns.find(column => column.label == 'Categoria');
-            if (!column) return;
+        this.categoryService.getAllCategoriesByPortfolioId(portfolioId).subscribe({
+            next: categories => {
+                let column = this.columns.find(column => column.label == 'Categoria');
+                if (!column) return;
 
-            column.selectButtonConfiguration = getPortfolioCategorySelectButtonConfigurations();
-            let config = column.selectButtonConfiguration;
+                column.selectButtonConfiguration = getPortfolioCategorySelectButtonConfigurations();
+                let config = column.selectButtonConfiguration;
 
-            categories.forEach(category =>
-                config.options.push({
-                    label: category.name,
-                    value: category.id.toString(),
-                    hidden: false
-                })
-            );
+                categories.forEach(category =>
+                    config.options.push({
+                        label: category.name,
+                        value: category.id.toString(),
+                        hidden: false
+                    })
+                );
+
+                this.setupPageByScenarioStatus();
+            },
+            error: _ => this.setupPageByScenarioStatus()
         });
     }
 
@@ -219,7 +224,6 @@ export class ScenarioDetailPageComponent {
             this.strategy = strategy;
             this.setupBreadcrumbs();
             this.loadPortfolioCategoriesOptions();
-            this.setupPageByScenarioStatus();
         })
     }
 
@@ -232,8 +236,8 @@ export class ScenarioDetailPageComponent {
             text: mapScenarioStatusEnumToText(scenarioDTO.status),
             color: mapScenarioStatusToBadgeStatusColor(scenarioDTO.status)
         };
-        this.lastUpdate = scenarioDTO.lastModifiedAt ? 
-            getDateObjectFromDDMMYYYYHHMMSS(scenarioDTO.lastModifiedAt): 
+        this.lastUpdate = scenarioDTO.lastModifiedAt ?
+            getDateObjectFromDDMMYYYYHHMMSS(scenarioDTO.lastModifiedAt) :
             getDateObjectFromDDMMYYYYHHMMSS(scenarioDTO.createdAt);
 
         this.budget = formatToBRL(scenarioDTO.budget);
@@ -276,7 +280,7 @@ export class ScenarioDetailPageComponent {
             { label: 'Início', url: '/inicio', isActive: false },
             { label: 'Estratégias', url: '/estrategias', isActive: false },
             { label: this.strategy?.name ?? '...', url: `/estrategia/${this.strategyId}`, isActive: false },
-            { label: this.name, url: `/estrategia/${this.strategyId}/cenario/${this.scenarioId}`, isActive: true },
+            { label: `Cenário: ${this.name}`, url: `/estrategia/${this.strategyId}/cenario/${this.scenarioId}`, isActive: true },
         ]);
     }
 
