@@ -191,7 +191,7 @@ export class CriterioComponent implements OnInit, OnDestroy {
       console.log('Objetivos vinculados ao critério:', this.linkedObjectives);
 
       this.breadcrumbService.addChildBreadcrumb({
-        label: criterio.name || `Critério ${this.criteriaId}`,
+        label: `Critério: ${criterio.name}` || `Critério ${this.criteriaId}`,
         url: `/estrategia/${this.estrategiaId}/grupo-criterio/${this.criteriaGroupId}/criterio/${this.criteriaId}`,
         isActive: true
       });

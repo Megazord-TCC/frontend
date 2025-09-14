@@ -92,7 +92,7 @@ export class EvaluationGroupDetailPageComponent implements OnInit, OnDestroy {
             // Usar addChildBreadcrumb para adicionar breadcrumb filho
             if (this.evaluationGroup)
               this.breadcrumbService.addChildBreadcrumb({
-            label: this.evaluationGroup.name,
+            label: `Grupo de Avaliação: ${this.evaluationGroup.name}`,
             url: `/estrategia/${this.strategyId}/grupo-avaliacao/${this.evaluationGroupId}`,
             isActive: true
           });

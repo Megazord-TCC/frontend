@@ -310,7 +310,7 @@ export class ProjectDetailpageComponent implements OnInit {
           this.project = projectDto;
           this.syncFormValues();
           this.breadcrumbService.addChildBreadcrumb({
-            label: project.name || `Projeto ${projectId}`,
+            label: `Projeto: ${project.name}` || `Projeto ${projectId}`,
             url: `/projetos/${projectId}`,
             isActive: true
           });

@@ -100,11 +100,7 @@ export class ObjectiveDetailPageComponent implements OnInit {
       const objectiveIdParam = params.get('objetivoId');
       this.objectiveId = objectiveIdParam ? Number(objectiveIdParam) : 0;
       this.loadObjective();
-      this.breadcrumbService.addChildBreadcrumb({
-        label: `Objetivo ${this.objectiveId}`,
-        url: `/estrategia/${this.estrategiaId}/objetivo/${this.objectiveId}`,
-        isActive: true
-      });
+
     });
   }
 
@@ -129,6 +125,11 @@ export class ObjectiveDetailPageComponent implements OnInit {
     try {
       const obj = await this.objetivoService.getObjectiveById(this.estrategiaId, this.objectiveId).toPromise();
       this.objective = obj;
+      this.breadcrumbService.addChildBreadcrumb({
+          label: `Objetivo: ${this.objective?.name}`,
+          url: `/estrategia/${this.estrategiaId}/objetivo/${this.objective!.name}`,
+          isActive: true
+        });
     } catch (err) {
       console.error('Erro ao buscar objetivo:', err);
     }

@@ -233,7 +233,7 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
           this.breadcrumbService.setBreadcrumbs([
             { label: 'Início', url: '/inicio', isActive: false },
             { label: 'Estratégias', url: '/estrategias', isActive: false },
-            { label: strategy.name || 'Estratégia', url: `/estrategia/${this.estrategiaId}`, isActive: true }
+            { label: `Estretégia: ${strategy.name}` || 'Estratégia', url: `/estrategia/${this.estrategiaId}`, isActive: true }
           ]);
 
           // COMPONENTE PAI: Remove breadcrumbs filhos quando volta ao foco somente se necessário

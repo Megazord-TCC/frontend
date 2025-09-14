@@ -107,9 +107,6 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
       const grupoIdParam = params.get('grupoId');
       this.criteriaGroupId = grupoIdParam ? Number(grupoIdParam) : 0;""
 
-      // COMPONENTE FILHO: Simplesmente carrega dados e adiciona seu breadcrumb
-      console.log('📍 Componente filho: Grupo de Critérios inicializando/recarregando');
-
 
       this.loadGruopCriteriaById();
     });
@@ -140,7 +137,7 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
       console.log('Grupo de critérios carregado:', this.criteriaGroup);
       // COMPONENTE FILHO: Adiciona seu breadcrumb ao array do pai
       this.breadcrumbService.addChildBreadcrumb({
-        label: criteriaGroup.name || `Grupo ${this.criteriaGroupId}`,
+        label: `Grupo de critérios: ${criteriaGroup.name}` || `Grupo ${this.criteriaGroupId}`,
         url: `/estrategia/${this.estrategiaId}/grupo-criterio/${this.criteriaGroupId}`,
         isActive: true
       });
@@ -274,7 +271,7 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
           name: groupData.name,
           description: groupData.description
         };
-      
+
         this.criterioGroupService.updateCriterio(this.criteriaGroupId, this.estrategiaId, updatedGroup).subscribe({
           next: () => {
             this.loadGruopCriteriaById();

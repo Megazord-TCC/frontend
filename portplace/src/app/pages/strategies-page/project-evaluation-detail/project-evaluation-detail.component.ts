@@ -113,7 +113,7 @@ export class ProjectEvaluationDetailComponent implements OnInit, OnDestroy {
 
         // Usar addChildBreadcrumb para adicionar breadcrumb filho
         this.breadcrumbService.addChildBreadcrumb({
-          label: project.name || `Projeto ${this.projectId}`,
+          label: `Projeto: ${project.name}` || `Projeto ${this.projectId}`,
           url: `/estrategia/${this.strategyId}/grupo-avaliacao/${this.evaluationGroupId}/projeto/${this.projectId}`,
           isActive: true
         });
