@@ -274,7 +274,7 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
           name: groupData.name,
           description: groupData.description
         };
-
+      
         this.criterioGroupService.updateCriterio(this.criteriaGroupId, this.estrategiaId, updatedGroup).subscribe({
           next: () => {
             this.loadGruopCriteriaById();

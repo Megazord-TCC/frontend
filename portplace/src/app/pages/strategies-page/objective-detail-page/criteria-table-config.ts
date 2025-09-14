@@ -35,22 +35,12 @@ export const getColumns = (): TableColumn[] => {
   column.isClickableMainColumn = true;
   columns.push(column);
 
-
-  column = new TableColumn();
-  column.label = 'Status';
-  column.order = 2;
-  column.isSortable = true;
-  column.frontendAttributeName = 'status';
-  column.backendAttributeName = 'status';
-  column.badgeConfiguration = getBadgeConfigurations();
-  columns.push(column);
-
   return columns;
 };
 
 export const getFilterText = (): InputFilter => {
   let input = new InputFilter();
-  input.label = 'Buscar pelo nome da estratégia';
+  input.label = 'Buscar pelo nome do critério';
   input.queryParam = { name: 'name', value: '' };
   return input;
 };

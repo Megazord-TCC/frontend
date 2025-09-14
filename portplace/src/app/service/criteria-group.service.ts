@@ -10,6 +10,16 @@ import { Page, PaginationQueryParams } from '../models/pagination-models';
 })
 export class CriteriaGroupService {
 
+  // Atualizar EvaluationGroup (PUT)
+  updateEvaluationGroup(
+    evaluationGroupId: number,
+    strategyId: number,
+    dto: any
+  ): Observable<any> {
+    const url = `${environment.apiUrl}/strategies/${strategyId}/evaluation-groups/${evaluationGroupId}`;
+    return this.http.put<any>(url, dto, { headers: this.getHeaders() });
+  }
+
   constructor(private http: HttpClient) { }
 
   // Headers com Content-Type JSON

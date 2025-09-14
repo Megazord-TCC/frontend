@@ -83,7 +83,7 @@ export class EvaluationGroupDeleteModal {
       });
 
     } catch (error) {
-      console.error('❌ Erro no processo de exclusão:', error);
+      console.error(' Erro no processo de exclusão:', error);
       this.errorMessage = 'Erro inesperado. Tente novamente mais tarde.';
       this.isDeleteButtonDisabled = false;
       this.isDeleting = false;
