@@ -27,7 +27,7 @@
                 </div>
 
                 <div class="last-update">
-                    Última alteração realizada em {{evaluationGroup?.lastModifiedAt | date: 'dd/MM/yyyy HH:mm'}}.
+                    Última alteração realizada em {{ evaluationGroup?.lastModifiedAt ? (parseDateString(evaluationGroup!.lastModifiedAt) | date: 'dd/MM/yyyy HH:mm') : '' }}.
                 </div>
             </div>
         </div>

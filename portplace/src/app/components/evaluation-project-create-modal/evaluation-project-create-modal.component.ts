@@ -7,6 +7,7 @@ import { environment } from '../../environments/environment';
 import { firstValueFrom, forkJoin, map } from 'rxjs';
 import { Page } from '../../models/pagination-models';
 import { EvaluationGroup } from '../../interface/carlos-interfaces';
+import { EvaluationGroupApiResponse } from '../../interface/interfacies';
 
 @Component({
   selector: 'app-project-evaluation-create-modal',
@@ -16,7 +17,7 @@ import { EvaluationGroup } from '../../interface/carlos-interfaces';
 })
 export class ProjectEvaluationCreateModal {
   @Input() isVisible = false;
-  @Input({ required: true }) evaluationGroup?: EvaluationGroup;
+  @Input() evaluationGroup?: EvaluationGroupApiResponse;
 
   @Output() close = new EventEmitter<void>();
   @Output() created = new EventEmitter<void>();

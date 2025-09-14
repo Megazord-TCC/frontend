@@ -14,6 +14,7 @@ import { EvaluationGroupDeleteModal } from '../../../components/evaluation-group
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../../service/breadcrumb.service';
 import { Page } from '../../../models/pagination-models';
+import { EvaluationGroupApiResponse } from '../../../interface/interfacies';
 
 @Component({
   selector: 'app-evaluation-group-detail-page',
@@ -31,6 +32,7 @@ import { Page } from '../../../models/pagination-models';
   styleUrl: './evaluation-group-detail-page.component.scss'
 })
 export class EvaluationGroupDetailPageComponent implements OnInit, OnDestroy {
+
   private routeSubscription?: Subscription;
 
   httpClient = inject(HttpClient);
@@ -41,7 +43,7 @@ export class EvaluationGroupDetailPageComponent implements OnInit, OnDestroy {
   strategyId = -1;
   evaluationGroupId = -1;
 
-  evaluationGroup: EvaluationGroup | undefined;
+  evaluationGroup: EvaluationGroupApiResponse | undefined;
 
   projectRankings: ProjectRanking[] = [];
   filteredProjectRankings: ProjectRanking[] = [];
@@ -82,27 +84,27 @@ export class EvaluationGroupDetailPageComponent implements OnInit, OnDestroy {
   setCurrentEvaluationGroupByHttpRequest() {
     let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups`;
 
-    this.httpClient.get<Page<EvaluationGroup>>(evaluationGroupsRoute, { params: { size: 1000 } })
+    this.httpClient.get<Page<EvaluationGroupApiResponse>>(evaluationGroupsRoute, { params: { size: 1000 } })
         .pipe(map(page => page.content))
         .subscribe(evaluationGroups => {
             this.evaluationGroup = evaluationGroups.find(evaluationGroup => evaluationGroup.id == this.evaluationGroupId);
 
             // Usar addChildBreadcrumb para adicionar breadcrumb filho
             if (this.evaluationGroup)
-            this.breadcrumbService.addChildBreadcrumb({
-                label: this.evaluationGroup.name,
-                url: `/estrategia/${this.strategyId}/grupo-avaliacao/${this.evaluationGroupId}`,
-                isActive: true
-            });
+              this.breadcrumbService.addChildBreadcrumb({
+            label: this.evaluationGroup.name,
+            url: `/estrategia/${this.strategyId}/grupo-avaliacao/${this.evaluationGroupId}`,
+            isActive: true
+          });
         });
-  }
+      }
 
-  setProjectRankingsByHttpRequest() {
-    let projectRankingsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroupId}/ranking`;
-    let getAllProjectRankings$ =  this.httpClient.get<ProjectRanking[]>(projectRankingsRoute);
-    getAllProjectRankings$.subscribe(projectRankings => {
-      this.projectRankings = projectRankings;
-      this.filteredProjectRankings = projectRankings;
+      setProjectRankingsByHttpRequest() {
+        let projectRankingsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroupId}/ranking`;
+        let getAllProjectRankings$ =  this.httpClient.get<ProjectRanking[]>(projectRankingsRoute);
+        getAllProjectRankings$.subscribe(projectRankings => {
+          this.projectRankings = projectRankings;
+          this.filteredProjectRankings = projectRankings;
       console.log('📍 Retorno dos rankings de projetos:', projectRankings);
     });
   }
@@ -134,6 +136,15 @@ export class EvaluationGroupDetailPageComponent implements OnInit, OnDestroy {
     this.setProjectRankingsByHttpRequest(); // Recarrega a lista
   }
 
+  // Converte string 'dd/MM/yyyy HH:mm:ss' para Date
+  public parseDateString(dateStr: string): Date | null {
+    if (!dateStr) return null;
+    const [datePart, timePart] = dateStr.split(' ');
+    if (!datePart || !timePart) return null;
+    const [day, month, year] = datePart.split('/').map(Number);
+    const [hour, minute, second = '0'] = timePart.split(':');
+    return new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute), Number(second));
+  }
   // Modal de edição do grupo de avaliação
   openEditModal() {
     this.showEditModal = true;

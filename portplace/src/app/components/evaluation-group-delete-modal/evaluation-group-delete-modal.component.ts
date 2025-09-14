@@ -4,6 +4,7 @@ import { EvaluationGroup } from '../../interface/carlos-interfaces';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from '../../environments/environment';
+import { EvaluationGroupApiResponse } from '../../interface/interfacies';
 
 @Component({
   selector: 'app-evaluation-group-delete-modal',
@@ -13,7 +14,7 @@ import { environment } from '../../environments/environment';
 })
 export class EvaluationGroupDeleteModal {
   @Input() isVisible = false;
-  @Input({ required: true }) evaluationGroup?: EvaluationGroup;
+  @Input({ required: true }) evaluationGroup?: EvaluationGroupApiResponse;
 
   @Output() close = new EventEmitter<void>();
   @Output() deleted = new EventEmitter<void>();

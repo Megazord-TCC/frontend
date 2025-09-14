@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CriteriaGroup, EvaluationGroup } from '../../interface/interfacies';
+import { CriteriaGroup, EvaluationGroup, EvaluationGroupApiResponse } from '../../interface/interfacies';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../environments/environment';
@@ -18,6 +18,7 @@ import { TableComponent } from '../table/table.component';
 })
 export class EvaluationGroupCreateModal {
   @Input() isVisible = false;
+  @Input() evaluationGroup?: EvaluationGroupApiResponse;
   @Output() close = new EventEmitter<void>();
   @Output() saved = new EventEmitter<void>();
 
@@ -91,10 +92,10 @@ export class EvaluationGroupCreateModal {
     });
   }
 
-  getNewlyCreatedEvaluationGroupByHttpRequest(): Observable<EvaluationGroup | undefined> {
+  getNewlyCreatedEvaluationGroupByHttpRequest(): Observable<EvaluationGroupApiResponse | undefined> {
     let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups`;
 
-    return this.httpClient.get<Page<EvaluationGroup>>(evaluationGroupsRoute, { params: { size: 1000 } })
+    return this.httpClient.get<Page<EvaluationGroupApiResponse>>(evaluationGroupsRoute, { params: { size: 1000 } })
       .pipe(
         map(page => page.content),
         map(evaluationGroups => evaluationGroups.find(evaluationGroup => evaluationGroup.name == this.inputName))
@@ -125,7 +126,7 @@ export class EvaluationGroupCreateModal {
 
   async isNameUnique(): Promise<boolean> {
     let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups`;
-    let getAllEvaluationGroups$ = this.httpClient.get<Page<EvaluationGroup>>(evaluationGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
+    let getAllEvaluationGroups$ = this.httpClient.get<Page<EvaluationGroupApiResponse>>(evaluationGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
     let evaluationGroups = await firstValueFrom(getAllEvaluationGroups$);
     let isUnique = !evaluationGroups.some(evaluationGroup => evaluationGroup.name == this.inputName);
 
