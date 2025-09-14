@@ -1,3 +1,120 @@
+// Interface baseada no objeto retornado pela API de grupos de avaliação
+export interface EvaluationGroupApiResponse {
+  id: number;
+  name: string;
+  description: string;
+  status: string;
+  disabled: boolean;
+  createdAt: string;
+  lastModifiedAt: string;
+  criteriaGroup: {
+    id: number;
+    name: string;
+    description: string;
+    status: string;
+    strategy: {
+      id: number;
+      name: string;
+      description: string;
+      status: string;
+      activeObjectivesCount: number;
+      cancellationReason: string | null;
+      disabled: boolean;
+      createdAt: string;
+      lastModifiedAt: string;
+    };
+    criteria: Array<{
+      id: number;
+      name: string;
+      description: string;
+      criteriaGroupId: number;
+      weight: number;
+      disabled: boolean;
+      createdAt: string;
+      lastModifiedAt: string;
+      relatedStrategicObjectivesCount: number;
+      strategicObjectives: Array<{
+        id: number;
+        name: string;
+        description: string;
+        status: string;
+        strategyId: number;
+        criteriaCount: number;
+        activePortfolioCount: number;
+        activeProjectsCount: number;
+        disabled: boolean;
+        createdAt: string;
+        lastModifiedAt: string;
+      }>;
+    }>;
+    criteriaComparisons: Array<{
+      id: number;
+      comparedCriterionId: number;
+      referenceCriterionId: number;
+      importanceScale: string;
+      criteriaGroupId: number;
+      disabled: boolean;
+      createdAt: string;
+      lastModifiedAt: string;
+    }>;
+    relatedObjectivesCount: number;
+    relatedEvaluationGroupsCount: number;
+    lastModifiedAt: string;
+    lastModifiedBy: any;
+    createdAt: string;
+    disabled: boolean;
+  };
+  evaluations: Array<{
+    id: number;
+    score: number;
+    project: {
+      id: number;
+      name: string;
+      description: string;
+      status: string;
+      payback: number;
+      roi: number;
+      startDate: string;
+      endDate: string;
+      cancellationReason: string | null;
+      plannedValue: number;
+      earnedValue: number;
+      actualCost: number;
+      budgetAtCompletion: number;
+      percentComplete: number;
+      costPerformanceIndex: number;
+      schedulePerformanceIndex: number;
+      estimateAtCompletion: number;
+      estimateToComplete: number;
+      portfolioCategory: {
+        id: number;
+        name: string;
+        description: string;
+        portfolioId: number;
+        canBeDeleted: boolean;
+        disabled: boolean;
+        createdAt: string;
+        lastModifiedAt: string;
+        lastModifiedBy: any;
+        createdBy: any;
+      };
+      portfolioName: string;
+      strategyName: string;
+      scenarioRankingScore: number;
+      priorityInPortfolio: number;
+      strategicObjectives: any;
+      evaluations: any;
+      createdAt: string;
+      lastModifiedAt: string;
+      disabled: boolean;
+    };
+    criterionId: number;
+    evaluationGroupId: number;
+    lastModifiedAt: string;
+    createdAt: string;
+    disabled: boolean;
+  }>;
+}
 export interface EvaluationGroupView {
   id: number;
   name: string;
@@ -53,10 +170,21 @@ export interface Project {
   scenarioRankingScore?: number;
   priorityInPortfolio?: number;
   strategicObjectives?: any[]; // Ajuste para o tipo correto se houver
-  evaluations?: any[]; // Ajuste para o tipo correto se houver
+  evaluations?: Evaluation[]; // Ajuste para o tipo correto se houver
   createdAt: string; // dd/MM/yyyy HH:mm:ss
   lastModifiedAt: string; // dd/MM/yyyy HH:mm:ss
   disabled: boolean;
+}
+
+export interface Evaluation {
+  id: number;
+  score: number;
+  project: Project;
+  criterionId: number;
+  evaluationGroupId?: string;
+  lastModifiedAt?: string;
+  createdAt?: string;
+  disabled?: boolean;
 }
 
 export interface ProjectPageableResponse {
@@ -224,6 +352,7 @@ export interface Criterion {
   lastModifiedAt?: Date;
   lastModifiedBy?: User;
   createdAt?: Date;
+  strategicObjectives?: Objective[];
 }
 
 export interface Strategy {
@@ -234,7 +363,7 @@ export interface Strategy {
   activeObjectivesCount?: number;
   disabled?: boolean;
   createdAt?: Date;
-  lastModifiedAt?: Date;
+  lastModifiedAt?: string;
   activeObjectives?: number;
   statusColor?: string;
 }

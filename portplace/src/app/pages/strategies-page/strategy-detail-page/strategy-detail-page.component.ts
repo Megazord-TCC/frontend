@@ -186,9 +186,6 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
       const estrategiaIdParam = params.get('estrategiaId');
       this.estrategiaId = estrategiaIdParam ? Number(estrategiaIdParam) : 0;
 
-      // COMPONENTE PAI: Configurar breadcrumbs base
-      console.log('📍 Componente pai: Strategy Detail recarregando');
-
       if (this.estrategiaId) {
         this.loadStrategyDetails(this.estrategiaId);
       }
@@ -203,7 +200,7 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
     }
   }
 
- // Método de busca para o app-table de grupos de critérios
+ //critérios Método de busca para o app-table de grupos de
   getDataForCriteriaGroupsTable: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => {
     return this.criterioService.getCriteriaGroupPage(this.strategy.id!, queryParams).pipe(
       map(page => {
@@ -212,10 +209,13 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
       })
     );
   };
-//  // Método de busca para o app-table de grupos de objetivos
+  // Método de busca para o app-table de grupos de objetivos
   getDataForObjetivesTable: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams) => {
     return this.objetivoService.getObjectivesPage(this.strategy.id!, queryParams).pipe(
-      map(page => mapObjectivePageDtoToObjectiveTableRowPage(page))
+      map(page => {
+        console.log('[LOG] Retorno da API getObjectivesPage:', page);
+        return mapObjectivePageDtoToObjectiveTableRowPage(page);
+      })
     );
   };
 
@@ -229,7 +229,7 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
         next: (strategy) => {
           this.strategy = strategy;
           this.syncFormValues();
-
+          console.log('Estratégia carregada:', strategy);
           this.breadcrumbService.setBreadcrumbs([
             { label: 'Início', url: '/inicio', isActive: false },
             { label: 'Estratégias', url: '/estrategias', isActive: false },
@@ -483,19 +483,6 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
     }
   }
 
-
-
-
-  openEvaluationModal(evaluation?: EvaluationGroup): void {
-    console.log("Opening evaluation modal", evaluation)
-    // Implementar modal de avaliação
-  }
-
-
-  openScenarioModal(scenario?: Scenario): void {
-    console.log("Opening scenario modal", scenario)
-    // Implementar modal de cenário
-  }
   getTabName(tab: string): string {
     const tabNames: { [key: string]: string } = {
       'criterios': 'Grupos de critérios',
@@ -600,30 +587,45 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
   onCancelStrategy(fields: FormField[]): void {
     const cancelReason = fields.find(f => f.id === 'reason')?.value || '';
 
-    const updatedStrategy = {
-      ...this.strategy,
-      status: StrategyStatusEnum.INACTIVE,
-      description: `${this.strategy.description || ''}\n\nRazão do cancelamento: ${cancelReason}`
-    };
-
-    const sanitizedStrategy = this.sanitizeStrategyData(updatedStrategy);
-
-    this.estrategiaService.updateStrategy(this.strategy.id!, sanitizedStrategy)
+    this.estrategiaService.cancelStrategy(this.strategy.id!, { cancellationReason: cancelReason })
       .pipe(retry(3))
       .subscribe({
         next: (updatedStrategy) => {
-          console.log('Estratégia cancelada com sucesso:', updatedStrategy);
           this.closeCancelModal();
           this.loadStrategyDetails(this.strategy.id!);
-          alert('Estratégia cancelada com sucesso');
           setTimeout(() => {
             this.router.navigate(['/estrategias']);
           }, 1000);
         },
         error: (err) => {
           console.error('Erro ao cancelar estratégia:', err);
-          console.error('Detalhes do erro:', err.error);
-          alert('Erro ao cancelar a estratégia. Tente novamente.');
+        }
+      });
+  }
+
+
+  // Verifica se a estratégia está inativa
+  isInactive(): boolean {
+    return this.strategy?.status === StrategyStatusEnum.INACTIVE;
+  }
+
+  // Ativa a estratégia
+  onActivateStrategy(): void {
+    if (!this.strategy) return;
+    if (this.strategy.status !== StrategyStatusEnum.INACTIVE) return;
+    const updatedStrategy = {
+      ...this.strategy,
+      status: StrategyStatusEnum.ACTIVE
+    };
+    const sanitizedStrategy = this.sanitizeStrategyData(updatedStrategy);
+    this.estrategiaService.updateStrategy(this.strategy.id!, sanitizedStrategy)
+      .pipe(retry(3))
+      .subscribe({
+        next: (updatedStrategy) => {
+          this.loadStrategyDetails(this.strategy.id!);
+        },
+        error: (err) => {
+          alert('Erro ao ativar a estratégia. Tente novamente.');
         }
       });
   }
@@ -683,6 +685,14 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
       default:
         return 'gray';
     }
+  }
+  public parseDateString(dateStr: string): Date | null {
+    if (!dateStr) return null;
+    const [datePart, timePart] = dateStr.split(' ');
+    if (!datePart || !timePart) return null;
+    const [day, month, year] = datePart.split('/').map(Number);
+    const [hour, minute, second = '0'] = timePart.split(':');
+    return new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute), Number(second));
   }
 
 }

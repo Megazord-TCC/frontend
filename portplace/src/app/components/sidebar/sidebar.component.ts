@@ -79,8 +79,7 @@ export class SidebarComponent {
       }
     }
   }
-
-  closeSidebar(): void {
-    // Implementar lógica para fechar sidebar em mobile
+  logout(): void {
+    this.router.navigate(['/login']);
   }
 }

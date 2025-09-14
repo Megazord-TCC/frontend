@@ -9,6 +9,7 @@
       <p>Gerencie o cadastro da estratégia, crie cenários, avalie projetos e os vincule a portfólios.</p>
     </div>
     <app-table
+        #tableComponent
         [dataRetrievalMethodRef]="this.getDataForTableComponent"
         [filterButtons]="filterButtons"
         [filterText]="filterText"

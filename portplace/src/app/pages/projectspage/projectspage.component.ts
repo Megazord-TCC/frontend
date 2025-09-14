@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CardComponent } from '../../components/card/card.component';
 import { Router } from '@angular/router';
@@ -32,6 +32,7 @@ import { mapProjectPageDtoToProjectTableRowPage } from "../../mappers/projects-m
   styleUrl: './projectspage.component.scss'
 })
 export class ProjectsComponent implements OnInit {
+  @ViewChild('tableComponent') tableComponent!: TableComponent;
   showCreateModal = false;
   loadingProjects = false;
   Projects: Project[] = [];
@@ -45,7 +46,7 @@ export class ProjectsComponent implements OnInit {
   actionButton = getActionButton();
 
 
-   newProject: Project = {
+  newProject: Project = {
     id: 0,
     name: '',
     description: '',
@@ -351,6 +352,9 @@ export class ProjectsComponent implements OnInit {
         this.loadProjects();
         this.resetNewProject();
         this.closeCreateModal();
+        if (this.tableComponent) {
+          this.tableComponent.refresh();
+        }
       },
       error: (err) => {
         console.error('Erro completo ao criar projeto:', err);

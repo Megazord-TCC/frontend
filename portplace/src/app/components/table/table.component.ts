@@ -121,8 +121,8 @@ export class TableComponent {
     }
 
     isSelectButton(frontendAttributeName: string): boolean {
-        return this.columns.some(column => 
-            (column.frontendAttributeName == frontendAttributeName) 
+        return this.columns.some(column =>
+            (column.frontendAttributeName == frontendAttributeName)
             && (column.selectButtonConfiguration)
         );
     }
@@ -140,14 +140,14 @@ export class TableComponent {
     }
 
     getSelectButton(row: any, frontendAttributeName: string): SelectButtonOptionSelected | undefined {
-        return this.selectButtonOptionsSelected.find(option => 
+        return this.selectButtonOptionsSelected.find(option =>
             (option.row == row) && (option.column.frontendAttributeName == frontendAttributeName)
         );
     }
 
     onChangeSelectedValue(event: any, row: any, attributeName: string) {
         let column = this.columns.find(column => column.frontendAttributeName === attributeName);
-        
+
         if (column)
             this.selectChange.emit({ value: event?.target?.value, row, column });
     }
@@ -161,7 +161,7 @@ export class TableComponent {
     }
 
     sendHttpGetRequestAndPopulateTable() {
-        this.dataRetrievalMethodRef(this.queryParams).subscribe(page => { 
+        this.dataRetrievalMethodRef(this.queryParams).subscribe(page => {
             this.page = page;
             this.setSelectButtonValues();
         });

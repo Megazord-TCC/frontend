@@ -38,7 +38,7 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
   @ViewChild('tableComponent') tableComponent!: TableComponent;
 
   createFormConfig: any = {
-    // Defina aqui a configuração do formulário conforme sua necessidade
+
     title: 'Cadastrar critérios',
     fields: [
       { id: 'name', label: 'Nome', type: 'text', value: '', required: true, placeholder: 'Digite o nome' },
@@ -274,7 +274,7 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
           name: groupData.name,
           description: groupData.description
         };
-
+      
         this.criterioGroupService.updateCriterio(this.criteriaGroupId, this.estrategiaId, updatedGroup).subscribe({
           next: () => {
             this.loadGruopCriteriaById();
@@ -289,9 +289,9 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
 
     // ...não há mais fluxo de exclusão via modal...
     }
-  
+
   }
-  
+
   // Move resetFormFields outside of onSaveByActiveTab as a class method
   resetFormFields(formConfig: any): void {
     if (formConfig && formConfig.fields) {

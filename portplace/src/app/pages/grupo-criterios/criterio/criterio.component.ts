@@ -13,6 +13,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { GrupoCriterioService } from '../../../service/criteria-group-comparations.service';
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../../service/breadcrumb.service';
+import { StrategiaObjetivoService } from '../../../service/strategia-objetivo.service';
+import { ObjectivesModalComponent } from '../../../components/objectives-modal/objectives-modal.component';
 
 @Component({
   selector: 'app-criterio',
@@ -24,7 +26,8 @@ import { BreadcrumbService } from '../../../service/breadcrumb.service';
     SvgIconComponent,
     BreadcrumbComponent,
     FormModalComponentComponent,
-    NgSelectModule
+    NgSelectModule,
+    ObjectivesModalComponent
   ],
   templateUrl: './criterio.component.html',
   styleUrl: './criterio.component.scss'
@@ -33,7 +36,7 @@ export class CriterioComponent implements OnInit, OnDestroy {
   private routeSubscription?: Subscription;
 
   editFormConfig: any = {
-    title: 'Editar grupo de critérios',
+    title: 'Editar critério',
     fields: [
       {
         id: 'name',
@@ -51,32 +54,6 @@ export class CriterioComponent implements OnInit, OnDestroy {
         required: false,
         placeholder: 'Digite a descrição',
         rows: 4
-      }
-    ],
-    validationMessage: 'Os campos marcados com * são obrigatórios.',
-    buttons: [
-      { id: 'cancel', label: 'Cancelar', type: 'button', variant: 'secondary' },
-      { id: 'save', label: 'Salvar', type: 'submit', variant: 'primary' }
-    ]
-  };
-
-  objectiveFormConfig: any = {
-    title: 'Cadastrar novo vínculo a objetivo',
-    fields: [
-      {
-        id: 'objectiveId',
-        label: 'Objetivo a ser vinculado ao critério',
-        type: 'select',
-        value: '',
-        required: true,
-        placeholder: 'Selecione um objetivo',
-        options: [],
-        customValidation: (value: any) => {
-          if (this.isObjectiveAlreadyLinked(value)) {
-            return 'Todos objetivos já foram vinculados a este critério.';
-          }
-          return null;
-        }
       }
     ],
     validationMessage: 'Os campos marcados com * são obrigatórios.',
@@ -135,8 +112,7 @@ export class CriterioComponent implements OnInit, OnDestroy {
   searchTerm = '';
   existingComparisons: CriteriaComparison[] = [];
 
-  // Dados dos objetivos
-  allObjectives: Objective[] = [];
+  // Dados dos objetivos - sempre inicializados
   linkedObjectives: Objective[] = [];
 
   constructor(
@@ -144,14 +120,13 @@ export class CriterioComponent implements OnInit, OnDestroy {
     private router: Router,
     private criterioService: CriterioService,
     private criteriaGroupComparationsService: GrupoCriterioService,
-    private breadcrumbService: BreadcrumbService
+    private breadcrumbService: BreadcrumbService,
+    private estrategiaObjetivoService: StrategiaObjetivoService
   ) {}
 
   async ngOnInit(): Promise<void> {
-    // LIMPAR DADOS ANTERIORES PRIMEIRO
     this.clearComponentData();
 
-    // Escutar mudanças nos parâmetros da rota para recarregar quando voltar
     this.routeSubscription = this.route.paramMap.subscribe(async params => {
       const estrategiaIdParam = params.get('estrategiaId');
       this.estrategiaId = estrategiaIdParam ? Number(estrategiaIdParam) : 0;
@@ -160,16 +135,10 @@ export class CriterioComponent implements OnInit, OnDestroy {
       const criteriaId = params.get('criterioId');
       this.criteriaId = criteriaId ? Number(criteriaId) : 0;
 
-      console.log('🔄 === INICIALIZANDO/RECARREGANDO COMPONENTE ===');
-      console.log('  - Estratégia ID:', this.estrategiaId);
-      console.log('  - Grupo ID:', this.criteriaGroupId);
-      console.log('  - Critério ID:', this.criteriaId);
-
       // Carregar dados em sequência
       await this.loadCriteria();
       await this.loadAllGroupCriteria();
       await this.loadExistingComparisons();
-      await this.loadObjectives();
     });
   }
 
@@ -194,7 +163,6 @@ export class CriterioComponent implements OnInit, OnDestroy {
     this.filteredCriteriaGroups = [];
     this.existingComparisons = [];
     this.comparisonValues = {};
-    this.allObjectives = [];
     this.linkedObjectives = [];
 
     // Resetar flags
@@ -218,7 +186,10 @@ export class CriterioComponent implements OnInit, OnDestroy {
       this.criteria = criterio;
       console.log('Critério carregado:', criterio);
 
-      // COMPONENTE NETO: Adiciona seu breadcrumb ao array do pai
+      // Sempre garantir que linkedObjectives seja um array
+      this.linkedObjectives = this.criteria?.strategicObjectives ? [...this.criteria.strategicObjectives] : [];
+      console.log('Objetivos vinculados ao critério:', this.linkedObjectives);
+
       this.breadcrumbService.addChildBreadcrumb({
         label: criterio.name || `Critério ${this.criteriaId}`,
         url: `/estrategia/${this.estrategiaId}/grupo-criterio/${this.criteriaGroupId}/criterio/${this.criteriaId}`,
@@ -251,11 +222,7 @@ export class CriterioComponent implements OnInit, OnDestroy {
       );
       this.existingComparisons = comparisons || [];
 
-      console.log('📊 Comparações carregadas do servidor:', this.existingComparisons);
-
-      // FILTRAR comparações apenas dos critérios que existem atualmente
       this.filterValidComparisons();
-
       this.initializeComparisonValues();
     } catch (err) {
       console.error('Erro ao carregar avaliações:', err);
@@ -264,108 +231,56 @@ export class CriterioComponent implements OnInit, OnDestroy {
     }
   }
 
-  // CARREGAR OBJETIVOS
-  async loadObjectives(): Promise<void> {
-    this.loadingObjectives = true;
-    try {
-      console.log('🎯 Implemente aqui a chamada ao service para carregar todos os objetivos da estratégia');
-      // const allObjectives = await firstValueFrom(this.objectiveService.getAllObjectives(this.estrategiaId));
-      // this.allObjectives = allObjectives;
-
-      console.log('🔗 Implemente aqui a chamada ao service para carregar objetivos vinculados ao critério');
-      // const linkedObjectives = await firstValueFrom(this.objectiveService.getLinkedObjectives(this.criteriaId, this.estrategiaId));
-      // this.linkedObjectives = linkedObjectives;
-
-      // SIMULAÇÃO TEMPORÁRIA PARA TESTE
-      this.allObjectives = [
-        { id: 1, name: 'Aumentar lucro', description: 'Aumentar lucro da empresa' },
-        { id: 2, name: 'Capacitar empregados', description: 'Capacitar empregados da empresa' },
-        { id: 3, name: 'Obter novos clientes', description: 'Obter novos clientes para a empresa' }
-      ] as Objective[];
-
-      this.linkedObjectives = [
-        { id: 1, name: 'Aumentar lucro', description: 'Aumentar lucro da empresa' },
-        { id: 2, name: 'Capacitar empregados', description: 'Capacitar empregados da empresa' }
-      ] as Objective[];
-
-      this.updateObjectiveFormOptions();
-    } catch (err) {
-      console.error('Erro ao carregar objetivos:', err);
-      this.allObjectives = [];
-      this.linkedObjectives = [];
-    } finally {
-      this.loadingObjectives = false;
-    }
-  }
-
-  // ATUALIZAR OPÇÕES DO FORMULÁRIO DE OBJETIVOS
-  updateObjectiveFormOptions(): void {
-    const availableObjectives = this.allObjectives.filter(obj =>
-      !this.linkedObjectives.some(linked => linked.id === obj.id)
-    );
-
-    const objectiveField = this.objectiveFormConfig.fields.find((field: any) => field.id === 'objectiveId');
-    if (objectiveField) {
-      objectiveField.options = availableObjectives.map(obj => ({
-        value: obj.id,
-        label: obj.name
-      }));
-    }
-  }
-
-  // VERIFICAR SE OBJETIVO JÁ ESTÁ VINCULADO
-  isObjectiveAlreadyLinked(objectiveId: number): boolean {
-    if (!objectiveId) return false;
-    return this.linkedObjectives.some(obj => obj.id === objectiveId);
-  }
-
   // ABRIR MODAL DE OBJETIVOS
   openObjectiveModal(): void {
-    this.updateObjectiveFormOptions();
-
-    const availableObjectives = this.allObjectives.filter(obj =>
-      !this.linkedObjectives.some(linked => linked.id === obj.id)
-    );
-
-    if (availableObjectives.length === 0) {
-      alert('Todos os objetivos já foram vinculados a este critério ou não há objetivos cadastrados na estratégia atual.');
-      return;
-    }
-
-    // Atualizar título do modal
-    this.objectiveFormConfig.title = `Cadastrar novo vínculo a objetivo`;
-
-    // Limpar campo
-    const objectiveField = this.objectiveFormConfig.fields.find((field: any) => field.id === 'objectiveId');
-    if (objectiveField) {
-      objectiveField.value = '';
-    }
-
+    console.log('🎯 Abrindo modal de objetivos');
     this.showObjectiveModal = true;
   }
 
   // FECHAR MODAL DE OBJETIVOS
   closeObjectiveModal(): void {
+    console.log('🎯 Fechando modal de objetivos');
     this.showObjectiveModal = false;
   }
 
   // SALVAR VÍNCULO DE OBJETIVO
-  async onSaveObjectiveLink(fields: any[]): Promise<void> {
-    const objectiveId = fields.find(field => field.id === 'objectiveId')?.value;
-
+  async onSaveObjectiveLink(objectiveId: number): Promise<void> {
     if (!objectiveId) {
-      alert('Selecione um objetivo para vincular.');
+      alert('Erro: ID do objetivo é inválido.');
       return;
     }
 
+    if (!this.criteria) {
+      alert('Erro: Critério não carregado.');
+      return;
+    }
+
+    console.log('🔗 Vinculando objetivo:', objectiveId, 'ao critério:', this.criteria.id);
+
     try {
-      console.log('🔗 Implemente aqui a chamada ao service para vincular objetivo ao critério');
-      console.log('Dados:', { criteriaId: this.criteriaId, objectiveId, estrategiaId: this.estrategiaId });
+      // Monta o array de IDs dos objetivos já vinculados + o novo (sem duplicar)
+      let ids = this.criteria.strategicObjectives ? this.criteria.strategicObjectives.map(obj => obj.id) : [];
+      if (!ids.includes(objectiveId)) {
+        ids.push(objectiveId);
+      }
 
-      // await firstValueFrom(this.objectiveService.linkObjectiveToCriteria(this.criteriaId, objectiveId, this.estrategiaId));
+      const updatedCriterion = {
+        name: this.criteria.name,
+        description: this.criteria.description,
+        strategicObjectives: ids
+      };
 
-      // Recarregar dados após salvar
-      await this.loadObjectives();
+      await firstValueFrom(
+        this.criterioService.updateCriterio(
+          this.criteria.id,
+          updatedCriterion,
+          this.estrategiaId,
+          this.criteriaGroupId
+        )
+      );
+
+      // Recarregar dados do critério para atualizar linkedObjectives
+      await this.loadCriteria();
       this.closeObjectiveModal();
 
       console.log('✅ Objetivo vinculado com sucesso');
@@ -378,19 +293,45 @@ export class CriterioComponent implements OnInit, OnDestroy {
   // REMOVER VÍNCULO DE OBJETIVO
   async removeObjectiveLink(objectiveId: number): Promise<void> {
     const objective = this.linkedObjectives.find(obj => obj.id === objectiveId);
-    if (!objective) return;
+    if (!objective) {
+      console.error('Objetivo não encontrado:', objectiveId);
+      return;
+    }
 
     const confirmed = confirm(`Tem certeza que deseja remover o vínculo com o objetivo "${objective.name}"?`);
     if (!confirmed) return;
 
+    if (!this.criteria) {
+      alert('Erro: Critério não carregado.');
+      return;
+    }
+
+    console.log('🗑️ Removendo vínculo do objetivo:', objectiveId, 'do critério:', this.criteria.id);
+
     try {
-      console.log('🗑️ Implemente aqui a chamada ao service para remover vínculo do objetivo');
-      console.log('Dados:', { criteriaId: this.criteriaId, objectiveId, estrategiaId: this.estrategiaId });
+      // Remove o ID do objetivo da lista
+      let ids = this.criteria.strategicObjectives ? this.criteria.strategicObjectives.map(obj => obj.id) : [];
+      if (ids.includes(objectiveId)) {
+        ids.splice(ids.indexOf(objectiveId), 1);
+      }
 
-      // await firstValueFrom(this.objectiveService.unlinkObjectiveFromCriteria(this.criteriaId, objectiveId, this.estrategiaId));
+      const updatedCriterion = {
+        name: this.criteria.name,
+        description: this.criteria.description,
+        strategicObjectives: ids
+      };
 
-      // Recarregar dados após remover
-      await this.loadObjectives();
+      await firstValueFrom(
+        this.criterioService.updateCriterio(
+          this.criteria.id,
+          updatedCriterion,
+          this.estrategiaId,
+          this.criteriaGroupId
+        )
+      );
+
+      // Recarregar dados do critério para atualizar linkedObjectives
+      await this.loadCriteria();
 
       console.log('✅ Vínculo removido com sucesso');
     } catch (error) {

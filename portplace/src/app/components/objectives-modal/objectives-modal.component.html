@@ -1,0 +1,41 @@
+<!-- objectives-modal.component.html -->
+<div class="modal-overlay" (click)="onOverlayClick($event)" *ngIf="isVisible">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header">
+            <h2>Vincular objetivo</h2>
+            <button class="close-btn" (click)="onClose()">
+                <i class="icon-x">✕</i>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+            <!-- Validation Message -->
+            <div *ngIf="errorMessage" class="validation-error">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>{{ errorMessage }}</span>
+            </div>
+
+            <!-- Form Fields -->
+            <div class="form-fields" [ngClass]="{'disabled': isSubmitButtonDisabled}">
+                <div class="form-group">
+                    <label>Objetivos para vincular<span class="required-asterisk">*</span></label>
+                    <select [(ngModel)]="inputObjectiveSelectedId" [disabled]="isSubmitButtonDisabled">
+                        <option value="" disabled>Selecione um objetivo</option>
+                        <option *ngFor="let objective of inputObjectivesOptions"
+                            [ngValue]="objective.id ? objective.id.toString() : ''">
+                            {{ objective.name }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button class="btn-outline" (click)="onClose()">Cancelar</button>
+            <button class="btn-primary" (click)="onSave()" [disabled]="isSubmitButtonDisabled || !inputObjectiveSelectedId">Salvar</button>
+        </div>
+    </div>
+</div>
