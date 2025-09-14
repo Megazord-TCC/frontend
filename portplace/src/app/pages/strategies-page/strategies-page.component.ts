@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { CardComponent } from '../../components/card/card.component';
 import { FormsModule } from '@angular/forms';
@@ -33,6 +33,7 @@ import { getFilterButtons, getFilterText, getColumns, getActionButton } from './
   styleUrl: './strategies-page.component.scss'
 })
 export class StrategiesPageComponent implements OnInit {
+  @ViewChild('tableComponent') tableComponent!: TableComponent;
   filterButtons = getFilterButtons();
   filterText = getFilterText();
   columns = getColumns();
@@ -99,32 +100,15 @@ export class StrategiesPageComponent implements OnInit {
   // Usado pelo TableComponent.
   // Recarrega a tabela de estratégias, buscando os dados via requisição HTTP.
   getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => (
-    this.estrategiaService.getProjectsPage(queryParams).pipe(
-      map(page => mapStrategyPageDtoToStrategyTableRowPage(page))
+    this.estrategiaService.getStrategiesPage(queryParams).pipe(
+      map(page => {
+        console.log(page);
+        return mapStrategyPageDtoToStrategyTableRowPage(page);
+      })
     )
   );
 
-  // loadStrategies(): void {
-  //   this.loadingStrategies = true;
-  //   this.estrategiaService.getStrategies()
-  //     .pipe(retry(3))
-  //     .subscribe({
-  //       next: (response) => {
-  //         console.log('Estratégias carregadas:', response);
-  //         this.allStrategies = response.content;
-  //         this.strategies = response.content;
-  //         this.filteredStrategies = [...this.strategies];
-  //         this.loadingStrategies = false;
-  //       },
-  //       error: (err) => {
-  //         console.error('Erro ao carregar estratégias:', err);
-  //         this.allStrategies = [];
-  //         this.strategies = [];
-  //         this.filteredStrategies = [];
-  //         this.loadingStrategies = false;
-  //       }
-  //     });
-  // }
+
 
   onFilterChange(filter: string): void {
     this.activeFilter = this.activeFilter === filter ? '' : filter;
@@ -207,8 +191,10 @@ export class StrategiesPageComponent implements OnInit {
 
     this.estrategiaService.createStrategy(newStrategy).subscribe({
       next: (createdStrategy) => {
-
         this.closeCreateModal();
+        if (this.tableComponent) {
+          this.tableComponent.refresh();
+        }
       },
       error: (err) => {
         console.error('Erro ao criar estratégia:', err);

@@ -1,21 +1,62 @@
-export interface Project {
-  id?: number;
+export interface EvaluationGroupView {
+  id: number;
   name: string;
   description: string;
-  portfolio?: any;
-  startDate: string;
-  endDate: string;
-  status: ProjectStatusEnum;
-  projectManager: number;
-  earnedValue: number;
-  plannedValue: number;
-  actualCost: number;
-  budget: number;
-  payback: number;
+  status: string;
+  statusText: string;
+  disabled: boolean;
+  createdAt: string;
+  lastModifiedAt: string;
+  criteriaGroup?: CriteriaGroup;
+  evaluations: any[]; // Ajuste para o tipo correto se houver
+  statusColor: 'green' | 'gray' | 'red';
+  // lastUpdatedBy?: any; // Descomente e ajuste se necessário
+}
+
+
+export interface StrategicObjective {
+  id: number;
+  name: string;
+  description?: string;
+  status: string;
+  strategyId: number;
+  criteriaCount: number;
+  activePortfolioCount: number;
+  activeProjectsCount: number;
+  disabled: boolean;
   createdAt?: string;
   lastModifiedAt?: string;
-  disabled?: boolean;
-  cancellationReason?: string;
+  // evaluationGroups?: any[];
+  // objectives?: any[];
+}
+export interface Project {
+  id: number;
+  name: string;
+  description: string;
+  status: string;
+  payback: number;
+  roi: number;
+  startDate: string; // dd/MM/yyyy
+  endDate: string;   // dd/MM/yyyy
+  plannedValue: number;
+  earnedValue: number;
+  actualCost: number;
+  budgetAtCompletion: number;
+  percentComplete: number;
+  costPerformanceIndex: number;
+  schedulePerformanceIndex: number;
+  estimateAtCompletion: number;
+  estimateToComplete: number;
+  portfolioCategory?: any; // Ajuste para o tipo correto se houver
+  portfolioName?: string;
+  strategyName?: string;
+  scenarioRankingScore?: number;
+  priorityInPortfolio?: number;
+  strategicObjectives?: any[]; // Ajuste para o tipo correto se houver
+  evaluations?: any[]; // Ajuste para o tipo correto se houver
+  createdAt: string; // dd/MM/yyyy HH:mm:ss
+  lastModifiedAt: string; // dd/MM/yyyy HH:mm:ss
+  disabled: boolean;
 }
 
 export interface ProjectPageableResponse {
@@ -92,15 +133,18 @@ export interface Portfolio {
 }
 
 export interface Objective {
-  id: number
-  strategyId: number
-  disabled: boolean
-  name: string
-  description?: string
-  createdAt: string
-  lastModifiedAt: string
-  status: "ATIVADO" | "CANCELADO"
-  statusColor: "green" | "gray"
+  id: number;
+  name: string;
+  description?: string;
+  status: string;
+  strategyId: number;
+  criteriaCount: number;
+  activePortfolioCount: number;
+  activeProjectsCount: number;
+  disabled: boolean;
+  createdAt?: string;
+  lastModifiedAt?: string;
+  statusColor: 'green' | 'gray' | 'red';
 }
 
 export interface Objectives {
@@ -138,7 +182,7 @@ export interface EvaluationGroup {
 }
 
 export interface EvaluationGroupView extends EvaluationGroup {
-  criteriaGroup?: CriteriaGroup;
+  // criteriaGroup?: CriteriaGroup; // Removido para evitar duplicidade
 }
 
 export interface Scenario {

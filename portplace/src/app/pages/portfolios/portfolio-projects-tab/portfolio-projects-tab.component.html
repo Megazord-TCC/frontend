@@ -7,7 +7,7 @@
 
     <ng-template #showProjectsTable>
         <p class="tab-description">
-            Confira os projetos que fazem parte deste portfólio, incluídos pelo cenário <b>COLOCAR VALOR AQUI</b>.
+            Confira os projetos que fazem parte deste portfólio, incluídos pelo cenário <b>{{ scenarioName }}</b>.
         </p>
         <app-table [dataRetrievalMethodRef]="this.getDataForTableComponent"
             [filterText]="filterText" [filterButtons]="filterButtons" [columns]="columns"

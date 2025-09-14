@@ -52,9 +52,9 @@ export const getColumns = (): TableColumn[] => {
     column = new TableColumn();
     column.label = 'Orçamento (R$)';
     column.order = 2;
-    column.isSortable = true;
+    // column.isSortable = true; // Comentado pois backend não permite ordenação
     column.frontendAttributeName = 'budget';
-    column.backendAttributeName = 'budget';
+    // column.backendAttributeName = 'estimateAtCompletion';
     columns.push(column);
 
     column = new TableColumn();

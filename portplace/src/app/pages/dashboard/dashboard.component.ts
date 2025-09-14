@@ -9,6 +9,8 @@ import { BreadcrumbService } from '../../service/breadcrumb.service';
 import { Router } from '@angular/router';
 import { Risk, MetricCard } from '../../interface/interfacies';
 import { Chart } from 'chart.js/auto';
+import { AuthService } from '../../service/auth-service';
+import { PageType } from '../../interface/carlos-auth-interfaces';
 
 @Component({
   selector: 'app-dashboard',
@@ -31,9 +33,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private breadcrumbService = inject(BreadcrumbService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  authService = inject(AuthService);
   costChart: any;
   projectBubbleChart: any;
   riskBubbleChart: any;
+  pageType = PageType;
 
   hasPortfolio = true;
   expandedSections: string[] = [];

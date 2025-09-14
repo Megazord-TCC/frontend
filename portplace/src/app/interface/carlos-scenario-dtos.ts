@@ -42,8 +42,8 @@ export interface ScenarioReadDTO {
     budget: number;
     status: ScenarioStatusEnum;
     disabled: boolean;
-    createdAt: Date;
-    lastModifiedAt: Date;
+    createdAt: string;
+    lastModifiedAt: string;
     strategyId: number;
     evaluationGroup: EvaluationGroup;
     scenarioRankings: ScenarioRankingReadDTO[];

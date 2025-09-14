@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
 import { debounceTime, forkJoin, map, Observable, of, Subject, Subscription, tap } from 'rxjs';
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../../service/breadcrumb.service';
@@ -13,7 +13,7 @@ import { Strategy } from '../../../interface/interfacies';
 import { getActionButton, getColumns, getFilterText, getPortfolioCategorySelectButtonConfigurations } from './scenario-detail-table-config';
 import { TableComponent } from '../../../components/table/table.component';
 import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } from '../../../models/pagination-models';
-import { ActionButton, SelectButtonOptionSelected } from '../../../components/table/table-contracts';
+import { ActionButton, SelectButtonOptionSelected, TableColumn } from '../../../components/table/table-contracts';
 import { ScenarioRankingStatusEnum, ScenarioReadDTO, ScenarioStatusEnum } from '../../../interface/carlos-scenario-dtos';
 import { ProjectInclusionStatusChangeHandler } from './project-inclusion-status-change-handler';
 import { ScenarioEditModal } from '../../../components/scenario-edit-modal/scenario-edit-modal.component';
@@ -26,6 +26,7 @@ import { ScenarioAuthorizationModalComponent } from '../../../components/scenari
 import { PortfolioService } from '../../../service/portfolio-service';
 import { CategoryService } from '../../../service/category-service';
 import { ProjectCategoryChangeHandler } from './project-category-change-handler';
+import { getDateObjectFromDDMMYYYYHHMMSS } from '../../../helpers/date-helper';
 
 @Component({
     selector: 'app-scenario-detail-page',
@@ -40,7 +41,8 @@ import { ProjectCategoryChangeHandler } from './project-category-change-handler'
         WarningInformationModalComponent,
         TooltipComponent,
         CancelScenarioModalComponent,
-        ScenarioAuthorizationModalComponent
+        ScenarioAuthorizationModalComponent,
+        RouterLink
     ],
     templateUrl: './scenario-detail-page.component.html',
     styleUrl: './scenario-detail-page.component.scss'
@@ -79,6 +81,7 @@ export class ScenarioDetailPageComponent {
     cancelAllActions = false;
 
     route = inject(ActivatedRoute);
+    router = inject(Router);
     breadcrumbService = inject(BreadcrumbService);
     scenarioService = inject(ScenarioService);
     strategyService = inject(EstrategiaService);
@@ -88,7 +91,8 @@ export class ScenarioDetailPageComponent {
     isScenarioDeleteModalVisible = false;
     isScenarioCancelModalVisible = false;
     isScenarioAuthorizationModalVisible = false;
-    isWarningInformationModalVisible = false;
+    isBudgetWarningVisible = false;
+    isCategoryWarningVisible = false;
     hasWarningInformationModalAlreadyDisplayed = false;
 
     private sendBudgetUpdateRequestThenRepopulateTableSubject = new Subject<void>();
@@ -181,6 +185,20 @@ export class ScenarioDetailPageComponent {
         });
     }
 
+    // Confere se irá mostrar o alerta que portfólio não tem categoria se clicar no <select> de categoria
+    onSelectClick(event: { row: any, column: TableColumn }) {
+        let userClickedCategoryColumnSelect = event.column.frontendAttributeName == 'portfolioCategoryId';
+        if (!userClickedCategoryColumnSelect) return;
+
+        let portfolioHasAtLeastOneCategory = (
+            event.column.selectButtonConfiguration?.options.filter(option => !option.hidden).length ?? 0
+        ) > 0;
+
+        if (portfolioHasAtLeastOneCategory) return;
+
+        this.isCategoryWarningVisible = true;
+    }
+
     // Usado pelo TableComponent.
     // Recarrega a tabela de projetos do cenário, buscando os dados via requisição HTTP.
     getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => (
@@ -214,7 +232,10 @@ export class ScenarioDetailPageComponent {
             text: mapScenarioStatusEnumToText(scenarioDTO.status),
             color: mapScenarioStatusToBadgeStatusColor(scenarioDTO.status)
         };
-        this.lastUpdate = scenarioDTO.lastModifiedAt ? new Date(scenarioDTO.lastModifiedAt) : new Date(scenarioDTO.createdAt);
+        this.lastUpdate = scenarioDTO.lastModifiedAt ? 
+            getDateObjectFromDDMMYYYYHHMMSS(scenarioDTO.lastModifiedAt): 
+            getDateObjectFromDDMMYYYYHHMMSS(scenarioDTO.createdAt);
+
         this.budget = formatToBRL(scenarioDTO.budget);
 
         this.allProjectsBudget = formatToBRL(this.calculateAllProjectsBudget(scenarioDTO));
@@ -233,12 +254,12 @@ export class ScenarioDetailPageComponent {
                 ranking.status === ScenarioRankingStatusEnum.MANUALLY_INCLUDED
                 || ranking.status === ScenarioRankingStatusEnum.INCLUDED
             )
-            .map(ranking => ranking.project?.budget ?? 0).reduce((a, b) => a + b, 0);
+            .map(ranking => ranking.project.estimateAtCompletion ?? 0).reduce((a, b) => a + b, 0);
     }
 
     calculateAllProjectsBudget(scenarioDto: any): number {
         let scenario: ScenarioReadDTO = scenarioDto as ScenarioReadDTO;
-        return scenario.scenarioRankings.map(ranking => ranking.project?.budget ?? 0).reduce((a, b) => a + b, 0);
+        return scenario.scenarioRankings.map(ranking => ranking.project.estimateAtCompletion ?? 0).reduce((a, b) => a + b, 0);
     }
 
     setVariablesByRouteParams(params: ParamMap) {
@@ -290,12 +311,12 @@ export class ScenarioDetailPageComponent {
     onBudgetClick() {
         if (this.hasWarningInformationModalAlreadyDisplayed) return;
 
-        this.isWarningInformationModalVisible = true;
+        this.isBudgetWarningVisible = true;
     }
 
     onWarningInformationModalClose() {
         this.hasWarningInformationModalAlreadyDisplayed = true;
-        this.isWarningInformationModalVisible = false;
+        this.isBudgetWarningVisible = false;
     }
 
     onBudgetKeyDown(event: KeyboardEvent) {

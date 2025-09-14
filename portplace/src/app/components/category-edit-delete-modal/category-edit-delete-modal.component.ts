@@ -40,6 +40,9 @@ export class CategoryEditDeleteModalComponent {
 
     errorMessage = '';
 
+    showEntityAlreadyUsedMessage = false;
+    canBeDeleted = false;
+
     isSubmitButtonDisabled = true;
 
     mouseDownOnOverlay = false;
@@ -56,6 +59,8 @@ export class CategoryEditDeleteModalComponent {
                 this.inputName = category.name;
                 this.inputDescription = category.description || '';
                 this.isSubmitButtonDisabled = false;
+                this.canBeDeleted = category.canBeDeleted;
+                this.showEntityAlreadyUsedMessage = !category.canBeDeleted;
             },
             error: _ => { 
                 this.errorMessage = 'Ocorreu um erro inesperado. Tente novamente mais tarde.';

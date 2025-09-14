@@ -16,4 +16,5 @@ export class PortfolioCategoryReadDTO {
     lastModifiedAt?: Date;
     lastModifiedBy = '';
     createdBy = '';
+    canBeDeleted = false;
 }

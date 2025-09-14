@@ -45,19 +45,34 @@ export class ProjectsComponent implements OnInit {
   actionButton = getActionButton();
 
 
-  newProject: Project = {
+   newProject: Project = {
+    id: 0,
     name: '',
     description: '',
-    portfolio: undefined  ,
+    status: ProjectStatusEnum.IN_ANALYSIS,
+    payback: 0,
+    roi: 0,
     startDate: '',
     endDate: '',
-    status: ProjectStatusEnum.IN_ANALYSIS,
-    projectManager: 1,
-    earnedValue: 0,
     plannedValue: 0,
+    earnedValue: 0,
     actualCost: 0,
-    budget: 0,
-    payback: 0
+    budgetAtCompletion: 0,
+    percentComplete: 0,
+    costPerformanceIndex: 0,
+    schedulePerformanceIndex: 0,
+    estimateAtCompletion: 0,
+    estimateToComplete: 0,
+    portfolioCategory: undefined,
+    portfolioName: '',
+    strategyName: '',
+    scenarioRankingScore: 0,
+    priorityInPortfolio: 0,
+    strategicObjectives: [],
+    evaluations: [],
+    createdAt: '',
+    lastModifiedAt: '',
+    disabled: false
   };
 
   createProjectConfig: FormModalConfig = {
@@ -113,17 +128,41 @@ export class ProjectsComponent implements OnInit {
 
     // Remover breadcrumbs filhos quando retorna para esta página
     this.breadcrumbService.removeChildrenAfter('/projetos');
+
+    this.loadProjects();
   }
 
   // Usado pelo TableComponent.
-  // Recarrega a tabela de projetos, buscando os dados via requisição HTTP.
+    // Recarrega a tabela de projetos, buscando os dados via requisição HTTP.
   getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => (
-    this.projetoService.getProjectsPage(queryParams).pipe(
-      map(page => mapProjectPageDtoToProjectTableRowPage(page))
-    )
+      this.projetoService.getProjectsPage(queryParams).pipe(
+          map(page => (mapProjectPageDtoToProjectTableRowPage(page)))
+      )
   );
 
+  loadProjects(): void {
+    this.loadingProjects = true;
+    this.projetoService.getAllProjects()
+    .pipe(retry(5))
+    .subscribe({
+      next: (response: ProjectPageableResponse) => {
+        console.log('Resposta paginada da API:', response);
+        console.log(`Total de elementos: ${response.totalElements}`);
+        console.log(`Página atual: ${response.number + 1} de ${response.totalPages}`);
 
+        // Extrair projetos da resposta paginada
+        this.allProjects = response.content;
+        this.Projects = response.content;
+        this.loadingProjects = false;
+      },
+      error: (err) => {
+        console.error('Erro ao buscar projetos:', err);
+        this.allProjects = [];
+        this.Projects = [];
+        this.loadingProjects = false;
+      }
+    });
+  }
 
   createProject(): void {
     console.log('Dados do projeto sendo enviados:', this.newProject);
@@ -131,6 +170,7 @@ export class ProjectsComponent implements OnInit {
     this.projetoService.createProject(this.newProject).subscribe({
       next: (createdProject) => {
         console.log('Projeto criado:', createdProject);
+        this.loadProjects();
         this.resetNewProject();
       },
       error: (err) => {
@@ -147,6 +187,8 @@ export class ProjectsComponent implements OnInit {
     }
     this.projetoService.updateProject(project.id, project).subscribe({
       next: (updatedProject) => {
+        console.log('Projeto atualizado:', updatedProject);
+        this.loadProjects();
       },
       error: (err) => {
         console.error('Erro ao atualizar projeto:', err);
@@ -157,7 +199,8 @@ export class ProjectsComponent implements OnInit {
   deleteProject(projectId: number): void {
     this.projetoService.deleteProject(projectId).subscribe({
       next: () => {
-
+        console.log('Projeto deletado!');
+        this.loadProjects();
       },
       error: (err) => {
         console.error('Erro ao deletar projeto:', err);
@@ -199,30 +242,51 @@ export class ProjectsComponent implements OnInit {
     this.Projects = filtered;
   }
 
-  onProjectClick(projectOrId: any): void {
-    const id = typeof projectOrId === 'object' && projectOrId !== null ? projectOrId.id : projectOrId;
+  onProjectClick(projectId: number): void {
+    let id: number | undefined;
+    if (typeof projectId === 'object' && projectId !== null && 'id' in projectId) {
+      id = (projectId as { id: number }).id;
+    } else if (typeof projectId === 'number') {
+      id = projectId;
+    }
     if (id) {
       this.router.navigate(['/projeto', id]);
     } else {
-      console.warn('ID do projeto não encontrado:', projectOrId);
+      console.warn('ID da estratégia não encontrado:', projectId);
     }
   }
 
   resetNewProject(): void {
     this.newProject = {
-      name: '',
-      description: '',
-      portfolio: undefined  ,
-      startDate: '',
-      endDate: '',
-      status: ProjectStatusEnum.IN_ANALYSIS,
-      projectManager: 1,
-      earnedValue: 0,
-      plannedValue: 0,
-      actualCost: 0,
-      budget: 0,
-      payback: 0
-    };
+        id: 0,
+        name: '',
+        description: '',
+        status: ProjectStatusEnum.IN_ANALYSIS,
+        payback: 0,
+        roi: 0,
+        startDate: '',
+        endDate: '',
+        plannedValue: 0,
+        earnedValue: 0,
+        actualCost: 0,
+        budgetAtCompletion: 0,
+        percentComplete: 0,
+        costPerformanceIndex: 0,
+        schedulePerformanceIndex: 0,
+        estimateAtCompletion: 0,
+        estimateToComplete: 0,
+        portfolioCategory: undefined,
+        portfolioName: '',
+        strategyName: '',
+        scenarioRankingScore: 0,
+        priorityInPortfolio: 0,
+        strategicObjectives: [],
+        evaluations: [],
+        createdAt: '',
+        lastModifiedAt: '',
+        disabled: false
+      };
+
   }
 
   openCreateModal(): void {
@@ -240,39 +304,51 @@ export class ProjectsComponent implements OnInit {
   }
 
   onSaveProject(fields: FormField[]): void {
-    // Process form data
     const projectData = fields.reduce((acc, field) => {
       acc[field.id] = field.value;
       return acc;
     }, {} as any);
 
-    // Validar dados antes de enviar
     const validationResult = this.validateProjectData(projectData);
     if (!validationResult.isValid) {
       console.error('Dados inválidos:', validationResult.errors);
-      // Aqui você pode mostrar os erros no formulário
+
       return;
     }
 
-    const newProject: Project = {
+
+    // Monta apenas os campos esperados pelo backend
+
+    // Função utilitária para formatar data dd/MM/yyyy
+    function formatDateBR(dateStr?: string): string {
+      if (!dateStr) return '';
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return dateStr; // já está formatada
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+
+    const newProject = {
       name: projectData.name,
       description: projectData.description,
-      portfolio: undefined,
-      startDate: projectData.startDate,
-      endDate: projectData.endDate,
       status: ProjectStatusEnum.IN_ANALYSIS,
-      projectManager: 1,
+      payback:  0,
       earnedValue: 0,
       plannedValue: 0,
       actualCost: 0,
-      budget: 0,
-      payback: 0
+      budgetAtCompletion: 0,
+      startDate: formatDateBR(projectData.startDate),
+      endDate: formatDateBR(projectData.endDate)
     };
 
     console.log('Dados do projeto sendo enviados:', newProject);
 
     this.projetoService.createProject(newProject).subscribe({
       next: (createdProject) => {
+        console.log('Projeto criado:', createdProject);
+        this.loadProjects();
         this.resetNewProject();
         this.closeCreateModal();
       },

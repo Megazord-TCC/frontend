@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { map, Observable, of } from 'rxjs';
 import { Page, PaginationQueryParams } from '../models/pagination-models';
-import { PortfolioCostStatus, PortfolioListReadDTO, PortfolioProgressStatus, PortfolioReadDTO, PortfolioSummaryTab, PortfolioUpdateDTO } from '../interface/carlos-portfolio-interfaces';
+import { PortfolioCancelationPatchDTO, PortfolioCostStatus, PortfolioListReadDTO, PortfolioProgressStatus, PortfolioReadDTO, PortfolioSummaryTab, PortfolioUpdateDTO } from '../interface/carlos-portfolio-interfaces';
 import { ScenarioService } from './scenario-service';
 import { ProjectReadDTO2 } from '../interface/carlos-project-dtos';
 
@@ -89,6 +89,16 @@ export class PortfolioService {
     updatePortfolio(portfolioId: number, body: PortfolioUpdateDTO): Observable<void> {
         const url = this.getPortfolioDetailUrl(portfolioId);
         return this.http.put<void>(url, body, { headers: this.getHeaders() });
+    }
+
+    // PATCH - Cancelar portfólio 
+    cancelPortfolio(portfolioId: number, reason: string): Observable<void> {
+        const url = `${this.getPortfolioDetailUrl(portfolioId)}/cancel`;
+
+        const body = new PortfolioCancelationPatchDTO();
+        body.cancellationReason = reason;
+
+        return this.http.patch<void>(url, body, { headers: this.getHeaders() });
     }
 
     deletePortfolio(portfolioId: number): Observable<void> {

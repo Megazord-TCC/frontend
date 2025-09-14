@@ -261,25 +261,6 @@ $success-color: #10b981;
       }
     }
 
-    .save-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      padding: 4px 12px;
-      background-color: white;
-      color: black;
-      border: 1px solid black;
-      border-radius: 4px;
-      font-size: 14px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background-color 0.2s, color 0.2s;
-
-      &:hover {
-        background-color: #f0f0f0;
-      }
-    }
 
     .last-update-text {
       font-size: 12px;
@@ -409,5 +390,27 @@ $success-color: #10b981;
     .evaluation-text {
       line-height: 1.4;
     }
+  }
+}
+
+.save-btn {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 12px;
+  background-color: white;
+  color: black;
+  border: 1px solid black;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s, color 0.2s;
+
+  &:hover {
+    background-color: #f0f0f0;
   }
 }

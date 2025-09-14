@@ -99,146 +99,17 @@
             Cadastre os objetivos desta estratégia, os quais são utilizados como base para os critérios de avaliação.
             Somente uma estratégia pode estar ativa, a qual tem efeito apenas para fins de organização.
           </p>
-
-          <!-- Filters -->
-          <div class="objectives-filters">
-            <div class="filter-label">
-              <app-svg-icon
-                class="nav-icon"
-                [path]="'assets/icon/filter_vetor.svg'"
-                [size]="18">
-              </app-svg-icon>
-              <span>Filtros:</span>
-            </div>
-            <div class="filter-buttons">
-              <button
-                class="filter-btn"
-                [class.active]="objectiveFilter === 'ativado'"
-                (click)="onObjectiveFilterChange('ativado')">
-                <div class="filter-indicator blue"></div>
-                Ativado
-              </button>
-              <button
-                class="filter-btn"
-                [class.active]="objectiveFilter === 'cancelado'"
-                (click)="onObjectiveFilterChange('cancelado')">
-                <div class="filter-indicator blue"></div>
-                Cancelado
-              </button>
-            </div>
-          </div>
-
-          <!-- Actions -->
-          <div class="actions-right">
-            <button class="btn-primary" (click)="openCreateModal()">
-              <i class="icon-plus">+</i>
-              Cadastrar
-            </button>
-            <div class="search-container">
-
-              <app-svg-icon
-                class="nav-icon"
-                [path]="'assets/icon/search_vetor.svg'"
-                [size]="18">
-              </app-svg-icon>
-              <input
-                type="text"
-                placeholder="Buscar pelo nome do objetivo"
-                [(ngModel)]="objectiveSearchTerm"
-                (input)="onSearchObjectives()">
-            </div>
-          </div>
-
-          <!-- Objectives Table -->
-          <app-card class="table-card">
-            <div class="table-container">
-              <table class="objectives-table">
-                <thead>
-                  <tr>
-                    <th>
-                      <div class="header-cell">
-                        Nome do objetivo
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Critérios vinculados
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Portfólios ativos vinculados
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Projetos ativos vinculados
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Status
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let objective of filteredObjectives" class="table-row">
-                    <td>
-                      <button class="link" (click)="openObjectiveModal(objective.id)">
-                        {{objective.name}}
-                      </button>
-                    </td>
-                    <td>2</td>
-                    <td>2</td>
-                    <td>2</td>
-                    <td>
-                      <app-badge [color]="objective.statusColor">{{objective.status}}</app-badge>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </app-card>
-          <!--
-            <div class="pagination">
-              <p class="pagination-info">Mostrando 1 a {{filteredObjectives.length}} de {{filteredObjectives.length}} registros</p>
-              <div class="pagination-controls">
-                <button class="pagination-btn" disabled>
-                  <i class="icon-chevron-left">‹</i>
-                </button>
-                <button class="pagination-btn active">1</button>
-                <button class="pagination-btn" disabled>
-                  <i class="icon-chevron-right">›</i>
-                </button>
-              </div>
-            </div>
-            -->
+          <app-table
+            #objectivesTableComponent
+           *ngIf="strategy.id"
+            [dataRetrievalMethodRef]="getDataForObjetivesTable"
+            [filterButtons]="objectivesFilterButtons"
+            [filterText]="objectivesFilterText"
+            [columns]="objectivesColumns"
+            [actionButton]="objectivesActionButton"
+            (actionButtonClick)="openCreateModal()"
+            (mainColumnRowClick)="openObjectiveModal($event.id)">
+          </app-table>
           </div>
 
         <!-- Grupos de Critérios Tab -->
@@ -247,113 +118,19 @@
           <p class="tab-description">
             Cadastre grupos de critérios a partir de objetivos estratégicos. Esses critérios são utilizados para gerar avaliações.
           </p>
-
-          <!-- Actions -->
-          <div class="actions-right">
-            <button class="btn-primary" (click)="openCreateModal()">
-              <i class="icon-plus">+</i>
-              Cadastrar
-            </button>
-            <div class="search-container">
-
-              <app-svg-icon
-                class="nav-icon"
-                [path]="'assets/icon/search_vetor.svg'"
-                [size]="18">
-              </app-svg-icon>
-              <input
-                type="text"
-                placeholder="Buscar pelo nome do grupo de critério"
-                [(ngModel)]="criteriaSearchTerm"
-                (input)="onSearchCriterios()">
-            </div>
-          </div>
-
           <!-- Criteria Groups Table -->
-          <app-card class="table-card">
-            <div class="table-container">
-              <div class="div-loading-projetcts" *ngIf="loadingProjects">Carregando grupo de critério...</div>
-              <table class="criteria-table" *ngIf="!loadingProjects">
-                <thead>
-                  <tr>
-                    <th>
-                      <div class="header-cell">
-                        Nome do grupo de critério
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Objetivos vinculados
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Grupos de avaliações vinculados
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Status
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
+          <app-table
+            #criteriaTableComponent
+            *ngIf="strategy.id"
+            [dataRetrievalMethodRef]="getDataForCriteriaGroupsTable"
+            [filterButtons]="criteriaFilterButtons"
+            [filterText]="criteriaFilterText"
+            [columns]="criteriaColumns"
+            [actionButton]="criteriaActionButton"
+            (actionButtonClick)="openCreateModal()"
+            (mainColumnRowClick)="openCriteriaGroup($event)">
+          </app-table>
 
-
-
-                    <tr *ngFor="let criteria of filteredCriteriaGroups" class="table-row">
-                      <td>
-                        <button class="link" (click)="openCriteriaGroup(criteria.id)">
-                          {{criteria.name}}
-                        </button>
-                      </td>
-                      <td>2 de 2</td>
-                      <td>{{getAvalicoesCoutntPorId(criteria.id!)}}</td>
-                      <td class="status-cell">
-                        <app-badge [color]="getStatusColorByDisabled(criteria.status)">{{getStatusLabelByDisabled(criteria.status)}}</app-badge>
-                      </td>
-                    </tr>
-
-                </tbody>
-              </table>
-            </div>
-          </app-card>
-
-          <!-- Pagination
-          <div class="pagination">
-            <p class="pagination-info">Mostrando 1 a {{filteredCriteriaGroups.length}} de {{filteredCriteriaGroups.length}} registros</p>
-            <div class="pagination-controls">
-              <button class="pagination-btn" disabled>
-                <i class="icon-chevron-left">‹</i>
-              </button>
-              <button class="pagination-btn active">1</button>
-              <button class="pagination-btn" disabled>
-                <i class="icon-chevron-right">›</i>
-              </button>
-            </div>
-          </div>
-          -->
         </div>
 
         <!-- Grupos de Avaliações Tab -->

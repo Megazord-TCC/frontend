@@ -49,30 +49,14 @@ export class PortfolioCancelModalComponent {
     }
 
     async onSave(): Promise<any> {
-        // TODO: Fazer cancelamento do portfólio quando Gabriel fizer endpoint.
-
-        // if (!this.scenario) {
-        //     this.isSubmitButtonDisabled = true;
-        //     this.errorMessage = 'Ocorreu um erro. Tente novamente mais tarde.';
-        //     return;
-        // }
-
-        // let body = {
-        //     name: this.scenario.name,
-        //     description: this.scenario.description,
-        //     budget: this.scenario.budget,
-        //     status: ScenarioStatusEnum.CANCELLED
-        // };
-
-        // this.scenarioService
-        //     .updateScenario(this.strategyId, this.scenarioId, body)
-        //     .subscribe({
-        //         next: _ => this.portfolioCancelled.emit(),
-        //         error: _ => {
-        //             this.isSubmitButtonDisabled = true;
-        //             this.errorMessage = 'Ocorreu um erro. Tente novamente mais tarde.'
-        //         },
-        //     });
+        this.portfolioService
+            .cancelPortfolio(this.portfolioId, this.inputCancellationReason)
+            .subscribe({
+                next: _ => this.portfolioCancelled.emit(),
+                error: _ => {
+                    this.isSubmitButtonDisabled = true;
+                    this.errorMessage = 'Ocorreu um erro. Tente novamente mais tarde.'
+                },
+            });
     }
-
 }

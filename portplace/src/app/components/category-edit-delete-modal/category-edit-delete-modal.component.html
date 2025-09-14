@@ -10,6 +10,14 @@
 
         <!-- Body -->
         <div class="modal-body">
+            <div *ngIf="showEntityAlreadyUsedMessage" class="alert-message">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>
+                    Apenas realize ajustes ortográficos ou adicione informações complementares, 
+                    pois esta categoria já foi vinculada a um cenário.
+                </span>
+            </div>
+
             <!-- Validation Message -->
             <div *ngIf="errorMessage" class="validation-error">
                 <i class="icon-alert-triangle">⚠️</i>
@@ -31,7 +39,7 @@
                         maxlength="255"></textarea>
                 </div>
 
-                <button class="btn-exclude" (click)="deleteCategory()">
+                <button *ngIf="canBeDeleted" class="btn-exclude" (click)="deleteCategory()">
                     <app-svg-icon class="nav-icon" path="assets/icon/excluir_vetor.svg" [size]="18"></app-svg-icon>
                     Remover categoria
                 </button>

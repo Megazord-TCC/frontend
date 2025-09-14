@@ -23,7 +23,7 @@ export interface ProjectReadDTO {
     earnedValue: number;
     plannedValue: number;
     actualCost: number;
-    budget: number;
+    budgetAtCompletion: number;
     payback: number;
     startDate: Date;
     endDate: Date;
@@ -31,6 +31,7 @@ export interface ProjectReadDTO {
     createdAt: Date;
     lastModifiedAt: Date;
     disabled: boolean;
+    estimateAtCompletion: number;
 }
 
 export enum PortfolioProjectTableRowProjectStatus {
@@ -72,10 +73,11 @@ export class ProjectReadDTO2 {
     earnedValue = 0;
     actualCost = 0;
     percentComplete = 0;
-    budget = 0;
+    budgetAtCompletion = 0;
     portfolioCategory?: PortfolioCategoryReadDTO;
     projectManager?: UserGetResponseDTO;
     createdAt?: Date;
     lastModifiedAt?: Date;
     disabled = false;
+    estimateAtCompletion = 0;
 }

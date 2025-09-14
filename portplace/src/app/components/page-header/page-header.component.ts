@@ -27,6 +27,7 @@ export class PageHeaderComponent {
     @Input() description?: string;
     @Input() lastUpdate?: Date;
     @Input() statusBadge?: { color: string, text: string };
+    @Input() cancellationReason = '';
 
     // Dados extras impressos abaixo da 'description'. Ex: { key: 'Orçamento', value: 'R$ 1.000,00' }
     @Input() extraKeyValuePairInfos: { key: string, value: string, tooltip: string }[] = [];

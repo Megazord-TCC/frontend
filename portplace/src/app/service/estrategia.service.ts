@@ -48,14 +48,14 @@ export class EstrategiaService {
 
   // DELETE - Deletar estratégia permanentemente (hard delete)
   deleteStrategy(strategyId: number): Observable<void> {
-    const url = `${this.apiUrl}/${strategyId}/hard-delete`;
+    const url = `${this.apiUrl}/${strategyId}`;
     return this.http.delete<void>(url, {
       headers: this.getHeaders()
     });
   }
 
-  getProjectsPage( queryParams?: PaginationQueryParams): Observable<Page<any>> {
-      return this.http.get<Page<any>>(this.apiUrl, { params: queryParams?.getParamsInHttpParamsFormat() });
+  getStrategiesPage( queryParams?: PaginationQueryParams): Observable<Page<any>> {
+    return this.http.get<Page<any>>(this.apiUrl, { params: queryParams?.getParamsInHttpParamsFormat() });
   }
   // READ - Buscar todas as estratégias com filtros e paginação
   getStrategies(

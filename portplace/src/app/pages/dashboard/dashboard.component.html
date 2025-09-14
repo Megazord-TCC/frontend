@@ -22,7 +22,10 @@
         <option value="portfolio1">Portfólio 1</option>
         <option value="portfolio2">Portfólio 2</option>
       </select>
-      <button class="add-portfolio-btn">Adicionar portfólio</button>
+      <button *ngIf="authService.getAuthorizedPageTypesByRole().includes(pageType.PORTFOLIOS)" 
+        class="add-portfolio-btn">
+        Acessar portfólio
+      </button>
     </div>
 
     <!-- Metrics Cards -->
