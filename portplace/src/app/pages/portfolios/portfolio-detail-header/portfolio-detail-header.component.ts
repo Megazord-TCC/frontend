@@ -93,7 +93,7 @@ export class PortfolioDetailHeaderComponent {
         this.breadcrumbService.setBreadcrumbs([
             { label: 'Início', url: '/inicio', isActive: false },
             { label: 'Portfólios', url: '/portfolios', isActive: false },
-            { label: this.name ?? '...', url: `/portfolio/${this.portfolioId}`, isActive: true },
+            { label: `Portfólio: ${this.name ?? '...'}`, url: `/portfolio/${this.portfolioId}`, isActive: true },
         ]);
     }
 

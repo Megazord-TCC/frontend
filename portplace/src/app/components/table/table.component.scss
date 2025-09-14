@@ -65,18 +65,18 @@ $blue-color: #3b82f6;
                         background-color: #f8fafc;
                     }
 
-                    .link {
-                        background: none;
-                        border: none;
+                    .clickable {
                         color: #000000;
-                        cursor: pointer;
                         text-decoration: none;
                         font-size: 0.875rem;
                         font-family: 'Roboto', sans-serif;
                         font-weight: 500;
 
                         &:hover {
+                            background-color: #f0f6ff;
                             color: $blue-color;
+                            cursor: pointer;
+                            text-decoration: underline;
                         }
                     }
 

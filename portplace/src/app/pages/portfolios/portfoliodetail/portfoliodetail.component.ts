@@ -168,7 +168,7 @@ export class PortfolioDetailComponent implements OnInit {
     // Adicionar o breadcrumb do portfólio atual após carregar
     if (this.portfolio) {
       this.breadcrumbService.addChildBreadcrumb({
-        label: this.portfolio.name || `Portfólio ${this.portfolioId}`,
+        label: `Portfólio ${this.portfolio.name}` || `Portfólio ${this.portfolioId}`,
         url: `/portfolio/${this.portfolioId}`,
         isActive: true
       });
@@ -212,7 +212,7 @@ export class PortfolioDetailComponent implements OnInit {
 
   private updateBreadcrumbWithPortfolioName(): void {
     this.breadcrumbService.addChildBreadcrumb({
-      label: this.portfolio.name || `Portfólio ${this.portfolioId}`,
+      label: `Portfólio ${this.portfolio.name}` || `Portfólio ${this.portfolioId}`,
       url: `/portfolio/${this.portfolioId}`,
       isActive: true
     });

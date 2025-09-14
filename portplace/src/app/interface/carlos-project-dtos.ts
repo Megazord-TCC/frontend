@@ -50,6 +50,7 @@ export class PortfolioProjectTableRow {
     endDate = '';
     plannedValue = '';
     earnedValue = '';
+    categoryName = '';
 }
 
 export enum ProjectStatusEnumDTO2 {

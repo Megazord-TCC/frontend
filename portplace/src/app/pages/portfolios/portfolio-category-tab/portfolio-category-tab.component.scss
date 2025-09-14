@@ -16,9 +16,18 @@
 
     .tab-description {
         color: #64748b;
-        margin-bottom: 1.5rem;
         line-height: 1.5;
         font-family: 'Roboto', sans-serif;
+
+        &.main {
+            margin-bottom: 0.5rem;
+        }
+
+        &.extra {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            font-size: 12px;
+        }
     }
 }
 

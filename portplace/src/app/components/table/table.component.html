@@ -28,11 +28,13 @@
             <tbody>
                 <!-- Variável "row" será do tipo 'Usuario' se o service retorna usuários paginados, por exemplo. -->
                 <tr *ngFor="let row of page?.content" class="table-row">
-                    <td *ngFor="let attributeName of getDesiredAndExistingAttributeNamesToPrint(); let colIdx = index">
+                    <td *ngFor="let attributeName of getDesiredAndExistingAttributeNamesToPrint(); let colIdx = index"
+                        [class.clickable]="isClickableMainColumn(attributeName)" 
+                        (click)="emitMainColumnRowClickIfIsMainColumn(attributeName, row)">
                         <span *ngIf="isClickableMainColumn(attributeName); else selectWithBadge">
-                            <button class="link" (click)="mainColumnRowClick.emit(row);">
+                            <div class="link">
                                 {{ getCellValue(row, columns[colIdx]) }}
-                            </button>
+                            </div>
                         </span>
                         <ng-template #selectWithBadge>
                             <app-badge *ngIf="hasBadgeStyle(attributeName) && isSelectButton(attributeName); else selectWithoutBadge"
