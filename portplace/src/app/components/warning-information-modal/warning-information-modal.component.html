@@ -15,11 +15,12 @@
                 <i class="icon-alert-triangle">⚠️</i>
                 <span>{{ text }}</span>
             </div>
+            <ng-content></ng-content>
         </div>
 
         <!-- Footer -->
         <div class="modal-footer">
-            <button class="btn-primary" (click)="onClose()">Entendi</button>
+            <button class="btn-primary" (click)="onClose()">{{ closeButtonLabel }}</button>
         </div>
     </div>
 </div>

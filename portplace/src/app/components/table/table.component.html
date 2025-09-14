@@ -39,7 +39,8 @@
                                 [color]="getBadgeColor(row, attributeName)">
                                 <select class="select-no-style"
                                     [disabled]="getSelectButtonDisabled(row, attributeName)"
-                                    (change)="onChangeSelectedValue($event, row, attributeName)">
+                                    (change)="onChangeSelectedValue($event, row, attributeName)"
+                                    (click)="selectClick.emit({ row: row, column: columns[colIdx] })">
                                     <option class="option-no-style" *ngFor="let option of getSelectButtonOptions(row, attributeName)"
                                         [value]="option.value" [hidden]="option.hidden" 
                                         [selected]="getSelectButtonValue(row, attributeName) == option.value">
@@ -52,7 +53,8 @@
                             <select *ngIf="isSelectButton(attributeName); else badge"
                                 class="select-with-style"
                                 [disabled]="getSelectButtonDisabled(row, attributeName)"
-                                (change)="onChangeSelectedValue($event, row, attributeName)">
+                                (change)="onChangeSelectedValue($event, row, attributeName)"
+                                (click)="selectClick.emit({ row: row, column: columns[colIdx] })">
                                 <option *ngFor="let option of getSelectButtonOptions(row, attributeName)"
                                     [value]="option.value" [hidden]="option.hidden"
                                     [selected]="getSelectButtonValue(row, attributeName) == option.value">

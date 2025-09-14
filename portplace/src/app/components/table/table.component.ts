@@ -59,6 +59,9 @@ export class TableComponent {
     // Só é exibido o <select> quando o TableColumn foi configurado com o atributo SelectButton.
     @Output() selectChange = new EventEmitter<SelectButtonOptionSelected>();
 
+    // Quando o usuário clica num select.
+    @Output() selectClick = new EventEmitter<{ row: any, column: TableColumn }>();
+
     // Contém dados de paginação retornados pelo service.
     // Para acessar a lista de objetos, usar 'page.content'.
     // Essa lista será por exemplo `User[]`, se o service retornar uma lista de usuários.

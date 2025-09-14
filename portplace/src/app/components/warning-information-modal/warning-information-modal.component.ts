@@ -12,6 +12,7 @@ import { ScenarioService } from '../../service/scenario-service';
 })
 export class WarningInformationModalComponent {
     @Input() text = 'Nenhum aviso foi definido.';
+    @Input() closeButtonLabel = 'Entendi';
 
     @Output() close = new EventEmitter<void>();
 
