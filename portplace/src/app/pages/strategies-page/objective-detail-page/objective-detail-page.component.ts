@@ -236,4 +236,29 @@ export class ObjectiveDetailPageComponent implements OnInit {
   closeDeleteModal(): void {
     this.showDeleteModal = false;
   }
+  getProjectStatusEnumToText = (statusEnum: any): string => {
+    switch (statusEnum) {
+        case "IDLE": return "PARADO";
+        case "ACTIVE": return "ATIVO";
+        case "CANCELLED": return "CANCELADO";
+        case "COMPLETED": return "FINALIZADO";
+        case "ON_HOLD": return "PAUSADO";
+        default: return "SEM STATUS";
+    }
+}
+
+  getProjectStatusColor(status: any): string {
+    switch (status) {
+      case 'IDLE':
+        return 'yellow';
+      case 'ACTIVE':
+        return 'green';
+      case 'CANCELLED':
+        return 'blue';
+      case 'COMPLETED':
+        return 'gray';
+      default:
+        return 'gray';
+    }
+  }
 }
