@@ -600,30 +600,18 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
   onCancelStrategy(fields: FormField[]): void {
     const cancelReason = fields.find(f => f.id === 'reason')?.value || '';
 
-    const updatedStrategy = {
-      ...this.strategy,
-      status: StrategyStatusEnum.INACTIVE,
-      description: `${this.strategy.description || ''}\n\nRazão do cancelamento: ${cancelReason}`
-    };
-
-    const sanitizedStrategy = this.sanitizeStrategyData(updatedStrategy);
-
-    this.estrategiaService.updateStrategy(this.strategy.id!, sanitizedStrategy)
+    this.estrategiaService.cancelStrategy(this.strategy.id!, { cancellationReason: cancelReason })
       .pipe(retry(3))
       .subscribe({
         next: (updatedStrategy) => {
-          console.log('Estratégia cancelada com sucesso:', updatedStrategy);
           this.closeCancelModal();
           this.loadStrategyDetails(this.strategy.id!);
-          alert('Estratégia cancelada com sucesso');
           setTimeout(() => {
             this.router.navigate(['/estrategias']);
           }, 1000);
         },
         error: (err) => {
           console.error('Erro ao cancelar estratégia:', err);
-          console.error('Detalhes do erro:', err.error);
-          alert('Erro ao cancelar a estratégia. Tente novamente.');
         }
       });
   }

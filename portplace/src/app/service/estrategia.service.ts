@@ -37,6 +37,12 @@ export class EstrategiaService {
       headers: this.getHeaders()
     });
   }
+  cancelStrategy(strategyId: number, dto: any): Observable<Strategy> {
+    const url = `${this.apiUrl}/${strategyId}/cancel`;
+    return this.http.patch<Strategy>(url, dto, {
+      headers: this.getHeaders()
+    });
+  }
 
   // DELETE - Desabilitar estratégia (soft delete)
   disableStrategy(strategyId: number): Observable<void> {

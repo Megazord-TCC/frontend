@@ -108,40 +108,6 @@ export class StrategiesPageComponent implements OnInit {
     )
   );
 
-
-
-  onFilterChange(filter: string): void {
-    this.activeFilter = this.activeFilter === filter ? '' : filter;
-    this.applyFilters();
-  }
-
-  onSearchChange(): void {
-    this.applyFilters();
-  }
-
-  applyFilters(): void {
-    let filtered = [...this.strategies];
-
-    if (this.activeFilter) {
-      filtered = filtered.filter(strategy => {
-        const statusMap: { [key: string]: StrategyStatusEnum } = {
-          'ativo': StrategyStatusEnum.ACTIVE,
-          'inativo': StrategyStatusEnum.INACTIVE
-        };
-
-        return strategy.status === statusMap[this.activeFilter.toLowerCase()];
-      });
-    }
-
-    if (this.searchTerm) {
-      filtered = filtered.filter(strategy =>
-        strategy.name.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
-    }
-
-    this.filteredStrategies = filtered;
-  }
-
   onStrategyClick(strategyId: number | { id: number }): void {
     let id: number | undefined;
     if (typeof strategyId === 'object' && strategyId !== null && 'id' in strategyId) {
@@ -214,21 +180,6 @@ export class StrategiesPageComponent implements OnInit {
       isValid: errors.length === 0,
       errors
     };
-  }
-  editStrategy() {
-    console.log('Editar estratégia');
-    // Lógica para edição
-  }
-
-  cancelStrategy() {
-    console.log('Cancelar estratégia');
-    // Lógica para cancelamento
-  }
-
-  deleteStrategy() {
-    console.log('Excluir estratégia');
-    // Lógica para exclusão
-    // Pode adicionar um modal de confirmação aqui
   }
 
   getStatusLabel(status?: StrategyStatusEnum): string {
