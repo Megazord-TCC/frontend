@@ -1,4 +1,3 @@
-
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -126,6 +125,7 @@ export class ProjectDetailpageComponent implements OnInit {
   httpClient = inject(HttpClient);
   evaluationGroupId = -1;
 
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -179,7 +179,11 @@ export class ProjectDetailpageComponent implements OnInit {
     return this.formatCurrency(etc);
   }
 
-  // Formatação de moeda
+  verifyStrategyBond(): boolean {
+    if (!this.project?.portfolioName && !this.project?.strategyName && !this.project?.scenarioRankingScore) return false;
+    return true;
+  }
+
   formatCurrency(value: number): string {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -326,7 +330,7 @@ export class ProjectDetailpageComponent implements OnInit {
     this.activeTab = tab;
   }
 
-  // Busca rankings de projetos para uma estratégia e evaluation group
+
   getProjectRankings(): void {
 
     const projectRankingsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroupId}/ranking`;
@@ -378,13 +382,7 @@ export class ProjectDetailpageComponent implements OnInit {
     });
     this.showEditModal = true;
   }
-  getProjectScore() {
 
-    if (!this.project || !Array.isArray(this.project.evaluations)) return 'Sem valor if';
-    const evaluation = this.project.evaluations.find((ev: any) => ev && ev.project.id === this.project!.id);
-
-    return evaluation && typeof evaluation.score === 'number' ? evaluation.score : 'Sem valor';
-  }
   onSaveEditPortfolio(fields: FormField[]): void {
     this.updateProjectField(fields);
     this.closeEditModal();
@@ -394,7 +392,6 @@ export class ProjectDetailpageComponent implements OnInit {
     this.showEditModal = false;
   }
 
-  // onSavePortfolio removido, agora é onSaveProjeto
 
   closeCancelModal(): void {
     this.showCancelModal = false;
@@ -407,6 +404,29 @@ export class ProjectDetailpageComponent implements OnInit {
       field.errorMessage = '';
     });
     this.showCancelModal = true;
+  }
+
+  isCancelled(): boolean {
+    return this.project?.status === ProjectStatusEnum.CANCELLED;
+  }
+
+  onUncancelProject(): void {
+    if (!this.project) return;
+    if (this.project.status !== ProjectStatusEnum.CANCELLED) return;
+    const updatedProject = {
+      ...this.project,
+      status: ProjectStatusEnum.IN_ANALYSIS
+    };
+    this.projetoService.updateProject(this.project.id, updatedProject)
+      .pipe(retry(3))
+      .subscribe({
+        next: (updatedProject) => {
+          this.loadProjectDetails(this.project!.id);
+        },
+        error: (err) => {
+          alert('Erro ao descancelar o projeto. Tente novamente.');
+        }
+      });
   }
 
   onCancelProject(fields: FormField[]): void {
@@ -423,7 +443,6 @@ export class ProjectDetailpageComponent implements OnInit {
     .pipe(retry(3))
     .subscribe({
       next: (updatedProject) => {
-
         this.closeCancelModal();
         this.loadProjectDetails(this.project!.id);
         setTimeout(() => {

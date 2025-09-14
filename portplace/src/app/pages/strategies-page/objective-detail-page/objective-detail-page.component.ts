@@ -18,7 +18,11 @@ import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } fro
 import { map, Observable } from 'rxjs';
 import { mapCriterionPageDtoToCriterionTableRowPage } from '../../../mappers/criterion-mappers';
 import { TableComponent } from '../../../components/table/table.component';
-import { getColumns as getCriterionColumns, getFilterButtons as getCriterionFilterButtons, getFilterText as getCriterionFilterText, getActionButton as getCriterionActionButton } from '../../grupo-criterios/criteria-table-config';
+import { mapPortfolioDTOPageToPortfolioTableRowPage } from '../../../mappers/portfolio-mapper';
+import { mapProjectPageDtoToProjectTableRowPage } from '../../../mappers/projects-mappers';
+import { getColumns as getCriterionColumns, getFilterButtons as getCriterionFilterButtons, getFilterText as getCriterionFilterText, getActionButton as getCriterionActionButton } from './criteria-table-config';
+import { getColumns as getPortfoliosColumns, getFilterButtons as getPortfoliosFilterButtons, getFilterText as getPortfoliosFilterText, getActionButton as getPortfoliosActionButton } from './portfolio-table-config';
+import { getColumns as getProjectColumns, getFilterButtons as getProjectFilterButtons, getFilterText as getProjectFilterText, getActionButton as getProjectActionButton } from './portfolio-table-config';
 
 @Component({
   selector: 'app-objective-detail-page',
@@ -64,6 +68,16 @@ export class ObjectiveDetailPageComponent implements OnInit {
   criterionFilterButtons = getCriterionFilterButtons();
   criterionFilterText = getCriterionFilterText();
   criterionActionButton = getCriterionActionButton();
+  // Propriedades para o app-table de portfolios
+  portfoliosColumns = getPortfoliosColumns();
+  portfoliosFilterButtons = getPortfoliosFilterButtons();
+  portfoliosFilterText = getPortfoliosFilterText();
+  portfoliosActionButton = getPortfoliosActionButton();
+  // Propriedades para o app-table de projetos
+  projectColumns = getProjectColumns();
+  projectFilterButtons = getProjectFilterButtons();
+  projectFilterText = getProjectFilterText();
+  projectActionButton = getProjectActionButton();
   criteriaGroupId = 0;
 
   objective?: Objective;
@@ -86,8 +100,6 @@ export class ObjectiveDetailPageComponent implements OnInit {
       const objectiveIdParam = params.get('objetivoId');
       this.objectiveId = objectiveIdParam ? Number(objectiveIdParam) : 0;
       this.loadObjective();
-      this.loadCriterios();
-      // Se quiser, adicione loadPortfolios/loadProjetos
       this.breadcrumbService.addChildBreadcrumb({
         label: `Objetivo ${this.objectiveId}`,
         url: `/estrategia/${this.estrategiaId}/objetivo/${this.objectiveId}`,
@@ -97,10 +109,22 @@ export class ObjectiveDetailPageComponent implements OnInit {
   }
 
   getDataForCriteriaTable: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => {
-    return this.criterioService.getCriteriaObjectivesPage(this.estrategiaId, this.objectiveId, queryParams).pipe(
+    return this.objetivoService.getObjectiveCriteria(this.estrategiaId, this.objectiveId, queryParams).pipe(
       map((page: Page<any>) => mapCriterionPageDtoToCriterionTableRowPage(page))
     );
   };
+  getDataForPortfoliosTable: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => {
+    return this.objetivoService.getObjectivePortfolios(this.estrategiaId, this.objectiveId, queryParams).pipe(
+      map((page: Page<any>) => mapPortfolioDTOPageToPortfolioTableRowPage(page))
+    );
+  };
+  getDataForProjectsTable: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => {
+    return this.objetivoService.getObjectiveProjects(this.estrategiaId, this.objectiveId, queryParams).pipe(
+      map((page: Page<any>) => mapProjectPageDtoToProjectTableRowPage(page))
+    );
+  };
+
+
   async loadObjective(): Promise<void> {
     try {
       const obj = await this.objetivoService.getObjectiveById(this.estrategiaId, this.objectiveId).toPromise();
@@ -110,18 +134,6 @@ export class ObjectiveDetailPageComponent implements OnInit {
     }
   }
 
-  async loadCriterios(): Promise<void> {
-    this.loadingCriteria = true;
-    try {
-      const criterios = await this.criterioService.getAllCriterios(this.estrategiaId, this.objectiveId).toPromise();
-      this.allCriterios = criterios || [];
-      this.filteredCriterios = criterios || [];
-      this.loadingCriteria = false;
-    } catch (err) {
-      this.loadingCriteria = false;
-      console.error('Erro ao buscar critérios:', err);
-    }
-  }
 
   onSearchCriterio(): void {
     let filtered = [...this.allCriterios];
@@ -181,9 +193,16 @@ export class ObjectiveDetailPageComponent implements OnInit {
   }
 
   deleteObjective() {
-    console.log('Excluir objetivo');
-    // Lógica para exclusão
-    // Pode adicionar um modal de confirmação aqui
+    this.objetivoService.disableObjective(this.estrategiaId, this.objectiveId).subscribe({
+      next: () => {
+        console.log('Objetivo excluído com sucesso');
+        this.closeDeleteModal();
+        this.goBack();
+      },
+      error: (err) => {
+        console.error('Erro ao excluir objetivo:', err);
+      }
+    });
   }
   onTabChange(tab: string): void {
     this.activeTab = tab;

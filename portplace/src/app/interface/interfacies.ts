@@ -246,7 +246,7 @@ export interface Strategy {
   activeObjectivesCount?: number;
   disabled?: boolean;
   createdAt?: Date;
-  lastModifiedAt?: Date;
+  lastModifiedAt?: string;
   activeObjectives?: number;
   statusColor?: string;
 }

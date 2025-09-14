@@ -23,16 +23,19 @@
           <button class="action-btn" (click)="editStrategy()">
             Editar
           </button>
-          <button class="action-btn cancel" (click)="cancelStrategy()">
+          <button class="action-btn cancel" (click)="cancelStrategy()" *ngIf="!isInactive()">
             Cancelar
           </button>
-          <button class="action-btn delete" (click)="deleteStrategy()">
+          <button class="action-btn delete" (click)="deleteStrategy()" *ngIf="!isInactive()">
             Excluir
           </button>
+          <button class="action-btn" (click)="onActivateStrategy()" *ngIf="isInactive()">
+            Ativar estratégia
+          </button>
         </div>
-        <div class="last-update">
-            Última alteração realizada em {{strategy.lastModifiedAt | date: 'dd/MM/yyyy HH:mm'}}.
-        </div>
+      <div class="last-update">
+        Última alteração realizada em {{ strategy.lastModifiedAt ? (parseDateString(strategy.lastModifiedAt) | date: 'dd/MM/yyyy HH:mm') : '' }}.
+      </div>
       </div>
     </div>
 

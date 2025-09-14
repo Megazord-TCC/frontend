@@ -10,6 +10,7 @@
       <p>Gerencie os projetos da organização.</p>
     </div>
     <app-table
+        #tableComponent
         [dataRetrievalMethodRef]="this.getDataForTableComponent"
         [filterButtons]="filterButtons"
         [filterText]="filterText"

@@ -548,6 +548,7 @@ $blue-color: #3b82f6;
       transition: all 0.2s ease;
       font-family: 'Inter', sans-serif;
       font-weight: 500;
+
       &:hover {
         background-color: rgba(0, 0, 0, 0.05);
       }
@@ -557,6 +558,15 @@ $blue-color: #3b82f6;
       }
 
       &.delete {
+        border-color: #f44336;
+        color: #f44336;
+
+        &:hover {
+          background-color: rgba(244, 67, 54, 0.05);
+        }
+      }
+
+      &.cancel {
         border-color: #f44336;
         color: #f44336;
 
