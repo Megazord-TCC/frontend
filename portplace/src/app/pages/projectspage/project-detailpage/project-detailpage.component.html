@@ -1,355 +1,273 @@
 <div class="project-detail-layout">
-  <div class="project-detail-content">
-    <!-- Breadcrumb -->
-    <app-breadcrumb></app-breadcrumb>
+    <div class="project-detail-content">
+        <!-- Breadcrumb -->
+        <app-breadcrumb></app-breadcrumb>
 
-    <!-- Header -->
-    <div class="project-header">
-      <div class="header-top">
-        <button class="back-btn" (click)="goBack()">
-          <app-svg-icon
-            class="nav-icon"
-            [path]="'assets/icon/voltar_vetor.svg'"
-            [size]="18">
-          </app-svg-icon>
-        </button>
-        <h1>{{project?.name}}</h1>
-        <app-badge [color]="getProjectStatusColor(project!.status)">{{getProjectStatusEnumToText(project?.status)}}</app-badge>
-      </div>
-      <p class="project-description">{{project?.description}}</p>
+        <!-- Header -->
+        <div class="project-header">
+            <div class="header-top">
+                <button class="back-btn" (click)="goBack()">
+                    <app-svg-icon class="nav-icon" [path]="'assets/icon/voltar_vetor.svg'" [size]="18">
+                    </app-svg-icon>
+                </button>
+                <h1>{{project?.name}}</h1>
+                <app-badge
+                    [color]="getProjectStatusColor(project!.status)">{{getProjectStatusEnumToText(project?.status)}}</app-badge>
+            </div>
+            <p class="project-description">{{project?.description}}</p>
 
-      <div class="project-dates">
-        <span>Início planejado: {{project?.startDate}}</span>
-        <span>Fim planejado: {{project?.endDate}}</span>
-        <span *ngIf="project?.roi">ROI: {{project?.roi | number:'1.2-2'}}%</span>
-      </div>
-
-      <div class="header-actions">
-        <button class="btn-outline" (click)="openEditModal()">
-          <app-svg-icon
-            class="nav-icon"
-            [path]="'assets/icon/editar_vetor.svg'"
-            [size]="18">
-          </app-svg-icon>
-          Editar dados básicos
-        </button>
-        <button class="btn-outline" (click)="openCancelModal()" *ngIf="!isCancelled()">
-          <app-svg-icon
-            class="nav-icon"
-            [path]="'assets/icon/editar_vetor.svg'"
-            [size]="18">
-          </app-svg-icon>
-          Cancelar projeto
-        </button>
-        <button class="btn-outline btn-danger" *ngIf="!isCancelled()">
-          <app-svg-icon
-            class="nav-icon"
-            [path]="'assets/icon/excluir_vetor.svg'"
-            [size]="18">
-          </app-svg-icon>
-          Excluir
-        </button>
-        <button class="btn-outline btn-success" (click)="onUncancelProject()" *ngIf="isCancelled()">
-          <app-svg-icon
-            class="nav-icon"
-            [path]="'assets/icon/salvar_vetor.svg'"
-            [size]="18">
-          </app-svg-icon>
-          Descancelar projeto
-        </button>
-      </div>
-      <p class="last-update">{{project?.lastModifiedAt}}</p>
-    </div>
-
-    <!-- Tabs -->
-    <div class="tabs-container">
-      <div class="tabs-list">
-        <button
-          class="tab-trigger"
-          [class.active]="activeTab === 'indicadores'"
-          (click)="onTabChange('indicadores')">
-          <app-svg-icon
-            class="nav-icon"
-            [path]="'assets/icon/indicadores_vetor.svg'"
-            [size]="18">
-          </app-svg-icon>
-          Indicadores
-        </button>
-        <button
-          class="tab-trigger"
-          [class.active]="activeTab === 'vinculo'"
-          (click)="onTabChange('vinculo')">
-          <app-svg-icon
-            class="nav-icon"
-            [path]="'assets/icon/estrategia_vetor.svg'"
-            [size]="18">
-          </app-svg-icon>
-          Vínculo estratégico
-        </button>
-      </div>
-
-
-      <div class="tab-content">
-
-        <div *ngIf="activeTab === 'indicadores'" class="tab-panel">
-          <h3>Indicadores</h3>
-          <p class="tab-description">
-            <strong>Campos editáveis:</strong> Atualize os valores base do projeto (EV, PV, AC, BAC, Payback).<br>
-            <strong>Campos calculados:</strong> São atualizados automaticamente com base nos valores editáveis.
-          </p>
-
-
-          <div class="indicators-grid">
-            <!-- Valor Agregado (EV) -->
-            <div class="indicator-item">
-              <label>Valor Agregado (EV) - Editável</label>
-              <div class="indicator-input-group">
-                <input
-                  type="number"
-                  [(ngModel)]="earnedValue"
-                  (ngModelChange)="onInputChange()"
-                  class="indicator-input"
-                  step="0.01"
-                  min="0"
-                  [value]="earnedValue || 0"
-                  placeholder="Digite o valor agregado">
-              </div>
-              <p class="last-update-text">Valor atual: {{formatCurrency(earnedValue || 0)}}</p>
+            <div class="project-dates">
+                <span>Início planejado: {{project?.startDate}}</span>
+                <span>Fim planejado: {{project?.endDate}}</span>
+                <span *ngIf="project?.roi">ROI: {{project?.roi | number:'1.2-2'}}%</span>
             </div>
 
-            <!-- Valor Planejado (PV) -->
-            <div class="indicator-item">
-              <label>Valor Planejado (PV) - Editável</label>
-              <div class="indicator-input-group">
-                <input
-                  type="number"
-                  [(ngModel)]="plannedValue"
-                  (ngModelChange)="onInputChange()"
-                  class="indicator-input"
-                  step="0.01"
-                  min="0"
-                  [value]="plannedValue || 0"
-                  placeholder="Digite o valor planejado">
-              </div>
-              <p class="last-update-text">Valor atual: {{formatCurrency(plannedValue || 0)}}</p>
+            <div class="header-actions">
+                <button class="btn-outline" (click)="openEditModal()">
+                    <app-svg-icon class="nav-icon" [path]="'assets/icon/editar_vetor.svg'" [size]="18">
+                    </app-svg-icon>
+                    Editar dados básicos
+                </button>
+                <button class="btn-outline" (click)="openCancelModal()" *ngIf="!isCancelled()">
+                    <app-svg-icon class="nav-icon" [path]="'assets/icon/editar_vetor.svg'" [size]="18">
+                    </app-svg-icon>
+                    Cancelar projeto
+                </button>
+                <button class="btn-outline btn-danger" *ngIf="!isCancelled()">
+                    <app-svg-icon class="nav-icon" [path]="'assets/icon/excluir_vetor.svg'" [size]="18">
+                    </app-svg-icon>
+                    Excluir
+                </button>
+                <button class="btn-outline btn-success" (click)="onUncancelProject()" *ngIf="isCancelled()">
+                    <app-svg-icon class="nav-icon" [path]="'assets/icon/salvar_vetor.svg'" [size]="18">
+                    </app-svg-icon>
+                    Descancelar projeto
+                </button>
             </div>
-
-            <!-- Custo Real (AC) -->
-            <div class="indicator-item">
-              <label>Custo Real (AC) - Editável</label>
-              <div class="indicator-input-group">
-                <input
-                  type="number"
-                  [(ngModel)]="actualCost"
-                  (ngModelChange)="onInputChange()"
-                  class="indicator-input"
-                  step="0.01"
-                  min="0"
-                  [value]="actualCost || 0"
-                  placeholder="Digite o custo real">
-              </div>
-              <p class="last-update-text">Valor atual: {{formatCurrency(actualCost || 0)}}</p>
-            </div>
-
-            <!-- Orçamento Planejado (BAC) -->
-            <div class="indicator-item">
-              <label>Orçamento Planejado (BAC) - Editável</label>
-              <div class="indicator-input-group">
-                <input
-                  type="number"
-                  [(ngModel)]="budgetAtCompletion"
-                  (ngModelChange)="onInputChange()"
-                  class="indicator-input"
-                  step="0.01"
-                  min="0"
-                  [value]="budgetAtCompletion || 0"
-                  placeholder="Digite o orçamento">
-              </div>
-              <p class="last-update-text">Valor atual: {{formatCurrency(budgetAtCompletion || 0)}}</p>
-            </div>
-
-            <!-- Payback -->
-            <div class="indicator-item">
-              <label>Payback (anos) - Editável</label>
-              <div class="indicator-input-group">
-                <input
-                  type="number"
-                  [(ngModel)]="payback"
-                  (ngModelChange)="onInputChange()"
-                  class="indicator-input"
-                  step="0.1"
-                  min="0"
-                  [value]="payback || 0"
-                  placeholder="Digite o payback em anos">
-              </div>
-              <p class="last-update-text">Valor atual: {{payback || 0}} anos</p>
-            </div>
-
-          </div>
-
-          <button class="save-btn"
-                  [disabled]="!formTouched"
-                  (click)="onSaveProjeto()">
-            <app-svg-icon
-              class="nav-icon"
-              [path]="'assets/icon/salvar_vetor.svg'"
-              [size]="18">
-            </app-svg-icon>
-            Salvar indicadores
-          </button>
-          <div class="strategic-links">
-            <!-- CPI -->
-            <div class="link-item">
-
-              <div class="link-info">
-                <span class="link-title">{{cpi}}</span>
-                <span class="link-subtitle">CPI (EV ÷ AC)</span>
-              </div>
-            </div>
-
-            <!-- SPI -->
-            <div class="link-item">
-
-              <div class="link-info">
-                <span class="link-title">{{spi}}</span>
-                <span class="link-subtitle">SPI (EV ÷ PV)</span>
-              </div>
-            </div>
-
-            <!-- Progresso -->
-            <div class="link-item">
-
-              <div class="link-info">
-                <span class="link-title">{{progress}}</span>
-                <span class="link-subtitle">Progresso (%)</span>
-              </div>
-            </div>
-
-            <!-- EAC -->
-            <div class="link-item">
-
-              <div class="link-info">
-                <span class="link-title">{{eac}}</span>
-                <span class="link-subtitle">EAC (BAC ÷ CPI)</span>
-              </div>
-            </div>
-
-            <!-- ETC -->
-            <div class="link-item">
-
-              <div class="link-info">
-                <span class="link-title">{{etc}}</span>
-                <span class="link-subtitle">ETC (EAC - AC)</span>
-              </div>
-            </div>
-          </div>
+            <p class="last-update">Última alteração realizada em {{project?.lastModifiedAt}}.</p>
         </div>
 
-        <!-- Vínculo Estratégico Tab -->
-        <div *ngIf="activeTab === 'vinculo'" class="tab-panel">
-          <h3>Vínculo estratégico</h3>
-          <ng-container *ngIf="verifyStrategyBond()">
-
-            <p class="tab-description">
-              Confira as entidades estratégicas vinculadas a este projeto.
-            </p>
-
-          <!-- Strategic Links -->
-          <div class="strategic-links">
-            <div class="link-item">
-              <app-svg-icon
-                class="nav-icon"
-                [path]="'assets/icon/hub_portfolios_vetor.svg'"
-                [size]="24">
-              </app-svg-icon>
-              <div class="link-info">
-                <span class="link-title">{{project?.portfolioName || "Sem valor"}}</span>
-              </div>
-            </div>
-
-            <div class="link-item">
-              <app-svg-icon
-              class="nav-icon"
-              [path]="'assets/icon/estrategia_vetor.svg'"
-              [size]="24">
-            </app-svg-icon>
-            <div class="link-info">
-              <span class="link-title">{{project?.strategyName || "Sem valor"}}</span>
-              <span class="link-subtitle">Estratégias vinculada</span>
-            </div>
-          </div>
-
-          <div class="link-item">
-            <app-svg-icon
-            class="nav-icon"
-            [path]="'assets/icon/estrategia_vetor.svg'"
-            [size]="24">
-          </app-svg-icon>
-          <div class="link-info">
-                <span class="link-title">700/1000</span>
-                <span class="link-subtitle">{{project?.scenarioRankingScore || "Sem valor"}}</span>
-              </div>
-            </div>
-
-            <div class="link-item">
-              <app-svg-icon
-              class="nav-icon"
-              [path]="'assets/icon/prioridade_vetor.svg'"
-              [size]="24">
-            </app-svg-icon>
-            <div class="link-info">
-              <span class="link-title">1°/15</span>
-              <span class="link-subtitle">{{project?.priorityInPortfolio || "Sem valor"}}</span>
-            </div>
-          </div>
-          <div class="link-item">
-              <app-svg-icon
-              class="nav-icon"
-              [path]="'assets/icon/hub_portfolios_vetor.svg'"
-              [size]="24">
-            </app-svg-icon>
-
-            <div class="link-info">
-              <span class="link-title">Categoria</span>
-              <span class="link-subtitle">{{project?.portfolioCategory.name || "Sem valor"}}</span>
-            </div>
-          </div>
+        <div class="tabs-list">
+            <button class="tab-trigger" [class.active]="activeTab === 'indicadores'"
+                (click)="onTabChange('indicadores')">
+                <app-svg-icon class="nav-icon" [path]="'assets/icon/indicadores_vetor.svg'" [size]="18">
+                </app-svg-icon>
+                Indicadores
+            </button>
+            <button class="tab-trigger" [class.active]="activeTab === 'vinculo'" (click)="onTabChange('vinculo')">
+                <app-svg-icon class="nav-icon" [path]="'assets/icon/estrategia_vetor.svg'" [size]="18">
+                </app-svg-icon>
+                Vínculo estratégico
+            </button>
         </div>
 
-        <!-- Objectives -->
-        <div class="objectives-section">
-          <h4>Objetivos</h4>
-          <div class="objectives-list">
-            <div *ngFor="let objective of project?.strategicObjectives" class="objective-item">
-              <app-svg-icon
-              class="nav-icon"
-              [path]="'assets/icon/p_vetor.svg'"
-              [size]="18">
-            </app-svg-icon>
-            <span>{{objective.name}}</span>
-          </div>
+        <!-- Tabs -->
+        <div class="tabs-container">
+            <div class="tab-content">
+
+                <div *ngIf="activeTab === 'indicadores'" class="tab-panel">
+                    <h3>Indicadores</h3>
+                    <p class="tab-description">
+                        <strong>Campos editáveis:</strong> Atualize os valores base do projeto (EV, PV, AC, BAC,
+                        Payback).<br>
+                        <strong>Campos calculados:</strong> São atualizados automaticamente com base nos valores
+                        editáveis.
+                    </p>
+
+
+                    <div class="indicators-grid">
+                        <!-- Valor Agregado (EV) -->
+                        <div class="indicator-item">
+                            <label>Valor Agregado (EV) - Editável</label>
+                            <div class="indicator-input-group">
+                                <input type="number" [(ngModel)]="earnedValue" (ngModelChange)="onInputChange()"
+                                    class="indicator-input" step="0.01" min="0" [value]="earnedValue || 0"
+                                    placeholder="Digite o valor agregado">
+                            </div>
+                            <p class="last-update-text">Valor atual: {{formatCurrency(earnedValue || 0)}}</p>
+                        </div>
+
+                        <!-- Valor Planejado (PV) -->
+                        <div class="indicator-item">
+                            <label>Valor Planejado (PV) - Editável</label>
+                            <div class="indicator-input-group">
+                                <input type="number" [(ngModel)]="plannedValue" (ngModelChange)="onInputChange()"
+                                    class="indicator-input" step="0.01" min="0" [value]="plannedValue || 0"
+                                    placeholder="Digite o valor planejado">
+                            </div>
+                            <p class="last-update-text">Valor atual: {{formatCurrency(plannedValue || 0)}}</p>
+                        </div>
+
+                        <!-- Custo Real (AC) -->
+                        <div class="indicator-item">
+                            <label>Custo Real (AC) - Editável</label>
+                            <div class="indicator-input-group">
+                                <input type="number" [(ngModel)]="actualCost" (ngModelChange)="onInputChange()"
+                                    class="indicator-input" step="0.01" min="0" [value]="actualCost || 0"
+                                    placeholder="Digite o custo real">
+                            </div>
+                            <p class="last-update-text">Valor atual: {{formatCurrency(actualCost || 0)}}</p>
+                        </div>
+
+                        <!-- Orçamento Planejado (BAC) -->
+                        <div class="indicator-item">
+                            <label>Orçamento Planejado (BAC) - Editável</label>
+                            <div class="indicator-input-group">
+                                <input type="number" [(ngModel)]="budgetAtCompletion" (ngModelChange)="onInputChange()"
+                                    class="indicator-input" step="0.01" min="0" [value]="budgetAtCompletion || 0"
+                                    placeholder="Digite o orçamento">
+                            </div>
+                            <p class="last-update-text">Valor atual: {{formatCurrency(budgetAtCompletion || 0)}}</p>
+                        </div>
+
+                        <!-- Payback -->
+                        <div class="indicator-item">
+                            <label>Payback (anos) - Editável</label>
+                            <div class="indicator-input-group">
+                                <input type="number" [(ngModel)]="payback" (ngModelChange)="onInputChange()"
+                                    class="indicator-input" step="0.1" min="0" [value]="payback || 0"
+                                    placeholder="Digite o payback em anos">
+                            </div>
+                            <p class="last-update-text">Valor atual: {{payback || 0}} anos</p>
+                        </div>
+
+                    </div>
+
+                    <button class="save-btn" [disabled]="!formTouched" (click)="onSaveProjeto()">
+                        <app-svg-icon class="nav-icon" [path]="'assets/icon/salvar_vetor.svg'" [size]="18">
+                        </app-svg-icon>
+                        Salvar indicadores
+                    </button>
+                    <div class="strategic-links">
+                        <!-- CPI -->
+                        <div class="link-item">
+
+                            <div class="link-info">
+                                <span class="link-title">{{cpi}}</span>
+                                <span class="link-subtitle">CPI (EV ÷ AC)</span>
+                            </div>
+                        </div>
+
+                        <!-- SPI -->
+                        <div class="link-item">
+
+                            <div class="link-info">
+                                <span class="link-title">{{spi}}</span>
+                                <span class="link-subtitle">SPI (EV ÷ PV)</span>
+                            </div>
+                        </div>
+
+                        <!-- Progresso -->
+                        <div class="link-item">
+
+                            <div class="link-info">
+                                <span class="link-title">{{progress}}</span>
+                                <span class="link-subtitle">Progresso (%)</span>
+                            </div>
+                        </div>
+
+                        <!-- EAC -->
+                        <div class="link-item">
+
+                            <div class="link-info">
+                                <span class="link-title">{{eac}}</span>
+                                <span class="link-subtitle">EAC (BAC ÷ CPI)</span>
+                            </div>
+                        </div>
+
+                        <!-- ETC -->
+                        <div class="link-item">
+
+                            <div class="link-info">
+                                <span class="link-title">{{etc}}</span>
+                                <span class="link-subtitle">ETC (EAC - AC)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vínculo Estratégico Tab -->
+                <div *ngIf="activeTab === 'vinculo'" class="tab-panel">
+                    <h3>Vínculo estratégico</h3>
+                    <ng-container *ngIf="verifyStrategyBond()">
+
+                        <p class="tab-description">
+                            Confira as entidades estratégicas vinculadas a este projeto.
+                        </p>
+
+                        <!-- Strategic Links -->
+                        <div class="strategic-links">
+                            <div class="link-item">
+                                <app-svg-icon class="nav-icon" [path]="'assets/icon/hub_portfolios_vetor.svg'"
+                                    [size]="24">
+                                </app-svg-icon>
+                                <div class="link-info">
+                                    <span class="link-title">{{project?.portfolioName || "Sem valor"}}</span>
+                                </div>
+                            </div>
+
+                            <div class="link-item">
+                                <app-svg-icon class="nav-icon" [path]="'assets/icon/estrategia_vetor.svg'" [size]="24">
+                                </app-svg-icon>
+                                <div class="link-info">
+                                    <span class="link-title">{{project?.strategyName || "Sem valor"}}</span>
+                                    <span class="link-subtitle">Estratégias vinculada</span>
+                                </div>
+                            </div>
+
+                            <div class="link-item">
+                                <app-svg-icon class="nav-icon" [path]="'assets/icon/estrategia_vetor.svg'" [size]="24">
+                                </app-svg-icon>
+                                <div class="link-info">
+                                    <span class="link-title">700/1000</span>
+                                    <span class="link-subtitle">{{project?.scenarioRankingScore || "Sem valor"}}</span>
+                                </div>
+                            </div>
+
+                            <div class="link-item">
+                                <app-svg-icon class="nav-icon" [path]="'assets/icon/prioridade_vetor.svg'" [size]="24">
+                                </app-svg-icon>
+                                <div class="link-info">
+                                    <span class="link-title">1°/15</span>
+                                    <span class="link-subtitle">{{project?.priorityInPortfolio || "Sem valor"}}</span>
+                                </div>
+                            </div>
+                            <div class="link-item">
+                                <app-svg-icon class="nav-icon" [path]="'assets/icon/hub_portfolios_vetor.svg'"
+                                    [size]="24">
+                                </app-svg-icon>
+
+                                <div class="link-info">
+                                    <span class="link-title">Categoria</span>
+                                    <span class="link-subtitle">{{project?.portfolioCategory.name || "Sem
+                                        valor"}}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Objectives -->
+                        <div class="objectives-section">
+                            <h4>Objetivos</h4>
+                            <div class="objectives-list">
+                                <div *ngFor="let objective of project?.strategicObjectives" class="objective-item">
+                                    <app-svg-icon class="nav-icon" [path]="'assets/icon/p_vetor.svg'" [size]="18">
+                                    </app-svg-icon>
+                                    <span>{{objective.name}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="!verifyStrategyBond()">
+                        <p class="no-bond-text">Nenhum vínculo estratégico encontrado para este projeto.</p>
+                    </ng-container>
+                </div>
+            </div>
+
+            <app-form-modal-component [isVisible]="showEditModal" [config]="editPortfolioConfig"
+                (close)="closeEditModal()" (save)="updateProjectField($event)" (cancel)="closeEditModal()">
+            </app-form-modal-component>
+
+            <app-form-modal-component [isVisible]="showCancelModal" [config]="cancelProjectConfig"
+                (close)="closeCancelModal()" (save)="onCancelProject($event)" (cancel)="closeCancelModal()">
+            </app-form-modal-component>
         </div>
-      </div>
-          </ng-container>
-          <ng-container *ngIf="!verifyStrategyBond()">
-            <p class="no-bond-text">Nenhum vínculo estratégico encontrado para este projeto.</p>
-          </ng-container>
-  </div>
-</div>
-
-  <app-form-modal-component
-    [isVisible]="showEditModal"
-    [config]="editPortfolioConfig"
-    (close)="closeEditModal()"
-    (save)="updateProjectField($event)"
-    (cancel)="closeEditModal()">
-  </app-form-modal-component>
-
-  <app-form-modal-component
-    [isVisible]="showCancelModal"
-    [config]="cancelProjectConfig"
-    (close)="closeCancelModal()"
-    (save)="onCancelProject($event)"
-    (cancel)="closeCancelModal()">
-  </app-form-modal-component>
-</div>
