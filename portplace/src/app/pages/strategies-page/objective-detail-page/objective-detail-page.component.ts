@@ -125,6 +125,7 @@ export class ObjectiveDetailPageComponent implements OnInit {
     try {
       const obj = await this.objetivoService.getObjectiveById(this.estrategiaId, this.objectiveId).toPromise();
       this.objective = obj;
+      console.log('Objetivo carregado:', this.objective);
       this.breadcrumbService.addChildBreadcrumb({
           label: `Objetivo: ${this.objective?.name}`,
           url: `/estrategia/${this.estrategiaId}/objetivo/${this.objective!.name}`,
@@ -260,5 +261,13 @@ export class ObjectiveDetailPageComponent implements OnInit {
       default:
         return 'gray';
     }
+  }
+  public parseDateString(dateStr: string | undefined): Date | null {
+    if (!dateStr) return null;
+    const [datePart, timePart] = dateStr.split(' ');
+    if (!datePart || !timePart) return null;
+    const [day, month, year] = datePart.split('/').map(Number);
+    const [hour, minute, second = '0'] = timePart.split(':');
+    return new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute), Number(second));
   }
 }

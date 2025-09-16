@@ -9,6 +9,10 @@ import { FormModalComponentComponent } from '../../components/form-modal-compone
 import { BadgeComponent } from '../../components/badge/badge.component';
 import { Router } from '@angular/router';
 import { CardComponent } from '../../components/card/card.component';
+import { TableComponent } from '../../components/table/table.component';
+import { ResourcesRequestComponent } from './resources-request/resources-request.component';
+import { ResourcesPositionComponent } from './resources-position/resources-position.component';
+import { ResourcesPoolComponent } from './resources-pool/resources-pool.component';
 
 @Component({
   selector: 'app-resources-page',
@@ -19,7 +23,11 @@ import { CardComponent } from '../../components/card/card.component';
     FormsModule,
     FormModalComponentComponent,
     BadgeComponent,
-    CardComponent
+    CardComponent,
+    TableComponent,
+    ResourcesRequestComponent,
+    ResourcesPositionComponent,
+    ResourcesPoolComponent
   ],
   templateUrl: './resources-page.component.html',
   styleUrl: './resources-page.component.scss'
@@ -27,6 +35,7 @@ import { CardComponent } from '../../components/card/card.component';
 export class ResourcesPageComponent implements OnInit {
   showCreateModal = false;
   activeFilter = '';
+  activeTab = "pedidos";
   loadingResources = false;
   allResources: Project[] = [];
   searchTerm: string = '';
@@ -146,6 +155,10 @@ export class ResourcesPageComponent implements OnInit {
     }
 
     this.Resources = filtered;
+  }
+
+  onTabChange(tab: string): void {
+    this.activeTab = tab;
   }
 
   onSearchChange(): void {
