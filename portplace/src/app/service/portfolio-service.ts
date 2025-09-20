@@ -1,3 +1,4 @@
+import { QueryParam } from './../models/pagination-models';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
@@ -6,6 +7,7 @@ import { Page, PaginationQueryParams } from '../models/pagination-models';
 import { PortfolioCancelationPatchDTO, PortfolioCostStatus, PortfolioListReadDTO, PortfolioProgressStatus, PortfolioReadDTO, PortfolioSummaryTab, PortfolioUpdateDTO } from '../interface/carlos-portfolio-interfaces';
 import { ScenarioService } from './scenario-service';
 import { ProjectReadDTO2 } from '../interface/carlos-project-dtos';
+import { NumberValueAccessor } from '@angular/forms';
 
 @Injectable({
     providedIn: 'root'
@@ -91,7 +93,7 @@ export class PortfolioService {
         return this.http.put<void>(url, body, { headers: this.getHeaders() });
     }
 
-    // PATCH - Cancelar portfólio 
+    // PATCH - Cancelar portfólio
     cancelPortfolio(portfolioId: number, reason: string): Observable<void> {
         const url = `${this.getPortfolioDetailUrl(portfolioId)}/cancel`;
 
@@ -104,5 +106,16 @@ export class PortfolioService {
     deletePortfolio(portfolioId: number): Observable<void> {
         const url = `${this.getPortfolioDetailUrl(portfolioId)}/hard-delete`;
         return this.http.delete<void>(url, { headers: this.getHeaders() });
+    }
+
+    getPortfolioAnalytics(portfolioId: number): Observable<any> {
+        const url = `${environment.apiUrl}/portfolios/${portfolioId}/analytics`;
+
+        return this.http.get<Page<ProjectReadDTO2>>(url, { headers: this.getHeaders() });
+    }
+    getPortfolios(queryParams: PaginationQueryParams):  Observable<Page<PortfolioListReadDTO>> {
+        const url = this.getPortfolioUrl();
+        queryParams = PaginationQueryParams.sortByThisIfNotSortedYet('name', queryParams);
+        return this.http.get<Page<PortfolioListReadDTO>>(url, { params: queryParams?.getParamsInHttpParamsFormat() });
     }
 }
