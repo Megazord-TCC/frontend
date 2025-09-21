@@ -1,17 +1,22 @@
-<div class="users-page-layout">
-  <div class="users-content">
-    <!-- Breadcrumb -->
-    <app-breadcrumb></app-breadcrumb>
+<div class="detail-layout">
 
-    <!-- Header -->
-    <div class="page-header">
-      <h1>Usuários</h1>
-      <p>Gerencie os usuários do sistema.</p>
-    </div>
+    <div class="detail-content">
+        <app-breadcrumb></app-breadcrumb>
+        <div class="page-header">
+            <h1>Usuários</h1>
+            <p>Gerencie os usuários com acesso ao sistema.</p>
+        </div>
 
-    <!-- Content -->
-    <div class="users-content-area">
-      <p>users-page works!</p>
+        <app-table [dataRetrievalMethodRef]="this.getDataForTableComponent" [filterText]="filterText"
+            [filterButtons]="filterButtons" [columns]="columns" [actionButton]="actionButton"
+            (mainColumnRowClick)="userEditId = $event.id; showEditModal = true" 
+            (actionButtonClick)="showCreateModal = true">
+        </app-table>
     </div>
-  </div>
 </div>
+<app-user-create-modal *ngIf="showCreateModal" (close)="showCreateModal = false"
+    (userCreate)="tableComponent?.sendHttpGetRequestAndPopulateTable(); showCreateModal = false">
+</app-user-create-modal>
+<app-user-edit-modal *ngIf="showEditModal" [userId]="userEditId" (close)="showEditModal = false"
+    (userEdit)="tableComponent?.sendHttpGetRequestAndPopulateTable(); showEditModal = false">
+</app-user-edit-modal>

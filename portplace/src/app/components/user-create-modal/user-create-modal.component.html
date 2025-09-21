@@ -1,0 +1,66 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)" (mousedown)="onOverlayMouseDown($event)">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header">
+            <h2>Cadastrar usuário</h2>
+            <button class="close-btn" (click)="close.emit()">
+                <i class="icon-x">✕</i>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+            <!-- Validation Message -->
+            <div *ngIf="errorMessage" class="validation-error">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>{{ errorMessage }}</span>
+            </div>
+
+            <!-- Form Fields -->
+            <div class="form-fields" [ngClass]="{'disabled': isSubmitButtonDisabled}">
+                <div class="form-group">
+                    <label>Nome<span class="required-asterisk">*</span></label>
+                    <input [(ngModel)]="inputName" [disabled]="isSubmitButtonDisabled" maxlength="50">
+                </div>
+
+                <div class="form-group">
+                    <label>E-mail<span class="required-asterisk">*</span></label>
+                    <input type="email" [(ngModel)]="inputEmail" [disabled]="isSubmitButtonDisabled" maxlength="50">
+                </div>
+
+                <div class="form-group">
+                    <label>Senha<span class="required-asterisk">*</span></label>
+                    <input type="password" [(ngModel)]="inputPassword" [disabled]="isSubmitButtonDisabled"
+                        maxlength="50">
+                </div>
+
+                <div class="form-group">
+                    <label>Perfil<span class="required-asterisk">*</span></label>
+                    <div class="input-with-info">
+                        <select [(ngModel)]="inputRoleSelected" [disabled]="isSubmitButtonDisabled">
+                            <option *ngFor="let roleOption of inputRoleOptions" [ngValue]="roleOption">
+                                {{ roleOption }}
+                            </option>
+                        </select>
+                        <p class="info-text">{{ getRoleDescription() }}</p>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="isUserActive" [(ngModel)]="inputIsUserActive" />
+                        <label for="isUserActive">Ativo</label>
+                    </div>
+                    <p class="info-text">Apenas usuários ativos podem acessar o sistema.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button class="btn-outline" (click)="close.emit()">Cancelar</button>
+            <button class="btn-primary" (click)="onSave()" [disabled]="isSubmitButtonDisabled">Salvar</button>
+        </div>
+    </div>
+</div>
