@@ -61,6 +61,7 @@ export const getColumns = (): TableColumn[] => {
     column = new TableColumn();
     column.label = 'Status';
     column.order = 4;
+    column.isSortable = true;
     column.frontendAttributeName = 'status';
     column.backendAttributeName = 'status';
     column.badgeConfiguration = getBadgeConfigurations();

@@ -60,6 +60,8 @@ export interface QueryParam {
  * Atributos com valor `undefined` ou `[]` simbolizam que o parâmetro não existe (o backend definirá
  * um valor default). Por exemplo, se `page` for `undefined`, então o backend
  * utilizará o valor `10`.
+ * 
+ * extraQueryParams é apenas pra adicionar parâmetros extras de maneira livre.
  */
 export class PaginationQueryParams {
     page?: number;
@@ -68,6 +70,7 @@ export class PaginationQueryParams {
     sortDir?: 'asc' | 'desc';
     filterButtonQueryParam?: QueryParam;
     filterTextQueryParam?: QueryParam;
+    extraQueryParams: QueryParam[] = [];
 
     /**
      * Retorna parâmetros (ou seja, os atributos desta classe, `PaginationQueryParams`) 
@@ -93,6 +96,8 @@ export class PaginationQueryParams {
 
         if (this.filterTextQueryParam)
             params = params.set(this.filterTextQueryParam.name, this.filterTextQueryParam.value);
+
+        this.extraQueryParams.forEach(param => params = params.append(param.name, param.value));
 
         return params;
     }

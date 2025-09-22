@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
-import { map, Observable, switchMap } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Page, PaginationQueryParams } from '../models/pagination-models';
 import { ScenarioService } from './scenario-service';
 import { UserGetResponseDTO, UserStatusEnumDTO } from '../interface/carlos-user-interfaces';

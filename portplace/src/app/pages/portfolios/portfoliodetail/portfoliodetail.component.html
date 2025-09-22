@@ -230,7 +230,8 @@
             </div>
 
             <!-- Responsáveis Tab -->
-            <div *ngIf="activeTab === 'responsaveis'" class="tab-panel">
+            <app-portfolio-supervisors-tab *ngIf="activeTab === 'responsaveis'" class="tab-panel"></app-portfolio-supervisors-tab>
+            <!-- <div *ngIf="activeTab === 'responsaveis'" class="tab-panel">
                 <h3>Usuários responsáveis pelo portfólio</h3>
 
                 <div class="users-actions">
@@ -267,7 +268,7 @@
                         </table>
                     </div>
                 </app-card>
-            </div>
+            </div> -->
 
             <!-- Categorias Tab -->
             <app-portfolio-category-tab *ngIf="activeTab === 'categorias'" class="tab-panel"></app-portfolio-category-tab>
