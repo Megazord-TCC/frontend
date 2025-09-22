@@ -1,0 +1,38 @@
+<div class="tab-content">
+    <div>
+        <h3>Informações e documentos</h3>
+        <p class="tab-description">
+            {{ requiredDocumentsAndGeneralInfo || 'Não informado.' }}
+        </p>
+    </div>
+    <div>
+        <h3>Tópico de discussão</h3>
+        <p class="tab-description">
+            {{ discussionTopic || 'Não informado.' }}
+        </p>
+    </div>
+    <div>
+        <h3>Motivo do evento</h3>
+        <p class="tab-description">
+            {{ eventReason || 'Não informado.' }}
+        </p>
+    </div>
+    <div>
+        <h3>Método de comunicação</h3>
+        <p class="tab-description">
+            {{ communicationMethods.join('; ') || 'Não informado' }}.
+        </p>
+    </div>
+    <div>
+        <h3>Periodicidade</h3>
+        <p class="tab-description">
+            {{ periodicity || 'Não informado' }}.
+        </p>
+        <button class="action-btn" (click)="showEditModal = true">Editar evento</button>   
+    </div>
+</div>
+
+<app-event-about-edit-modal *ngIf="showEditModal" 
+    (close)="showEditModal = false"
+    (edit)="fillFormDataByHttpRequest(); showEditModal = false">
+</app-event-about-edit-modal>

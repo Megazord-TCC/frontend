@@ -53,6 +53,7 @@ export class PortfolioReadDTO {
     canBeDeleted = false;
     activeScenarioName = '';
     cancellationReason = '';
+    communicationStorageDescription = '';
 }
 
 export enum PortfolioProgressStatus {
@@ -87,6 +88,7 @@ export class PortfolioListReadDTO {
 export class PortfolioUpdateDTO {
     name = '';
     description = '';
+    communicationStorageDescription = '';
 }
 
 export class PortfolioCancelationPatchDTO {

@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
-import { map, Observable, of } from 'rxjs';
+import { map, Observable, of, switchMap } from 'rxjs';
 import { Page, PaginationQueryParams } from '../models/pagination-models';
 import { PortfolioCancelationPatchDTO, PortfolioCostStatus, PortfolioListReadDTO, PortfolioProgressStatus, PortfolioReadDTO, PortfolioSummaryTab, PortfolioUpdateDTO } from '../interface/carlos-portfolio-interfaces';
 import { ScenarioService } from './scenario-service';
@@ -89,6 +89,19 @@ export class PortfolioService {
     updatePortfolio(portfolioId: number, body: PortfolioUpdateDTO): Observable<void> {
         const url = this.getPortfolioDetailUrl(portfolioId);
         return this.http.put<void>(url, body, { headers: this.getHeaders() });
+    }
+
+    updatePortfolioCommunicationStorageDescription(portfolioId: number, description: string): Observable<void> {
+        const url = this.getPortfolioDetailUrl(portfolioId);
+
+        return this.getPortfolioById(portfolioId).pipe(
+            map(portfolio => ({
+                name: portfolio.name,
+                description: portfolio.description,
+                communicationStorageDescription: description
+            }) as PortfolioUpdateDTO),
+            switchMap(body => this.http.put<void>(url, body, { headers: this.getHeaders() }))
+        );
     }
 
     // PATCH - Cancelar portfólio 

@@ -1,0 +1,11 @@
+<app-table [dataRetrievalMethodRef]="this.getDataForTableComponent"
+    [filterText]="filterText" [columns]="columns" [actionButton]="actionButton"
+    (mainColumnRowClick)="navigateToEventDetailPage($event.id)"
+    (actionButtonClick)="isCreateModalVisible = true">
+</app-table>
+
+<app-event-create-modal *ngIf="isCreateModalVisible" [portfolioId]="portfolioId" 
+    (close)="isCreateModalVisible = false" 
+    (eventCreate)="tableComponent?.sendHttpGetRequestAndPopulateTable(); isCreateModalVisible = false">
+</app-event-create-modal>
+

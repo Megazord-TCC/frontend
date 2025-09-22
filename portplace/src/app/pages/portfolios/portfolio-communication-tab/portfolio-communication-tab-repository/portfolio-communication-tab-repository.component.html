@@ -1,0 +1,8 @@
+<div class="container">
+    <div><span class="gray">Método de armazenamento:</span> {{ storageMethod || 'Não definido.' }}</div>
+    <button class="action-btn" (click)="showEditModal = true">Editar</button>
+</div>
+
+<app-portfolio-communication-repository-edit-modal *ngIf="showEditModal" [portfolioId]="portfolioId"
+    (close)="showEditModal = false" (edit)="loadStorageMethodByHttpRequest(); showEditModal = false">
+</app-portfolio-communication-repository-edit-modal>

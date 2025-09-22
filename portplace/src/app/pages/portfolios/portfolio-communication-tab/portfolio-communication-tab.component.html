@@ -1,0 +1,18 @@
+<div class="tab-panel">
+    <h3>Comunicação no portfólio</h3>
+
+    <div class="comm-tabs-list">
+        <button class="comm-tab-trigger" [class.active]="activeTab === 'plan'" (click)="activeTab = 'plan'">
+            Plano de comunicação
+        </button>
+        <button class="comm-tab-trigger" [class.active]="activeTab === 'stakeholders'" (click)="activeTab = 'stakeholders'">
+            Partes interessadas
+        </button>
+        <button class="comm-tab-trigger" [class.active]="activeTab === 'repository'" (click)="activeTab = 'repository'">
+            Armazenamento
+        </button>
+    </div>
+
+    <app-portfolio-communication-tab-plan *ngIf="activeTab === 'plan'"></app-portfolio-communication-tab-plan>
+    <app-portfolio-communication-tab-repository *ngIf="activeTab === 'repository'"></app-portfolio-communication-tab-repository>
+</div>
