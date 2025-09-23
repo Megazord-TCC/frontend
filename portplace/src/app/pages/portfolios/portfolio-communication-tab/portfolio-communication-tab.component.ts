@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PortfolioCommunicationTabPlanComponent } from './portfolio-communication-tab-plan/portfolio-communication-tab-plan.component';
 import { PortfolioCommunicationTabRepositoryComponent } from './portfolio-communication-tab-repository/portfolio-communication-tab-repository.component';
+import { PortfolioCommunicationTabStakeholdersComponent } from './portfolio-communication-tab-stakeholders/portfolio-communication-tab-stakeholders.component';
 
 type Tab = 'plan' | 'stakeholders' | 'repository';
 
@@ -14,7 +15,8 @@ type Tab = 'plan' | 'stakeholders' | 'repository';
         CommonModule,
         FormsModule,
         PortfolioCommunicationTabPlanComponent,
-        PortfolioCommunicationTabRepositoryComponent
+        PortfolioCommunicationTabRepositoryComponent,
+        PortfolioCommunicationTabStakeholdersComponent
     ],
     standalone: true
 })

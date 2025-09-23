@@ -20,6 +20,7 @@ import { ObjectiveDetailPageComponent } from './pages/strategies-page/objective-
 import { PageType } from './interface/carlos-auth-interfaces';
 import { RoleGuard } from './guards/role-guard';
 import { PortfolioEventDetailComponent } from './pages/portfolios/portfolio-event-detail/portfolio-event-detail.component';
+import { PortfolioStakeholderDetailComponent } from './pages/portfolios/portfolio-stakeholder-detail/portfolio-stakeholder-detail.component';
 
 export const routes: Routes = [
 
@@ -29,6 +30,7 @@ export const routes: Routes = [
   { path: 'portfolios', component: PortfoliosComponent, canActivate: [RoleGuard], data: { pageType: PageType.PORTFOLIOS } },
   { path: 'portfolio/:id', component: PortfolioDetailComponent, canActivate: [RoleGuard], data: { pageType: PageType.PORTFOLIOS } },
   { path: 'portfolio/:portfolioId/evento/:eventoId', component: PortfolioEventDetailComponent, canActivate: [RoleGuard], data: { pageType: PageType.PORTFOLIOS } },
+  { path: 'portfolio/:portfolioId/interessado/:interessadoId', component: PortfolioStakeholderDetailComponent, canActivate: [RoleGuard], data: { pageType: PageType.PORTFOLIOS } },
   { path: 'projetos', component: ProjectsComponent, canActivate: [RoleGuard], data: { pageType: PageType.PROJECTS } },
   { path: 'projeto/:id', component: ProjectDetailpageComponent, canActivate: [RoleGuard], data: { pageType: PageType.PROJECTS } },
   { path: 'estrategias', component: StrategiesPageComponent, canActivate: [RoleGuard], data: { pageType: PageType.STRATEGIES } },

@@ -5,43 +5,6 @@
 
         <app-portfolio-event-detail-tab-buttons (change)="activeTab = $event"></app-portfolio-event-detail-tab-buttons>
 
-        <!-- Tabs -->
-        <!-- <div class="tab-content">
-            <h3>Balanceamento do cenário</h3>
-            <p class="tab-description">
-                Inclua ou remova projetos do cenário, defina suas categorias e ajuste o orçamento. Ao finalizar,
-                autorize para vinculá-los ao portfólio de destino.
-            </p>
-        </div> -->
-
         <app-portfolio-event-detail-about-tab *ngIf="activeTab == 'about'"></app-portfolio-event-detail-about-tab>
     </div>
 </div>
-<!-- <app-scenario-edit-modal [isVisible]="isScenarioEditModalVisible" (close)="onCloseEditModal()"
-    (cancel)="isScenarioEditModalVisible = false">
-</app-scenario-edit-modal>
-
-<app-scenario-delete-modal [isVisible]="isScenarioDeleteModalVisible" (close)="isScenarioDeleteModalVisible = false"
-    (cancel)="isScenarioDeleteModalVisible = false">
-</app-scenario-delete-modal>
-
-<app-warning-information-modal *ngIf="isBudgetWarningVisible" (close)="onWarningInformationModalClose()"
-    text="Ao alterar o orçamento, todas as inclusões de projetos serão recalculadas, desfazendo alterações manuais.">
-</app-warning-information-modal>
-
-<app-warning-information-modal *ngIf="isCategoryWarningVisible" (close)="isCategoryWarningVisible = false"
-    text="Não há categorias para seleção." closeButtonLabel="Voltar para o cenário">
-    <p class="aviso-paragrafo">
-        <a class="link-portfolio" [routerLink]="`/portfolio/${scenarioDTO?.portfolio?.id}`">Clique aqui</a>
-        para acessar o portfólio <i>{{ scenarioDTO?.portfolio?.name }}</i> e cadastre pelo menos uma categoria.
-    </p>
-</app-warning-information-modal>
-
-<app-cancel-scenario-modal *ngIf="isScenarioCancelModalVisible" (scenarioCancelled)="onScenarioCancelled()"
-    (close)="isScenarioCancelModalVisible = false">
-</app-cancel-scenario-modal>
-
-<app-scenario-authorization-modal *ngIf="isScenarioAuthorizationModalVisible"
-    (scenarioAuthorized)="loadScenarioByIdAndStrategyByIdAndSetupBreadcrumbs(); this.isScenarioAuthorizationModalVisible = false;"
-    (close)="isScenarioAuthorizationModalVisible = false">
-</app-scenario-authorization-modal> -->

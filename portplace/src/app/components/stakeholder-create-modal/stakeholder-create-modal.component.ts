@@ -5,15 +5,15 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom, Subscription } from 'rxjs';
 import { PortfolioService } from '../../service/portfolio-service';
-import { PortfolioEventsService } from '../../service/portfolio-events-service';
+import { PortfolioStakeholdersService } from '../../service/portfolio-stakeholders-service';
 
 @Component({
-    selector: 'app-event-create-modal',
+    selector: 'app-stakeholder-create-modal',
     imports: [CommonModule, FormsModule],
-    templateUrl: './event-create-modal.component.html',
-    styleUrl: './event-create-modal.component.scss'
+    templateUrl: './stakeholder-create-modal.component.html',
+    styleUrl: './stakeholder-create-modal.component.scss'
 })
-export class EventCreateModal {
+export class StakeholderCreateModal {
     @Input({ required: true }) portfolioId = 0;
 
     @Output() close = new EventEmitter<void>();
@@ -22,19 +22,15 @@ export class EventCreateModal {
     route = inject(ActivatedRoute);
     router = inject(Router);
     portfolioService = inject(PortfolioService);
-    portfolioEventsService = inject(PortfolioEventsService);
+    portfolioStakeholdersService = inject(PortfolioStakeholdersService);
 
     portfolioName = '';
 
     inputName = '';
-    inputDescription = '';
 
     errorMessage = '';
-
     isSubmitButtonDisabled = false;
-
     mouseDownOnOverlay = false;
-
     routeSubscription?: Subscription;
 
     async ngOnInit() {
@@ -66,15 +62,14 @@ export class EventCreateModal {
         let isFormValid = await this.isFormValid();
         if (!isFormValid) return;
 
-        this.portfolioEventsService.createEvent(this.portfolioId, this.inputName, this.inputDescription).subscribe({
-            next: event => this.router.navigate([`/portfolio/${this.portfolioId}/evento/${event.id}`]),
+        this.portfolioStakeholdersService.createNewStakeholder(this.portfolioId, this.inputName).subscribe({
+            next: stakeholder => this.router.navigate([`/portfolio/${this.portfolioId}/interessado/${stakeholder.id}`]),
             error: _ => this.errorMessage = 'Ocorreu um erro inesperado. Tente novamente mais tarde.',
         });
     }
 
     clearForm() {
         this.inputName = '';
-        this.inputDescription = '';
         this.errorMessage = '';
         this.isSubmitButtonDisabled = false;
     }
@@ -93,12 +88,12 @@ export class EventCreateModal {
     }
 
     async isNameUnique(): Promise<boolean> {
-        let eventNameAlreadyExists = await firstValueFrom(
-            this.portfolioEventsService.getEventByExactName(this.portfolioId, this.inputName)
+        let stakeholderNameAlreadyExists = await firstValueFrom(
+            this.portfolioStakeholdersService.getStakeholderByExactName(this.portfolioId, this.inputName)
         );
 
-        this.errorMessage = eventNameAlreadyExists ? 'Nome já cadastrado.' : '';
+        this.errorMessage = stakeholderNameAlreadyExists ? 'Nome já cadastrado.' : '';
 
-        return !eventNameAlreadyExists;
+        return !stakeholderNameAlreadyExists;
     }
 }

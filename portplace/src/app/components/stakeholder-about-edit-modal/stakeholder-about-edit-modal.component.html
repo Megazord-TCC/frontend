@@ -1,0 +1,81 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)" (mousedown)="onOverlayMouseDown($event)">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header">
+            <h2>Editar evento</h2>
+            <button class="close-btn" (click)="close.emit();">
+                <i class="icon-x">✕</i>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+            <!-- Validation Message -->
+            <div *ngIf="errorMessage" class="validation-error">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>{{ errorMessage }}</span>
+            </div>
+
+            <h3 class="no-top-margin">Classificação por níveis</h3>
+            <!-- Form Fields -->
+            <div class="form-fields bottom-margin bottom-margin" [ngClass]="{'disabled': isSubmitButtonDisabled}">
+                <div class="form-group">
+                    <label>Nível de poder<span class="required-asterisk">*</span></label>
+                    <select [(ngModel)]="powerLevelSelected" [disabled]="isSubmitButtonDisabled">
+                        <option *ngFor="let option of powerLevelOptions" [ngValue]="option">
+                            {{ option }}
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Justificativa do poder</label>
+                    <textarea [(ngModel)]="inputPowerLevelJustification" [disabled]="isSubmitButtonDisabled"
+                        [maxlength]="255"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Nível de interesse<span class="required-asterisk">*</span></label>
+                    <select [(ngModel)]="interestLevelSelected" [disabled]="isSubmitButtonDisabled">
+                        <option *ngFor="let option of interestLevelOptions" [ngValue]="option">
+                            {{ option }}
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Justificativa do interesse</label>
+                    <textarea [(ngModel)]="inputInterestLevelJustification" [disabled]="isSubmitButtonDisabled"
+                        [maxlength]="255"></textarea>
+                </div>
+            </div>
+
+            <h3>Análise adicional</h3>
+            <div class="form-fields" [ngClass]="{'disabled': isSubmitButtonDisabled}">
+                <div class="form-group">
+                    <label>Expectativas</label>
+                    <textarea [(ngModel)]="inputExpectations" [disabled]="isSubmitButtonDisabled"
+                        [maxlength]="255"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Obrigações dos responsáveis com a parte</label>
+                    <textarea [(ngModel)]="inputSupervisorsObligationWithStakeholder" [disabled]="isSubmitButtonDisabled"
+                        [maxlength]="255"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Pontos positivos</label>
+                    <textarea [(ngModel)]="inputPositivePoints" [disabled]="isSubmitButtonDisabled"
+                        [maxlength]="255"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Pontos negativos</label>
+                    <textarea [(ngModel)]="inputNegativePoints" [disabled]="isSubmitButtonDisabled"
+                        [maxlength]="255"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button class="btn-outline" (click)="close.emit();">Cancelar</button>
+            <button class="btn-primary" (click)="onSave()" [disabled]="isSubmitButtonDisabled">Salvar</button>
+        </div>
+    </div>
+</div>

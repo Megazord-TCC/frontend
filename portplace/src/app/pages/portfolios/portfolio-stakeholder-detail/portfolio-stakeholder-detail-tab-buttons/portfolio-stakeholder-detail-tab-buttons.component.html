@@ -1,0 +1,14 @@
+<div class="tabs-list">
+    <button class="tab-trigger" [class.active]="activeTab === 'about'" 
+        (click)="activeTab = 'about'; change.emit('about')">
+        <app-svg-icon class="nav-icon" [path]="'assets/icon/resumo_vetor.svg'" [size]="18">
+        </app-svg-icon>
+        Análise da parte interessada
+    </button>
+    <button class="tab-trigger" [class.active]="activeTab === 'events'" 
+        (click)="activeTab = 'events'; change.emit('events')">
+        <app-svg-icon class="nav-icon" [path]="'assets/icon/assignment_projetos_vetor.svg'" [size]="18">
+        </app-svg-icon>
+        Eventos que participa
+    </button>
+</div>

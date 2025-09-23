@@ -7,32 +7,30 @@ import { BreadcrumbComponent } from '../../../../components/breadcrumb/breadcrum
 import { BreadcrumbService } from '../../../../service/breadcrumb.service';
 import { ActionButtons, PageHeaderComponent } from '../../../../components/page-header/page-header.component';
 import { PortfolioService } from '../../../../service/portfolio-service';
-import { getDateObjectFromDDMMYYYYHHMMSS } from '../../../../helpers/date-helper';
-import { PortfolioEventsService } from '../../../../service/portfolio-events-service';
-import { EventEditModal } from '../../../../components/event-edit-modal/event-edit-modal.component';
-import { EventDeleteModalComponent } from '../../../../components/event-delete-modal/event-delete-modal.component';
+import { PortfolioStakeholdersService } from '../../../../service/portfolio-stakeholders-service';
+import { StakeholderEditModalComponent } from '../../../../components/stakeholder-edit-modal/stakeholder-edit-modal.component';
+import { StakeholderDeleteModalComponent } from '../../../../components/stakeholder-delete-modal/stakeholder-delete-modal.component';
 
 @Component({
-    selector: 'app-portfolio-event-detail-header',
+    selector: 'app-portfolio-stakeholder-detail-header',
     imports: [
         CommonModule,
         FormsModule,
         BreadcrumbComponent,
         PageHeaderComponent,
-        EventEditModal,
-        EventDeleteModalComponent
+        StakeholderEditModalComponent,
+        StakeholderDeleteModalComponent
     ],
-    templateUrl: './portfolio-event-detail-header.component.html',
-    styleUrl: './portfolio-event-detail-header.component.scss'
+    templateUrl: './portfolio-stakeholder-detail-header.component.html',
+    styleUrl: './portfolio-stakeholder-detail-header.component.scss'
 })
-export class PortfolioEventDetailHeaderComponent {
-    eventId = 0;
+export class PortfolioStakeholderDetailHeaderComponent {
+    stakeholderId = 0;
 
     portfolioId = 0;
     portfolioName = '...';
 
     name = '...';
-    description = '...';
     goBackButtonPathToNavigate = '';
     lastUpdate?: Date;
     visibleActionButtons: ActionButtons[] = ['edit', 'delete'];
@@ -43,28 +41,27 @@ export class PortfolioEventDetailHeaderComponent {
     router = inject(Router);
     breadcrumbService = inject(BreadcrumbService);
     portfolioService = inject(PortfolioService);
-    eventService = inject(PortfolioEventsService);
+    portfolioStakeholdersService = inject(PortfolioStakeholdersService);
 
     isEditModalVisible = false;
     isDeleteModalVisible = false;
 
     ngOnInit(): void {
         this.routeSubscription = this.route.paramMap.subscribe(params => {
-            this.eventId = Number(params.get('eventoId'));
+            this.stakeholderId = Number(params.get('interessadoId'));
             this.portfolioId = Number(params.get('portfolioId'));
-            this.loadEventAndPortfolioDetails();
+            this.loadHeaderDataByHttpRequest();
         });
     }
 
-    loadEventAndPortfolioDetails() {
+    loadHeaderDataByHttpRequest() {
         forkJoin({
-            event: this.eventService.getPortfolioEventById(this.portfolioId, this.eventId),
+            stakeholder: this.portfolioStakeholdersService.getStakeholderById(this.portfolioId, this.stakeholderId),
             portfolio: this.portfolioService.getPortfolioById(this.portfolioId)
-        }).subscribe(({ event, portfolio }) => {
-            this.name = event.name;
-            this.description = event.description;
+        }).subscribe(({ stakeholder, portfolio }) => {
+            this.name = stakeholder.name;
             this.goBackButtonPathToNavigate = `/portfolio/${this.portfolioId}`;
-            this.lastUpdate = getDateObjectFromDDMMYYYYHHMMSS(event.lastModifiedAt);
+            this.lastUpdate = new Date(stakeholder.lastModifiedAt);
             this.portfolioName = portfolio.name;
             this.setupBreadcrumbs();
         });
@@ -79,7 +76,7 @@ export class PortfolioEventDetailHeaderComponent {
             { label: 'Início', url: '/inicio', isActive: false },
             { label: 'Portfólios', url: '/portfolios', isActive: false },
             { label: `Portfólio: ${this.portfolioName ?? '...'}`, url: `/portfolio/${this.portfolioId}`, isActive: false },
-            { label: `Evento: ${this.name}`, url: `/portfolio/${this.portfolioId}/evento/${this.eventId}`, isActive: true },
+            { label: `Parte interessada: ${this.name ?? '...'}`, url: `/portfolio/${this.portfolioId}/interessado/${this.stakeholderId}`, isActive: true },
         ]);
     }
 }

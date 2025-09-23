@@ -5,7 +5,6 @@
 </app-table>
 
 <app-event-create-modal *ngIf="isCreateModalVisible" [portfolioId]="portfolioId" 
-    (close)="isCreateModalVisible = false" 
-    (eventCreate)="tableComponent?.sendHttpGetRequestAndPopulateTable(); isCreateModalVisible = false">
+    (close)="isCreateModalVisible = false">
 </app-event-create-modal>
 
