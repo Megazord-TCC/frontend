@@ -11,17 +11,17 @@ import { BadgeComponent } from '../../../../components/badge/badge.component';
 export type EventTab = 'about' | 'participants';
 
 @Component({
-    selector: 'app-portfolio-event-detail-about-tab',
+    selector: 'app-portfolio-stakeholder-detail-about-tab',
     imports: [
         CommonModule,
         FormsModule,
         StakeholderAboutEditModalComponent,
         BadgeComponent
     ],
-    templateUrl: './portfolio-event-detail-about-tab.component.html',
-    styleUrl: './portfolio-event-detail-about-tab.component.scss'
+    templateUrl: './portfolio-stakeholder-detail-about-tab.component.html',
+    styleUrl: './portfolio-stakeholder-detail-about-tab.component.scss'
 })
-export class PortfolioEventDetailAboutTabComponent {
+export class PortfolioStakeholderDetailAboutTabComponent {
     powerLevel?: PortfolioLevelScale;
     powerLevelJustification = '';
     interestLevel?: PortfolioLevelScale;

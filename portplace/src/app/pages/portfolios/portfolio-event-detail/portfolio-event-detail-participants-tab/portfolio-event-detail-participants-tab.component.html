@@ -1,0 +1,13 @@
+<div class="tab-content">
+    <div>
+        <h3>Participantes do evento</h3>
+        <p class="tab-description">Vincule as partes interessadas do portfólio a este evento.</p>
+    </div>
+    <app-table [dataRetrievalMethodRef]="this.getDataForTableComponent" [filterText]="filterText" [columns]="columns"
+        [actionButton]="actionButton" (actionButtonClick)="showCreateModal = true">
+    </app-table>
+</div>
+
+<app-portfolio-participant-create-modal *ngIf="showCreateModal" (close)="showCreateModal = false"
+    (create)="tableComponent?.sendHttpGetRequestAndPopulateTable(); showCreateModal = false">
+</app-portfolio-participant-create-modal>
