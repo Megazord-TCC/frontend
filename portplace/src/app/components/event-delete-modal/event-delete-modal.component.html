@@ -1,0 +1,32 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)" (mousedown)="onOverlayMouseDown($event)">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header">
+            <h2>Excluir evento</h2>
+            <button class="close-btn" (click)="onClose()">
+                <i class="icon-x">✕</i>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+            <!-- Alert Message -->
+            <div *ngIf="!errorMessage" class="alert-message">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>Esta ação não poderá ser desfeita.</span>
+            </div>
+
+            <!-- Validation Message -->
+            <div *ngIf="errorMessage" class="validation-error">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>{{ errorMessage }}</span>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button class="btn-outline" (click)="onClose()">Cancelar</button>
+            <button class="btn-primary" (click)="onSave()" [disabled]="isSubmitButtonDisabled">Excluir</button>
+        </div>
+    </div>
+</div>

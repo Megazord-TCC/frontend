@@ -17,6 +17,8 @@ import { PortfolioDetailHeaderComponent } from '../portfolio-detail-header/portf
 import { PortfolioSummaryTabComponent } from '../portfolio-summary-tab/portfolio-summary-tab.component';
 import { PortfolioCategoryTabComponent } from '../portfolio-category-tab/portfolio-category-tab.component';
 import { PortfolioProjectsTabComponent } from '../portfolio-projects-tab/portfolio-projects-tab.component';
+import { PortfolioSupervisorsTabComponent } from '../portfolio-supervisors-tab/portfolio-supervisors-tab.component';
+import { PortfolioCommunicationTabComponent } from '../portfolio-communication-tab/portfolio-communication-tab.component';
 
 interface Portfolio {
   id: number;
@@ -70,7 +72,9 @@ interface Category {
     PortfolioDetailHeaderComponent,
     PortfolioSummaryTabComponent,
     PortfolioCategoryTabComponent,
-    PortfolioProjectsTabComponent
+    PortfolioProjectsTabComponent,
+    PortfolioSupervisorsTabComponent,
+    PortfolioCommunicationTabComponent
   ],
   standalone: true
 })

@@ -1,0 +1,41 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)" (mousedown)="onOverlayMouseDown($event)">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header">
+            <h2>Cadastrar responsabilidade</h2>
+            <button class="close-btn" (click)="close.emit()">
+                <i class="icon-x">✕</i>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+            <!-- Validation Message -->
+            <div *ngIf="errorMessage" class="validation-error">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>{{ errorMessage }}</span>
+            </div>
+
+            <!-- Form Fields -->
+            <div class="form-fields" [ngClass]="{'disabled': isSubmitButtonDisabled}">
+                <p>Portfólio: <b>{{ portfolioName }}</b></p>
+                <div class="form-group">
+                    <label>Nome do usuário responsável (PMO)<span class="required-asterisk">*</span></label>
+                    <div class="input-with-info">
+                        <select [(ngModel)]="inputNameSelected" [disabled]="isSubmitButtonDisabled">
+                            <option *ngFor="let inputNameOption of inputNameOptions" [ngValue]="inputNameOption.id">
+                                {{ inputNameOption.name }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button class="btn-outline" (click)="close.emit()">Cancelar</button>
+            <button class="btn-primary" (click)="onSave()" [disabled]="isSubmitButtonDisabled">Salvar</button>
+        </div>
+    </div>
+</div>
