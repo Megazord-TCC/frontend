@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
-import { map, Observable, of } from 'rxjs';
+import { map, Observable, of, switchMap } from 'rxjs';
 import { Page, PaginationQueryParams } from '../models/pagination-models';
 import { CommunicationMethodDTO, EventCreateDTO, EventPeriodicity, EventPeriodicityDTO, EventReadDTO, EventUpdateDTO } from '../interface/carlos-portfolio-events-interfaces';
 import { mapEventPeriodicityToEventPeriodicityDTO } from '../mappers/portfolio-events-mappers';
@@ -28,16 +28,22 @@ export class PortfolioEventsService {
     // UPDATE - Editar os dados básicos (nome, descrição) de um evento de comunicação do portfólio
     updateEventBasicInformation(portfolioId: number, eventId: number, eventName: string, eventDescription: string): Observable<any> {
         const url = `${this.getPortfolioEventsUrl(portfolioId)}/${eventId}`;
-        const body: EventCreateDTO = { name: eventName, description: eventDescription, portfolioId: portfolioId };
         
-        return of(undefined); // TODO: Ajustar quando o gabriel adicionar edição de dados básicos do evento. 
-        // return this.http.put<any>(url, body, { headers: this.getHeaders() });
+        return this.getPortfolioEventById(portfolioId, eventId).pipe(switchMap(event => {
+            const body: EventUpdateDTO = {
+                ...event,
+                name: eventName,
+                description: eventDescription
+            };
+
+            return this.http.put<any>(url, body, { headers: this.getHeaders() });
+        }));
     }
 
     // UPDATE - Editar os dados sobre o evento do portfólio (método comunicação, periodicidade, tópicos, etc)
     updateEventAboutInformation(
-        portfolioId: number, 
-        eventId: number, 
+        portfolioId: number,
+        eventId: number,
         requiredDocumentsAndGeneralInfo: string,
         discussionTopic: string,
         eventReason: string,
@@ -53,15 +59,18 @@ export class PortfolioEventsService {
         if (usesCommunicationMethodOnlineMeeting) communicationMethods.push(CommunicationMethodDTO.ONLINE_MEETING);
         if (usesCommunicationMethodOnSiteMeeting) communicationMethods.push(CommunicationMethodDTO.ON_SITE_MEETING);
 
-        const body: EventUpdateDTO = { 
-            infosAndDocs: requiredDocumentsAndGeneralInfo,
-            discussionTopic: discussionTopic,
-            reason: eventReason,
-            periodicity: mapEventPeriodicityToEventPeriodicityDTO(periodicitySelected),
-            communicationMethods: communicationMethods
-         };
+        return this.getPortfolioEventById(portfolioId, eventId).pipe(switchMap(event => {
+            const body: EventUpdateDTO = {
+                ...event,
+                infosAndDocs: requiredDocumentsAndGeneralInfo,
+                discussionTopic: discussionTopic,
+                reason: eventReason,
+                periodicity: mapEventPeriodicityToEventPeriodicityDTO(periodicitySelected),
+                communicationMethods: communicationMethods
+            };
 
-        return this.http.put<any>(url, body, { headers: this.getHeaders() });
+            return this.http.put<any>(url, body, { headers: this.getHeaders() });
+        }));
     }
 
     getPortfolioEventById(portfolioId: number, eventId: number): Observable<EventReadDTO> {

@@ -60,9 +60,11 @@ export class EventReadDTO {
 }
 
 export class EventUpdateDTO {
+    name = '';
+    description = '';
     infosAndDocs = '';
     discussionTopic = '';
     reason = '';
     periodicity?: EventPeriodicityDTO;
-    communicationMethods: CommunicationMethodDTO[] = [];
+    communicationMethods?: CommunicationMethodDTO[] = [];
 }
