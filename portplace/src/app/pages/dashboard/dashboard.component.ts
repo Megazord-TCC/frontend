@@ -198,9 +198,9 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
-      const labels = this.projetos.map(p => p.name);
-      const plannedValues = this.projetos.map(p => p.plannedValue ?? 0);
-      const earnedValues = this.projetos.map(p => p.earnedValue ?? 0);
+      const labels = this.projetos.slice(0,3).map(p => p.name);
+      const plannedValues = this.projetos.slice(0,3).map(p => p.plannedValue ?? 0);
+      const earnedValues = this.projetos.slice(0,3).map(p => p.earnedValue ?? 0);
 
       this.costChart = new Chart(ctx, {
         type: 'bar',
@@ -292,50 +292,28 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
+      const projetos = this.projetos.slice(0, 3);
+      const colors = [
+        { bg: 'rgba(255, 99, 132, 0.6)', border: 'rgba(255, 99, 132, 1)' },
+        { bg: 'rgba(54, 162, 235, 0.6)', border: 'rgba(54, 162, 235, 1)' },
+        { bg: 'rgba(75, 192, 192, 0.6)', border: 'rgba(75, 192, 192, 1)' }
+      ];
+      const datasets = projetos.map((p, i) => ({
+        label: p.name,
+        data: [{
+          x: p.payback ?? 0,
+          y: p.scenarioRankingScore ?? 0,
+          r: Math.max(20, Math.min(60, Math.round((p.budgetAtCompletion ?? 0) / 1000)))
+        }],
+        backgroundColor: colors[i % colors.length].bg,
+        borderColor: colors[i % colors.length].border,
+        borderWidth: 2
+      }));
+
       this.projectBubbleChart = new Chart(ctx, {
         type: 'bubble',
         data: {
-          datasets: [
-            {
-              label: 'Projeto 1',
-              data: [
-                {
-                  x: 7, // Payback (meses)
-                  y: 8, // Alinhamento estratégico (escala 1-10)
-                  r: 15 // Tamanho da bolha (representando valor do projeto)
-                }
-              ],
-              backgroundColor: 'rgba(255, 99, 132, 0.6)',
-              borderColor: 'rgba(255, 99, 132, 1)',
-              borderWidth: 2
-            },
-            {
-              label: 'Projeto 2',
-              data: [
-                {
-                  x: 12, // Payback (meses)
-                  y: 6, // Alinhamento estratégico (escala 1-10)
-                  r: 20 // Tamanho da bolha
-                }
-              ],
-              backgroundColor: 'rgba(54, 162, 235, 0.6)',
-              borderColor: 'rgba(54, 162, 235, 1)',
-              borderWidth: 2
-            },
-            {
-              label: 'Projeto 3',
-              data: [
-                {
-                  x: 9, // Payback (meses)
-                  y: 9, // Alinhamento estratégico (escala 1-10)
-                  r: 18 // Tamanho da bolha
-                }
-              ],
-              backgroundColor: 'rgba(75, 192, 192, 0.6)',
-              borderColor: 'rgba(75, 192, 192, 1)',
-              borderWidth: 2
-            }
-          ]
+          datasets: datasets
         },
         options: {
           responsive: true,
@@ -349,7 +327,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
               callbacks: {
                 label: function(context: any) {
                   const label = context.dataset.label || '';
-                  return `${label}: Payback ${context.parsed.x} meses, Alinhamento ${context.parsed.y}/10`;
+                  return `${label}: Payback ${context.parsed.x} meses, Alinhamento ${context.parsed.y}`;
                 }
               }
             }
@@ -366,10 +344,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
             y: {
               title: {
                 display: true,
-                text: 'Alinhamento Estratégico (1-10)'
+                text: 'Alinhamento Estratégico'
               },
               min: 0,
-              max: 10
+              max: 1000
             }
           }
         }
