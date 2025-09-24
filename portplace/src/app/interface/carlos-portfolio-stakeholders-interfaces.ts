@@ -54,3 +54,8 @@ export class StakeholderUpdateDTO {
     positivePoints = '';
     negativePoints = ''; 
 }
+
+export class PortfolioStakeholderEventTableRow {
+    id = 0;
+    eventName = '';
+}

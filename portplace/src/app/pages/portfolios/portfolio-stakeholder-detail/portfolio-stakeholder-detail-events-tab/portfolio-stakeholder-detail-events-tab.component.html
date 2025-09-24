@@ -1,0 +1,5 @@
+<div class="tab-content">
+    <app-table [dataRetrievalMethodRef]="this.getDataForTableComponent" [filterText]="filterText" [columns]="columns"
+        (mainColumnRowClick)="router.navigate([`/portfolio/${portfolioId}/evento/${$event.id}`])">
+    </app-table>
+</div>

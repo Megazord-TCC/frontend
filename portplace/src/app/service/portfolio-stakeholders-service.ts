@@ -4,6 +4,7 @@ import { environment } from '../environments/environment';
 import { map, Observable, switchMap } from 'rxjs';
 import { Page, PaginationQueryParams } from '../models/pagination-models';
 import { PortfolioScaleEnumDTO, StakeholderCreateDTO, StakeholderReadDTO, StakeholderUpdateDTO } from '../interface/carlos-portfolio-stakeholders-interfaces';
+import { EventReadDTO } from '../interface/carlos-portfolio-events-interfaces';
 
 @Injectable({
     providedIn: 'root'
@@ -98,5 +99,12 @@ export class PortfolioStakeholdersService {
     deleteStakeholder(portfolioId: number, stakeholderId: number): Observable<void> {
         const url = `${this.getPortfolioStakeholdersUrl(portfolioId)}/${stakeholderId}`;
         return this.http.delete<void>(url, { headers: this.getHeaders() });
+    }
+
+    // GET - Obtém todos eventos relacionados ao stakeholder
+    getEventsByStakeholderId(portfolioId: number, stakeholderId: number, queryParams?: PaginationQueryParams): Observable<Page<EventReadDTO>> {
+        const url = `${this.getPortfolioStakeholdersUrl(portfolioId)}/${stakeholderId}/events`;
+        const params = PaginationQueryParams.sortByThisIfNotSortedYet('name', queryParams).getParamsInHttpParamsFormat();
+        return this.http.get<Page<EventReadDTO>>(url, { headers: this.getHeaders(), params });
     }
 }

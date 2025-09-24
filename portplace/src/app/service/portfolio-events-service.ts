@@ -21,7 +21,7 @@ export class PortfolioEventsService {
     }
 
     deleteEvent(portfolioId: number, eventId: number): Observable<void> {
-        const url = `${this.getPortfolioEventsUrl(portfolioId)}/${eventId}/hard-delete`;
+        const url = `${this.getPortfolioEventsUrl(portfolioId)}/${eventId}`;
         return this.http.delete<void>(url, { headers: this.getHeaders() });
     }
 

@@ -4,10 +4,17 @@
         <p class="tab-description">Vincule as partes interessadas do portfólio a este evento.</p>
     </div>
     <app-table [dataRetrievalMethodRef]="this.getDataForTableComponent" [filterText]="filterText" [columns]="columns"
-        [actionButton]="actionButton" (actionButtonClick)="showCreateModal = true">
+        [actionButton]="actionButton" (actionButtonClick)="showCreateModal = true"
+        (mainColumnRowClick)="selectedParticipantId = $event.id; showEditModal = true">
     </app-table>
 </div>
 
 <app-portfolio-participant-create-modal *ngIf="showCreateModal" (close)="showCreateModal = false"
     (create)="tableComponent?.sendHttpGetRequestAndPopulateTable(); showCreateModal = false">
 </app-portfolio-participant-create-modal>
+
+<app-event-participant-edit-delete-modal *ngIf="showEditModal" [participantId]="selectedParticipantId"
+    (close)="showEditModal = false"
+    (edit)="tableComponent?.sendHttpGetRequestAndPopulateTable(); showEditModal = false"
+    (delete)="tableComponent?.sendHttpGetRequestAndPopulateTable(); showEditModal = false">
+</app-event-participant-edit-delete-modal>

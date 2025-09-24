@@ -33,7 +33,7 @@ export class PortfolioStakeholderDetailHeaderComponent {
     name = '...';
     goBackButtonPathToNavigate = '';
     lastUpdate?: Date;
-    visibleActionButtons: ActionButtons[] = ['edit', 'delete'];
+    visibleActionButtons: ActionButtons[] = [];
 
     routeSubscription?: Subscription;
 
@@ -57,12 +57,14 @@ export class PortfolioStakeholderDetailHeaderComponent {
     loadHeaderDataByHttpRequest() {
         forkJoin({
             stakeholder: this.portfolioStakeholdersService.getStakeholderById(this.portfolioId, this.stakeholderId),
-            portfolio: this.portfolioService.getPortfolioById(this.portfolioId)
-        }).subscribe(({ stakeholder, portfolio }) => {
+            portfolio: this.portfolioService.getPortfolioById(this.portfolioId),
+            eventsRelatedToStakeholder: this.portfolioStakeholdersService.getEventsByStakeholderId(this.portfolioId, this.stakeholderId)
+        }).subscribe(({ stakeholder, portfolio, eventsRelatedToStakeholder }) => {
             this.name = stakeholder.name;
             this.goBackButtonPathToNavigate = `/portfolio/${this.portfolioId}`;
             this.lastUpdate = new Date(stakeholder.lastModifiedAt);
             this.portfolioName = portfolio.name;
+            this.visibleActionButtons = eventsRelatedToStakeholder.totalElements > 0 ? ['edit'] : ['edit', 'delete'];
             this.setupBreadcrumbs();
         });
     }
@@ -76,7 +78,7 @@ export class PortfolioStakeholderDetailHeaderComponent {
             { label: 'Início', url: '/inicio', isActive: false },
             { label: 'Portfólios', url: '/portfolios', isActive: false },
             { label: `Portfólio: ${this.portfolioName ?? '...'}`, url: `/portfolio/${this.portfolioId}`, isActive: false },
-            { label: `Parte interessada: ${this.name ?? '...'}`, url: `/portfolio/${this.portfolioId}/interessado/${this.stakeholderId}`, isActive: true },
+            { label: `Interessado: ${this.name ?? '...'}`, url: `/portfolio/${this.portfolioId}/interessado/${this.stakeholderId}`, isActive: true },
         ]);
     }
 }

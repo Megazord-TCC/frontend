@@ -1,4 +1,5 @@
-import { PortfolioLevelScale, PortfolioScaleEnumDTO, PortfolioStakeholderTableRow, StakeholderReadDTO } from "../interface/carlos-portfolio-stakeholders-interfaces";
+import { EventReadDTO } from "../interface/carlos-portfolio-events-interfaces";
+import { PortfolioLevelScale, PortfolioScaleEnumDTO, PortfolioStakeholderEventTableRow, PortfolioStakeholderTableRow, StakeholderReadDTO } from "../interface/carlos-portfolio-stakeholders-interfaces";
 import { Page } from "../models/pagination-models";
 
 export function mapPortfolioLevelScaleToBadgeColor(scale?: PortfolioLevelScale): string {
@@ -41,5 +42,19 @@ export function mapStakeholderReadDTOPageToPortfolioStakeholderTableRowPage(dto:
     return {
         ...dto,
         content: dto.content.map(stakeholder => mapStakeholderReadDTOToPortfolioStakeholderTableRow(stakeholder))
+    };
+}
+
+export function mapEventReadDTOToPortfolioStakeholderEventTableRow(dto: EventReadDTO): PortfolioStakeholderEventTableRow {
+    return {
+        id: dto.id,
+        eventName: dto.name
+    };
+}
+
+export function mapEventReadDTOPageToPortfolioStakeholderEventTableRowPage(dto: Page<EventReadDTO>): Page<PortfolioStakeholderEventTableRow> {
+    return {
+        ...dto,
+        content: dto.content.map(event => mapEventReadDTOToPortfolioStakeholderEventTableRow(event))
     };
 }

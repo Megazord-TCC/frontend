@@ -10,6 +10,7 @@ import { map, Observable } from 'rxjs';
 import { PortfolioEventParticipantService } from '../../../../service/portfolio-event-participant-service';
 import { mapEventParticipantReadDTOPageToEventParticipantTableRowPage } from '../../../../mappers/portfolio-event-participant-mappers';
 import { PortfolioParticipantCreateModalComponent } from '../../../../components/event-participant-create-modal/portfolio-participant-create-modal.component';
+import { EventParticipantEditDeleteModalComponent } from '../../../../components/event-participant-edit-delete-modal/event-participant-edit-delete-modal.component';
 
 export type EventTab = 'about' | 'participants';
 
@@ -19,7 +20,8 @@ export type EventTab = 'about' | 'participants';
         CommonModule,
         FormsModule,
         TableComponent,
-        PortfolioParticipantCreateModalComponent
+        PortfolioParticipantCreateModalComponent,
+        EventParticipantEditDeleteModalComponent
     ],
     templateUrl: './portfolio-event-detail-participants-tab.component.html',
     styleUrl: './portfolio-event-detail-participants-tab.component.scss'
@@ -36,6 +38,7 @@ export class PortfolioEventDetailParticipantsTabComponent {
 
     portfolioId = 0;
     eventId = 0;
+    selectedParticipantId = 0;
 
     portfolioEventParticipantService = inject(PortfolioEventParticipantService);
     route = inject(ActivatedRoute);
