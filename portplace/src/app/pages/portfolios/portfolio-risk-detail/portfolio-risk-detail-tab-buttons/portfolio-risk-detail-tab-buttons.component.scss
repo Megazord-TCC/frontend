@@ -1,0 +1,51 @@
+.tabs-list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 340px;
+    height: 44px;
+    background: #e5e5e5;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    padding: 5px;
+    gap: 4px;
+    box-sizing: border-box;
+
+    .tab-trigger {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: transparent;
+        border: none;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #000;
+        white-space: nowrap;
+        border-radius: 0.25rem;
+        flex: 1;
+        justify-content: center;
+
+        &:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 0.5rem;
+        }
+
+        &.active {
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            border-radius: 0.5rem;
+            color: #000;
+            height: 34px;
+            justify-content: center;
+        }
+
+        .nav-icon {
+            display: flex;
+            align-items: center;
+        }
+    }
+}

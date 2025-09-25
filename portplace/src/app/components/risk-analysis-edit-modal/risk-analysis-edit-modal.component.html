@@ -1,0 +1,77 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)" (mousedown)="onOverlayMouseDown($event)">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header">
+            <h2>Editar análise de risco</h2>
+            <button class="close-btn" (click)="close.emit();">
+                <i class="icon-x">✕</i>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+            <!-- Validation Message -->
+            <div *ngIf="errorMessage" class="validation-error">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>{{ errorMessage }}</span>
+            </div>
+
+            <h3 class="no-top-margin">Probabilidade</h3>
+            <div class="form-fields bottom-margin bottom-margin" [ngClass]="{'disabled': isSubmitButtonDisabled}">
+                <div class="form-group">
+                    <label>Valor<span class="required-asterisk">*</span></label>
+                    <select [(ngModel)]="inputProbabilitySelected" [disabled]="isSubmitButtonDisabled">
+                        <option *ngFor="let option of riskOptions" [ngValue]="option">
+                            {{ option }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Justificativa do valor</label>
+                    <textarea [(ngModel)]="inputProbabilityJustification" [disabled]="isSubmitButtonDisabled"
+                        [maxlength]="255"></textarea>
+                </div>
+            </div>
+
+            <h3 class="no-top-margin">Impacto</h3>
+            <div class="form-fields bottom-margin bottom-margin" [ngClass]="{'disabled': isSubmitButtonDisabled}">
+                <div class="form-group">
+                    <label>Valor<span class="required-asterisk">*</span></label>
+                    <select [(ngModel)]="inputImpactSelected" [disabled]="isSubmitButtonDisabled">
+                        <option *ngFor="let option of riskOptions" [ngValue]="option">
+                            {{ option }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Justificativa do valor</label>
+                    <textarea [(ngModel)]="inputImpactJustification" [disabled]="isSubmitButtonDisabled"
+                        [maxlength]="255"></textarea>
+                </div>
+            </div>
+
+            <h3>Planos</h3>
+            <div class="form-fields" [ngClass]="{'disabled': isSubmitButtonDisabled}">
+                <div class="form-group">
+                    <label>Plano de prevenção</label>
+                    <textarea [(ngModel)]="preventionPlan" [disabled]="isSubmitButtonDisabled"
+                        [maxlength]="255"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Plano de contingência</label>
+                    <textarea [(ngModel)]="contingencyPlan" [disabled]="isSubmitButtonDisabled"
+                        [maxlength]="255"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button class="btn-outline" (click)="close.emit();">Cancelar</button>
+            <button class="btn-primary" (click)="onSave()" [disabled]="isSubmitButtonDisabled">Salvar</button>
+        </div>
+    </div>
+</div>
