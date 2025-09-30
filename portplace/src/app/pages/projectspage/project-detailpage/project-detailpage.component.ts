@@ -14,6 +14,7 @@ import { BreadcrumbService } from '../../../service/breadcrumb.service';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 
+
 @Component({
   selector: 'app-project-detailpage',
   imports: [
@@ -23,7 +24,7 @@ import { HttpClient } from '@angular/common/http';
     SvgIconComponent,
     BreadcrumbComponent,
     FormModalComponentComponent
-  ],
+],
   templateUrl: './project-detailpage.component.html',
   styleUrl: './project-detailpage.component.scss'
 })
@@ -199,15 +200,15 @@ export class ProjectDetailpageComponent implements OnInit {
   onSaveProjeto(): void {
     if (!this.project) return;
 
-    function formatDateBR(dateStr?: string): string {
-      if (!dateStr) return '';
-      const date = new Date(dateStr);
-      if (isNaN(date.getTime())) return dateStr;
-      const day = String(date.getDate()).padStart(2, '0');
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const year = date.getFullYear();
-      return `${day}/${month}/${year}`;
-    }
+    // function formatDateBR(dateStr?: string): string {
+    //   if (!dateStr) return '';
+    //   const date = new Date(dateStr);
+    //   if (isNaN(date.getTime())) return dateStr;
+    //   const day = String(date.getDate()).padStart(2, '0');
+    //   const month = String(date.getMonth() + 1).padStart(2, '0');
+    //   const year = date.getFullYear();
+    //   return `${day}/${month}/${year}`;
+    // }
 
     const updatedProject = {
       name: this.project.name,
@@ -218,8 +219,8 @@ export class ProjectDetailpageComponent implements OnInit {
       actualCost: this.actualCost,
       budgetAtCompletion: this.budgetAtCompletion,
       payback: this.payback,
-      startDate: formatDateBR(this.project.startDate),
-      endDate: formatDateBR(this.project.endDate)
+      startDate: this.project.startDate,
+      endDate: this.project.endDate
     };
 
     console.log('Dados do projeto a serem salvos:', updatedProject);
@@ -408,6 +409,20 @@ export class ProjectDetailpageComponent implements OnInit {
 
   isCancelled(): boolean {
     return this.project?.status === ProjectStatusEnum.CANCELLED;
+  }
+
+  excluirProjeto(): void {
+    if (!this.project) return;
+    this.projetoService.deleteProject(this.project.id)
+      .pipe(retry(3))
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/projetos']);
+        },
+        error: (err) => {
+          alert('Erro ao excluir o projeto. Tente novamente.');
+        }
+      });
   }
 
   onUncancelProject(): void {

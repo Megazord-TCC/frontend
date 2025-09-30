@@ -33,7 +33,7 @@
                     </app-svg-icon>
                     Cancelar projeto
                 </button>
-                <button class="btn-outline btn-danger" *ngIf="!isCancelled()">
+                <button class="btn-outline btn-danger" (click)="excluirProjeto()" *ngIf="!isCancelled()">
                     <app-svg-icon class="nav-icon" [path]="'assets/icon/excluir_vetor.svg'" [size]="18">
                     </app-svg-icon>
                     Excluir
