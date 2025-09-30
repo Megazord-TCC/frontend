@@ -36,11 +36,9 @@
         </button>
       </div>
 
-      <!-- <div class="last-update">
-        Última alteração realizada em {{objective?.lastModifiedAt | date: 'dd/MM/yyyy HH:mm'}}.
-      </div> -->
+
       <div class="last-update">
-        Última alteração realizada em {{objective?.lastModifiedAt | date: 'dd/MM/yyyy HH:mm'}}.
+        Última alteração realizada em {{objective && objective.lastModifiedAt ? (parseDateString(objective.lastModifiedAt) | date: 'dd/MM/yyyy HH:mm') : ''}}.
       </div>
     </div>
   </div>

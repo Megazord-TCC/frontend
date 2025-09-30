@@ -1,7 +1,7 @@
 import { PortfolioCategoryReadDTO } from "./carlos-category-interfaces";
 import { UserGetResponseDTO } from "./carlos-user-dtos";
 
-/** 
+/**
  * @deprecated Use ProjectStatusEnumDTO2 instead.
 */
 export enum ProjectStatusEnum {
@@ -12,7 +12,7 @@ export enum ProjectStatusEnum {
     FINISHED
 }
 
-/** 
+/**
  * @deprecated Use ProjectReadDTO2 instead.
 */
 export interface ProjectReadDTO {
@@ -73,6 +73,7 @@ export class ProjectReadDTO2 {
     currentPlannedValue = 0;
     earnedValue = 0;
     actualCost = 0;
+    scenarioRankingScore = 0;
     percentComplete = 0;
     budgetAtCompletion = 0;
     portfolioCategory?: PortfolioCategoryReadDTO;

@@ -1,3 +1,4 @@
+import { StrategiaObjetivoService } from '../../service/strategia-objetivo.service';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef, inject, ChangeDetectorRef } from '@angular/core';
 import { CardComponent } from '../../components/card/card.component';
@@ -7,10 +8,15 @@ import { ProgressComponent } from '../../components/progress/progress.component'
 import { SvgIconComponent } from '../../components/svg-icon/svg-icon.component';
 import { BreadcrumbService } from '../../service/breadcrumb.service';
 import { Router } from '@angular/router';
-import { Risk, MetricCard } from '../../interface/interfacies';
+import { Risk, MetricCard, Objective } from '../../interface/interfacies';
 import { Chart } from 'chart.js/auto';
 import { AuthService } from '../../service/auth-service';
 import { PageType } from '../../interface/carlos-auth-interfaces';
+import { Page } from '../../models/pagination-models';
+import { PortfolioService } from '../../service/portfolio-service';
+import { ProjectReadDTO2 } from '../../interface/carlos-project-dtos';
+import { PortfolioListReadDTO, PortfolioReadDTO } from '../../interface/carlos-portfolio-interfaces';
+import { PaginationQueryParams } from '../../models/pagination-models';
 
 @Component({
   selector: 'app-dashboard',
@@ -26,6 +32,8 @@ import { PageType } from '../../interface/carlos-auth-interfaces';
   ],
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
+  private objetivoService = inject(StrategiaObjetivoService);
+  objetivos: Objective[] = [];
   @ViewChild('costChart', { static: false }) costChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('projectBubbleChart', { static: false }) projectBubbleChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('riskBubbleChart', { static: false }) riskBubbleChartRef!: ElementRef<HTMLCanvasElement>;
@@ -33,6 +41,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private breadcrumbService = inject(BreadcrumbService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  private portfolioService = inject(PortfolioService);
   authService = inject(AuthService);
   costChart: any;
   projectBubbleChart: any;
@@ -41,15 +50,9 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   hasPortfolio = true;
   expandedSections: string[] = [];
-  selectedPortfolio = 'portfolio1';
+  selectedPortfolioId: number | null = null;
+  portfolios: PortfolioListReadDTO[] = [];
 
-  metricCards: MetricCard[] = [
-    { title: 'Dentro do prazo', subtitle: 'Status do projeto', color: 'green', icon:'assets/icon/calendario_vetor.svg' },
-    { title: 'Ativo do planejado', subtitle: 'Status', color: 'blue', icon:'assets/icon/paid_vetor.svg' },
-    { title: 'Estratégia 1', subtitle: 'Estratégia ativa', color: 'purple', icon:'assets/icon/estrategia_vetor.svg' },
-    { title: 'R$ 1.000.000,00', subtitle: 'Valor total', color: 'none', value: 'R$ 1.000.000,00', icon:'assets/icon/porco_vetor.svg' },
-    { title: 'Gabriel Martins', subtitle: 'Responsável', color: 'none', icon:'assets/icon/user_vetor.svg  ' }
-  ];
 
   risks: Risk[] = [
     {
@@ -86,11 +89,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     { name: 'Nome do objetivo 2', description: 'Descrição do objetivo.' },
     { name: 'Nome do objetivo 3', description: 'Descrição do objetivo.' }
   ];
-
+  portfolioDetails: PortfolioReadDTO | null = null;
+  projetos: ProjectReadDTO2[] = [];
 
 
   ngOnInit(): void {
-    // Configurar breadcrumbs para Dashboard
     this.breadcrumbService.setBreadcrumbs([
       {
         label: 'Início',
@@ -103,21 +106,60 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         isActive: true
       }
     ]);
-
-    // Remover breadcrumbs filhos quando retorna para esta página
     this.breadcrumbService.removeChildrenAfter('/dashboard');
+    this.loadPortfolios();
   }
 
   ngAfterViewInit(): void {
-    // Criar o gráfico apenas após a view estar inicializada
-    if (this.hasPortfolio) {
-      // Aguardar que o DOM esteja completamente renderizado
+    // Os gráficos só serão criados após carregar os dados do portfólio selecionado
+  }
+
+
+  loadPortfolios() {
+    const queryParams = new PaginationQueryParams();
+    this.portfolioService.getPortfoliosPage(queryParams).subscribe(page => {
+      this.portfolios = page.content;
+      if (this.portfolios.length > 0) {
+        this.hasPortfolio = true;
+        this.selectedPortfolioId = this.portfolios[0].id;
+        this.loadPortfolioDetails(this.selectedPortfolioId);
+      } else {
+        this.hasPortfolio = false;
+        this.selectedPortfolioId = null;
+      }
+    });
+  }
+
+  loadPortfolioDetails(portfolioId: number) {
+    this.portfolioService.getPortfolioAnalytics(portfolioId).subscribe(details => {
+      this.portfolioDetails = details.portfolio;
+      console.log('Portfolio details loaded:', this.portfolioDetails);
+      this.projetos = details.portfolio.projects;
+      this.objetivos = [];
+      // Buscar objetivos de cada estratégia ligada ao portfólio
+      let strategies: any[] = [];
+      if (this.portfolioDetails?.strategy) {
+        if (Array.isArray(this.portfolioDetails.strategy)) {
+          strategies = this.portfolioDetails.strategy;
+        } else {
+          strategies = [this.portfolioDetails.strategy];
+        }
+      }
+      strategies.forEach((strategy) => {
+        if (strategy && strategy.id) {
+          this.objetivoService.getObjectivesPage(strategy.id).subscribe((objPage: Page<Objective>) => {
+            if (objPage && objPage.content) {
+              this.objetivos = [...this.objetivos, ...objPage.content];
+            }
+          });
+        }
+      });
       setTimeout(() => {
         this.createCostChart();
         this.createProjectBubbleChart();
         this.createRiskBubbleChart();
       }, 100);
-    }
+    });
   }
 
   createCostChart() {
@@ -156,21 +198,25 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
+      const labels = this.projetos.slice(0,3).map(p => p.name);
+      const plannedValues = this.projetos.slice(0,3).map(p => p.plannedValue ?? 0);
+      const earnedValues = this.projetos.slice(0,3).map(p => p.earnedValue ?? 0);
+
       this.costChart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+          labels: labels,
           datasets: [
             {
               label: 'Custo Planejado (R$)',
-              data: [64000, 48000, 32000, 64000],
+              data: plannedValues,
               backgroundColor: 'rgba(54, 162, 235, 0.6)',
               borderColor: 'rgba(54, 162, 235, 1)',
               borderWidth: 1
             },
             {
               label: 'Custo Real (R$)',
-              data: [48000, 80000, 32000, 48000],
+              data: earnedValues,
               backgroundColor: 'rgba(255, 99, 132, 0.6)',
               borderColor: 'rgba(255, 99, 132, 1)',
               borderWidth: 1
@@ -197,7 +243,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
             x: {
               title: {
                 display: true,
-                text: 'Trimestres'
+                text: 'Projetos'
               }
             }
           }
@@ -246,50 +292,28 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
+      const projetos = this.projetos.slice(0, 3);
+      const colors = [
+        { bg: 'rgba(255, 99, 132, 0.6)', border: 'rgba(255, 99, 132, 1)' },
+        { bg: 'rgba(54, 162, 235, 0.6)', border: 'rgba(54, 162, 235, 1)' },
+        { bg: 'rgba(75, 192, 192, 0.6)', border: 'rgba(75, 192, 192, 1)' }
+      ];
+      const datasets = projetos.map((p, i) => ({
+        label: p.name,
+        data: [{
+          x: p.payback ?? 0,
+          y: p.scenarioRankingScore ?? 0,
+          r: Math.max(20, Math.min(60, Math.round((p.budgetAtCompletion ?? 0) / 1000)))
+        }],
+        backgroundColor: colors[i % colors.length].bg,
+        borderColor: colors[i % colors.length].border,
+        borderWidth: 2
+      }));
+
       this.projectBubbleChart = new Chart(ctx, {
         type: 'bubble',
         data: {
-          datasets: [
-            {
-              label: 'Projeto 1',
-              data: [
-                {
-                  x: 7, // Payback (meses)
-                  y: 8, // Alinhamento estratégico (escala 1-10)
-                  r: 15 // Tamanho da bolha (representando valor do projeto)
-                }
-              ],
-              backgroundColor: 'rgba(255, 99, 132, 0.6)',
-              borderColor: 'rgba(255, 99, 132, 1)',
-              borderWidth: 2
-            },
-            {
-              label: 'Projeto 2',
-              data: [
-                {
-                  x: 12, // Payback (meses)
-                  y: 6, // Alinhamento estratégico (escala 1-10)
-                  r: 20 // Tamanho da bolha
-                }
-              ],
-              backgroundColor: 'rgba(54, 162, 235, 0.6)',
-              borderColor: 'rgba(54, 162, 235, 1)',
-              borderWidth: 2
-            },
-            {
-              label: 'Projeto 3',
-              data: [
-                {
-                  x: 9, // Payback (meses)
-                  y: 9, // Alinhamento estratégico (escala 1-10)
-                  r: 18 // Tamanho da bolha
-                }
-              ],
-              backgroundColor: 'rgba(75, 192, 192, 0.6)',
-              borderColor: 'rgba(75, 192, 192, 1)',
-              borderWidth: 2
-            }
-          ]
+          datasets: datasets
         },
         options: {
           responsive: true,
@@ -303,7 +327,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
               callbacks: {
                 label: function(context: any) {
                   const label = context.dataset.label || '';
-                  return `${label}: Payback ${context.parsed.x} meses, Alinhamento ${context.parsed.y}/10`;
+                  return `${label}: Payback ${context.parsed.x} meses, Alinhamento ${context.parsed.y}`;
                 }
               }
             }
@@ -320,10 +344,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
             y: {
               title: {
                 display: true,
-                text: 'Alinhamento Estratégico (1-10)'
+                text: 'Alinhamento Estratégico'
               },
               min: 0,
-              max: 10
+              max: 1000
             }
           }
         }
@@ -480,14 +504,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.expandedSections.includes(section);
   }
 
-  onPortfolioChange(value: string): void {
-    this.selectedPortfolio = value;
-    // Recriar o gráfico quando o portfólio for alterado
-    setTimeout(() => {
-      this.createCostChart();
-      this.createProjectBubbleChart();
-      this.createRiskBubbleChart();
-    }, 100);
+  onPortfolioChange(portfolioId: number | null): void {
+    if (portfolioId != null) {
+      this.selectedPortfolioId = portfolioId;
+      this.loadPortfolioDetails(portfolioId);
+    }
   }
 
   ngOnDestroy(): void {
@@ -514,5 +535,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       this.createProjectBubbleChart();
       this.createRiskBubbleChart();
     }, 300);
+  }
+  getPortfolioProgress(): number {
+    if (!this.projetos || this.projetos.length === 0) return 0;
+    const total = this.projetos.reduce((sum, p) => sum + (p.percentComplete || 0), 0);
+    return Math.round(total / this.projetos.length);
   }
 }

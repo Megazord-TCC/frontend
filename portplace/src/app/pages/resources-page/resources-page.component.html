@@ -6,74 +6,54 @@
     <!-- Header -->
     <div class="page-header">
       <h1>Recursos</h1>
-      <p>Gerencie os recursos do sistema.</p>
+      <p>Gerencie os recursos humanos da organização</p>
     </div>
 
-    <!-- Filters -->
-    <div class="filters-section">
-      <div class="filters-left">
-        <div class="filter-label">
+    <!-- Tabs -->
+    <div class="tabs-container">
+      <div class="tabs-list">
+        <button
+          class="tab-trigger"
+          [class.active]="activeTab === 'pedidos'"
+          (click)="onTabChange('pedidos')">
           <app-svg-icon
             class="nav-icon"
-            [path]="'assets/icon/filter_vetor.svg'"
+            [path]="'assets/icon/pedido_vetor.svg'"
             [size]="18">
           </app-svg-icon>
-          <span>Filtros:</span>
-        </div>
-        <div class="filter-buttons">
-          <button
-            class="filter-btn"
-            [class.active]="activeFilter === 'em-analise'"
-            (click)="onFilterChange('em-analise')">
-            <div class="filter-indicator blue"></div>
-            Em análise
-          </button>
-          <button
-            class="filter-btn"
-            [class.active]="activeFilter === 'em-andamento'"
-            (click)="onFilterChange('em-andamento')">
-            <div class="filter-indicator blue"></div>
-            Em andamento
-          </button>
-          <button
-            class="filter-btn"
-            [class.active]="activeFilter === 'finalizado'"
-            (click)="onFilterChange('finalizado')">
-            <div class="filter-indicator blue"></div>
-            Finalizado
-          </button>
-          <button
-            class="filter-btn"
-            [class.active]="activeFilter === 'cancelado'"
-            (click)="onFilterChange('cancelado')">
-            <div class="filter-indicator blue"></div>
-            Cancelado
-          </button>
-        </div>
-      </div>
-
-      <div class="actions-right">
-        <button class="btn-primary" (click)="openCreateModal()">
-          <i class="icon-plus">+</i>
-          Cadastrar
+          Pedidos de recursos
         </button>
-        <div class="search-container">
-
+        <button
+          class="tab-trigger"
+          [class.active]="activeTab === 'pool'"
+          (click)="onTabChange('pool')">
           <app-svg-icon
             class="nav-icon"
-            [path]="'assets/icon/search_vetor.svg'"
+            [path]="'assets/icon/pool_vetor.svg'"
             [size]="18">
           </app-svg-icon>
-          <input
-            type="text"
-            placeholder="Buscar pelo nome do projeto"
-            [(ngModel)]="searchTerm"
-            (input)="onSearchChange()">
-        </div>
+          Pool de recursos
+        </button>
+        <button
+          class="tab-trigger"
+          [class.active]="activeTab === 'Cargos'"
+          (click)="onTabChange('Cargos')">
+          <app-svg-icon
+            class="nav-icon"
+            [path]="'assets/icon/cargos_vetor.svg'"
+            [size]="18">
+          </app-svg-icon>
+          Cargos
+        </button>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <resources-request *ngIf="activeTab === 'pedidos'"></resources-request>
+        <resources-pool *ngIf="activeTab === 'pool'"></resources-pool>
+        <resources-position *ngIf="activeTab === 'Cargos'"></resources-position>
       </div>
     </div>
-
-
     <!-- Table -->
     <app-card class="table-card">
       <div class="table-container">
