@@ -466,7 +466,7 @@ export class ProjectDetailpageComponent implements OnInit {
     }
 }
 
-  getProjectStatusColor(status: string): string {
+  getProjectStatusColor(status: any): string {
     switch (status) {
       case 'IN_ANALYSIS':
         return 'yellow';
@@ -479,5 +479,19 @@ export class ProjectDetailpageComponent implements OnInit {
       default:
         return 'gray';
     }
+  }
+  deleteProject(): void {
+    if (!this.project) return;
+    this.projetoService.deleteProject(this.project.id)
+      .pipe(retry(3))
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/projetos']);
+        },
+        error: (err) => {
+          console.error('Erro ao deletar projeto:', err);
+          alert('Erro ao deletar o projeto. Tente novamente.');
+        }
+      });
   }
 }
