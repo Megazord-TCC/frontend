@@ -4,7 +4,7 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { map, Observable, of, switchMap } from 'rxjs';
 import { Page, PaginationQueryParams } from '../models/pagination-models';
-import { PortfolioCancelationPatchDTO, PortfolioCostStatus, PortfolioListReadDTO, PortfolioProgressStatus, PortfolioReadDTO, PortfolioSummaryTab, PortfolioUpdateDTO } from '../interface/carlos-portfolio-interfaces';
+import { PortfolioAnalyticsReadDTO, PortfolioCancelationPatchDTO, PortfolioCostStatus, PortfolioListReadDTO, PortfolioProgressStatus, PortfolioReadDTO, PortfolioSummaryTab, PortfolioUpdateDTO } from '../interface/carlos-portfolio-interfaces';
 import { ScenarioService } from './scenario-service';
 import { ProjectReadDTO2 } from '../interface/carlos-project-dtos';
 import { NumberValueAccessor } from '@angular/forms';
@@ -124,7 +124,7 @@ export class PortfolioService {
     getPortfolioAnalytics(portfolioId: number): Observable<any> {
         const url = `${environment.apiUrl}/portfolios/${portfolioId}/analytics`;
 
-        return this.http.get<Page<ProjectReadDTO2>>(url, { headers: this.getHeaders() });
+        return this.http.get<PortfolioAnalyticsReadDTO>(url, { headers: this.getHeaders() });
     }
     getPortfolios(queryParams: PaginationQueryParams):  Observable<Page<PortfolioListReadDTO>> {
         const url = this.getPortfolioUrl();

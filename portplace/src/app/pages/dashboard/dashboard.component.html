@@ -38,7 +38,7 @@
         </app-svg-icon>
         <div class="metric-info-container">
           <div class="metric-title-row">
-            <p class="metric-title">{{portfolioDetails?.status}}</p>
+            <p class="metric-title">{{getPortfolioStatusEnumToText(portfolioDetails?.status)}}</p>
             <div class="metric-indicator" [class]="'indicator-' + portfolioDetails?.budgetHealth" ></div>
           </div>
           <p class="metric-subtitle">Status progresso</p>
@@ -54,7 +54,7 @@
           </app-svg-icon>
           <div class="metric-info-container">
             <div class="metric-title-row">
-              <p class="metric-title">XXX</p>
+              <p class="metric-title">{{getPortfolioHealthEnumToText(portfolioDetails?.budgetHealth)}}</p>
               <div class="metric-indicator" [class]="'indicator-' + portfolioDetails?.budgetHealth" ></div>
             </div>
             <p class="metric-subtitle">Status custo</p>
@@ -85,7 +85,7 @@
           </app-svg-icon>
           <div class="metric-info-container">
             <div class="metric-title-row">
-              <p class="metric-title">{{portfolioDetails?.budget}}</p>
+              <p class="metric-title">{{portfolioDetails?.budget | currency:'BRL':'symbol':'1.2-2'}}</p>
             </div>
             <p class="metric-subtitle">Orçamento</p>
           </div>
@@ -159,13 +159,13 @@
             </thead>
             <tbody>
               <tr *ngFor="let risk of risks">
-                <td>{{risk.code}}</td>
+                <td>{{risk.id}}</td>
                 <td class="risk-name">{{risk.name}}</td>
-                <td>{{risk.probability}}</td>
-                <td>{{risk.impact}}</td>
+                <td>{{getRiskSeverityEnumToText(risk.probability)}}</td>
+                <td>{{getRiskSeverityEnumToText(risk.impact)}}</td>
                 <td>{{risk.severity}}</td>
-                <td [class.text-red]="risk.resolvedOccurrences > 3">{{risk.resolvedOccurrences}}</td>
-                <td [class.text-red]="risk.unresolvedOccurrences > 1">{{risk.unresolvedOccurrences}}</td>
+                <td [class.text-red]="getOccurrencesSolvedCount(risk) > 3">{{getOccurrencesSolvedCount(risk)}}</td>
+                <td [class.text-red]="getOccurrencesNotSolvedCount(risk) > 1">{{getOccurrencesNotSolvedCount(risk)}}</td>
               </tr>
             </tbody>
           </table>
