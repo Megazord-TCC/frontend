@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../service/breadcrumb.service';
 import { SvgIconComponent } from '../../components/svg-icon/svg-icon.component';
@@ -13,6 +13,8 @@ import { TableComponent } from '../../components/table/table.component';
 import { ResourcesRequestComponent } from './resources-request/resources-request.component';
 import { ResourcesPositionComponent } from './resources-position/resources-position.component';
 import { ResourcesPoolComponent } from './resources-pool/resources-pool.component';
+import { AuthService } from '../../service/auth-service';
+import { PageType } from '../../interface/carlos-auth-interfaces';
 
 @Component({
   selector: 'app-resources-page',
@@ -33,6 +35,8 @@ import { ResourcesPoolComponent } from './resources-pool/resources-pool.componen
   styleUrl: './resources-page.component.scss'
 })
 export class ResourcesPageComponent implements OnInit {
+  authService = inject(AuthService);
+  pageType = PageType;
   showCreateModal = false;
   activeFilter = '';
   activeTab = "pedidos";

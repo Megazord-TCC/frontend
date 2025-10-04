@@ -2,17 +2,6 @@
   <div class="dashboard-header">
     <h1>Dashboard de portfólio</h1>
   </div>
-
-  <div *ngIf="!hasPortfolio" class="no-portfolio">
-    <p>
-      Nenhum portfólio em andamento.
-      <button class="link-btn" (click)="onHasPortfolioChange()">
-        Acesse a página de Portfólios
-      </button>
-      e realize o cadastro.
-    </p>
-  </div>
-
   <div *ngIf="hasPortfolio" class="dashboard-content">
     <!-- Portfolio Selector -->
     <div class="portfolio-selector">
@@ -22,7 +11,8 @@
         <option *ngFor="let portfolio of portfolios" [value]="portfolio.id">{{portfolio.name}}</option>
       </select>
       <button *ngIf="authService.getAuthorizedPageTypesByRole().includes(pageType.PORTFOLIOS)"
-        class="add-portfolio-btn">
+        class="add-portfolio-btn"
+        (click)="openPortfolio(selectedPortfolioId)">
         Acessar portfólio
       </button>
     </div>

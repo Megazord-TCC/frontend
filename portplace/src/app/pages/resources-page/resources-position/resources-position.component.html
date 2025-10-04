@@ -1,1 +1,21 @@
-<p>resources-position works!</p>
+<div class="resources-layout">
+
+  <div class="resources-content">
+
+
+    <app-table
+        [dataRetrievalMethodRef]="this.getDataForTableComponent"
+        [filterText]="filterText"
+        [columns]="columns"
+        [actionButton]="actionButton"
+        (mainColumnRowClick)="router.navigate([`/portfolio/${portfolioId}/risco/${$event.id}`])"
+        (actionButtonClick)="showCreateModal = true">
+    </app-table>
+  </div>
+
+  <!-- Form Modal -->
+  <app-resources-create
+    *ngIf="showCreateModal"
+    (close)="closeCreateModal()">
+  </app-resources-create>
+</div>

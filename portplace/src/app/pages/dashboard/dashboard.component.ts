@@ -51,7 +51,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   hasPortfolio = true;
   expandedSections: string[] = [];
-  selectedPortfolioId: number | null = null;
+  selectedPortfolioId: number = 0;
   portfolios: PortfolioListReadDTO[] = [];
 
 
@@ -86,6 +86,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     // Os gráficos só serão criados após carregar os dados do portfólio selecionado
   }
+  openPortfolio(id: number) {
+    this.router.navigate(['/portfolio', id]);
+  }
+
 
   loadPortfoliosAnalytics(portfolioId: number) {
     console.log('Loading portfolio analytics for portfolio ID:', portfolioId);
@@ -109,7 +113,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loadPortfoliosAnalytics(this.selectedPortfolioId);
       } else {
         this.hasPortfolio = false;
-        this.selectedPortfolioId = null;
+        this.selectedPortfolioId = 0;
       }
     });
   }
