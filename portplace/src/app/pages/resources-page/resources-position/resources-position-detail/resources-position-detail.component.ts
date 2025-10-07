@@ -2,26 +2,30 @@ import { Component, inject } from '@angular/core';
 import { SvgIconComponent } from '../../../../components/svg-icon/svg-icon.component';
 import { Router } from '@angular/router';
 import { BadgeComponent } from '../../../../components/badge/badge.component';
-import { FormModalConfig } from '../../../../interface/interfacies';
-import { PositionReadDTO } from '../../../../interface/cargos-interfaces';
+import { FormField, FormModalConfig } from '../../../../interface/interfacies';
+import { PositionReadDTO, PositionStatusEnum } from '../../../../interface/cargos-interfaces';
 import { CargosService } from '../../../../service/cargos.service';
 import { retry } from 'rxjs';
 import { BreadcrumbService } from '../../../../service/breadcrumb.service';
 import { BreadcrumbComponent } from '../../../../components/breadcrumb/breadcrumb.component';
+import { CommonModule } from '@angular/common';
+import { FormModalComponentComponent } from '../../../../components/form-modal-component/form-modal-component.component';
 
 @Component({
   selector: 'app-resources-position-detail',
   imports: [
     SvgIconComponent,
     BadgeComponent,
-    BreadcrumbComponent
+    BreadcrumbComponent,
+    CommonModule,
+    FormModalComponentComponent
   ],
   templateUrl: './resources-position-detail.component.html',
   styleUrl: './resources-position-detail.component.scss'
 })
 export class ResourcesPositionDetailComponent {
-  editPortfolioConfig: FormModalConfig = {
-      title: 'Editar portfólio',
+  editPositionConfig: FormModalConfig = {
+      title: 'Editar posição',
       fields: [
         {
           id: 'name',
@@ -29,7 +33,7 @@ export class ResourcesPositionDetailComponent {
           type: 'text',
           value: '',
           required: true,
-          placeholder: 'Digite o nome do portfólio'
+          placeholder: 'Digite o nome da posição'
         }
       ],
       validationMessage: 'Os campos marcados com * são obrigatórios.'
@@ -39,7 +43,16 @@ export class ResourcesPositionDetailComponent {
   position: PositionReadDTO | null = null;
   router = inject(Router);
   cargoService = inject(CargosService);
-  breadCrumbService = inject(BreadcrumbService); // Supondo que você tenha um serviço de breadcrumb
+  breadCrumbService = inject(BreadcrumbService);
+  constructor() {
+    const urlSegments = this.router.url.split('/');
+    const positionId = Number(urlSegments[urlSegments.length - 1]);
+    this.loadPositionDetails(positionId);
+    this.breadCrumbService.setBreadcrumbs([
+      { label: 'Recursos', url: '/recursos', isActive: false },
+      { label: 'Detalhes do recurso', url: `/recursos/${positionId}`, isActive: true }
+    ]);
+  }
   loadPositionDetails(positionId: number): void {
     this.cargoService.getPositionById(positionId)
       .pipe(retry(5))
@@ -63,24 +76,18 @@ export class ResourcesPositionDetailComponent {
   }
   getPositionStatusEnumToText = (statusEnum: any): string => {
       switch (statusEnum) {
-          case "IN_ANALYSIS": return "EM ANÁLISE";
-          case "CANCELLED": return "CANCELADO";
-          case "IN_PROGRESS": return "EM ANDAMENTO";
-          case "COMPLETED": return "FINALIZADO";
+          case "ACTIVE": return "ATIVO";
+          case "INACTIVE": return "INATIVO";
           default: return "SEM STATUS";
       }
   }
 
   getPositionStatusColor(status: any): string {
     switch (status) {
-      case 'IN_ANALYSIS':
-        return 'yellow';
-      case 'IN_PROGRESS':
+      case 'ACTIVE':
         return 'green';
-      case 'COMPLETED':
-        return 'blue';
-      case 'CANCELLED':
-        return 'gray';
+      case 'INACTIVE':
+        return 'red';
       default:
         return 'gray';
     }
@@ -90,14 +97,10 @@ export class ResourcesPositionDetailComponent {
   }
   openEditModal(): void {
     if (!this.position) return;
-    this.editPortfolioConfig.fields[0].value = this.position.name;
-    this.editPortfolioConfig.fields.forEach(field => {
-      field.hasError = false;
-      field.errorMessage = '';
-    });
+    this.editPositionConfig.fields[0].value = this.position.name;
     this.showEditModal = true;
   }
-    closeEditModal(): void {
+  closeEditModal(): void {
     this.showEditModal = false;
   }
 
@@ -124,22 +127,83 @@ export class ResourcesPositionDetailComponent {
       });
   }
   onUncancelPosition(): void {
-      if (!this.position) return;
-      if (this.position.status !== 'CANCELLED') return;
-      const updatedPosition = {
-        ...this.position,
-        status: 'IN_ANALYSIS'
-      };
-      this.cargoService.updatePosition(this.position.id, updatedPosition)
-        .pipe(retry(3))
-        .subscribe({
-          next: (updatedPosition) => {
-            this.loadPositionDetails(this.position!.id);
-          },
-          error: (err) => {
-            alert('Erro ao descancelar o position. Tente novamente.');
-          }
-        });
-    }
+    if (!this.position) return;
+    if (this.position.status !== PositionStatusEnum.INACTIVE) return;
+    const updatedPosition = {
+      ...this.position,
+      status: PositionStatusEnum.ACTIVE
+    };
+    this.cargoService.updatePosition(this.position.id, updatedPosition)
+      .pipe(retry(3))
+      .subscribe({
+        next: (updatedPosition) => {
+          this.loadPositionDetails(this.position!.id);
+        },
+        error: (err) => {
+          alert('Erro ao descancelar o position. Tente novamente.');
+        }
+      });
+  }
+  isInactive(): boolean {
+    return this.position?.status === 'INACTIVE';
+  }
+  onCancelPosition(): void {
+    if (!this.position) return;
+
+
+    const updatedPosition = {
+      ...this.position,
+      status: PositionStatusEnum.INACTIVE,
+
+    };
+
+    this.cargoService.updatePosition(this.position.id, updatedPosition)
+    .pipe(retry(3))
+    .subscribe({
+      next: (updatedPosition) => {
+        this.closeCancelModal();
+        this.loadPositionDetails(this.position!.id);
+        setTimeout(() => {
+          this.router.navigate(['/recursos']);
+        }, 1000);
+      },
+      error: (err) => {
+        console.error('Erro ao cancelar posição:', err);
+        console.error('Detalhes do erro:', err.error);
+        alert('Erro ao cancelar a posição. Tente novamente.');
+      }
+    });
+  }
+  updatePositionField(fields: FormField[]): void {
+    if (!this.position) return;
+
+    // Utiliza os valores dos fields recebidos para atualizar a posição
+    const fieldMap: { [key: string]: any } = {};
+    fields.forEach(field => {
+      fieldMap[field.id] = field.value;
+    });
+
+
+
+    const updatedPosition = {
+      name: fieldMap['name'] !== undefined ? fieldMap['name'] : this.position.name,
+
+      status: this.position.status,
+
+    };
+
+    this.cargoService.updatePosition(this.position.id, updatedPosition)
+      .pipe(retry(3))
+      .subscribe({
+        next: (updatedPosition) => {
+          this.position = updatedPosition;
+          this.loadPositionDetails(this.position!.id);
+        },
+        error: (err) => {
+          alert('Erro ao salvar. Tente novamente.');
+        }
+      });
+      this.showEditModal = false;
+  }
 
 }
