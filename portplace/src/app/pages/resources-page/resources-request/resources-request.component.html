@@ -4,11 +4,12 @@
 
 
     <app-table
+        #tableComponent
         [dataRetrievalMethodRef]="this.getDataForTableComponent"
         [filterText]="filterText"
         [columns]="columns"
         [actionButton]="actionButton"
-        (mainColumnRowClick)="router.navigate([`/portfolio/${portfolioId}/risco/${$event.id}`])"
+        (mainColumnRowClick)="openResource($event)"
         (actionButtonClick)="showCreateModal = true">
     </app-table>
   </div>

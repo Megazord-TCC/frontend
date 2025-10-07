@@ -98,4 +98,7 @@ export class ResourcesRequestComponent {
     this.showCreateModal = true;
 
   }
+  openResource(event: any): void {
+    this.router.navigate([`/portfolio/${this.portfolioId}/recurso/${event.id}`]);
+  }
 }

@@ -106,6 +106,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     const queryParams = new PaginationQueryParams();
     this.portfolioService.getPortfoliosPage(queryParams).subscribe(page => {
       this.portfolios = page.content;
+      console.log('Portfolios loaded:', this.portfolios);
       if (this.portfolios.length > 0) {
         this.hasPortfolio = true;
         this.selectedPortfolioId = this.portfolios[0].id;

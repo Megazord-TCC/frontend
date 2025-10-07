@@ -15,6 +15,7 @@ import { CarlosPortfolioRisksService } from '../../../service/carlos-portfolio-r
 import { getActionButton, getColumns, getFilterText } from './cargos-table-config';
 import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } from '../../../models/pagination-models';
 import { mapPositionReadDTOPageToResourcesPositionTableRowPage } from '../../../mappers/carga-mappers';
+import { CargosService } from '../../../service/cargos.service';
 
 @Component({
   selector: 'resources-position',
@@ -22,7 +23,8 @@ import { mapPositionReadDTOPageToResourcesPositionTableRowPage } from '../../../
     CommonModule,
     FormsModule,
     TableComponent,
-    ResourcesCreateComponent
+    ResourcesCreateComponent,
+    FormModalComponentComponent
   ],
   templateUrl: './resources-position.component.html',
   styleUrl: './resources-position.component.scss'
@@ -37,30 +39,7 @@ export class ResourcesPositionComponent {
           type: 'text',
           value: '',
           required: true,
-          placeholder: 'Digite o nome do projeto'
-        },
-        {
-          id: 'description',
-          label: 'Descrição',
-          type: 'textarea',
-          value: '',
-          required: false,
-          placeholder: 'Digite a descrição do projeto',
-          rows: 4
-        },
-        {
-          id: 'startDate',
-          label: 'Início planejado',
-          type: 'date',
-          value: '',
-          required: true
-        },
-        {
-          id: 'endDate',
-          label: 'Fim planejado',
-          type: 'date',
-          value: '',
-          required: true
+          placeholder: 'Digite o nome do cargo'
         }
       ],
       validationMessage: 'Os campos marcados com * são obrigatórios.'
@@ -70,18 +49,43 @@ export class ResourcesPositionComponent {
   private routeSubscription?: Subscription;
   private route = inject(ActivatedRoute);
   riskService = inject(CarlosPortfolioRisksService);
+  cargoService = inject(CargosService);
   router = inject(Router);
   portfolioId = 0;
   filterText = getFilterText();
   columns = getColumns();
   actionButton = getActionButton();
 
-   getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => (
-        this.riskService.getPortfolioRisksPage(this.portfolioId, queryParams).pipe(
-            map(page => (mapPositionReadDTOPageToResourcesPositionTableRowPage(page)))
-        )
-    );
-    closeCreateModal() {
+
+
+  getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => (
+      this.cargoService.getPositionsPage(queryParams).pipe(
+          map(page => (mapPositionReadDTOPageToResourcesPositionTableRowPage(page)))
+      )
+  );
+  closeCreateModal() {
+      this.showCreateModal = false;
+  }
+  onSavePosition(event: any) {
+    const positionData = this.createProjectConfig.fields.reduce((acc, field) => {
+      acc[field.id] = field.value;
+      return acc;
+    }, {} as any);
+
+    console.log('Salvar cargo:', positionData);
+    this.cargoService.createPosition(positionData).subscribe({
+      next: (createdPosition) => {
+        console.log('Cargo criado com sucesso:', createdPosition);
         this.showCreateModal = false;
-    }
+        this.tableComponent.refresh();
+      },
+      error: (error) => {
+        console.error('Erro ao criar cargo:', error);
+      }
+    });
+  }
+
+  openPosition(event: any): void {
+    this.router.navigate([`/recurso/position/${event.id}`]);
+  }
 }

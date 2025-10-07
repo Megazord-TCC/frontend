@@ -8,14 +8,17 @@
         [filterText]="filterText"
         [columns]="columns"
         [actionButton]="actionButton"
-        (mainColumnRowClick)="router.navigate([`/portfolio/${portfolioId}/risco/${$event.id}`])"
+        (mainColumnRowClick)="openPosition($event)"
         (actionButtonClick)="showCreateModal = true">
     </app-table>
   </div>
 
   <!-- Form Modal -->
-  <app-resources-create
-    *ngIf="showCreateModal"
-    (close)="closeCreateModal()">
-  </app-resources-create>
+  <app-form-modal-component
+    [isVisible]="showCreateModal"
+    [config]="createProjectConfig"
+    (close)="closeCreateModal()"
+    (save)="onSavePosition($event)"
+    (cancel)="closeCreateModal()">
+  </app-form-modal-component>
 </div>
