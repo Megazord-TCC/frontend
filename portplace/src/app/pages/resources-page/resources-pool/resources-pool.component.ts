@@ -11,6 +11,7 @@ import { getActionButton, getColumns, getFilterButtons, getFilterText } from './
 import { FormModalComponentComponent } from '../../../components/form-modal-component/form-modal-component.component';
 import { FormField, FormModalConfig } from '../../../interface/interfacies';
 import { ResourcesCreateComponent } from '../../../components/resources-create/resources-create.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'resources-pool',
@@ -69,6 +70,7 @@ export class ResourcePoolComponent {
 
   isChartTab = true;
   resourcesService = inject(ResourcesService);
+  router = inject(Router);
   // Filtros
   selectedResource = 'all';
   selectedProject = 'all';
@@ -118,10 +120,6 @@ export class ResourcePoolComponent {
 
 
 
-  openPosition(row: any): void {
-    console.log('Row clicked:', row);
-  }
-
 
   closeCreateModal(): void {
     this.tableComponent.refresh();
@@ -170,6 +168,20 @@ export class ResourcePoolComponent {
         console.error('Erro completo ao criar recurso:', err);
       }
     });
+  }
+  goToResourceDetail(resourceId: number | { id: number }): void {
+    console.log('Recurso clicado:', resourceId);
+    let id: number | undefined;
+    if (typeof resourceId === 'object' && resourceId !== null && 'id' in resourceId) {
+      id = (resourceId as { id: number }).id;
+    } else if (typeof resourceId === 'number') {
+      id = resourceId;
+    }
+    if (id) {
+      this.router.navigate(['/recurso', id]);
+    } else {
+      console.warn('ID da estratégia não encontrado:', resourceId);
+    }
   }
 }
 
