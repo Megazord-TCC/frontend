@@ -28,16 +28,16 @@
     background: white;
     border: 1px solid #d1d5db;
     border-radius: 0 0 6px 6px;
-    max-height: 260px;
+    max-height: 160px;
     overflow-y: auto;
-    z-index: 1200;
+    z-index: 10;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .custom-option {
-    padding: 5px 12px;
+    padding: 10px 12px;
     cursor: pointer;
-    height: 20px;
+    height: 40px;
     display: flex;
     align-items: center;
     &:hover {
@@ -45,6 +45,37 @@
     }
 }
 
+.custom-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+
+}
+
+.custom-options {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  width: 100%;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 0 0 6px 6px;
+  max-height: 160px;
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.custom-option {
+  padding: 10px 12px;
+  cursor: pointer;
+  &:hover {
+    background: #f3f4f6;
+  }
+}
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -63,7 +94,7 @@
     border-radius: 8px;
     width: 90%;
     max-width: 600px;
-    max-height: 1200px;
+    max-height: 90vh;
     display: flex;
     flex-direction: column;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -162,13 +193,6 @@
         }
     }
 
-    textarea {
-      resize: none;
-      border: 1px solid #d1d5db;
-      padding: 5px 12px;
-      font-size: 14px;
-      color: #111827;
-    }
     select,
     input {
         padding: 10px 12px;

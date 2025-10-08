@@ -12,9 +12,10 @@ import { CardComponent } from '../../components/card/card.component';
 import { TableComponent } from '../../components/table/table.component';
 import { ResourcesRequestComponent } from './resources-request/resources-request.component';
 import { ResourcesPositionComponent } from './resources-position/resources-position.component';
-import { ResourcesPoolComponent } from './resources-pool/resources-pool.component';
+
 import { AuthService } from '../../service/auth-service';
 import { PageType } from '../../interface/carlos-auth-interfaces';
+import { ResourcePoolComponent } from './resources-pool/resources-pool.component';
 
 @Component({
   selector: 'app-resources-page',
@@ -29,7 +30,7 @@ import { PageType } from '../../interface/carlos-auth-interfaces';
     TableComponent,
     ResourcesRequestComponent,
     ResourcesPositionComponent,
-    ResourcesPoolComponent
+    ResourcePoolComponent
   ],
   templateUrl: './resources-page.component.html',
   styleUrl: './resources-page.component.scss'

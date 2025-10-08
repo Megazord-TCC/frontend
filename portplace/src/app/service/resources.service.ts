@@ -47,10 +47,22 @@ export class ResourcesService {
   }
 
   // GET paginated
-  getResourcesPage(queryParams?: PaginationQueryParams): Observable<Page<ResourceReadDTO>> {
+  getResourcesPage(queryParams?: PaginationQueryParams, startDate?: string, endDate?: string, status?: string | string[]): Observable<Page<ResourceReadDTO>> {
     const url = this.getResourceUrl();
-    queryParams = PaginationQueryParams.sortByThisIfNotSortedYet('name', queryParams);
-    return this.http.get<Page<ResourceReadDTO>>(url, { params: queryParams?.getParamsInHttpParamsFormat(), headers: this.getHeaders() });
+    const params: { [key: string]: any } = {};
+    if (startDate) params['startDate'] = startDate;
+    if (endDate) params['endDate'] = endDate;
+    // Sempre converte status para string separada por vírgula
+    let statusParam = params['status'] ?? status;
+    if (Array.isArray(statusParam)) {
+      statusParam = statusParam.join(',');
+    }
+    if (!statusParam || statusParam === '') {
+      statusParam = 'ACTIVE,INACTIVE';
+    }
+    params['status'] = statusParam;
+    console.log('Fetching resources with params:', params);
+    return this.http.get<Page<ResourceReadDTO>>(url, { params: params, headers: this.getHeaders() });
   }
 
   // GET paginated with available hours (startDate, endDate)

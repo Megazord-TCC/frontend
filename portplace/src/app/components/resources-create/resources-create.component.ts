@@ -1,11 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { Subscription } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
-import { PortfolioService } from '../../service/portfolio-service';
-import { CarlosPortfolioRisksService } from '../../service/carlos-portfolio-risks.service';
+import { ResourcesService } from '../../service/resources.service';
+import { ResourceCreateDTO } from '../../interface/resources-interface';
+import { CargosService } from '../../service/cargos.service';
+import { PositionReadDTO } from '../../interface/cargos-interfaces';
 
 @Component({
     selector: 'app-resources-create',
@@ -14,120 +13,94 @@ import { CarlosPortfolioRisksService } from '../../service/carlos-portfolio-risk
     styleUrl: './resources-create.component.scss'
 })
 export class ResourcesCreateComponent {
-  @Output() close = new EventEmitter<void>();
+    @Output() close = new EventEmitter<void>();
 
-  route = inject(ActivatedRoute);
-  httpClient = inject(HttpClient);
+    resourcesService = inject(ResourcesService);
+    cargosService = inject(CargosService);
 
-  // Dados do projeto
-  projectName = 'Portfólio 1';
-  requesterName = 'Carlos Krefer';
+    positionOptions: PositionReadDTO[] = [];
+    hoursOptions = [
+        { id: '', name: 'Selecione horas/dia' },
+        { id: '1', name: '1' },
+        { id: '2', name: '2' },
+        { id: '3', name: '3' },
+        { id: '4', name: '4' },
+        { id: '5', name: '5' },
+        { id: '6', name: '6' },
+        { id: '7', name: '7' },
+        { id: '8', name: '8' }
+    ];
 
-  // Opções mockadas
-  positionOptions = [
-      { id: '', name: 'Selecione um cargo' },
-      { id: '1', name: 'Analista sênior' },
-      { id: '2', name: 'Analista pleno' },
-      { id: '3', name: 'Desenvolvedor' }
-  ];
+    selectedPosition: string = '';
+    selectedCollaborator: string = '';
+    selectedHours: string = '';
+    description: string = '';
+    errorMessage = '';
+    isSubmitButtonDisabled = false;
+    isOpen = false;
 
-  collaboratorOptions = [
-      { id: '', name: 'Selecione um colaborador' },
-      { id: '1', name: 'João' },
-      { id: '2', name: 'Maria' },
-      { id: '3', name: 'Pedro' }
-  ];
+    ngOnInit() {
+        this.cargosService.getPositionsUnpaged().subscribe({
+            next: (positions) => {
+                this.positionOptions = positions;
+            },
+            error: () => {
+                this.positionOptions = [];
+            }
+        });
+    }
 
-  hoursOptions = [
-      { id: '', name: 'Selecione horas/dia' },
-      { id: '1', name: '1' },
-      { id: '2', name: '2' },
-      { id: '4', name: '4' },
-      { id: '8', name: '8' },
-      { id: '9', name: '10' },
-      { id: '10', name: '12' },
-      { id: '11', name: '14' },
-      { id: '12', name: '16' },
-      { id: '13', name: '18' }
-  ];
+    async onSave(): Promise<any> {
+        if (!this.selectedPosition || !this.selectedCollaborator || !this.selectedHours) {
+            this.errorMessage = 'Os campos marcados com * são obrigatórios.';
+            return;
+        }
+        const dailyHoursNum = Number(this.selectedHours);
+        if (isNaN(dailyHoursNum) || dailyHoursNum < 0 || dailyHoursNum > 24) {
+            this.errorMessage = 'Horas/dia devem ser entre 0 e 24.';
+            return;
+        }
+        const resourceDTO: ResourceCreateDTO = {
+            name: this.selectedCollaborator,
+            description: this.description,
+            dailyHours: dailyHoursNum,
+            positionId: Number(this.selectedPosition)
+        };
+        this.isSubmitButtonDisabled = true;
+        this.resourcesService.createResource(resourceDTO).subscribe({
+            next: () => {
+                this.errorMessage = '';
+                this.close.emit();
+            },
+            error: (err) => {
+                this.errorMessage = 'Erro ao criar recurso: ' + (err?.error?.message || '');
+                this.isSubmitButtonDisabled = false;
+            }
+        });
+    }
 
-  router = inject(Router);
-  portfolioService = inject(PortfolioService);
-  riskService = inject(CarlosPortfolioRisksService);
-  // Valores selecionados
-  selectedPosition = '';
-  selectedCollaborator = '';
-  selectedHours = '';
-  startDate = '';
-  endDate = '';
-  priority = '';
-  isOpen = false;
+    toggleDropdown(): void {
+        this.isOpen = !this.isOpen;
+    }
 
-  errorMessage = '';
-  isSubmitButtonDisabled = false;
-  mouseDownOnOverlay = false;
-  routeSubscription?: Subscription;
-
-  ngOnInit() {
-      // Implementar lógica de inicialização se necessário
-  }
-
-  ngOnDestroy(): void {
-      this.routeSubscription?.unsubscribe();
-  }
-
-  onOverlayClick(event: MouseEvent): void {
-      if (event.target === event.currentTarget && this.mouseDownOnOverlay) this.close.emit();
-      this.mouseDownOnOverlay = false;
-  }
-
-  onOverlayMouseDown(event: MouseEvent): void {
-      if (event.target === event.currentTarget) this.mouseDownOnOverlay = true;
-  }
-
-  async onSave(): Promise<any> {
-      let isFormValid = await this.isFormValid();
-      if (!isFormValid) return;
-
-
-  }
-
-  onCancel(): void {
-      this.close.emit();
-  }
-
-  onReject(): void {
-      // Implementar lógica de rejeição
-      console.log('Pedido rejeitado');
-      this.close.emit();
-  }
-
-  clearForm(): void {
-      this.selectedPosition = '';
-      this.selectedCollaborator = '';
-      this.selectedHours = '';
-      this.startDate = '';
-      this.endDate = '';
-      this.priority = '';
-      this.errorMessage = '';
-      this.isSubmitButtonDisabled = false;
-  }
-
-  isFormValid(): boolean {
-      if (!this.selectedPosition || !this.selectedCollaborator || !this.selectedHours ||
-          !this.startDate || !this.endDate || !this.priority) {
-          this.errorMessage = 'Os campos marcados com * são obrigatórios.';
-          return false;
+    selectOption(option: any): void {
+        this.selectedHours = option.name;
+        this.isOpen = false;
+    }
+    onCustomSelectKeyDown(event: KeyboardEvent): void {
+        if (event.key === 'Enter' || event.key === ' ') {
+            this.toggleDropdown();
+            event.preventDefault();
+        }
+    }
+    onCancel(): void {
+        this.close.emit();
+    }
+    onOverlayClick(event: MouseEvent): void {
+      if (event.target === event.currentTarget && this.isOpen) {
+          this.onCancel();
       }
-      this.errorMessage = '';
-      return true;
-  }
-  toggleDropdown(): void {
-    this.isOpen = !this.isOpen;
-  }
+    }
 
-  selectOption(option: any): void {
-    this.selectedHours = option.name;
-    this.isOpen = false;
-  }
+
 }

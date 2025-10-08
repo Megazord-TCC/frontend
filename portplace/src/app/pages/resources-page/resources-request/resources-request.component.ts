@@ -13,21 +13,17 @@ import { map, Observable, Subscription } from 'rxjs';
 import { CarlosPortfolioRisksService } from '../../../service/carlos-portfolio-risks.service';
 import { mapRiskReadDTOPageToPortfolioRisksTableRowPage } from '../../../mappers/carlos-risks-mappers';
 import { ActivatedRoute, Router } from '@angular/router';
-import { getActionButton, getColumns, getFilterText } from './resources-table-config';
+
 import { ResourcesCreateComponent } from '../../../components/resources-create/resources-create.component';
+import { getActionButton, getColumns, getFilterText } from '../resources-pool/resources-table-config';
 @Component({
   selector: 'resources-request',
   imports: [
     CommonModule,
     FormsModule,
-    CardComponent,
-    BadgeComponent,
-    SvgIconComponent,
-    BreadcrumbComponent,
-    FormModalComponentComponent,
     TableComponent,
     ResourcesCreateComponent
-  ],
+],
   templateUrl: './resources-request.component.html',
   styleUrl: './resources-request.component.scss'
 })
