@@ -22,7 +22,7 @@
     <p class="objective-description">{{objective?.description}}</p>
     <div class="action-header">
       <div class="action-buttons">
-        <button class="action-btn" (click)="editObjective()">
+        <button class="action-btn" (click)="openEditModal()">
 
           Editar
         </button>
@@ -120,6 +120,13 @@
     </div>
   </div>
 </div>
+  <app-form-modal-component
+    [isVisible]="showEditModal"
+    [config]="editStrategyConfig"
+    (close)="closeEditModal()"
+    (save)="onSaveObjectiveEdit($event)"
+    (cancel)="closeEditModal()">
+  </app-form-modal-component>
 
 </div>
 

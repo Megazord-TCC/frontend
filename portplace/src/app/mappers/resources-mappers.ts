@@ -15,6 +15,15 @@ export interface ResourcesPositionTableRow {
 
 // Mapeia ResourceReadDTO para ResourcesPositionTableRow
 export function mapResourceReadDTOToResourcesPositionTableRow(dto: ResourceReadDTO): ResourcesPositionTableRow {
+	function traduzirStatus(status: string | undefined): string {
+		if (!status) return '-';
+		switch (status) {
+			case 'ACTIVE': return 'ATIVO';
+			case 'INACTIVE': return 'INATIVO';
+			default: return status;
+		}
+	}
+
 	return {
 		id: dto.id,
 		nome: dto.name,
@@ -22,7 +31,7 @@ export function mapResourceReadDTOToResourcesPositionTableRow(dto: ResourceReadD
 		horasDiaContrato: dto.dailyHours ?? 0,
 		projetosVinculados: dto.relatedProjectsCount ?? 0,
 		horasOciosas: dto.availableHours ?? 0,
-		status: dto.status ?? '-'
+		status: traduzirStatus(dto.status)
 	};
 }
 
