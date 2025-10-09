@@ -1,1 +1,25 @@
-<p>resources-detail works!</p>
+<div class="resources-page-layout">
+  <div class="resources-content">
+    <!-- Breadcrumb -->
+    <app-breadcrumb></app-breadcrumb>
+
+    <!-- Header -->
+    <div class="page-header">
+      <h1>Recursos</h1>
+      <p>Gerencie os recursos humanos da organização</p>
+    </div>
+
+  
+
+  </div>
+
+  <!-- Form Modal -->
+  <app-form-modal-component
+    [isVisible]="showCreateModal"
+    [config]="createResourcesConfig"
+    (close)="closeCreateModal()"
+    (save)="onSaveProject($event)"
+    (cancel)="closeCreateModal()">
+  </app-form-modal-component>
+
+</div>

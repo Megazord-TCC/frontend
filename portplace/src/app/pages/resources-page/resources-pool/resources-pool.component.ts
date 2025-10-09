@@ -73,6 +73,7 @@ export class ResourcePoolComponent {
   router = inject(Router);
   // Filtros
   selectedResource = 'all';
+  resourcesList: { id: number, name: string }[] = [];
   selectedProject = 'all';
   startDate = '2025-01-01';
   endDate = '2026-01-01';
@@ -87,7 +88,18 @@ export class ResourcePoolComponent {
   showCreateModal = false;
 
   constructor() {
+    this.loadResourcesList();
+  }
 
+  loadResourcesList(): void {
+    this.resourcesService.getResourcesUnpaged().subscribe({
+      next: (resources) => {
+        this.resourcesList = resources.map(r => ({ id: r.id, name: r.name }));
+      },
+      error: (err) => {
+        console.error('Erro ao carregar lista de recursos:', err);
+      }
+    });
   }
 
 
@@ -177,7 +189,7 @@ export class ResourcePoolComponent {
     } else if (typeof resourceId === 'number') {
       id = resourceId;
     }
-    if (id) {
+    if (id) { 
       this.router.navigate(['/recurso', id]);
     } else {
       console.warn('ID da estratégia não encontrado:', resourceId);

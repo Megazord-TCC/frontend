@@ -10,9 +10,7 @@
 
     <select [(ngModel)]="selectedResource" (change)="onFilterChange()" class="filter-select">
       <option value="all">Todos recursos</option>
-      <option value="fernando">Fernando B.</option>
-      <option value="julio">Júlio M.</option>
-      <option value="rogerio">Rogério S.</option>
+      <option *ngFor="let resource of resourcesList" [value]="resource.id">{{ resource.name }}</option>
     </select>
 
     <select [(ngModel)]="selectedProject" (change)="onFilterChange()" class="filter-select">

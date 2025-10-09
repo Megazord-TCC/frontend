@@ -15,7 +15,7 @@ import { mapRiskReadDTOPageToPortfolioRisksTableRowPage } from '../../../mappers
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { ResourcesCreateComponent } from '../../../components/resources-create/resources-create.component';
-import { getActionButton, getColumns, getFilterText } from '../resources-pool/resources-table-config';
+import { getActionButton, getColumns, getFilterButtons, getFilterText } from './request-allocation-config';
 @Component({
   selector: 'resources-request',
   imports: [
@@ -72,6 +72,7 @@ export class ResourcesRequestComponent {
   riskService = inject(CarlosPortfolioRisksService);
   router = inject(Router);
   portfolioId = 0;
+  filterButtons = getFilterButtons(); 
   filterText = getFilterText();
   columns = getColumns();
   actionButton = getActionButton();
