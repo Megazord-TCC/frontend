@@ -61,7 +61,7 @@ export class ResourcesService {
       statusParam = 'ACTIVE,INACTIVE';
     }
     params['status'] = statusParam;
-    console.log('Fetching resources with params:', params);
+
     return this.http.get<Page<ResourceReadDTO>>(url, { params: params, headers: this.getHeaders() });
   }
 

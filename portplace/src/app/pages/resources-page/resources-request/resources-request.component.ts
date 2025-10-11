@@ -2,27 +2,21 @@ import { Component, inject, ViewChild } from '@angular/core';
 import { FormModalConfig } from '../../../interface/interfacies';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BadgeComponent } from '../../../components/badge/badge.component';
-import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
-import { CardComponent } from '../../../components/card/card.component';
-import { FormModalComponentComponent } from '../../../components/form-modal-component/form-modal-component.component';
-import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.component';
 import { TableComponent } from '../../../components/table/table.component';
 import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } from '../../../models/pagination-models';
 import { map, Observable, Subscription } from 'rxjs';
-import { CarlosPortfolioRisksService } from '../../../service/carlos-portfolio-risks.service';
-import { mapRiskReadDTOPageToPortfolioRisksTableRowPage } from '../../../mappers/carlos-risks-mappers';
 import { ActivatedRoute, Router } from '@angular/router';
-
-import { ResourcesCreateComponent } from '../../../components/resources-create/resources-create.component';
 import { getActionButton, getColumns, getFilterButtons, getFilterText } from './request-allocation-config';
+import { ResourcesAllocationRequestComponent } from '../../../components/resources-allocation-request/resources-allocation-request.component';
+import { AllocationRequestService } from '../../../service/allocation-request.service';
+import { mapAllocationRequestReadDTOPageToTableRowPage } from '../../../mappers/allocation-request-mappers';
 @Component({
   selector: 'resources-request',
   imports: [
     CommonModule,
     FormsModule,
     TableComponent,
-    ResourcesCreateComponent
+    ResourcesAllocationRequestComponent
 ],
   templateUrl: './resources-request.component.html',
   styleUrl: './resources-request.component.scss'
@@ -69,23 +63,30 @@ export class ResourcesRequestComponent {
   showCreateModal = false;
   private routeSubscription?: Subscription;
   private route = inject(ActivatedRoute);
-  riskService = inject(CarlosPortfolioRisksService);
+  allocationRequestService = inject(AllocationRequestService);
   router = inject(Router);
   portfolioId = 0;
-  filterButtons = getFilterButtons(); 
+  filterButtons = getFilterButtons();
   filterText = getFilterText();
   columns = getColumns();
   actionButton = getActionButton();
+
+  selectedProject = 'all';
+
+  statusFilter = 'ACTIVE';
 
   async ngOnInit() {
       this.routeSubscription = this.route.paramMap.subscribe(async params => {
           this.portfolioId = Number(params.get('id'));
       });
   }
+
   getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => (
-      this.riskService.getPortfolioRisksPage(this.portfolioId, queryParams).pipe(
-          map(page => (mapRiskReadDTOPageToPortfolioRisksTableRowPage(page)))
-      )
+    this.allocationRequestService.getAllocationRequestPage(
+      queryParams,
+    ).pipe(
+      map(page => mapAllocationRequestReadDTOPageToTableRowPage(page))
+    )
   );
   closeCreateModal(): void {
       this.showCreateModal = false;

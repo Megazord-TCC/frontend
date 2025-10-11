@@ -15,7 +15,7 @@ export const getColumns = (): TableColumn[] => {
 	column.order = 1;
 	column.isSortable = true;
 	column.frontendAttributeName = 'cargoDesejado';
-	column.backendAttributeName = 'desiredPosition.name';
+	column.backendAttributeName = 'cargo';
 	columns.push(column);
 
 	column = new TableColumn();
@@ -31,7 +31,7 @@ export const getColumns = (): TableColumn[] => {
 	column.order = 3;
 	column.isSortable = true;
 	column.frontendAttributeName = 'projeto';
-	column.backendAttributeName = 'project.name';
+	column.backendAttributeName = 'project';
 	columns.push(column);
 
 	column = new TableColumn();

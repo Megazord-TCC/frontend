@@ -47,8 +47,8 @@ export const routes: Routes = [
   { path: 'estrategia/:estrategiaId/grupo-avaliacao/:grupoAvaliacaoId', component: EvaluationGroupDetailPageComponent, canActivate: [RoleGuard], data: { pageType: PageType.STRATEGIES } },
   { path: 'estrategia/:estrategiaId/grupo-avaliacao/:grupoAvaliacaoId/projeto/:projetoId', component: ProjectEvaluationDetailComponent, canActivate: [RoleGuard], data: { pageType: PageType.STRATEGIES } },
   { path: 'estrategia/:estrategiaId/cenario/:cenarioId', component: ScenarioDetailPageComponent, canActivate: [RoleGuard], data: { pageType: PageType.STRATEGIES } },
-  { path: 'recurso/position/:id', component: ResourcesPositionDetailComponent, canActivate: [RoleGuard], data: { pageType: PageType.RESOURCES } },
-  { path: 'recurso/:id', component: ResourcesDetailComponent, canActivate: [RoleGuard], data: { pageType: PageType.RESOURCES } },
+  { path: 'recurso/position/:positionId', component: ResourcesPositionDetailComponent, canActivate: [RoleGuard], data: { pageType: PageType.RESOURCES } },
+  { path: 'recurso/:resourceId', component: ResourcesDetailComponent, canActivate: [RoleGuard], data: { pageType: PageType.RESOURCES } },
 
   // Redireciona qualquer URL diferente dos de cima para o início
   { path: '**', redirectTo: 'inicio', pathMatch: 'full' }

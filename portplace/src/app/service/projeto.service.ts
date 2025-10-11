@@ -27,7 +27,7 @@ export class ProjetoService {
   }
 
   getProjectsPage( queryParams?: PaginationQueryParams): Observable<Page<any>> {
-      return this.http.get<Page<any>>(this.apiUrl, { params: queryParams?.getParamsInHttpParamsFormat() });
+    return this.http.get<Page<any>>(this.apiUrl, { params: queryParams?.getParamsInHttpParamsFormat() });
   }
 
   // Buscar todos os projetos (GET)
@@ -48,5 +48,12 @@ export class ProjetoService {
   // Deletar projeto (DELETE)
   deleteProject(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+  }
+  // Buscar todos os projetos sem paginação (GET /projects/unpaged)
+  getProjectsUnpaged(portfolioId?: number, status?: string[]): Observable<Project[]> {
+    const params: any = {};
+    if (portfolioId !== undefined) params['portfolioId'] = portfolioId;
+    if (status && status.length > 0) params['status'] = status;
+    return this.http.get<Project[]>(`${this.apiUrl}/unpaged`, { params, headers: this.getHeaders() });
   }
 }

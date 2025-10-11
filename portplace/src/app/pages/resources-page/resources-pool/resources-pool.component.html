@@ -2,7 +2,7 @@
   <h1>Pool de recursos</h1>
   <p class="description">{{ isChartTab ? 'Confira o uso do pool de recursos da organização.' : 'Gerencie o uso do pool de recursos da organização.' }}</p>
 
-  <div class="filters-row">
+  <div class="filters-row" *ngIf="isChartTab">
     <div class="filter-icon">
       <span class="material-icons">filter_list</span>
       <span>Filtros:</span>

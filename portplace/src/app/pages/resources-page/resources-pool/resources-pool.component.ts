@@ -13,6 +13,7 @@ import { FormField, FormModalConfig } from '../../../interface/interfacies';
 import { ResourcesCreateComponent } from '../../../components/resources-create/resources-create.component';
 import { Router } from '@angular/router';
 
+
 @Component({
   selector: 'resources-pool',
   templateUrl: './resources-pool.component.html',
@@ -189,7 +190,7 @@ export class ResourcePoolComponent {
     } else if (typeof resourceId === 'number') {
       id = resourceId;
     }
-    if (id) { 
+    if (id) {
       this.router.navigate(['/recurso', id]);
     } else {
       console.warn('ID da estratégia não encontrado:', resourceId);
