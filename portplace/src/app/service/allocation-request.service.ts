@@ -45,7 +45,7 @@ export class AllocationRequestService {
   }
 
   // READ by ID
-  findById(id: number): Observable<AllocationRequestReadDTO> {
+  getById(id: number): Observable<AllocationRequestReadDTO> {
     return this.http.get<AllocationRequestReadDTO>(`${this.getAllocationRequestUrl()}/${id}`, { headers: this.getHeaders() });
   }
 

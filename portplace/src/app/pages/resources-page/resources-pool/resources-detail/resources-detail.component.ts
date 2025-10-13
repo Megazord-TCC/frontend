@@ -20,6 +20,10 @@ import { ResourcesCreateComponent } from '../../../../components/resources-creat
 import { PoolGraphicComponent } from '../pool-graphic/pool-graphic.component';
 import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } from '../../../../models/pagination-models';
 import { mapAllocationRequestReadDTOPageToTableRowPage } from '../../../../mappers/allocation-request-mappers';
+import { AllocationService } from '../../../../service/allocation.service';
+import { getActionButton, getColumns, getFilterButtons, getFilterText } from './allocation-config';
+import { get } from 'http';
+import { AllocationRequestService } from '../../../../service/allocation-request.service';
 
 @Component({
   selector: 'app-resources-detail',
@@ -32,7 +36,8 @@ import { mapAllocationRequestReadDTOPageToTableRowPage } from '../../../../mappe
     CommonModule,
     TableComponent,
     FormsModule,
-    ResourcesCreateComponent
+    ResourcesCreateComponent,
+    SvgIconComponent
   ],
   templateUrl: './resources-detail.component.html',
   styleUrl: './resources-detail.component.scss'
@@ -77,6 +82,7 @@ export class ResourcesDetailComponent implements OnInit {
   };
   breadcrumbService = inject(BreadcrumbService);
   resourceService = inject(ResourcesService);
+  allocationRequestService = inject(AllocationRequestService);
   router = inject(Router);
   route = inject(ActivatedRoute)
   showCreateModal = false;
@@ -90,6 +96,10 @@ export class ResourcesDetailComponent implements OnInit {
   endDate = '2026-01-01';
   statusFilter = 'ACTIVE';
 
+
+  columns = getColumns();
+  filterButtons = getFilterButtons();
+  filterText = getFilterText();
   private routeSubscription?: Subscription;
 
 
@@ -114,12 +124,7 @@ export class ResourcesDetailComponent implements OnInit {
   }
 
   getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => (
-      this.resourceService.getResourcesPage(
-        queryParams,
-        this.startDate,
-        this.endDate,
-        this.statusFilter ? this.statusFilter : 'ACTIVE,INACTIVE'
-      ).pipe(
+      this.allocationRequestService.getAllocationRequestPage(queryParams).pipe(
         map(page => (mapAllocationRequestReadDTOPageToTableRowPage(page)))
       )
     );
@@ -183,6 +188,10 @@ export class ResourcesDetailComponent implements OnInit {
     //   }
     // });
     this.closeCreateModal();
+  }
+
+  goBack(): void {
+    this.router.navigate(['/recursos']);
   }
 
   switchTab(isChart: boolean): void {

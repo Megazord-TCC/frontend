@@ -1,11 +1,20 @@
-import { CommonModule } from '@angular/common';
+  import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Output, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PortfolioService } from '../../service/portfolio-service';
 import { CarlosPortfolioRisksService } from '../../service/carlos-portfolio-risks.service';
 import { Subscription } from 'rxjs';
+import { ResourcesService } from '../../service/resources.service';
+import { CargosService } from '../../service/cargos.service';
+import { PositionReadDTO } from '../../interface/cargos-interfaces';
+import { AllocationRequestService } from '../../service/allocation-request.service';
+import { AllocationRequestCreateDTO, AllocationRequestReadDTO, PriorityEnum } from '../../interface/allocation-request-interfaces';
+import { Project } from '../../interface/interfacies';
+import { ProjetoService } from '../../service/projeto.service';
+import { AllocationService } from '../../service/allocation.service';
+
 
 @Component({
   selector: 'app-resources-allocation-create',
@@ -14,29 +23,44 @@ import { Subscription } from 'rxjs';
   styleUrl: './resources-allocation-create.component.scss'
 })
 export class ResourcesAllocationCreateComponent {
+    formatDateForInput(date: string): string {
+        if (!date) return '';
+        const d = new Date(date);
+        if (isNaN(d.getTime())) return '';
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+  @Input() allocationRequestId!: number;
+  collaboratorOptions: Array<{ id: number | string, name: string }> = [
+      { id: '', name: 'Selecione um colaborador' }
+  ];
+  formatDateToDDMMYYYY(date: string): string {
+      if (!date) return '';
+      const d = new Date(date);
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      return `${day}/${month}/${year}`;
+  }
   @Output() close = new EventEmitter<void>();
 
   route = inject(ActivatedRoute);
   httpClient = inject(HttpClient);
 
   // Dados do projeto
-  projectName = 'Portfólio 1';
-  requesterName = 'Carlos Krefer';
+  projectName:string = '';
+  requesterName:string = '';
 
-  // Opções mockadas
-  positionOptions = [
-      { id: '', name: 'Selecione um cargo' },
-      { id: '1', name: 'Analista sênior' },
-      { id: '2', name: 'Analista pleno' },
-      { id: '3', name: 'Desenvolvedor' }
+  positionOptions: PositionReadDTO[] = [];
+  projectOptions: Project[] = [];
+  priorityOptions = [
+      { id: PriorityEnum.LOW, name: 'Baixa' },
+      { id: PriorityEnum.MEDIUM, name: 'Média' },
+      { id: PriorityEnum.HIGH, name: 'Alta' }
   ];
 
-  collaboratorOptions = [
-      { id: '', name: 'Selecione um colaborador' },
-      { id: '1', name: 'João' },
-      { id: '2', name: 'Maria' },
-      { id: '3', name: 'Pedro' }
-  ];
 
   hoursOptions = [
       { id: '', name: 'Selecione horas/dia' },
@@ -51,16 +75,19 @@ export class ResourcesAllocationCreateComponent {
       { id: '13', name: '18' }
   ];
 
+  allocationRequestService = inject(AllocationRequestService);
+  allocationService = inject(AllocationService);
   router = inject(Router);
-  portfolioService = inject(PortfolioService);
-  riskService = inject(CarlosPortfolioRisksService);
+  resourcesService = inject(ResourcesService);
+  cargosService = inject(CargosService);
   // Valores selecionados
-  selectedPosition = '';
-  selectedCollaborator = '';
-  selectedHours = '';
-  startDate = '';
-  endDate = '';
-  priority = '';
+  selectedPosition: number = 0;
+  selectedCollaborator: number = 0;
+  selectedHours: number = 0;
+  selectedProject: number = 0;
+  startDate: string = '';
+  endDate: string = '';
+  priority: PriorityEnum = PriorityEnum.LOW;
   isOpen = false;
 
   errorMessage = '';
@@ -69,7 +96,49 @@ export class ResourcesAllocationCreateComponent {
   routeSubscription?: Subscription;
 
   ngOnInit() {
-      // Implementar lógica de inicialização se necessário
+
+    this.cargosService.getPositionsUnpaged().subscribe({
+      next: (positions) => {
+          this.positionOptions = positions;
+      },
+      error: () => {
+          this.positionOptions = [];
+      }
+    });
+
+    // Carregar colaboradores do pool de recursos
+    this.resourcesService.getResourcesUnpaged().subscribe({
+      next: (resources: any[]) => {
+        console.log("resources", resources);
+          this.collaboratorOptions = [
+              { id: '', name: 'Selecione um colaborador' },
+              ...resources.map(r => ({ id: r.id, name: r.name }))
+          ];
+      },
+      error: () => {
+          this.collaboratorOptions = [{ id: '', name: 'Selecione um colaborador' }];
+      }
+    });
+
+    // Se vier allocationRequestId, buscar dados da request e preencher campos
+    if (this.allocationRequestId) {
+      this.allocationRequestService.getById(this.allocationRequestId).subscribe({
+        next: (data: AllocationRequestReadDTO) => {
+            console.log("allocation request data", data);
+            this.selectedPosition = data.position?.id ?? 0;
+            // this.selectedCollaborator = data.collaborator?.id ?? 0;
+            this.selectedHours = data.dailyHours ?? 0;
+            this.selectedProject = data.project?.id ?? 0;
+            this.startDate = data.startDate ?? '';
+            this.endDate = data.endDate ?? '';
+            this.priority = data.priority ?? PriorityEnum.LOW;
+            this.projectName = data.project?.name ?? '';
+        },
+        error: () => {
+            this.errorMessage = 'Erro ao carregar dados da solicitação.';
+        }
+      });
+    }
   }
 
   ngOnDestroy(): void {
@@ -82,45 +151,95 @@ export class ResourcesAllocationCreateComponent {
   }
 
   onOverlayMouseDown(event: MouseEvent): void {
-      if (event.target === event.currentTarget) this.mouseDownOnOverlay = true;
+    if (event.target === event.currentTarget) this.mouseDownOnOverlay = true;
   }
 
   async onSave(): Promise<any> {
-      let isFormValid = await this.isFormValid();
-      if (!isFormValid) return;
+    let isFormValid = this.isFormValid();
+    if (!isFormValid) return;
 
+    // Monta DTO para PUT da allocation request
+    const allocationRequestDto = {
+        startDate: this.formatDateToDDMMYYYY(this.startDate),
+        endDate: this.formatDateToDDMMYYYY(this.endDate),
+        dailyHours: Number(this.selectedHours),
+        priority: this.priority,
+        positionId: Number(this.selectedPosition),
+        projectId: Number(this.selectedProject),
+        collaboratorId: Number(this.selectedCollaborator)
+    };
 
+    this.isSubmitButtonDisabled = true;
+    this.errorMessage = '';
+
+    // Se allocationRequestId, faz PUT antes do create
+    if (this.allocationRequestId) {
+      await new Promise<void>((resolve, reject) => {
+        this.allocationRequestService.update(this.allocationRequestId, allocationRequestDto).subscribe({
+          next: () => resolve(),
+          error: (err) => {
+              this.errorMessage = 'Erro ao atualizar solicitação.';
+              this.isSubmitButtonDisabled = false;
+              reject(err);
+          }
+        });
+      });
+    }
+
+    // Monta DTO de criação de alocação
+    const allocationDto = {
+      startDate: allocationRequestDto.startDate,
+      endDate: allocationRequestDto.endDate,
+      dailyHours: allocationRequestDto.dailyHours,
+      resourceId: allocationRequestDto.collaboratorId,
+      allocationRequestId: this.allocationRequestId
+    };
+    this.allocationService.create(allocationDto).subscribe({
+      next: () => {
+        this.clearForm();
+        this.close.emit();
+      },
+      error: (err) => {
+        this.errorMessage = 'Erro ao criar pedido de alocação.';
+        this.isSubmitButtonDisabled = false;
+      }
+    });
   }
 
   onCancel(): void {
-      this.close.emit();
+    this.close.emit();
   }
 
   onReject(): void {
-      // Implementar lógica de rejeição
-      console.log('Pedido rejeitado');
-      this.close.emit();
+    console.log('Pedido rejeitado');
+    this.close.emit();
   }
 
   clearForm(): void {
-      this.selectedPosition = '';
-      this.selectedCollaborator = '';
-      this.selectedHours = '';
-      this.startDate = '';
-      this.endDate = '';
-      this.priority = '';
-      this.errorMessage = '';
-      this.isSubmitButtonDisabled = false;
+    this.selectedPosition = 0;
+    this.selectedCollaborator = 0;
+    this.selectedHours = 0;
+    this.startDate = '';
+    this.endDate = '';
+    this.priority = PriorityEnum.LOW;
+    this.errorMessage = '';
+    this.isSubmitButtonDisabled = false;
   }
 
   isFormValid(): boolean {
-      if (!this.selectedPosition || !this.selectedCollaborator || !this.selectedHours ||
-          !this.startDate || !this.endDate || !this.priority) {
-          this.errorMessage = 'Os campos marcados com * são obrigatórios.';
-          return false;
-      }
-      this.errorMessage = '';
-      return true;
+    if (
+      this.selectedPosition == null ||
+      this.selectedCollaborator == null ||
+      this.selectedHours == null ||
+      this.startDate == null ||
+      this.endDate == null ||
+      this.priority == null
+    ) {
+      this.errorMessage = 'Os campos marcados com * são obrigatórios.';
+      return false;
+    }
+    this.errorMessage = '';
+    return true;
   }
   toggleDropdown(): void {
     this.isOpen = !this.isOpen;
@@ -129,5 +248,11 @@ export class ResourcesAllocationCreateComponent {
   selectOption(option: any): void {
     this.selectedHours = option.name;
     this.isOpen = false;
+  }
+  onCustomSelectKeyDown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' || event.key === ' ') {
+      this.toggleDropdown();
+      event.preventDefault();
+    }
   }
 }

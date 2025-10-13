@@ -16,6 +16,7 @@ export const getColumns = (): TableColumn[] => {
 	column.isSortable = true;
 	column.frontendAttributeName = 'cargoDesejado';
 	column.backendAttributeName = 'cargo';
+  column.isClickableMainColumn = true;
 	columns.push(column);
 
 	column = new TableColumn();

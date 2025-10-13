@@ -24,18 +24,21 @@
 
             <!-- Form Fields -->
             <div class="form-fields" [ngClass]="{'disabled': isSubmitButtonDisabled}">
-                <div class="form-group">
+                  <div class="form-group">
                     <label>Cargo desejado<span class="required-asterisk">*</span></label>
                     <select [(ngModel)]="selectedPosition" [disabled]="isSubmitButtonDisabled">
+                        <option [value]="0" disabled selected>Selecione...</option>
                         <option *ngFor="let option of positionOptions" [ngValue]="option.id">
                             {{ option.name }}
                         </option>
                     </select>
                 </div>
 
+
                 <div class="form-group">
                     <label>Colaborador do pool de recursos<span class="required-asterisk">*</span></label>
                     <select [(ngModel)]="selectedCollaborator" [disabled]="isSubmitButtonDisabled">
+                        <option [value]="0" disabled selected>Selecione...</option>
                         <option *ngFor="let option of collaboratorOptions" [ngValue]="option.id">
                             {{ option.name }}
                         </option>
@@ -61,17 +64,22 @@
 
                 <div class="form-group">
                     <label>Início<span class="required-asterisk">*</span></label>
-                    <input type="date" [(ngModel)]="startDate" [disabled]="isSubmitButtonDisabled">
+                    <input type="date" [ngModel]="formatDateForInput(startDate)" (ngModelChange)="startDate = $event" [disabled]="isSubmitButtonDisabled">
                 </div>
 
                 <div class="form-group">
                     <label>Fim<span class="required-asterisk">*</span></label>
-                    <input type="date" [(ngModel)]="endDate" [disabled]="isSubmitButtonDisabled">
+                    <input type="date" [ngModel]="formatDateForInput(endDate)" (ngModelChange)="endDate = $event" [disabled]="isSubmitButtonDisabled">
                 </div>
 
                 <div class="form-group">
                     <label>Prioridade<span class="required-asterisk">*</span></label>
-                    <input type="date" [(ngModel)]="priority" [disabled]="isSubmitButtonDisabled">
+                    <select [(ngModel)]="priority" [disabled]="isSubmitButtonDisabled">
+                        <option [value]="0" disabled selected>Selecione...</option>
+                        <option *ngFor="let option of priorityOptions" [ngValue]="option.id">
+                            {{ option.name }}
+                        </option>
+                    </select>
                 </div>
             </div>
         </div>

@@ -3,14 +3,19 @@
     <!-- Breadcrumb -->
     <app-breadcrumb></app-breadcrumb>
 
-    <!-- Header -->
-    <div class="page-header">
-      <h1>Recursos</h1>
-      <p>Gerencie os recursos humanos da organização</p>
+
+    <div class="header-top">
+      <button class="back-btn" (click)="goBack()">
+        <app-svg-icon class="nav-icon" [path]="'assets/icon/voltar_vetor.svg'" [size]="18">
+        </app-svg-icon>
+      </button>
+      <h1>{{this.resource?.name}}</h1>
+      <p class="resource-description">{{this.resource?.description}}</p>
+
     </div>
 
     <div class="resource-pool-container">
-      <h1>Pool de recursos</h1>
+      <h1>Contrato: </h1>
       <p class="description">{{ isChartTab ? 'Confira o uso do pool de recursos da organização.' : 'Gerencie o uso do pool de recursos da organização.' }}</p>
 
       <div class="filters-row" *ngIf="isChartTab">
@@ -60,16 +65,14 @@
         </app-pool-graphic>
 
         <div *ngIf="!isChartTab" class="table-container">
-          <!-- <app-table
+          <app-table
             #tableComponent
             [dataRetrievalMethodRef]="this.getDataForTableComponent"
             [filterButtons]="filterButtons"
             [filterText]="filterText"
             [columns]="columns"
-            [actionButton]="actionButton"
-            (mainColumnRowClick)="goToResourceDetail($event)"
             (actionButtonClick)="showCreateModal = true">
-          </app-table> -->
+          </app-table>
         </div>
       </div>
       <app-resources-create

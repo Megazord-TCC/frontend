@@ -20,4 +20,10 @@
     *ngIf="showCreateModal"
     (close)="closeCreateModal()">
   </app-resources-allocation-request>
+
+  <app-resources-allocation-create
+    *ngIf="showAllocationModal"
+    (close)="closeAllocationModal()"
+    [allocationRequestId]="this.selectedAllocationRequestId">
+  </app-resources-allocation-create>
 </div>

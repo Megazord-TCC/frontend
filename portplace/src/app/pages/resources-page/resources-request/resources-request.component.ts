@@ -1,27 +1,38 @@
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, ViewChild, OnInit } from '@angular/core';
+import { AuthService } from '../../../service/auth-service';
 import { FormModalConfig } from '../../../interface/interfacies';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableComponent } from '../../../components/table/table.component';
 import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } from '../../../models/pagination-models';
+import { PageType } from '../../../interface/carlos-auth-interfaces';
 import { map, Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { getActionButton, getColumns, getFilterButtons, getFilterText } from './request-allocation-config';
 import { ResourcesAllocationRequestComponent } from '../../../components/resources-allocation-request/resources-allocation-request.component';
 import { AllocationRequestService } from '../../../service/allocation-request.service';
 import { mapAllocationRequestReadDTOPageToTableRowPage } from '../../../mappers/allocation-request-mappers';
+import { ResourcesAllocationCreateComponent } from '../../../components/resources-allocation-create/resources-allocation-create.component';
 @Component({
   selector: 'resources-request',
   imports: [
     CommonModule,
     FormsModule,
     TableComponent,
-    ResourcesAllocationRequestComponent
+    ResourcesAllocationRequestComponent,
+    ResourcesAllocationCreateComponent
 ],
   templateUrl: './resources-request.component.html',
   styleUrl: './resources-request.component.scss'
 })
 export class ResourcesRequestComponent {
+  private readonly authService = inject(AuthService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly allocationRequestService = inject(AllocationRequestService);
+  private readonly router = inject(Router);
+  isPMO = false;
+  isProjectManager = false;
+  selectedAllocationRequestId: number = 0;
   createProjectConfig: FormModalConfig = {
       title: 'Cadastrar novo projeto',
       fields: [
@@ -61,24 +72,22 @@ export class ResourcesRequestComponent {
     };
   @ViewChild('tableComponent') tableComponent!: TableComponent;
   showCreateModal = false;
-  private routeSubscription?: Subscription;
-  private route = inject(ActivatedRoute);
-  allocationRequestService = inject(AllocationRequestService);
-  router = inject(Router);
-  portfolioId = 0;
+  showAllocationModal = false;
   filterButtons = getFilterButtons();
   filterText = getFilterText();
   columns = getColumns();
-  actionButton = getActionButton();
-
+  actionButton: any = undefined;
   selectedProject = 'all';
-
   statusFilter = 'ACTIVE';
 
-  async ngOnInit() {
-      this.routeSubscription = this.route.paramMap.subscribe(async params => {
-          this.portfolioId = Number(params.get('id'));
-      });
+  ngOnInit(): void {
+
+    const authorizedPages = this.authService.getAuthorizedPageTypesByRole();
+    this.isPMO = authorizedPages.includes(PageType.DASHBOARD) && authorizedPages.includes(PageType.RESOURCES) && !authorizedPages.includes(PageType.USERS);
+    this.isProjectManager = authorizedPages.length === 3 && authorizedPages.includes(PageType.PROJECTS) && authorizedPages.includes(PageType.RESOURCES);
+    if (this.isProjectManager) {
+      this.actionButton = getActionButton();
+    }
   }
 
   getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => (
@@ -92,11 +101,16 @@ export class ResourcesRequestComponent {
       this.showCreateModal = false;
       this.tableComponent.refresh();
   }
-  onSaveRisk(): void {
-    this.showCreateModal = true;
-
+  closeAllocationModal(): void {
+      this.showAllocationModal = false;
+      this.tableComponent.refresh();
   }
   openResource(event: any): void {
-    this.router.navigate([`/portfolio/${this.portfolioId}/recurso/${event.id}`]);
+    if (this.isPMO) {
+      console.log("allocation request id", event.id);
+      this.selectedAllocationRequestId = event.id;
+      this.showAllocationModal = true;
+
+    }
   }
 }

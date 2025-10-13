@@ -58,12 +58,9 @@ import { Page, PaginationQueryParams } from '../models/pagination-models';
     }
 
     // GET paginated
-    getAllocationsPage(queryParams?: PaginationQueryParams, searchQuery?: string, includeDisabled?: boolean): Observable<Page<AllocationReadDTO>> {
+    getAllocationsPage(queryParams?: PaginationQueryParams): Observable<Page<AllocationReadDTO>> {
       const url = this.getAllocationUrl();
-      const params: { [key: string]: any } = { ...queryParams };
-      if (searchQuery !== undefined) params['searchQuery'] = searchQuery;
-      if (includeDisabled !== undefined) params['includeDisabled'] = includeDisabled;
-      return this.http.get<Page<AllocationReadDTO>>(url, { params, headers: this.getHeaders() });
+      return this.http.get<Page<AllocationReadDTO>>(url, { params: queryParams?.getParamsInHttpParamsFormat() });
     }
 
     // GET unpaged

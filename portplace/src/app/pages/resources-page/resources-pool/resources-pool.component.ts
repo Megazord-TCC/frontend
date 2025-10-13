@@ -182,16 +182,16 @@ export class ResourcePoolComponent {
       }
     });
   }
-  goToResourceDetail(resourceId: number | { id: number }): void {
-    console.log('Recurso clicado:', resourceId);
-    let id: number | undefined;
-    if (typeof resourceId === 'object' && resourceId !== null && 'id' in resourceId) {
-      id = (resourceId as { id: number }).id;
-    } else if (typeof resourceId === 'number') {
-      id = resourceId;
+  goToResourceDetail(id: number | { id: number }): void {
+    console.log('Recurso clicado:', id);
+    let resourceId: number | undefined;
+    if (typeof id === 'object' && id !== null && 'id' in id) {
+      resourceId = id.id;
+    } else if (typeof id === 'number') {
+      resourceId = id;
     }
-    if (id) {
-      this.router.navigate(['/recurso', id]);
+    if (resourceId) {
+      this.router.navigate(['/recurso', resourceId]);
     } else {
       console.warn('ID da estratégia não encontrado:', resourceId);
     }
