@@ -15,7 +15,21 @@ $blue-color: #3b82f6;
   .resources-content {
     flex: 1;
     padding: 32px;
+    .resource-pool-container {
+      padding: 24px;
+      background: #fff;
+    }
 
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .description {
+      color: #666;
+      margin-bottom: 24px;
+    }
     @media (max-width: 1024px) {
       margin-left: 0;
       padding: 24px;

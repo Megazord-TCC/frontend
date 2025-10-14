@@ -133,6 +133,7 @@ export class ResourcesAllocationCreateComponent {
             this.endDate = data.endDate ?? '';
             this.priority = data.priority ?? PriorityEnum.LOW;
             this.projectName = data.project?.name ?? '';
+            this.requesterName = data.createdBy ?? '';
         },
         error: () => {
             this.errorMessage = 'Erro ao carregar dados da solicitação.';

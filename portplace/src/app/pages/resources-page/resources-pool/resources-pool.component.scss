@@ -1,17 +1,40 @@
-.resource-pool-container {
-  padding: 24px;
-  background: #fff;
-}
+// Variables
+$background-color: #fff;
+$card-background: #ffffff;
+$text-primary: #1e293b;
+$text-secondary: #64748b;
+$border-color: #e2e8f0;
+$primary-color: #1e293b;
+$blue-color: #3b82f6;
 
-h1 {
-  font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
+.resources-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: $background-color;
 
-.description {
-  color: #666;
-  margin-bottom: 24px;
+  .resources-content {
+    flex: 1;
+    padding: 32px;
+    .resource-pool-container {
+      padding: 24px;
+      background: #fff;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .description {
+      color: #666;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 1024px) {
+      margin-left: 0;
+      padding: 24px;
+    }
+  }
 }
 
 .filters-row {

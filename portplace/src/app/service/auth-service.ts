@@ -62,7 +62,7 @@ export class AuthService {
                     this.tokenPaylod = decodeToken<TokenPayload>(this.token);
                     this.name = this.tokenPaylod?.name ?? '';
                     this.roleFrontend = fromRolesDTOToRoles(this.tokenPaylod?.role);
-
+                    console.log(this.roleFrontend);
                     if (this.isLocalStorageAcessible())
                         localStorage.setItem('userData', JSON.stringify({
                             token: this.token,

@@ -83,6 +83,7 @@ export class ResourcesRequestComponent {
   ngOnInit(): void {
 
     const authorizedPages = this.authService.getAuthorizedPageTypesByRole();
+    console.log("authorized pages", authorizedPages);
     this.isPMO = authorizedPages.includes(PageType.DASHBOARD) && authorizedPages.includes(PageType.RESOURCES) && !authorizedPages.includes(PageType.USERS);
     this.isProjectManager = authorizedPages.length === 3 && authorizedPages.includes(PageType.PROJECTS) && authorizedPages.includes(PageType.RESOURCES);
     if (this.isProjectManager) {

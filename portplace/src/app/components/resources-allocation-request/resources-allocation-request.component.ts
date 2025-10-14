@@ -22,6 +22,21 @@ import { ProjetoService } from '../../service/projeto.service';
   styleUrl: './resources-allocation-request.component.scss'
 })
 export class ResourcesAllocationRequestComponent {
+  token: string = '';
+  name: string = '';
+  roleFrontend: string = '';
+  tokenPaylod: any = null;
+
+  setUserDataFromLocalStorage(): void {
+    const userDataStr = localStorage.getItem('userData');
+    if (userDataStr) {
+        const userData = JSON.parse(userDataStr);
+        this.token = userData.token;
+        this.name = userData.name;
+        this.roleFrontend = userData.roleFrontend;
+        this.tokenPaylod = userData.tokenPaylod;
+    }
+  }
   formatDateToDDMMYYYY(date: string): string {
       if (!date) return '';
       const d = new Date(date);
@@ -100,6 +115,7 @@ export class ResourcesAllocationRequestComponent {
             this.projectOptions = [];
         }
     });
+    this.setUserDataFromLocalStorage();
   }
 
   ngOnDestroy(): void {

@@ -1,15 +1,17 @@
-<div class="resource-pool-container">
-  <h1>Pool de recursos</h1>
-  <p class="description">{{ isChartTab ? 'Confira o uso do pool de recursos da organização.' : 'Gerencie o uso do pool de recursos da organização.' }}</p>
+<div class="resources-layout">
+  <div class="resources-content">
 
-  <div class="filters-row" *ngIf="isChartTab">
-    <div class="filter-icon">
-      <span class="material-icons">filter_list</span>
-      <span>Filtros:</span>
-    </div>
+    <h1>Pool de recursos</h1>
+    <p class="description">{{ isChartTab ? 'Confira o uso do pool de recursos da organização.' : 'Gerencie o uso do pool de recursos da organização.' }}</p>
 
-    <select [(ngModel)]="selectedResource" (change)="onFilterChange()" class="filter-select">
-      <option value="all">Todos recursos</option>
+    <div class="filters-row" *ngIf="isChartTab">
+      <div class="filter-icon">
+        <span class="material-icons">filter_list</span>
+        <span>Filtros:</span>
+      </div>
+
+      <select [(ngModel)]="selectedResource" (change)="onFilterChange()" class="filter-select">
+        <option value="all">Todos recursos</option>
       <option *ngFor="let resource of resourcesList" [value]="resource.id">{{ resource.name }}</option>
     </select>
 
@@ -50,19 +52,20 @@
 
     <div *ngIf="!isChartTab" class="table-container">
       <app-table
-        #tableComponent
-        [dataRetrievalMethodRef]="this.getDataForTableComponent"
-        [filterButtons]="filterButtons"
-        [filterText]="filterText"
-        [columns]="columns"
-        [actionButton]="actionButton"
-        (mainColumnRowClick)="goToResourceDetail($event)"
-        (actionButtonClick)="showCreateModal = true">
-      </app-table>
+      #tableComponent
+      [dataRetrievalMethodRef]="this.getDataForTableComponent"
+      [filterButtons]="filterButtons"
+      [filterText]="filterText"
+      [columns]="columns"
+      [actionButton]="actionButton"
+      (mainColumnRowClick)="goToResourceDetail($event)"
+      (actionButtonClick)="showCreateModal = true">
+    </app-table>
     </div>
+    </div>
+    <app-resources-create
+      *ngIf="showCreateModal"
+      (close)="closeCreateModal()">
+      </app-resources-create>
   </div>
-  <app-resources-create
-    *ngIf="showCreateModal"
-    (close)="closeCreateModal()">
-  </app-resources-create>
 </div>

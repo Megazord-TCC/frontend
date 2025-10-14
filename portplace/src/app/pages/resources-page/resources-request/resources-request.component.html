@@ -2,8 +2,9 @@
 
   <div class="resources-content">
 
-
-    <app-table
+    <h1>Pedidos de recursos</h1>
+    <p class="description">Listagem de recursos solicitados para projetos. Clique em um item da coluna Cargo desejado para alocar, editar ou rejeitar o pedido.</p>
+  <app-table
         #tableComponent
         [dataRetrievalMethodRef]="this.getDataForTableComponent"
         [filterButtons]="filterButtons"
