@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from '../environments/environment';
 import { Observable } from 'rxjs';
 import { Page, PaginationQueryParams } from '../models/pagination-models';
@@ -47,22 +47,30 @@ export class ResourcesService {
   }
 
   // GET paginated
-  getResourcesPage(queryParams?: PaginationQueryParams, startDate?: string, endDate?: string, status?: string | string[]): Observable<Page<ResourceReadDTO>> {
+  getResourcesPage(
+    queryParams?: PaginationQueryParams,
+    searchQuery?: string,
+    positionId?: number,
+    resourceId?: number,
+    projectId?: number,
+    status?: string[],
+    includeDisabled?: boolean,
+    startDate?: string,
+    endDate?: string
+  ): Observable<Page<ResourceReadDTO>> {
     const url = this.getResourceUrl();
-    const params: { [key: string]: any } = {};
-    if (startDate) params['startDate'] = startDate;
-    if (endDate) params['endDate'] = endDate;
-    // Sempre converte status para string separada por vírgula
-    let statusParam = params['status'] ?? status;
-    if (Array.isArray(statusParam)) {
-      statusParam = statusParam.join(',');
-    }
-    if (!statusParam || statusParam === '') {
-      statusParam = 'ACTIVE,INACTIVE';
-    }
-    params['status'] = statusParam;
+    let params = queryParams?.getParamsInHttpParamsFormat() || new HttpParams();
 
-    return this.http.get<Page<ResourceReadDTO>>(url, { params: params, headers: this.getHeaders() });
+    if (searchQuery !== undefined) params = params.set('searchQuery', searchQuery);
+    if (positionId !== undefined) params = params.set('positionId', positionId.toString());
+    if (resourceId !== undefined) params = params.set('resourceId', resourceId.toString());
+    if (projectId !== undefined) params = params.set('projectId', projectId.toString());
+    if (status && status.length > 0) params = params.set('status', status.join(','));
+    if (includeDisabled !== undefined) params = params.set('includeDisabled', includeDisabled.toString());
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
+
+    return this.http.get<Page<ResourceReadDTO>>(url, { params, headers: this.getHeaders() });
   }
 
   // GET paginated with available hours (startDate, endDate)

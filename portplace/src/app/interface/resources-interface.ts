@@ -3,7 +3,7 @@ export interface ResourceReadDTO {
     name: string;
     description?: string;
     dailyHours?: number;
-    status?: string;
+    status?: ResourceStatusEnum;
     relatedProjectsCount?: number;
     availableHours?: number;
     position?: PositionReadDTO;
@@ -12,6 +12,11 @@ export interface ResourceReadDTO {
     createdAt?: string;
     lastModifiedAt?: string;
     disabled?: boolean;
+}
+
+export enum ResourceStatusEnum {
+    ACTIVE = 'ACTIVE',
+    INACTIVE = 'INACTIVE'
 }
 
 export interface ResourceCreateDTO {
@@ -26,7 +31,7 @@ export interface ResourceUpdateDTO {
     description?: string;
     dailyHours: number;
     positionId?: number;
-    status?: string;
+    status?: ResourceStatusEnum;
 }
 
 export interface PositionReadDTO {

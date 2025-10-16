@@ -64,6 +64,10 @@ export class ResourcesPositionComponent {
       )
   );
   closeCreateModal() {
+    this.createProjectConfig.fields.reduce((acc, field) => {
+      acc[field.id] = "";
+      return acc;
+    }, {} as any);
       this.showCreateModal = false;
   }
   onSavePosition(event: any) {
@@ -78,6 +82,7 @@ export class ResourcesPositionComponent {
         console.log('Cargo criado com sucesso:', createdPosition);
         this.showCreateModal = false;
         this.tableComponent.refresh();
+        this.resetFormFields(this.createProjectConfig);
       },
       error: (error) => {
         console.error('Erro ao criar cargo:', error);
@@ -88,4 +93,13 @@ export class ResourcesPositionComponent {
   openPosition(event: any): void {
     this.router.navigate([`/recurso/position/${event.id}`]);
   }
+
+  resetFormFields(formConfig: any): void {
+    if (formConfig && formConfig.fields) {
+      formConfig.fields.forEach((field: any) => {
+        field.value = '';
+      });
+    }
+  }
+
 }

@@ -2,7 +2,7 @@
     <div class="modal-content" (click)="$event.stopPropagation()">
         <!-- Header -->
         <div class="modal-header">
-            <h2>Análise de pedido de recurso</h2>
+            <h2>Pedido de alocação de recurso</h2>
             <button class="close-btn" (click)="close.emit()">
                 <i class="icon-x">✕</i>
             </button>
@@ -69,7 +69,7 @@
                     <input type="date" [(ngModel)]="endDate" [disabled]="isSubmitButtonDisabled">
                 </div>
 
-               <div class="form-group">
+              <div class="form-group">
                     <label>Prioridade<span class="required-asterisk">*</span></label>
                     <select [(ngModel)]="priority" [disabled]="isSubmitButtonDisabled">
                         <option [value]="0" disabled selected>Selecione...</option>
@@ -84,7 +84,6 @@
         <!-- Footer -->
         <div class="modal-footer">
             <button class="btn-outline" (click)="onCancel()">Cancelar</button>
-            <button class="btn-danger" (click)="onReject()" [disabled]="isSubmitButtonDisabled">Rejeitar pedido</button>
             <button class="btn-primary" (click)="onSave()" [disabled]="isSubmitButtonDisabled">Alocar recurso</button>
         </div>
     </div>

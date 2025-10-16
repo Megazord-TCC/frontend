@@ -43,7 +43,7 @@ export class ResourcesAllocationRequestComponent {
       const day = String(d.getDate()).padStart(2, '0');
       const month = String(d.getMonth() + 1).padStart(2, '0');
       const year = d.getFullYear();
-      return `${day}/${month}/${year}`;
+      return `${year}-${month}-${day}`;
   }
   @Output() close = new EventEmitter<void>();
 
@@ -163,11 +163,7 @@ export class ResourcesAllocationRequestComponent {
     this.close.emit();
   }
 
-  onReject(): void {
-      // Implementar lógica de rejeição
-      console.log('Pedido rejeitado');
-      this.close.emit();
-  }
+
 
   clearForm(): void {
       this.selectedPosition = 0;

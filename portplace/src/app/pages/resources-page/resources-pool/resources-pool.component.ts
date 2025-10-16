@@ -12,6 +12,7 @@ import { FormModalComponentComponent } from '../../../components/form-modal-comp
 import { FormField, FormModalConfig } from '../../../interface/interfacies';
 import { ResourcesCreateComponent } from '../../../components/resources-create/resources-create.component';
 import { Router } from '@angular/router';
+import { ProjetoService } from '../../../service/projeto.service';
 
 
 @Component({
@@ -71,13 +72,15 @@ export class ResourcePoolComponent {
 
   isChartTab = true;
   resourcesService = inject(ResourcesService);
+  projetoService = inject(ProjetoService);
   router = inject(Router);
   // Filtros
   selectedResource = 'all';
   resourcesList: { id: number, name: string }[] = [];
   selectedProject = 'all';
-  startDate = '2025-01-01';
-  endDate = '2026-01-01';
+  projectsList: { id: number, name: string }[] = [];
+  startDate: string;
+  endDate: string;
   statusFilter = 'ACTIVE';
 
   filterText = getFilterText();
@@ -90,6 +93,12 @@ export class ResourcePoolComponent {
 
   constructor() {
     this.loadResourcesList();
+    this.loadProjectsList();
+    // Definir datas padrão: endDate hoje, startDate 30 dias atrás
+    const today = new Date();
+    this.endDate = today.toISOString().split('T')[0];
+    const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+    this.startDate = thirtyDaysAgo.toISOString().split('T')[0];
   }
 
   loadResourcesList(): void {
@@ -99,6 +108,17 @@ export class ResourcePoolComponent {
       },
       error: (err) => {
         console.error('Erro ao carregar lista de recursos:', err);
+      }
+    });
+  }
+
+  loadProjectsList(): void {
+    this.projetoService.getProjectsUnpaged().subscribe({
+      next: (projects) => {
+        this.projectsList = projects.map(p => ({ id: p.id, name: p.name }));
+      },
+      error: (err) => {
+        console.error('Erro ao carregar lista de projetos:', err);
       }
     });
   }
@@ -118,18 +138,36 @@ export class ResourcePoolComponent {
       endDate: this.endDate,
       status: this.statusFilter
     });
+    // Atualizar tabela sempre que filtros mudarem
+    if (this.tableComponent) {
+      this.tableComponent.refresh();
+    }
   }
 
-  getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => (
-    this.resourcesService.getResourcesPage(
+  getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => {
+    const resourceId = this.selectedResource !== 'all' ? Number(this.selectedResource) : undefined;
+    const projectId = this.selectedProject !== 'all' ? Number(this.selectedProject) : undefined;
+
+    // Usar status do filterButton se presente, senão default
+    let status: string[] = ['ACTIVE', 'INACTIVE'];
+    if (queryParams?.filterButtonQueryParam?.name === 'status') {
+      status = [queryParams.filterButtonQueryParam.value];
+    }
+
+    return this.resourcesService.getResourcesPage(
       queryParams,
+      queryParams?.filterTextQueryParam?.value || '', // searchQuery
+      undefined, // positionId
+      resourceId,
+      projectId,
+      status,
+      false, // includeDisabled
       this.startDate,
-      this.endDate,
-      this.statusFilter ? this.statusFilter : 'ACTIVE,INACTIVE'
+      this.endDate
     ).pipe(
       map(page => (mapResourceReadDTOPageToResourcesPositionTableRowPage(page)))
-    )
-  );
+    );
+  };
 
 
 
@@ -171,11 +209,12 @@ export class ResourcePoolComponent {
     this.resourcesService.createResource(newResource).subscribe({
       next: (createdResource) => {
         console.log('Recurso criado:', createdResource);
-
+        this.resetFormFields(this.createResourceConfig);
         this.closeCreateModal();
         if (this.tableComponent) {
           this.tableComponent.refresh();
         }
+
       },
       error: (err) => {
         console.error('Erro completo ao criar recurso:', err);
@@ -196,6 +235,14 @@ export class ResourcePoolComponent {
       console.warn('ID da estratégia não encontrado:', resourceId);
     }
   }
+  resetFormFields(formConfig: any): void {
+    if (formConfig && formConfig.fields) {
+      formConfig.fields.forEach((field: any) => {
+        field.value = '';
+      });
+    }
+  }
+
 }
 
 

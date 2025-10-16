@@ -4,7 +4,7 @@
     <h1>Pool de recursos</h1>
     <p class="description">{{ isChartTab ? 'Confira o uso do pool de recursos da organização.' : 'Gerencie o uso do pool de recursos da organização.' }}</p>
 
-    <div class="filters-row" *ngIf="isChartTab">
+  <div class="filters-row" >
       <div class="filter-icon">
         <span class="material-icons">filter_list</span>
         <span>Filtros:</span>
@@ -17,8 +17,7 @@
 
     <select [(ngModel)]="selectedProject" (change)="onFilterChange()" class="filter-select">
       <option value="all">Todos projetos</option>
-      <option value="project1">Projeto 1</option>
-      <option value="project2">Projeto 2</option>
+      <option *ngFor="let project of projectsList" [value]="project.id">{{ project.name }}</option>
     </select>
 
     <input type="date" [(ngModel)]="startDate" (change)="onFilterChange()" class="filter-date" />

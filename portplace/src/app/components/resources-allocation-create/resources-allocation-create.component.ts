@@ -23,26 +23,56 @@ import { AllocationService } from '../../service/allocation.service';
   styleUrl: './resources-allocation-create.component.scss'
 })
 export class ResourcesAllocationCreateComponent {
-    formatDateForInput(date: string): string {
-        if (!date) return '';
-        const d = new Date(date);
-        if (isNaN(d.getTime())) return '';
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
+  formatDateForInput(date: string): string {
+    if (!date) return '';
+    // já está em yyyy-MM-dd
+    const isoRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (isoRegex.test(date)) return date;
+
+    // formato ISO com hora -> pega a parte da data
+    if (date.includes('T')) return date.split('T')[0];
+
+    // formato dd/MM/yyyy -> converte para yyyy-MM-dd
+    const parts = date.split('/');
+    if (parts.length === 3) {
+      const [day, month, year] = parts;
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
+
+    // fallback: tenta criar Date e extrair componentes (pode ter issues de timezone)
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return '';
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
     }
   @Input() allocationRequestId!: number;
   collaboratorOptions: Array<{ id: number | string, name: string }> = [
       { id: '', name: 'Selecione um colaborador' }
   ];
+  // Retorna data no formato ISO LocalDate (yyyy-MM-dd) para envio ao backend Java
   formatDateToDDMMYYYY(date: string): string {
       if (!date) return '';
+      const isoRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (isoRegex.test(date)) return date;
+
+      // aceita dd/MM/yyyy
+      const parts = date.split('/');
+      if (parts.length === 3) {
+        const [day, month, year] = parts;
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      }
+
+      // aceita ISO com hora
+      if (date.includes('T')) return date.split('T')[0];
+
       const d = new Date(date);
-      const day = String(d.getDate()).padStart(2, '0');
-      const month = String(d.getMonth() + 1).padStart(2, '0');
+      if (isNaN(d.getTime())) return date;
       const year = d.getFullYear();
-      return `${day}/${month}/${year}`;
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
   }
   @Output() close = new EventEmitter<void>();
 

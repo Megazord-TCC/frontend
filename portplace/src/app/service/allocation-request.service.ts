@@ -53,7 +53,7 @@ export class AllocationRequestService {
   getAllocationRequestPage(queryParams?: PaginationQueryParams, status?: AllocationRequestStatusEnum[]): Observable<any> {
     const params: { [key: string]: any } = {};
     if (status && status.length > 0) params['status'] = status;
-    return this.http.get<any>(this.getAllocationRequestUrl(), { params: params, headers: this.getHeaders() });
+    return this.http.get<any>(this.getAllocationRequestUrl(), { params: queryParams?.getParamsInHttpParamsFormat(), headers: this.getHeaders() });
   }
 
   // GET unpaged

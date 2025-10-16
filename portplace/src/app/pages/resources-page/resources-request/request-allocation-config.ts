@@ -1,4 +1,5 @@
 import { ActionButton, InputFilter, TableColumn } from '../../../components/table/table-contracts';
+import { AllocationRequestStatusEnum } from '../../../interface/allocation-request-interfaces';
 // Importe o tipo correto do row se existir
 // import { AllocationRequestTableRow } from '../../../mappers/allocation-mappers';
 
@@ -81,7 +82,7 @@ export const getColumns = (): TableColumn[] => {
 export const getFilterText = (): InputFilter => {
 	let input = new InputFilter();
 	input.label = 'Buscar por projeto ou solicitante';
-	input.queryParam = { name: 'search', value: '' };
+	input.queryParam = { name: 'searchQuery', value: '' };
 	return input;
 };
 
@@ -91,22 +92,22 @@ export const getFilterButtons = (): InputFilter[] => {
 
 	input = new InputFilter();
 	input.label = 'Alocado';
-	input.queryParam = { name: 'status', value: 'ALLOCATED' };
+	input.queryParam = { name: 'status', value: AllocationRequestStatusEnum.ALLOCATED };
 	inputs.push(input);
 
 	input = new InputFilter();
 	input.label = 'Em análise';
-	input.queryParam = { name: 'status', value: 'IN_ANALYSIS' };
+	input.queryParam = { name: 'status', value: AllocationRequestStatusEnum.IN_ANALYSIS };
 	inputs.push(input);
 
 	input = new InputFilter();
 	input.label = 'Rejeitado';
-	input.queryParam = { name: 'status', value: 'REJECTED' };
+	input.queryParam = { name: 'status', value: AllocationRequestStatusEnum.REJECTED };
 	inputs.push(input);
 
 	input = new InputFilter();
 	input.label = 'Cancelado';
-	input.queryParam = { name: 'status', value: 'CANCELLED' };
+	input.queryParam = { name: 'status', value: AllocationRequestStatusEnum.CANCELLED };
 	inputs.push(input);
 
 	return inputs;

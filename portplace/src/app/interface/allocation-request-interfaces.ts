@@ -1,6 +1,6 @@
 // Enums
 export enum AllocationRequestStatusEnum {
-	IN_ANALYSIS = 'EM ANÁLISE',
+	IN_ANALYSIS = 'IN_ANALYSIS',
 	ALLOCATED = 'ALLOCATED',
 	REJECTED = 'REJECTED',
 	CANCELLED = 'CANCELLED'
