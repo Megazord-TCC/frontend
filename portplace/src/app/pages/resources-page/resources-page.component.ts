@@ -45,6 +45,7 @@ export class ResourcesPageComponent implements OnInit {
   allResources: Project[] = [];
   searchTerm: string = '';
   Resources: Project[] = [];
+  isProjectManager = false;
   createResourcesConfig: FormModalConfig = {
     title: 'Cadastrar novo projeto',
     fields: [
@@ -93,9 +94,11 @@ export class ResourcesPageComponent implements OnInit {
       { label: 'Início', url: '/inicio', isActive: false },
       { label: 'Recursos', url: '/recursos', isActive: true }
     ]);
-
+    const authorizedPages = this.authService.getAuthorizedPageTypesByRole();
     // Remover breadcrumbs filhos quando retorna para esta página
     this.breadcrumbService.removeChildrenAfter('/recursos');
+    this.isProjectManager = authorizedPages.length === 3 && authorizedPages.includes(PageType.PROJECTS) && authorizedPages.includes(PageType.RESOURCES);
+
   }
 
   openCreateModal(): void {

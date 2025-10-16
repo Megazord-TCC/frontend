@@ -11,7 +11,7 @@
 
     <!-- Tabs -->
     <div class="tabs-container" >
-      <div class="tabs-list"  *ngIf="authService.getAuthorizedPageTypesByRole().includes(pageType.RESOURCES)">
+      <div class="tabs-list"  *ngIf="!this.isProjectManager">
         <button
           class="tab-trigger"
           [class.active]="activeTab === 'pedidos'"
