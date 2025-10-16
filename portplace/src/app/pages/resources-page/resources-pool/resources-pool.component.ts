@@ -94,11 +94,11 @@ export class ResourcePoolComponent {
   constructor() {
     this.loadResourcesList();
     this.loadProjectsList();
-    // Definir datas padrão: endDate hoje, startDate 30 dias atrás
+    // Definir datas padrão: startDate hoje, endDate hoje + 7 dias
     const today = new Date();
-    this.endDate = today.toISOString().split('T')[0];
-    const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
-    this.startDate = thirtyDaysAgo.toISOString().split('T')[0];
+    this.startDate = today.toISOString().split('T')[0];
+    const sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+    this.endDate = sevenDaysLater.toISOString().split('T')[0];
   }
 
   loadResourcesList(): void {

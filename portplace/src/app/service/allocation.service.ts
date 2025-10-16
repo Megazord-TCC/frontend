@@ -50,10 +50,12 @@ import { Page, PaginationQueryParams } from '../models/pagination-models';
     }
 
     // GET analytics by date range
-    getAllocationsByDateRange(startDate: string, endDate: string): Observable<DailyAllocationDTO[]> {
-      const params = new HttpParams()
+    getAllocationsByDateRange(startDate: string, endDate: string, resourceId?: number, projectId?: number): Observable<DailyAllocationDTO[]> {
+      let params = new HttpParams()
         .set('startDate', startDate)
         .set('endDate', endDate);
+      if (resourceId !== undefined) params = params.set('resourceId', resourceId.toString());
+      if (projectId !== undefined) params = params.set('projectId', projectId.toString());
       return this.http.get<DailyAllocationDTO[]>(`${this.getAllocationUrl()}/analytics`, { params, headers: this.getHeaders() });
     }
 
