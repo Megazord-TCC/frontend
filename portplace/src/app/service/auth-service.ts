@@ -42,10 +42,11 @@ export class AuthService {
         else setTimeout(() => this.checkTokenExpiration(), (this.tokenPaylod.exp - now) * 1000);
     }
 
-    private getHeaders(): HttpHeaders {
+    public getHeaders(): HttpHeaders {
         return new HttpHeaders({
             'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${this.token}`
         });
     }
 

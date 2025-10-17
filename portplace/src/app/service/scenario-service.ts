@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { filter, map, Observable, of } from 'rxjs';
 import { EvaluationGroup, Portfolio, ProjectInclusionStatus, ProjectStatus, Scenario, ScenarioStatus } from '../interface/carlos-interfaces';
@@ -7,6 +7,7 @@ import { Page, PaginationQueryParams } from '../models/pagination-models';
 import { ScenarioRankingStatusEnum, ScenarioReadDTO, ScenarioUpdateDTO } from '../interface/carlos-scenario-dtos';
 import { ProjectReadDTO } from '../interface/carlos-project-dtos';
 import { PortfolioDTOStatus, PortfolioListReadDTO } from '../interface/carlos-portfolio-interfaces';
+import { AuthService } from './auth-service';
 
 @Injectable({
     providedIn: 'root'
@@ -14,11 +15,9 @@ import { PortfolioDTOStatus, PortfolioListReadDTO } from '../interface/carlos-po
 export class ScenarioService {
     constructor(private http: HttpClient) { }
 
+    authService = inject(AuthService);
     private getHeaders(): HttpHeaders {
-        return new HttpHeaders({
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        });
+      return this.authService.getHeaders();
     }
 
     private getScenariosUrl(strategyId: number): string {
@@ -79,9 +78,9 @@ export class ScenarioService {
     // O status não deveria precisar ser informado, pois não está sendo alterado.
     // Se quiser atualizar o status, utilizar updateProjectInclusionStatus.
     updateScenarioProject(
-        strategyId: number, 
-        scenarioId: number, 
-        rankingId: number, 
+        strategyId: number,
+        scenarioId: number,
+        rankingId: number,
         status: ScenarioRankingStatusEnum,
         categoryId: number
     ): Observable<any> {

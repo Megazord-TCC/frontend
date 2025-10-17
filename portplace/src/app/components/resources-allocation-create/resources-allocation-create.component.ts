@@ -196,8 +196,7 @@ export class ResourcesAllocationCreateComponent {
         dailyHours: Number(this.selectedHours),
         priority: this.priority,
         positionId: Number(this.selectedPosition),
-        projectId: Number(this.selectedProject),
-        collaboratorId: Number(this.selectedCollaborator)
+        status: AllocationRequestStatusEnum.ALLOCATED,
     };
 
     this.isSubmitButtonDisabled = true;
@@ -222,7 +221,7 @@ export class ResourcesAllocationCreateComponent {
       startDate: allocationRequestDto.startDate,
       endDate: allocationRequestDto.endDate,
       dailyHours: allocationRequestDto.dailyHours,
-      resourceId: allocationRequestDto.collaboratorId,
+      resourceId: this.selectedCollaborator,
       allocationRequestId: this.allocationRequestId
     };
     this.allocationService.create(allocationDto).subscribe({

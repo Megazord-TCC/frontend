@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from '../environments/environment';
 import { Observable } from 'rxjs';
 import { Page, PaginationQueryParams } from '../models/pagination-models';
 import { ResourceReadDTO, ResourceCreateDTO, ResourceUpdateDTO } from '../interface/resources-interface';
+import { AuthService } from './auth-service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +14,9 @@ import { ResourceReadDTO, ResourceCreateDTO, ResourceUpdateDTO } from '../interf
 export class ResourcesService {
   constructor(private http: HttpClient) {}
 
+  authService = inject(AuthService);
   private getHeaders(): HttpHeaders {
-    return new HttpHeaders({ 'Content-Type': 'application/json', 'Accept': 'application/json' });
+    return this.authService.getHeaders();
   }
 
   private getResourceUrl(): string {

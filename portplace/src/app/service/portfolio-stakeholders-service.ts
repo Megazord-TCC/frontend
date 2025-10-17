@@ -5,6 +5,7 @@ import { map, Observable, switchMap } from 'rxjs';
 import { Page, PaginationQueryParams } from '../models/pagination-models';
 import { PortfolioScaleEnumDTO, StakeholderCreateDTO, StakeholderReadDTO, StakeholderUpdateDTO } from '../interface/carlos-portfolio-stakeholders-interfaces';
 import { EventReadDTO } from '../interface/carlos-portfolio-events-interfaces';
+import { AuthService } from './auth-service';
 
 @Injectable({
     providedIn: 'root'
@@ -12,8 +13,9 @@ import { EventReadDTO } from '../interface/carlos-portfolio-events-interfaces';
 export class PortfolioStakeholdersService {
     http = inject(HttpClient);
 
+    authService = inject(AuthService);
     private getHeaders(): HttpHeaders {
-        return new HttpHeaders({ 'Content-Type': 'application/json', 'Accept': 'application/json' });
+      return this.authService.getHeaders();
     }
 
     private getPortfolioStakeholdersUrl(portfolioId: number): string {
@@ -58,7 +60,7 @@ export class PortfolioStakeholdersService {
     // UPDATE - Atualiza os dados básicos do stakeholder
     updateStakeholderBasicInformation(portfolioId: number, stakeholderId: number, name: string): Observable<StakeholderReadDTO> {
         const url = `${this.getPortfolioStakeholdersUrl(portfolioId)}/${stakeholderId}`;
-        
+
         return this.getStakeholderById(portfolioId, stakeholderId).pipe(
             map(stakeholder => ({ ...stakeholder, name }) as StakeholderUpdateDTO),
             switchMap(body => this.http.put<StakeholderReadDTO>(url, body, { headers: this.getHeaders() }))
@@ -67,15 +69,15 @@ export class PortfolioStakeholdersService {
 
     // UPDATE - Atualiza dados da análise do stakeholder
     updateStakeholderAnalysisInformation(
-        portfolioId: number, 
-        stakeholderId: number, 
-        powerLevel: PortfolioScaleEnumDTO, 
-        interestLevel: PortfolioScaleEnumDTO, 
-        powerLevelJustification: string, 
+        portfolioId: number,
+        stakeholderId: number,
+        powerLevel: PortfolioScaleEnumDTO,
+        interestLevel: PortfolioScaleEnumDTO,
+        powerLevelJustification: string,
         interestLevelJustification: string,
-        expectations: string, 
-        obligationsWithStakeholder: string, 
-        positivePoints: string, 
+        expectations: string,
+        obligationsWithStakeholder: string,
+        positivePoints: string,
         negativePoints: string
     ): Observable<StakeholderReadDTO> {
         const url = `${this.getPortfolioStakeholdersUrl(portfolioId)}/${stakeholderId}`;
@@ -94,7 +96,7 @@ export class PortfolioStakeholdersService {
             switchMap(body => this.http.put<StakeholderReadDTO>(url, body, { headers: this.getHeaders() }))
         );
     }
-    
+
     // DELETE - Deleta um stakeholder do portfólio
     deleteStakeholder(portfolioId: number, stakeholderId: number): Observable<void> {
         const url = `${this.getPortfolioStakeholdersUrl(portfolioId)}/${stakeholderId}`;

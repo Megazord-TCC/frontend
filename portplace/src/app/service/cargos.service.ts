@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../environments/environment';
 import { Observable } from 'rxjs';
 import { Page, PaginationQueryParams } from '../models/pagination-models';
 import { PositionReadDTO, PositionCreateDTO, PositionUpdateDTO } from '../interface/cargos-interfaces';
+import { AuthService } from './auth-service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +12,9 @@ import { PositionReadDTO, PositionCreateDTO, PositionUpdateDTO } from '../interf
 export class CargosService {
   constructor(private http: HttpClient) {}
 
+  authService = inject(AuthService);
   private getHeaders(): HttpHeaders {
-    return new HttpHeaders({ 'Content-Type': 'application/json', 'Accept': 'application/json' });
+    return this.authService.getHeaders();
   }
 
   private getPositionUrl(): string {

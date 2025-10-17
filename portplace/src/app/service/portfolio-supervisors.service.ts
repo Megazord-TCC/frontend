@@ -9,6 +9,7 @@ import { RoleDTO } from '../interface/carlos-auth-interfaces';
 import { subtractArraysById } from '../helpers/array-helper';
 import { PortfolioOwnersCreateDTO } from '../interface/carlos-portfolio-supervisors-interfaces';
 import { PortfolioService } from './portfolio-service';
+import { AuthService } from './auth-service';
 
 @Injectable({
     providedIn: 'root'
@@ -18,8 +19,9 @@ export class PortfolioSupervisorService {
     userService = inject(UserService);
     portfolioService = inject(PortfolioService);
 
+    authService = inject(AuthService);
     private getHeaders(): HttpHeaders {
-        return new HttpHeaders({ 'Content-Type': 'application/json', 'Accept': 'application/json' });
+      return this.authService.getHeaders();
     }
 
     private getPortfolioSupervisorsUrl(portfolioId: number): string {
@@ -74,7 +76,7 @@ export class PortfolioSupervisorService {
 
         return this.portfolioService.getPortfolioById(portfolioId).pipe(
             switchMap(portfolio => {
-                portfolio.owners.forEach(owner => { 
+                portfolio.owners.forEach(owner => {
                     if (owner.id != supervisorUserIdToRemove) body.ownersIds.push(owner.id);
                 });
                 return this.http.post(url, body, { headers: this.getHeaders() });

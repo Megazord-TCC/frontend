@@ -4,6 +4,7 @@ import { environment } from '../environments/environment';
 import { map, Observable, switchMap } from 'rxjs';
 import { Page, PaginationQueryParams } from '../models/pagination-models';
 import { EventParticipantCreateDTO, EventParticipantReadDTO, EventParticipantUpdateDTO } from '../interface/carlos-portfolio-event-participant-interfaces';
+import { AuthService } from './auth-service';
 
 @Injectable({
     providedIn: 'root'
@@ -11,10 +12,10 @@ import { EventParticipantCreateDTO, EventParticipantReadDTO, EventParticipantUpd
 export class PortfolioEventParticipantService {
     http = inject(HttpClient);
 
+    authService = inject(AuthService);
     private getHeaders(): HttpHeaders {
-        return new HttpHeaders({ 'Content-Type': 'application/json', 'Accept': 'application/json' });
+      return this.authService.getHeaders();
     }
-
     private getParticipantsUrl(portfolioId: number, eventId: number): string {
         return `${environment.apiUrl}/portfolios/${portfolioId}/events/${eventId}/participants`;
     }

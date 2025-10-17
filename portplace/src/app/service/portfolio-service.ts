@@ -8,6 +8,7 @@ import { PortfolioAnalyticsReadDTO, PortfolioCancelationPatchDTO, PortfolioCostS
 import { ScenarioService } from './scenario-service';
 import { ProjectReadDTO2 } from '../interface/carlos-project-dtos';
 import { NumberValueAccessor } from '@angular/forms';
+import { AuthService } from './auth-service';
 
 @Injectable({
     providedIn: 'root'
@@ -16,8 +17,9 @@ export class PortfolioService {
     http = inject(HttpClient);
     scenarioService = inject(ScenarioService);
 
+    authService = inject(AuthService);
     private getHeaders(): HttpHeaders {
-        return new HttpHeaders({ 'Content-Type': 'application/json', 'Accept': 'application/json' });
+      return this.authService.getHeaders();
     }
 
     private getPortfolioUrl(): string {

@@ -11,7 +11,7 @@
         [filterText]="filterText"
         [columns]="columns"
         [actionButton]="actionButton"
-        (mainColumnRowClick)="openResource($event)"
+        (mainColumnRowClick)="handleMainColumnClick($event)"
         (actionButtonClick)="showCreateModal = true">
     </app-table>
   </div>

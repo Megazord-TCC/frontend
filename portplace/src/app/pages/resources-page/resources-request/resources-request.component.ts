@@ -13,6 +13,7 @@ import { ResourcesAllocationRequestComponent } from '../../../components/resourc
 import { AllocationRequestService } from '../../../service/allocation-request.service';
 import { mapAllocationRequestReadDTOPageToTableRowPage } from '../../../mappers/allocation-request-mappers';
 import { ResourcesAllocationCreateComponent } from '../../../components/resources-allocation-create/resources-allocation-create.component';
+import Swal from 'sweetalert2';
 @Component({
   selector: 'resources-request',
   imports: [
@@ -25,7 +26,7 @@ import { ResourcesAllocationCreateComponent } from '../../../components/resource
   templateUrl: './resources-request.component.html',
   styleUrl: './resources-request.component.scss'
 })
-export class ResourcesRequestComponent {
+export class ResourcesRequestComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
   private readonly allocationRequestService = inject(AllocationRequestService);
@@ -75,7 +76,7 @@ export class ResourcesRequestComponent {
   showAllocationModal = false;
   filterButtons = getFilterButtons();
   filterText = getFilterText();
-  columns = getColumns();
+  columns: any[] = [];
   actionButton: any = undefined;
   selectedProject = 'all';
   statusFilter = 'ACTIVE';
@@ -89,6 +90,8 @@ export class ResourcesRequestComponent {
     if (this.isProjectManager) {
       this.actionButton = getActionButton();
     }
+
+    this.columns = getColumns(this.isPMO);
   }
 
   getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => (
@@ -108,10 +111,25 @@ export class ResourcesRequestComponent {
   }
   openResource(event: any): void {
     if (this.isPMO) {
+      if (event.status === 'CANCELADO') {
+        Swal.fire({
+          title: 'Ação não permitida',
+          text: 'Não é possível alocar um pedido cancelado.',
+          icon: 'warning',
+          confirmButtonText: 'Entendi'
+        });
+        return;
+      }
       console.log("allocation request id", event.id);
       this.selectedAllocationRequestId = event.id;
       this.showAllocationModal = true;
 
+    }
+  }
+
+  handleMainColumnClick(event: any): void {
+    if (this.isPMO) {
+      this.openResource(event);
     }
   }
 }

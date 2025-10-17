@@ -1,8 +1,9 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
 import { Page, PaginationQueryParams } from '../models/pagination-models';
+import { AuthService } from './auth-service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,11 +13,9 @@ export class EvaluationService {
 
   constructor(private http: HttpClient) { }
 
+  authService = inject(AuthService);
   private getHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    });
+    return this.authService.getHeaders();
   }
 
   // Buscar grupos de avaliação paginados e filtrados

@@ -1,9 +1,10 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Project, ProjectPageableResponse } from '../interface/interfacies';
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
 import { Page, PaginationQueryParams } from '../models/pagination-models';
+import { AuthService } from './auth-service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,12 +14,9 @@ export class ProjetoService {
 
   constructor(private http: HttpClient) { }
 
-  // Headers com Content-Type JSON
+  authService = inject(AuthService);
   private getHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    });
+    return this.authService.getHeaders();
   }
 
   // Cadastrar novo projeto (POST)

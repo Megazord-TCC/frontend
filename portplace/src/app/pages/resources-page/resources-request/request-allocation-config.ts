@@ -7,7 +7,7 @@ export const getActionButton = (): ActionButton => {
 	return new ActionButton();
 };
 
-export const getColumns = (): TableColumn[] => {
+export const getColumns = (isPMO: boolean = false): TableColumn[] => {
 	let columns: TableColumn[] = [];
 	let column: TableColumn;
 
@@ -17,7 +17,7 @@ export const getColumns = (): TableColumn[] => {
 	column.isSortable = true;
 	column.frontendAttributeName = 'cargoDesejado';
 	column.backendAttributeName = 'cargo';
-  column.isClickableMainColumn = true;
+  column.isClickableMainColumn = isPMO;
 	columns.push(column);
 
 	column = new TableColumn();
