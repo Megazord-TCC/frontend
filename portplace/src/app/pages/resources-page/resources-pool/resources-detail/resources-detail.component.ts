@@ -89,13 +89,12 @@ export class ResourcesDetailComponent implements OnInit {
   resourceId:number = 0;
   resource: ResourceReadDTO | null = null;
   isChartTab = true;
-  selectedResource = 'all';
-  resourcesList: { id: number, name: string }[] = [];
+  resourceName: string= 'all';
   selectedProject = 'all';
-  startDate = '2025-01-01';
-  endDate = '2026-01-01';
+  projectsList: { id: number, name: string }[] = [];
+  startDate: string;
+  endDate: string;
   statusFilter = 'ACTIVE';
-
 
   columns = getColumns();
   filterButtons = getFilterButtons();
@@ -105,29 +104,43 @@ export class ResourcesDetailComponent implements OnInit {
 
 
   constructor() {
-    this.loadResourcesList();
+    const today = new Date();
+    this.startDate = today.toISOString().split('T')[0];
+    const sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+    this.endDate = sevenDaysLater.toISOString().split('T')[0];
+
   }
 
 
   ngOnInit(): void {
-      // Escutar mudanças nos parâmetros da rota para recarregar quando voltar
-    this.routeSubscription = this.route.paramMap.subscribe(params => {
-      const estrategiaIdParam = params.get('resourceId');
-      this.resourceId = estrategiaIdParam ? Number(estrategiaIdParam) : 0;
+  // Escutar mudanças nos parâmetros da rota para recarregar quando voltar
+  this.routeSubscription = this.route.paramMap.subscribe(params => {
+    const estrategiaIdParam = params.get('resourceId');
+    this.resourceId = estrategiaIdParam ? Number(estrategiaIdParam) : 0;
 
-      if (this.resourceId) {
-        this.loadResourceDetail(this.resourceId);
-      }
+    if (this.resourceId) {
+      this.loadResourceDetail(this.resourceId);
+    }
+  });
+}
 
-    });
+  getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => {
 
-  }
+    const projectId = this.selectedProject !== 'all' ? Number(this.selectedProject) : undefined;
 
-  getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => (
-      this.allocationRequestService.getAllocationRequestPage(queryParams).pipe(
+    return this.allocationRequestService.getAllocationRequestPage(
+      queryParams,
+      queryParams?.filterTextQueryParam?.value || '', // searchQuery
+      this.resourceId,
+      projectId,
+      undefined, // status - não passar para evitar erro, usar default do backend
+      false, // includeDisabled
+      this.startDate,
+      this.endDate
+      ).pipe(
         map(page => (mapAllocationRequestReadDTOPageToTableRowPage(page)))
-      )
-    );
+      );
+  };
 
 
   loadResourceDetail(resourceId: number): void {
@@ -136,6 +149,7 @@ export class ResourcesDetailComponent implements OnInit {
       .subscribe({
         next: (resource) => {
           this.resource = resource;
+          this.resourceName = resource.id.toString();
           console.log('Recurso carregado:', resource);
           this.breadcrumbService.setBreadcrumbs([
             { label: 'Início', url: '/inicio', isActive: false },
@@ -198,20 +212,11 @@ export class ResourcesDetailComponent implements OnInit {
     this.isChartTab = isChart;
   }
 
-  loadResourcesList(): void {
-    this.resourceService.getResourcesUnpaged().subscribe({
-      next: (resources) => {
-        this.resourcesList = resources.map(r => ({ id: r.id, name: r.name }));
-      },
-      error: (err) => {
-        console.error('Erro ao carregar lista de recursos:', err);
-      }
-    });
-  }
+
   onFilterChange(): void {
     // Lógica para aplicar filtros
     console.log('Filtros aplicados:', {
-      resource: this.selectedResource,
+      resource: this.resourceName,
       project: this.selectedProject,
       startDate: this.startDate,
       endDate: this.endDate,

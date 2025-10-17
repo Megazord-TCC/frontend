@@ -1,5 +1,6 @@
 
 import { ActionButton, InputFilter, TableColumn } from '../../../components/table/table-contracts';
+import { ResourceStatusEnum } from '../../../interface/resources-interface';
 import { ResourcesPositionTableRow } from '../../../mappers/resources-mappers';
 
 export const getActionButton = (): ActionButton => {
@@ -75,12 +76,12 @@ export const getFilterButtons = (): InputFilter[] => {
 
 	input = new InputFilter();
 	input.label = 'Ativado';
-	input.queryParam = { name: 'status', value: "ACTIVE" };
+	input.queryParam = { name: 'status', value: ResourceStatusEnum.ACTIVE };
 	inputs.push(input);
 
 	input = new InputFilter();
 	input.label = 'Desativado';
-	input.queryParam = { name: 'status', value: "INACTIVE" };
+	input.queryParam = { name: 'status', value: ResourceStatusEnum.INACTIVE };
 	inputs.push(input);
 
 	return inputs;

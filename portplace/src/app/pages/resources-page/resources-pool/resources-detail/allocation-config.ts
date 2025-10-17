@@ -1,4 +1,5 @@
 import { ActionButton, InputFilter, TableColumn } from "../../../../components/table/table-contracts";
+import { AllocationRequestStatusEnum } from "../../../../interface/allocation-request-interfaces";
 
 export const getActionButton = (): ActionButton => {
   return new ActionButton();
@@ -81,15 +82,14 @@ export const getFilterButtons = (): InputFilter[] => {
   let inputs: InputFilter[] = [];
   let input: InputFilter;
 
-  input = new InputFilter();
-  input.label = 'Alocação concluída';
-  input.queryParam = { name: 'status', value: "ACTIVE" };
-  inputs.push(input);
+	input = new InputFilter();
+	input.label = 'Alocado';
+	input.queryParam = { name: 'status', value: AllocationRequestStatusEnum.ALLOCATED };
+	inputs.push(input);
 
-  input = new InputFilter();
-  input.label = 'Alocação cancelada';
-  input.queryParam = { name: 'status', value: "INACTIVE" };
-  inputs.push(input);
 
-  return inputs;
+	input = new InputFilter();
+	input.label = 'Cancelado';
+	input.queryParam = { name: 'status', value: AllocationRequestStatusEnum.CANCELLED };
+	inputs.push(input);  return inputs;
 };

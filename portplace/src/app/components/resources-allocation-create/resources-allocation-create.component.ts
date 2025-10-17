@@ -10,7 +10,7 @@ import { ResourcesService } from '../../service/resources.service';
 import { CargosService } from '../../service/cargos.service';
 import { PositionReadDTO } from '../../interface/cargos-interfaces';
 import { AllocationRequestService } from '../../service/allocation-request.service';
-import { AllocationRequestCreateDTO, AllocationRequestReadDTO, PriorityEnum } from '../../interface/allocation-request-interfaces';
+import { AllocationRequestCreateDTO, AllocationRequestReadDTO, AllocationRequestStatusEnum, PriorityEnum } from '../../interface/allocation-request-interfaces';
 import { Project } from '../../interface/interfacies';
 import { ProjetoService } from '../../service/projeto.service';
 import { AllocationService } from '../../service/allocation.service';
@@ -241,8 +241,39 @@ export class ResourcesAllocationCreateComponent {
     this.close.emit();
   }
 
-  onReject(): void {
-    console.log('Pedido rejeitado');
+  async onReject(): Promise<any> {
+    // mudar status para cancelado
+    let isFormValid = this.isFormValid();
+    if (!isFormValid) return;
+
+    // Monta DTO para PUT da allocation request
+    const allocationRequestDto = {
+        startDate: this.formatDateToDDMMYYYY(this.startDate),
+        endDate: this.formatDateToDDMMYYYY(this.endDate),
+        dailyHours: Number(this.selectedHours),
+        priority: this.priority,
+        positionId: Number(this.selectedPosition),
+        projectId: Number(this.selectedProject),
+        collaboratorId: Number(this.selectedCollaborator),
+        status: AllocationRequestStatusEnum.CANCELLED
+    };
+
+    this.isSubmitButtonDisabled = true;
+    this.errorMessage = '';
+
+    // Se allocationRequestId, faz PUT antes do create
+    if (this.allocationRequestId) {
+      await new Promise<void>((resolve, reject) => {
+        this.allocationRequestService.update(this.allocationRequestId, allocationRequestDto).subscribe({
+          next: () => resolve(),
+          error: (err) => {
+              this.errorMessage = 'Erro ao atualizar solicitação.';
+              this.isSubmitButtonDisabled = false;
+              reject(err);
+          }
+        });
+      });
+    }
     this.close.emit();
   }
 

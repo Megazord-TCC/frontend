@@ -8,7 +8,7 @@ import {
   AllocationRequestUpdateDTO,
   AllocationRequestStatusEnum
 } from '../interface/allocation-request-interfaces';
-import { PaginationQueryParams } from '../models/pagination-models';
+import { Page, PaginationQueryParams } from '../models/pagination-models';
 
 @Injectable({
   providedIn: 'root'
@@ -50,10 +50,36 @@ export class AllocationRequestService {
   }
 
   // GET paginated
-  getAllocationRequestPage(queryParams?: PaginationQueryParams, status?: AllocationRequestStatusEnum[]): Observable<any> {
-    const params: { [key: string]: any } = {};
-    if (status && status.length > 0) params['status'] = status;
-    return this.http.get<any>(this.getAllocationRequestUrl(), { params: queryParams?.getParamsInHttpParamsFormat(), headers: this.getHeaders() });
+  getAllocationRequestPage(
+    queryParams?: PaginationQueryParams,
+    searchQuery?: string,
+    resourceId?: number,
+    projectId?: number,
+    status?: string[],
+    includeDisabled?: boolean,
+    startDate?: string,
+    endDate?: string
+  ): Observable<any> {
+      let params = queryParams?.getParamsInHttpParamsFormat() || new HttpParams();
+
+      // Se status não foi passado, tentar ler do filterButtonQueryParam
+      if (!status && queryParams?.filterButtonQueryParam?.name === 'status') {
+        status = [queryParams.filterButtonQueryParam.value];
+      }
+
+      if (searchQuery !== undefined) params = params.set('searchQuery', searchQuery);
+      if (resourceId !== undefined) params = params.set('resourceId', resourceId.toString());
+      if (projectId !== undefined) params = params.set('projectId', projectId.toString());
+      if (status && status.length > 0) {
+        for (const s of status) {
+          params = params.append('status', s);
+        }
+      }
+      if (includeDisabled !== undefined) params = params.set('includeDisabled', includeDisabled.toString());
+      if (startDate) params = params.set('startDate', startDate);
+      if (endDate) params = params.set('endDate', endDate);
+
+      return this.http.get<Page<AllocationRequestReadDTO>>(this.getAllocationRequestUrl(), { params, headers: this.getHeaders() });
   }
 
   // GET unpaged

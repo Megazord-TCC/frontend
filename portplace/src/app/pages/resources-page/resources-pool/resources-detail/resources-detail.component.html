@@ -24,15 +24,9 @@
           <span>Filtros:</span>
         </div>
 
-        <select [(ngModel)]="selectedResource" (change)="onFilterChange()" class="filter-select">
-          <option value="all">Todos recursos</option>
-          <option *ngFor="let resource of resourcesList" [value]="resource.id">{{ resource.name }}</option>
-        </select>
-
         <select [(ngModel)]="selectedProject" (change)="onFilterChange()" class="filter-select">
           <option value="all">Todos projetos</option>
-          <option value="project1">Projeto 1</option>
-          <option value="project2">Projeto 2</option>
+          <option *ngFor="let project of projectsList" [value]="project.id">{{ project.name }}</option>
         </select>
 
         <input type="date" [(ngModel)]="startDate" (change)="onFilterChange()" class="filter-date" />
@@ -58,7 +52,7 @@
       <div class="content">
         <app-pool-graphic
           *ngIf="isChartTab"
-          [selectedResource]="selectedResource"
+          [selectedResource]="resourceName"
           [selectedProject]="selectedProject"
           [startDate]="startDate"
           [endDate]="endDate">
