@@ -18,13 +18,13 @@
       <h1>Contrato: </h1>
       <p class="description">{{ isChartTab ? 'Confira o uso do pool de recursos da organização.' : 'Gerencie o uso do pool de recursos da organização.' }}</p>
 
-      <div class="filters-row" *ngIf="isChartTab">
+      <div class="filters-row" >
         <div class="filter-icon">
           <span class="material-icons">filter_list</span>
           <span>Filtros:</span>
         </div>
 
-        <select [(ngModel)]="selectedProject" (change)="onFilterChange()" class="filter-select">
+        <select [(ngModel)]="selectedProject" (change)="onFilterChange()" class="filter-select" *ngIf="isChartTab">
           <option value="all">Todos projetos</option>
           <option *ngFor="let project of projectsList" [value]="project.id">{{ project.name }}</option>
         </select>

@@ -62,9 +62,36 @@ import { AuthService } from './auth-service';
     }
 
     // GET paginated
-    getAllocationsPage(queryParams?: PaginationQueryParams): Observable<Page<AllocationReadDTO>> {
-      const url = this.getAllocationUrl();
-      return this.http.get<Page<AllocationReadDTO>>(url, { params: queryParams?.getParamsInHttpParamsFormat() });
+    getAllocationsPage(
+      queryParams?: PaginationQueryParams,
+      searchQuery?: string,
+      startDate?: string,
+      endDate?: string,
+      status?: string[],
+      includeDisabled?: boolean,
+      resourceId?: number,
+      projectId?: number
+    ): Observable<Page<AllocationReadDTO>> {
+      let params = queryParams?.getParamsInHttpParamsFormat() || new HttpParams();
+
+      // Se statuses não foi passado, tentar ler do filterButtonQueryParam
+      if (!status && queryParams?.filterButtonQueryParam?.name === 'status') {
+        status = [queryParams.filterButtonQueryParam.value];
+      }
+
+      if (startDate) params = params.set('startDate', startDate);
+      if (endDate) params = params.set('endDate', endDate);
+      if (status && status.length > 0) {
+        for (const s of status) {
+          params = params.append('status', s);
+        }
+      }
+      if (searchQuery !== undefined) params = params.set('searchQuery', searchQuery);
+      if (includeDisabled !== undefined) params = params.set('includeDisabled', includeDisabled.toString());
+      if (resourceId !== undefined) params = params.set('resourceId', resourceId.toString());
+      if (projectId !== undefined) params = params.set('projectId', projectId.toString());
+
+      return this.http.get<Page<AllocationReadDTO>>(this.getAllocationUrl(), { params, headers: this.getHeaders() });
     }
 
     // GET unpaged

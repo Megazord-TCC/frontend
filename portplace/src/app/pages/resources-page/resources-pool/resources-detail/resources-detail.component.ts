@@ -1,5 +1,6 @@
+import { AllocationService } from './../../../../service/allocation.service';
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BadgeComponent } from '../../../../components/badge/badge.component';
 import { BreadcrumbComponent } from '../../../../components/breadcrumb/breadcrumb.component';
@@ -20,10 +21,11 @@ import { ResourcesCreateComponent } from '../../../../components/resources-creat
 import { PoolGraphicComponent } from '../pool-graphic/pool-graphic.component';
 import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } from '../../../../models/pagination-models';
 import { mapAllocationRequestReadDTOPageToTableRowPage } from '../../../../mappers/allocation-request-mappers';
-import { AllocationService } from '../../../../service/allocation.service';
 import { getActionButton, getColumns, getFilterButtons, getFilterText } from './allocation-config';
 import { get } from 'http';
 import { AllocationRequestService } from '../../../../service/allocation-request.service';
+import { mapAllocationReadDTOPageToTableRowPage } from '../../../../mappers/allocation-mappers';
+import { ProjetoService } from '../../../../service/projeto.service';
 
 @Component({
   selector: 'app-resources-detail',
@@ -43,6 +45,7 @@ import { AllocationRequestService } from '../../../../service/allocation-request
   styleUrl: './resources-detail.component.scss'
 })
 export class ResourcesDetailComponent implements OnInit {
+  @ViewChild('tableComponent') tableComponent!: TableComponent;
   createResourcesConfig: FormModalConfig = {
     title: 'Cadastrar novo projeto',
     fields: [
@@ -83,6 +86,8 @@ export class ResourcesDetailComponent implements OnInit {
   breadcrumbService = inject(BreadcrumbService);
   resourceService = inject(ResourcesService);
   allocationRequestService = inject(AllocationRequestService);
+  allocationService = inject(AllocationService);
+  projetoService = inject(ProjetoService);
   router = inject(Router);
   route = inject(ActivatedRoute)
   showCreateModal = false;
@@ -104,6 +109,8 @@ export class ResourcesDetailComponent implements OnInit {
 
 
   constructor() {
+    this.loadProjectsList();
+
     const today = new Date();
     this.startDate = today.toISOString().split('T')[0];
     const sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -128,21 +135,30 @@ export class ResourcesDetailComponent implements OnInit {
 
     const projectId = this.selectedProject !== 'all' ? Number(this.selectedProject) : undefined;
 
-    return this.allocationRequestService.getAllocationRequestPage(
+    return this.allocationService.getAllocationsPage(
       queryParams,
       queryParams?.filterTextQueryParam?.value || '', // searchQuery
-      this.resourceId,
-      projectId,
+      this.startDate,
+      this.endDate,
       undefined, // status - não passar para evitar erro, usar default do backend
       false, // includeDisabled
-      this.startDate,
-      this.endDate
+      this.resourceId,
+      projectId
       ).pipe(
-        map(page => (mapAllocationRequestReadDTOPageToTableRowPage(page)))
+        map(page => (mapAllocationReadDTOPageToTableRowPage(page)))
       );
   };
 
-
+  loadProjectsList(): void {
+    this.projetoService.getProjectsUnpaged().subscribe({
+      next: (projects) => {
+        this.projectsList = projects.map(p => ({ id: p.id, name: p.name }));
+      },
+      error: (err) => {
+        console.error('Erro ao carregar lista de projetos:', err);
+      }
+    });
+  }
   loadResourceDetail(resourceId: number): void {
     this.resourceService.getResourceById(resourceId)
       .pipe(retry(3))
@@ -222,6 +238,9 @@ export class ResourcesDetailComponent implements OnInit {
       endDate: this.endDate,
       status: this.statusFilter
     });
+    if (this.tableComponent) {
+      this.tableComponent.refresh();
+    }
   }
 
 
