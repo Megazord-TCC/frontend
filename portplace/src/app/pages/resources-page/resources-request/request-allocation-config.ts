@@ -1,8 +1,35 @@
-import { ActionButton, InputFilter, TableColumn } from '../../../components/table/table-contracts';
+import { ActionButton, BadgeConfiguration, InputFilter, TableColumn } from '../../../components/table/table-contracts';
 import { AllocationRequestStatusEnum } from '../../../interface/allocation-request-interfaces';
 // Importe o tipo correto do row se existir
 // import { AllocationRequestTableRow } from '../../../mappers/allocation-mappers';
 
+const getBadgeConfigurations = (): BadgeConfiguration[] => {
+    let badgeConfigs: BadgeConfiguration[] = [];
+    let badgeConfig: BadgeConfiguration;
+
+    badgeConfig = new BadgeConfiguration();
+    badgeConfig.color = 'green';
+    badgeConfig.triggeringValues = ['ALLOCATED'];
+    badgeConfigs.push(badgeConfig);
+
+    badgeConfig = new BadgeConfiguration();
+    badgeConfig.color = 'grey';
+    badgeConfig.triggeringValues = ['IN_ANALYSIS'];
+    badgeConfigs.push(badgeConfig);
+
+    badgeConfig = new BadgeConfiguration();
+    badgeConfig.color = 'yellow';
+    badgeConfig.triggeringValues = ['REJECTED'];
+    badgeConfigs.push(badgeConfig);
+
+    badgeConfig = new BadgeConfiguration();
+    badgeConfig.color = 'red';
+    badgeConfig.triggeringValues = ['CANCELLED'];
+    badgeConfigs.push(badgeConfig);
+
+
+    return badgeConfigs;
+}
 export const getActionButton = (): ActionButton => {
 	return new ActionButton();
 };
@@ -74,6 +101,7 @@ export const getColumns = (isPMO: boolean = false): TableColumn[] => {
 	column.isSortable = true;
 	column.frontendAttributeName = 'status';
 	column.backendAttributeName = 'status';
+  column.badgeConfiguration = getBadgeConfigurations();
 	columns.push(column);
 
 	return columns;

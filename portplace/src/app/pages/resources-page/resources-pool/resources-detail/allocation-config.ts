@@ -1,5 +1,25 @@
-import { ActionButton, InputFilter, TableColumn } from "../../../../components/table/table-contracts";
+import { ActionButton, BadgeConfiguration, InputFilter, TableColumn } from "../../../../components/table/table-contracts";
+import { AllocationStatusEnum } from "../../../../interface/allocation-interfaces";
 import { AllocationRequestStatusEnum } from "../../../../interface/allocation-request-interfaces";
+
+
+const getBadgeConfigurations = (): BadgeConfiguration[] => {
+    let badgeConfigs: BadgeConfiguration[] = [];
+    let badgeConfig: BadgeConfiguration;
+
+    badgeConfig = new BadgeConfiguration();
+    badgeConfig.color = 'green';
+    badgeConfig.triggeringValues = ['AUTORIZADO'];
+    badgeConfigs.push(badgeConfig);
+
+    badgeConfig = new BadgeConfiguration();
+    badgeConfig.color = 'red';
+    badgeConfig.triggeringValues = ['CANCELADO'];
+    badgeConfigs.push(badgeConfig);
+
+
+    return badgeConfigs;
+}
 
 export const getActionButton = (): ActionButton => {
   return new ActionButton();
@@ -64,6 +84,7 @@ export const getColumns = (): TableColumn[] => {
   column.isSortable = true;
   column.frontendAttributeName = 'status';
   column.backendAttributeName = 'status';
+  column.badgeConfiguration = getBadgeConfigurations();
   columns.push(column);
 
   return columns;
@@ -84,12 +105,13 @@ export const getFilterButtons = (): InputFilter[] => {
 
 	input = new InputFilter();
 	input.label = 'Alocado';
-	input.queryParam = { name: 'status', value: AllocationRequestStatusEnum.ALLOCATED };
+	input.queryParam = { name: 'status', value: AllocationStatusEnum.ALLOCATED };
 	inputs.push(input);
 
 
 	input = new InputFilter();
 	input.label = 'Cancelado';
-	input.queryParam = { name: 'status', value: AllocationRequestStatusEnum.CANCELLED };
-	inputs.push(input);  return inputs;
+	input.queryParam = { name: 'status', value: AllocationStatusEnum.CANCELLED };
+	inputs.push(input);
+  return inputs;
 };

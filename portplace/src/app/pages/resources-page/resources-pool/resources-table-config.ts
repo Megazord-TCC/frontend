@@ -1,7 +1,25 @@
 
-import { ActionButton, InputFilter, TableColumn } from '../../../components/table/table-contracts';
+import { ActionButton, BadgeConfiguration, InputFilter, TableColumn } from '../../../components/table/table-contracts';
 import { ResourceStatusEnum } from '../../../interface/resources-interface';
 import { ResourcesPositionTableRow } from '../../../mappers/resources-mappers';
+
+const getBadgeConfigurations = (): BadgeConfiguration[] => {
+    let badgeConfigs: BadgeConfiguration[] = [];
+    let badgeConfig: BadgeConfiguration;
+
+    badgeConfig = new BadgeConfiguration();
+    badgeConfig.color = 'green';
+    badgeConfig.triggeringValues = ['ACTIVE'];
+    badgeConfigs.push(badgeConfig);
+
+    badgeConfig = new BadgeConfiguration();
+    badgeConfig.color = 'grey';
+    badgeConfig.triggeringValues = ['INACTIVE'];
+    badgeConfigs.push(badgeConfig);
+
+
+    return badgeConfigs;
+}
 
 export const getActionButton = (): ActionButton => {
 	return new ActionButton();
@@ -58,6 +76,7 @@ export const getColumns = (): TableColumn[] => {
 	column.isSortable = true;
 	column.frontendAttributeName = 'status';
 	column.backendAttributeName = 'status';
+  column.badgeConfiguration = getBadgeConfigurations();
 	columns.push(column);
 
 	return columns;

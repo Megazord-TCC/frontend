@@ -13,8 +13,14 @@ export interface AllocationReadDTO {
   lastModifiedBy: string;
   createdAt: string; // formato dd/MM/yyyy HH:mm:ss
   lastModifiedAt: string; // formato dd/MM/yyyy HH:mm:ss
+  status: AllocationStatusEnum;
 }
+export enum AllocationStatusEnum {
 
+  ALLOCATED = 'ALLOCATED',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED'
+}
 export interface AllocationCreateDTO {
   startDate: string; // formato dd/MM/yyyy
   endDate: string;   // formato dd/MM/yyyy
