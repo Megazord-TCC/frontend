@@ -1,0 +1,30 @@
+<div class="resources-layout">
+
+  <div class="resources-content">
+
+    <h1>Pedidos de recursos</h1>
+    <p class="description">Listagem de recursos solicitados para projetos. Clique em um item da coluna Cargo desejado para alocar, editar ou rejeitar o pedido.</p>
+  <app-table
+        #tableComponent
+        [dataRetrievalMethodRef]="this.getDataForTableComponent"
+        [filterButtons]="filterButtons"
+        [filterText]="filterText"
+        [columns]="columns"
+        [actionButton]="actionButton"
+        (mainColumnRowClick)="handleMainColumnClick($event)"
+        (actionButtonClick)="showCreateModal = true">
+    </app-table>
+  </div>
+
+  <!-- Form Modal -->
+  <app-resources-allocation-request
+    *ngIf="showCreateModal"
+    (close)="closeCreateModal()">
+  </app-resources-allocation-request>
+
+  <app-resources-allocation-create
+    *ngIf="showAllocationModal"
+    (close)="closeAllocationModal()"
+    [allocationRequestId]="this.selectedAllocationRequestId">
+  </app-resources-allocation-create>
+</div>

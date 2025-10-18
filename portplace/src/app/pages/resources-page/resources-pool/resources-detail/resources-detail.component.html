@@ -1,0 +1,90 @@
+<div class="resources-page-layout">
+  <div class="resources-content">
+    <!-- Breadcrumb -->
+    <app-breadcrumb></app-breadcrumb>
+
+
+    <div class="header-top">
+      <button class="back-btn" (click)="goBack()">
+        <app-svg-icon class="nav-icon" [path]="'assets/icon/voltar_vetor.svg'" [size]="18">
+        </app-svg-icon>
+      </button>
+      <h1>{{this.resource?.name}}</h1>
+      <p class="resource-description">{{this.resource?.description}}</p>
+
+    </div>
+
+    <div class="resource-pool-container">
+      <h1>Contrato: </h1>
+      <p class="description">{{ isChartTab ? 'Confira o uso do pool de recursos da organização.' : 'Gerencie o uso do pool de recursos da organização.' }}</p>
+
+      <div class="filters-row" >
+        <div class="filter-icon">
+          <span class="material-icons">filter_list</span>
+          <span>Filtros:</span>
+        </div>
+
+        <select [(ngModel)]="selectedProject" (change)="onFilterChange()" class="filter-select" *ngIf="isChartTab">
+          <option value="all">Todos projetos</option>
+          <option *ngFor="let project of projectsList" [value]="project.id">{{ project.name }}</option>
+        </select>
+
+        <input type="date" [(ngModel)]="startDate" (change)="onFilterChange()" class="filter-date" />
+        <span class="date-separator">à</span>
+        <input type="date" [(ngModel)]="endDate" (change)="onFilterChange()" class="filter-date" />
+      </div>
+
+      <div class="tabs">
+        <button
+          class="tab"
+          [class.active]="isChartTab"
+          (click)="switchTab(true)">
+          Gráfico
+        </button>
+        <button
+          class="tab"
+          [class.active]="!isChartTab"
+          (click)="switchTab(false)">
+          Tabela
+        </button>
+      </div>
+
+      <div class="content">
+        <app-pool-graphic
+          *ngIf="isChartTab"
+          [selectedResource]="resourceName"
+          [selectedProject]="selectedProject"
+          [startDate]="startDate"
+          [endDate]="endDate">
+        </app-pool-graphic>
+
+        <div *ngIf="!isChartTab" class="table-container">
+          <app-table
+            #tableComponent
+            [dataRetrievalMethodRef]="this.getDataForTableComponent"
+            [filterButtons]="filterButtons"
+            [filterText]="filterText"
+            [columns]="columns"
+            (actionButtonClick)="showCreateModal = true">
+          </app-table>
+        </div>
+      </div>
+      <app-resources-create
+        *ngIf="showCreateModal"
+        (close)="closeCreateModal()">
+      </app-resources-create>
+    </div>
+
+
+  </div>
+
+  <!-- Form Modal -->
+  <app-form-modal-component
+    [isVisible]="showCreateModal"
+    [config]="createResourcesConfig"
+    (close)="closeCreateModal()"
+    (save)="onSaveProject($event)"
+    (cancel)="closeCreateModal()">
+  </app-form-modal-component>
+
+</div>

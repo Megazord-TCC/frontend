@@ -1,0 +1,44 @@
+<div class="tab-content">
+    <div>
+        <h3>Nível de poder <app-badge [color]="mapToBadgeColor(powerLevel)">{{ powerLevel }}</app-badge></h3>
+        <p class="tab-description">
+            <span class="justification">Justificativa: </span>{{ powerLevelJustification || 'não informada.' }}
+        </p>
+    </div>
+    <div>
+        <h3>Nível de interesse <app-badge [color]="mapToBadgeColor(interestLevel)">{{ interestLevel }}</app-badge></h3>
+        <p class="tab-description">
+            <span class="justification">Justificativa: </span>{{ interestLevelJustification || 'não informada.' }}
+        </p>
+    </div>
+    <div>
+        <h3>Expectativa</h3>
+        <p class="tab-description">
+            {{ expectations || 'Não informado.' }}
+        </p>
+    </div>
+    <div>
+        <h3>Obrigação dos responsáveis com parte</h3>
+        <p class="tab-description">
+            {{ supervisorsObligationWithStakeholder || 'Não informado.' }}
+        </p>
+    </div>
+    <div>
+        <h3>Pontos positivos</h3>
+        <p class="tab-description">
+            {{ positivePoints || 'Não informado.' }}
+        </p>
+    </div>
+    <div>
+        <h3>Pontos negativos</h3>
+        <p class="tab-description">
+            {{ negativePoints || 'Não informado.' }}
+        </p>
+        <button class="action-btn" (click)="showEditModal = true">Editar análise</button>  
+    </div>
+</div>
+
+<app-stakeholder-about-edit-modal *ngIf="showEditModal" 
+    (close)="showEditModal = false"
+    (edit)="fillFormDataByHttpRequest(); showEditModal = false">
+</app-stakeholder-about-edit-modal>

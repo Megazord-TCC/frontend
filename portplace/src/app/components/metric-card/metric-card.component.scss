@@ -1,0 +1,67 @@
+.metric-content {
+    display: flex;
+    align-items: center; // Alinhar no topo
+    gap: 12px; // Espaço maior entre ícone e texto
+
+    .nav-icon {
+        flex-shrink: 0;
+        margin-top: 2px;
+        color: #868686
+    }
+
+    .metric-info-container {
+        display: flex;
+        flex-direction: column;
+        gap: 4px; // Espaço entre título e subtítulo
+        flex-grow: 1;
+        overflow: hidden;
+    }
+
+    .metric-title-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .metric-title {
+        font-size: 14px;
+        font-weight: 500;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-family: 'Roboto', sans-serif;
+        font-weight: 600;
+        color: #000000;
+
+    }
+
+    .metric-indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+
+        // Cores dos indicadores
+        &.indicator-green {
+            background-color: #10b981;
+        }
+
+        &.indicator-red {
+            background-color: #ef4444;
+        }
+
+        &.indicator-yellow {
+            background-color: #f59e0b;
+        }
+    }
+
+    .metric-subtitle {
+        font-size: 12px;
+        color: #868686;
+        margin: 0;
+        text-align: left; // Alinhar à esquerda
+        font-family: 'Roboto', sans-serif;
+        font-weight: 400;
+    }
+}

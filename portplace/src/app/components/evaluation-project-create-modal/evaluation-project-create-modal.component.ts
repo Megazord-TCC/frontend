@@ -4,7 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from '../../environments/environment';
-import { firstValueFrom, forkJoin } from 'rxjs';
+import { firstValueFrom, forkJoin, map } from 'rxjs';
+import { Page } from '../../models/pagination-models';
+import { EvaluationGroup } from '../../interface/carlos-interfaces';
+import { EvaluationGroupApiResponse } from '../../interface/interfacies';
 
 @Component({
   selector: 'app-project-evaluation-create-modal',
@@ -14,7 +17,7 @@ import { firstValueFrom, forkJoin } from 'rxjs';
 })
 export class ProjectEvaluationCreateModal {
   @Input() isVisible = false;
-  @Input() evaluationGroup: any;
+  @Input() evaluationGroup?: EvaluationGroupApiResponse;
 
   @Output() close = new EventEmitter<void>();
   @Output() created = new EventEmitter<void>();
@@ -74,20 +77,20 @@ export class ProjectEvaluationCreateModal {
     }
 
     // Verificar se temos o criteriaGroupId no evaluationGroup
-    if (!this.evaluationGroup?.criteriaGroupId) {
+    if (!this.evaluationGroup?.criteriaGroup.id) {
       console.log('❌ Erro: criteriaGroupId não encontrado no grupo de avaliação');
       this.errorMessage = 'Erro: grupo de critérios não encontrado no grupo de avaliação.';
       return;
     }
 
-    console.log('📋 Criteria Group ID:', this.evaluationGroup.criteriaGroupId);
+    console.log('📋 Criteria Group ID:', this.evaluationGroup.criteriaGroup.id);
 
     try {
       // Buscar critérios do grupo de critérios
-      const criteriaRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups/${this.evaluationGroup.criteriaGroupId}/criteria`;
+      const criteriaRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups/${this.evaluationGroup.criteriaGroup.id}/criteria`;
       console.log('🔍 Buscando critérios na rota:', criteriaRoute);
 
-      const getCriteria$ = this.httpClient.get<any[]>(criteriaRoute);
+      const getCriteria$ = this.httpClient.get<Page<any>>(criteriaRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
       const criteria = await firstValueFrom(getCriteria$);
 
       console.log('✅ Critérios encontrados:', criteria);
@@ -102,12 +105,13 @@ export class ProjectEvaluationCreateModal {
       // Criar uma avaliação para cada critério
       console.log('🚀 Iniciando criação de avaliações...');
       const evaluationPromises = criteria.map((criterion: any, index: number) => {
-        const evaluationRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps/${this.evaluationGroupId}/evaluations`;
+        const evaluationRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroupId}/evaluations`;
         const body = {
-          score: 0,
-          projectId: Number(this.inputProjectSelectedId),
-          criterionId: criterion.id,
-          ahpId: this.evaluationGroupId
+            name: 'Avaliação', // Esse name não serve pra nada, coloquei só pq o backend pede
+            description: this.inputDescription, // Esse description não serve pra nada, coloquei só pq o backend pede. O campo 'description' do form tinha que ser removido.
+            score: 0,
+            projectId: Number(this.inputProjectSelectedId),
+            criterionId: criterion.id,
         };
 
         console.log(`📝 Criando avaliação ${index + 1}/${criteria.length}:`, {
@@ -160,8 +164,8 @@ export class ProjectEvaluationCreateModal {
   }
 
   async isProjectNotAlreadyEvaluated(): Promise<boolean> {
-    let evaluationsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps/${this.evaluationGroupId}/evaluations`;
-    let getAllEvaluations$ = this.httpClient.get<any[]>(evaluationsRoute);
+    let evaluationsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroupId}/evaluations`;
+    let getAllEvaluations$ = this.httpClient.get<Page<any>>(evaluationsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
     let evaluations = await firstValueFrom(getAllEvaluations$);
     let isNotAlreadyEvaluated = !evaluations.some(evaluation => evaluation.projectId == Number(this.inputProjectSelectedId));
 
@@ -173,7 +177,7 @@ export class ProjectEvaluationCreateModal {
   setInputProjectOptions() {
     // Chamada direta para a API de projetos
     let projectsRoute = `${environment.apiUrl}/projects`;
-    let getAllProjects$ = this.httpClient.get<any[]>(projectsRoute);
+    let getAllProjects$ = this.httpClient.get<Page<any>>(projectsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
 
     getAllProjects$.subscribe({
       next: (projects) => {

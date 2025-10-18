@@ -1,36 +1,33 @@
 <div class="login-container">
-  <div class="login-card">
-    <div class="login-header">
-      <h1>PORTPLACE</h1>
-      <p>Sistema de Gestão de Portfólio</p>
+    <div class="login-card">
+        <div class="login-header">
+            <h1>PORTPLACE</h1>
+            <p>Sistema de Gestão de Portfólio</p>
+        </div>
+
+        <div class="login-form">
+            <h2>Entrar na sua conta</h2>
+            <!-- Validation Message -->
+            <div *ngIf="errorMessage" class="validation-error">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>{{ errorMessage }}</span>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input id="email" type="email" [(ngModel)]="email" placeholder="Digite seu email">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input id="password" type="password" [(ngModel)]="password" placeholder="Digite sua senha">
+            </div>
+
+            <button class="login-btn" (click)="onLogin()">Entrar</button>
+
+            <div class="forgot-password">
+                Não possui conta ou esqueceu a senha? Entre em contato com o administrador.
+            </div>
+        </div>
     </div>
-
-    <div class="login-form">
-      <h2>Entrar na sua conta</h2>
-
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          [(ngModel)]="email"
-          placeholder="Digite seu email">
-      </div>
-
-      <div class="form-group">
-        <label for="password">Senha</label>
-        <input
-          id="password"
-          type="password"
-          [(ngModel)]="password"
-          placeholder="Digite sua senha">
-      </div>
-
-      <button class="login-btn" (click)="onLogin()">Entrar</button>
-
-      <div class="forgot-password">
-        <button class="link-btn">Esqueceu sua senha?</button>
-      </div>
-    </div>
-  </div>
 </div>

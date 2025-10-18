@@ -1,0 +1,129 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)" (mousedown)="onOverlayMouseDown($event)">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header">
+            <h2>Autorizar cenário</h2>
+            <button class="close-btn" (click)="onClose()">
+                <i class="icon-x">✕</i>
+            </button>
+        </div>
+
+        <!-- Painel de carregamento -->
+        <div *ngIf="currentModalPage == 'loading'" class="modal-body">
+            <!-- Validation Message -->
+            <div *ngIf="errorMessage" class="validation-error">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>{{ errorMessage }}</span>
+            </div>
+        </div>
+
+        <!-- Painel que informa que não há projetos incluídos -->
+        <div *ngIf="currentModalPage == 'inclusionWarning'" class="modal-body">
+            <!-- Validation Message -->
+            <div class="validation-error">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>Não há projetos incluídos</span>
+            </div>
+
+            <p>Inclua pelo menos um projeto pela coluna <i>Inclusão</i>.</p>
+        </div>
+
+        <!-- Painel que informa que nem todos projetos tem categoria -->
+        <div *ngIf="currentModalPage == 'categoryWarning'" class="modal-body">
+            <!-- Validation Message -->
+            <div class="validation-error">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>Há projetos sem categoria</span>
+            </div>
+
+            <p>
+                Os projetos abaixo foram incluídos, mas não possuem categoria:
+            </p>
+
+            <ul>
+                <li *ngFor="let project of getIncludedProjectsWithoutCategory()">
+                    {{ project.name }}
+                </li>
+            </ul>
+
+            Você deverá selecionar uma categoria para cada um deles pela coluna <i>Categoria</i>.
+        </div>
+
+        <!-- Painel que informa os projetos incluídos no cenário -->
+        <div *ngIf="currentModalPage == 'includedProjects'" class="modal-body">
+            <!-- Validation Message -->
+            <div *ngIf="errorMessage" class="validation-error">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>{{ errorMessage }}</span>
+            </div>
+
+            <p>
+                Ao autorizar o cenário <b>{{ scenario?.name ?? '...' }}</b>, 
+                o portfólio <b>{{ scenario?.portfolio?.name ?? '...' }}</b> passará a conter os seguintes projetos:
+            </p>
+
+            <ul>
+                <li *ngFor="let project of getIncludedProjects()">
+                    {{ project.name }}
+                </li>
+            </ul>
+
+            O status desses projetos passará a ser <i>Em andamento</i>.
+        </div>
+
+        <!-- Painel que informa os projetos a serem excluídos do portfólio -->
+        <div *ngIf="currentModalPage == 'projectsToExclude'" class="modal-body">
+            <!-- Validation Message -->
+            <div *ngIf="errorMessage" class="validation-error">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>{{ errorMessage }}</span>
+            </div>
+
+            <p>
+                O portfólio <b>{{ scenario?.portfolio?.name ?? '...' }}</b> continha os seguintes projetos, 
+                mas eles não foram incluídos no cenário atual:
+            </p>
+
+            <ul>
+                <li *ngFor="let project of projectsInPortfolioNotIncludedInScenario">
+                    {{ project.name }}
+                </li>
+            </ul>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="agreeWithRemoval" [(ngModel)]="agreeWithProjectRemoval" (change)="agreeWithProjectCheckboxChange()"/>
+                <label for="agreeWithRemoval">Concordo com a <span>remoção dos projetos</span> acima do portfólio indicado.</label>
+            </div>
+        </div>
+
+        <!-- Painel que informa que os projetos incluídos no cenário estão acima do orçamento do cenário -->
+        <div *ngIf="currentModalPage == 'overbudgetWarning'" class="modal-body">
+            <!-- Alert Message -->
+            <div *ngIf="!errorMessage" class="alert-message">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>O orçamento disponível foi ultrapassado.</span>
+            </div>
+
+            <!-- Validation Message -->
+            <div *ngIf="errorMessage" class="validation-error">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>{{ errorMessage }}</span>
+            </div>
+
+            <p>Orçamento disponível: <b>R$ {{  getScenarioBudgetFormattedToBRL() }}</b></p>
+            <p>Orçamento total dos projetos incluídos: <b>R$ {{  getTotalIncludedProjectsBudgetFormattedToBRL() }}</b></p>
+            <p>Diferença: <b class="budget-diff">R$ {{  getDiffBetweenScenarioBudgetAndIncludedProjectsBudget() }}</b></p>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="agreeWithOverbudget" [(ngModel)]="agreeWithOverbudget" (change)="agreeWithOverbudgetCheckboxChange()"/>
+                <label for="agreeWithOverbudget">Tenho ciência que o orçamento é insuficiente.</label>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button *ngIf="isCancelButtonVisible" class="btn-outline" (click)="onClose()">Cancelar</button>
+            <button class="btn-primary" (click)="onConfirmButtonClick()" [disabled]="isSubmitButtonDisabled">{{ confirmButtonLabel }}</button>
+        </div>
+    </div>
+</div>

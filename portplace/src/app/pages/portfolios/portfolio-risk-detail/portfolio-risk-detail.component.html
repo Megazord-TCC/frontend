@@ -1,0 +1,13 @@
+<div class="strategy-detail-layout">
+
+    <div class="strategy-detail-content">
+        <app-portfolio-risk-detail-header></app-portfolio-risk-detail-header>
+
+        <app-portfolio-risk-detail-tab-buttons (change)="activeTab = $event"></app-portfolio-risk-detail-tab-buttons>
+
+        <app-portfolio-risk-detail-analysis-tab *ngIf="activeTab == 'analysis'"></app-portfolio-risk-detail-analysis-tab>
+        <app-portfolio-risk-detail-occurrences-tab *ngIf="activeTab == 'occurrences'"
+            (change)="headerComponent?.loadRiskAndPortfolioDetails(); tabButtonsComponent?.reloadOccurrenceNotSolvedCount();">
+        </app-portfolio-risk-detail-occurrences-tab>
+    </div>
+</div>

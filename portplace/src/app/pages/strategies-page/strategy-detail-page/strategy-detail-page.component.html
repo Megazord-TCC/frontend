@@ -14,32 +14,28 @@
             [size]="18">
           </app-svg-icon>
         </button>
-        <h1>{{strategy?.name}}</h1>
-        <app-badge color="green">{{strategy?.status}}</app-badge>
+        <h1>{{strategy.name}}</h1>
+        <app-badge [color]="getStrategyStatusColor(strategy.status)">{{getStrategyStatusLabel(strategy.status)}}</app-badge>
       </div>
-      <p class="strategy-description">{{strategy?.description}}</p>
+      <p class="strategy-description">{{strategy.description}}</p>
       <div class="action-header">
         <div class="action-buttons">
           <button class="action-btn" (click)="editStrategy()">
-
             Editar
           </button>
-          <button class="action-btn cancel" (click)="cancelStrategy()">
-
+          <button class="action-btn cancel" (click)="cancelStrategy()" *ngIf="!isInactive()">
             Cancelar
           </button>
-          <button class="action-btn delete" (click)="deleteStrategy()">
-
+          <button class="action-btn delete" (click)="deleteStrategy()" *ngIf="!isInactive()">
             Excluir
           </button>
+          <button class="action-btn" (click)="onActivateStrategy()" *ngIf="isInactive()">
+            Ativar estratégia
+          </button>
         </div>
-
-        <!-- <div class="last-update">
-            Última alteração realizada em {{strategy?.lastModifiedAt | date: 'dd/MM/yyyy HH:mm'}}.
-        </div> -->
-        <div class="last-update">
-            Última alteração realizada em {{strategy?.lastUpdate | date: 'dd/MM/yyyy HH:mm'}}.
-        </div>
+      <div class="last-update">
+        Última alteração realizada em {{ strategy.lastModifiedAt ? (parseDateString(strategy.lastModifiedAt) | date: 'dd/MM/yyyy HH:mm') : '' }}.
+      </div>
       </div>
     </div>
 
@@ -106,146 +102,17 @@
             Cadastre os objetivos desta estratégia, os quais são utilizados como base para os critérios de avaliação.
             Somente uma estratégia pode estar ativa, a qual tem efeito apenas para fins de organização.
           </p>
-
-          <!-- Filters -->
-          <div class="objectives-filters">
-            <div class="filter-label">
-              <app-svg-icon
-                class="nav-icon"
-                [path]="'assets/icon/filter_vetor.svg'"
-                [size]="18">
-              </app-svg-icon>
-              <span>Filtros:</span>
-            </div>
-            <div class="filter-buttons">
-              <button
-                class="filter-btn"
-                [class.active]="objectiveFilter === 'ativado'"
-                (click)="onObjectiveFilterChange('ativado')">
-                <div class="filter-indicator blue"></div>
-                Ativado
-              </button>
-              <button
-                class="filter-btn"
-                [class.active]="objectiveFilter === 'cancelado'"
-                (click)="onObjectiveFilterChange('cancelado')">
-                <div class="filter-indicator blue"></div>
-                Cancelado
-              </button>
-            </div>
-          </div>
-
-          <!-- Actions -->
-          <div class="actions-right">
-            <button class="btn-primary" (click)="openCreateModal()">
-              <i class="icon-plus">+</i>
-              Cadastrar
-            </button>
-            <div class="search-container">
-
-              <app-svg-icon
-                class="nav-icon"
-                [path]="'assets/icon/search_vetor.svg'"
-                [size]="18">
-              </app-svg-icon>
-              <input
-                type="text"
-                placeholder="Buscar pelo nome do projeto"
-                [(ngModel)]="searchTerm"
-                (input)="onSearchChange()">
-            </div>
-          </div>
-
-          <!-- Objectives Table -->
-          <app-card class="table-card">
-            <div class="table-container">
-              <table class="objectives-table">
-                <thead>
-                  <tr>
-                    <th>
-                      <div class="header-cell">
-                        Nome do objetivo
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Critérios vinculados
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Portfólios ativos vinculados
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Projetos ativos vinculados
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Status
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let objective of filteredObjectives" class="table-row">
-                    <td>
-                      <button class="link" (click)="openObjectiveModal(objective)">
-                        {{objective.name}}
-                      </button>
-                    </td>
-                    <td>{{objective.linkedCriteria}}</td>
-                    <td>{{objective.activePortfolios}}</td>
-                    <td>{{objective.activeProjects}}</td>
-                    <td>
-                      <app-badge [color]="objective.statusColor">{{objective.status}}</app-badge>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </app-card>
-          <!--
-            <div class="pagination">
-              <p class="pagination-info">Mostrando 1 a {{filteredObjectives.length}} de {{filteredObjectives.length}} registros</p>
-              <div class="pagination-controls">
-                <button class="pagination-btn" disabled>
-                  <i class="icon-chevron-left">‹</i>
-                </button>
-                <button class="pagination-btn active">1</button>
-                <button class="pagination-btn" disabled>
-                  <i class="icon-chevron-right">›</i>
-                </button>
-              </div>
-            </div>
-            -->
+          <app-table
+            #objectivesTableComponent
+           *ngIf="strategy.id"
+            [dataRetrievalMethodRef]="getDataForObjetivesTable"
+            [filterButtons]="objectivesFilterButtons"
+            [filterText]="objectivesFilterText"
+            [columns]="objectivesColumns"
+            [actionButton]="objectivesActionButton"
+            (actionButtonClick)="openCreateModal()"
+            (mainColumnRowClick)="openObjectiveModal($event.id)">
+          </app-table>
           </div>
 
         <!-- Grupos de Critérios Tab -->
@@ -254,248 +121,26 @@
           <p class="tab-description">
             Cadastre grupos de critérios a partir de objetivos estratégicos. Esses critérios são utilizados para gerar avaliações.
           </p>
-
-          <!-- Actions -->
-          <div class="actions-right">
-            <button class="btn-primary" (click)="openCreateModal()">
-              <i class="icon-plus">+</i>
-              Cadastrar
-            </button>
-            <div class="search-container">
-
-              <app-svg-icon
-                class="nav-icon"
-                [path]="'assets/icon/search_vetor.svg'"
-                [size]="18">
-              </app-svg-icon>
-              <input
-                type="text"
-                placeholder="Buscar pelo nome do projeto"
-                [(ngModel)]="searchTerm"
-                (input)="onSearchChange()">
-            </div>
-          </div>
-
           <!-- Criteria Groups Table -->
-          <app-card class="table-card">
-            <div class="table-container">
-              <div class="div-loading-projetcts" *ngIf="loadingProjects">Carregando grupo de critério...</div>
-              <table class="criteria-table" *ngIf="!loadingProjects">
-                <thead>
-                  <tr>
-                    <th>
-                      <div class="header-cell">
-                        Nome do grupo de critério
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Objetivos vinculados
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Avaliações realizadas
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Status
-                        <app-svg-icon
-                          class="nav-icon"
-                          [path]="'assets/icon/sort-alt.svg'"
-                          [size]="18">
-                        </app-svg-icon>
-                      </div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
+          <app-table
+            #criteriaTableComponent
+            *ngIf="strategy.id"
+            [dataRetrievalMethodRef]="getDataForCriteriaGroupsTable"
+            [filterButtons]="criteriaFilterButtons"
+            [filterText]="criteriaFilterText"
+            [columns]="criteriaColumns"
+            [actionButton]="criteriaActionButton"
+            (actionButtonClick)="openCreateModal()"
+            (mainColumnRowClick)="openCriteriaGroup($event)">
+          </app-table>
 
-
-
-                    <tr *ngFor="let criteria of filteredCriteriaGroups" class="table-row">
-                      <td>
-                        <button class="link" (click)="openCriteriaGroup(criteria.id)">
-                          {{criteria.name}}
-                        </button>
-                      </td>
-                      <td>2 de 2</td>
-                      <td>{{getAvalicoesCoutntPorId(criteria.id!)}}</td>
-                      <td class="status-cell">
-                        <app-badge [color]="getStatusColorByDisabled(criteria.disabled)">{{getStatusLabelByDisabled(criteria.disabled)}}</app-badge>
-                      </td>
-                    </tr>
-
-                </tbody>
-              </table>
-            </div>
-          </app-card>
-
-          <!-- Pagination
-          <div class="pagination">
-            <p class="pagination-info">Mostrando 1 a {{filteredCriteriaGroups.length}} de {{filteredCriteriaGroups.length}} registros</p>
-            <div class="pagination-controls">
-              <button class="pagination-btn" disabled>
-                <i class="icon-chevron-left">‹</i>
-              </button>
-              <button class="pagination-btn active">1</button>
-              <button class="pagination-btn" disabled>
-                <i class="icon-chevron-right">›</i>
-              </button>
-            </div>
-          </div>
-          -->
         </div>
 
         <!-- Grupos de Avaliações Tab -->
-        <app-evaluation-groups-tab *ngIf="activeTab === 'avaliacoes'" class="tab-panel"></app-evaluation-groups-tab>
+        <app-evaluation-groups-tab *ngIf="activeTab === 'avaliacoes'"></app-evaluation-groups-tab>
 
         <!-- Cenários Tab -->
-        <div *ngIf="activeTab === 'cenarios'" class="tab-panel">
-          <h3>Cenários de avaliação</h3>
-          <p class="tab-description">
-            Cadastre cenários de avaliação para vincular projetos a um portfólio. Durante esse processo é realizado o balanceamento.
-          </p>
-
-          <!-- Filters -->
-          <div class="scenarios-filters">
-            <div class="filter-label">
-              <i class="icon-filter">🔽</i>
-              <span>Filtros:</span>
-            </div>
-            <div class="filter-buttons">
-              <button
-                class="filter-btn"
-                [class.active]="scenarioFilter === 'aguardando'"
-                (click)="onScenarioFilterChange('aguardando')">
-                <div class="filter-indicator blue"></div>
-                Aguardando autorização
-              </button>
-              <button
-                class="filter-btn"
-                [class.active]="scenarioFilter === 'autorizado'"
-                (click)="onScenarioFilterChange('autorizado')">
-                <div class="filter-indicator blue"></div>
-                Autorizado
-              </button>
-              <button
-                class="filter-btn"
-                [class.active]="scenarioFilter === 'cancelado'"
-                (click)="onScenarioFilterChange('cancelado')">
-                <div class="filter-indicator blue"></div>
-                Cancelado
-              </button>
-            </div>
-          </div>
-
-          <!-- Actions -->
-          <div class="actions-right">
-            <button class="btn-primary" (click)="openCreateModal()">
-              <i class="icon-plus">+</i>
-              Cadastrar
-            </button>
-            <div class="search-container">
-
-              <app-svg-icon
-                class="nav-icon"
-                [path]="'assets/icon/search_vetor.svg'"
-                [size]="18">
-              </app-svg-icon>
-              <input
-                type="text"
-                placeholder="Buscar pelo nome do projeto"
-                [(ngModel)]="searchTerm"
-                (input)="onSearchChange()">
-            </div>
-          </div>
-
-          <!-- Scenarios Table -->
-          <app-card class="table-card">
-            <div class="table-container">
-              <table class="scenarios-table">
-                <thead>
-                  <tr>
-                    <th>
-                      <div class="header-cell">
-                        Nome do cenário
-                        <i class="icon-sort">↕️</i>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Orçamento
-                        <i class="icon-sort">↕️</i>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Avaliação
-                        <i class="icon-sort">↕️</i>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Projetos selecionados
-                        <i class="icon-sort">↕️</i>
-                      </div>
-                    </th>
-                    <th>
-                      <div class="header-cell">
-                        Status
-                        <i class="icon-sort">↕️</i>
-                      </div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let scenario of filteredScenarios" class="table-row">
-                    <td>
-                      <button class="scenario-link" (click)="openScenarioModal(scenario)">
-                        {{scenario.name}}
-                      </button>
-                    </td>
-                    <td>{{scenario.budget}}</td>
-                    <td>{{scenario.evaluation}}</td>
-                    <td>{{scenario.selectedProjects}}</td>
-                    <td>
-                      <app-badge [color]="scenario.statusColor">{{scenario.status}}</app-badge>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </app-card>
-
-          <!-- Pagination -->
-          <div class="pagination">
-            <p class="pagination-info">Mostrando 1 a {{filteredScenarios.length}} de {{filteredScenarios.length}} registros</p>
-            <div class="pagination-controls">
-              <button class="pagination-btn" disabled>
-                <i class="icon-chevron-left">‹</i>
-              </button>
-              <button class="pagination-btn active">1</button>
-              <button class="pagination-btn" disabled>
-                <i class="icon-chevron-right">›</i>
-              </button>
-            </div>
-          </div>
-        </div>
+        <app-scenario-tab *ngIf="activeTab === 'cenarios'"></app-scenario-tab>
       </div>
     </div>
   </div>
@@ -505,5 +150,23 @@
     (close)="closeCreateModal()"
     (save)="onSaveByActiveTab($event)"
     (cancel)="closeCreateModal()">
-</app-form-modal-component>
+  </app-form-modal-component>
+
+  <!-- Modal de Edição -->
+  <app-form-modal-component
+    [isVisible]="showEditModal"
+    [config]="editStrategyConfig"
+    (close)="closeEditModal()"
+    (save)="onSaveStrategyEdit($event)"
+    (cancel)="closeEditModal()">
+  </app-form-modal-component>
+
+  <!-- Modal de Cancelamento -->
+  <app-form-modal-component
+    [isVisible]="showCancelModal"
+    [config]="cancelStrategyConfig"
+    (close)="closeCancelModal()"
+    (save)="onCancelStrategy($event)"
+    (cancel)="closeCancelModal()">
+  </app-form-modal-component>
 </div>

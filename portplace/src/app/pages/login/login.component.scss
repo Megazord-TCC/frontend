@@ -1,3 +1,5 @@
+$danger-color: #ef4444;
+
 .login-container {
   min-height: 100vh;
   background-color: #f8fafc;
@@ -60,6 +62,7 @@
   border: 1px solid #e2e8f0;
   border-radius: 6px;
   font-size: 14px;
+  box-sizing: border-box;
 }
 
 .form-group input:focus {
@@ -87,7 +90,8 @@
 }
 
 .forgot-password {
-  text-align: center;
+  color: gray;
+  font-size: 12px;
 }
 
 .link-btn {
@@ -101,4 +105,39 @@
 
 .link-btn:hover {
   color: #1e40af;
+}
+
+// Validation Error
+.validation-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  animation: errorSlideIn 0.3s ease-out;
+  margin-bottom: 24px;
+
+  @keyframes errorSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  i {
+    color: $danger-color;
+    font-size: 16px;
+  }
+
+  span {
+    font-size: 14px;
+    color: #dc2626;
+    font-weight: 500;
+  }
 }

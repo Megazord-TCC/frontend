@@ -1,0 +1,14 @@
+<app-breadcrumb></app-breadcrumb>
+
+<app-page-header [title]="name" [description]="description" [goBackButtonPathToNavigate]="goBackButtonPathToNavigate"
+    [visibleActionButtons]="visibleActionButtons" [lastUpdate]="lastUpdate"
+    (editClick)="isEditModalVisible = true" (deleteClick)="isDeleteModalVisible = true">
+</app-page-header>
+
+<app-risk-edit-modal *ngIf="isEditModalVisible" [portfolioId]="portfolioId" [riskId]="riskId"
+    (close)="isEditModalVisible = false"
+    (edit)="this.loadRiskAndPortfolioDetails(); isEditModalVisible = false">
+</app-risk-edit-modal>
+
+<app-risk-delete-modal *ngIf="isDeleteModalVisible" (close)="isDeleteModalVisible = false">
+</app-risk-delete-modal>

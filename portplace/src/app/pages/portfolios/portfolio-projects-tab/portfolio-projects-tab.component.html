@@ -1,0 +1,17 @@
+<div class="tab-panel">
+    <h3>Projetos do portfólio</h3>
+    <ng-container *ngIf="doesNotHaveProjects; else showProjectsTable">
+        <p>O portfólio não possui projetos.</p>
+        <p class="tab-description">Para realizar esse vínculo: crie um cenário, autorize-o e selecione o portfólio atual.</p>
+    </ng-container>
+
+    <ng-template #showProjectsTable>
+        <p class="tab-description">
+            Confira os projetos que fazem parte deste portfólio, incluídos pelo cenário <b>{{ scenarioName }}</b>.
+        </p>
+        <app-table [dataRetrievalMethodRef]="this.getDataForTableComponent"
+            [filterText]="filterText" [filterButtons]="filterButtons" [columns]="columns"
+            (mainColumnRowClick)="navigateToProjectDetailPage($event.id)">
+        </app-table>
+    </ng-template>
+</div>

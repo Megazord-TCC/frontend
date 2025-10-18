@@ -5,6 +5,7 @@ $text-secondary: #64748b;
 $border-color: #e2e8f0;
 $primary-color: #1e293b;
 $blue-color: #3b82f6;
+$danger-color: #f44336;
 
 .strategy-detail-layout {
   display: flex;
@@ -26,9 +27,7 @@ $blue-color: #3b82f6;
   margin-bottom: 1.5rem;
   font-size: 0.875rem;
   color: $text-secondary;
-
   text-decoration: none;
-
 
   .separator {
     color: #9ca3af;
@@ -119,8 +118,8 @@ $blue-color: #3b82f6;
       }
 
       &.delete {
-        border-color: #f44336;
-        color: #f44336;
+        border-color: $danger-color;
+        color: $danger-color;
 
         &:hover {
           background-color: rgba(244, 67, 54, 0.05);
@@ -229,9 +228,9 @@ $blue-color: #3b82f6;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 447px;
+    width: 580px;
     height: 44px;
-    background: #e5e5e5; // fundo escuro conforme a imagem
+    background: #e5e5e5;
     border-radius: 0.5rem;
     overflow-x: auto;
     margin-bottom: 1.5rem;
@@ -242,13 +241,13 @@ $blue-color: #3b82f6;
       gap: 0.5rem;
       background: transparent;
       border: none;
-      padding: 0.5rem 1rem; // padding um pouco menor
+      padding: 0.5rem 0.8rem;
       cursor: pointer;
       font-size: 0.875rem;
       font-weight: 500;
-      color: #000; // texto preto
+      color: #000;
       white-space: nowrap;
-      border-radius: 0.25rem; // cantos suaves para todos
+      border-radius: 0.25rem;
 
       &:hover {
         background: rgba(255, 255, 255, 0.3);
@@ -256,8 +255,8 @@ $blue-color: #3b82f6;
 
       &.active {
         background: #ffffff;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); // leve sombra para realce
-        border-radius: 0.5rem; // cantos mais arredondados para destaque
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        border-radius: 0.5rem;
         color: #000;
         height: 34px;
         justify-content: center;
@@ -269,13 +268,13 @@ $blue-color: #3b82f6;
     }
   }
 
-
   .tab-content {
     background: white;
     border: 1px solid #e2e8f0;
     border-radius: 0 0 0.75rem 0.75rem;
     min-height: 400px;
-    .div-loading-projetcts{
+
+    .div-loading-projetcts {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -284,6 +283,7 @@ $blue-color: #3b82f6;
   }
 }
 
+// TABELAS PADRONIZADAS - Aplicado para ambas as abas
 .table-container {
   display: flex;
   flex-direction: column;
@@ -295,7 +295,7 @@ $blue-color: #3b82f6;
 }
 
 .table-header {
-  background-color: $background-color;
+  background-color: #f9fafb;
   border-bottom: 1px solid $border-color;
   position: sticky;
   top: 0;
@@ -307,12 +307,18 @@ $blue-color: #3b82f6;
 
     .header-cell {
       flex: 1;
-      padding: 1rem;
+      padding: 12px 16px;
       text-align: left;
-      font-size: 0.875rem;
+      font-size: 0.75rem;
       font-weight: 500;
-      color: $text-secondary;
-      min-width: 150px; // Largura mínima para cada coluna
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-right: 1px solid $border-color;
+
+      &:last-child {
+        border-right: none;
+      }
 
       .header-content {
         display: flex;
@@ -329,8 +335,9 @@ $blue-color: #3b82f6;
   flex-direction: column;
   overflow-y: auto;
   max-height: none;
-  min-height: 400px;
+  min-height: 200px;
   flex-grow: 1;
+
   .table-row {
     display: flex;
     width: 100%;
@@ -342,50 +349,80 @@ $blue-color: #3b82f6;
     }
 
     &:hover {
-      background-color: lighten($background-color, 2%);
+      background-color: #f8fafc;
     }
 
     .table-cell {
       flex: 1;
-      padding: 12px 16px;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
       font-size: 0.875rem;
-      color: $text-secondary;
+      color: $text-primary;
       font-family: 'Roboto', sans-serif;
-      font-weight: 500;
+      font-weight: 400;
       overflow: visible;
       position: relative;
-      min-width: 150px; // Deve corresponder ao header-cell
       display: flex;
       align-items: center;
+      line-height: 1.5;
 
-      &:first-child, &:last-child {
-        white-space: nowrap;
+      &:last-child {
+        border-right: none;
+      }
+
+      // Estilos para links clicáveis (usado na aba recíprocas)
+      .criteria-link {
+        color: $blue-color;
+        cursor: pointer;
+        text-decoration: underline;
+        transition: color 0.2s;
+        font-weight: 500;
+
+        &:hover {
+          color: $text-primary;
+          text-decoration: none;
+        }
+      }
+
+      // Estilos para texto de comparação (usado na aba recíprocas)
+      .comparison-text {
+        font-weight: 500;
+
+        &.not-evaluated {
+          color: #f59e0b;
+          font-style: italic;
+        }
+
+        &.evaluated {
+          color: $text-primary;
+        }
       }
     }
   }
-}
 
-
-// Responsive
-@media (max-width: 768px) {
-  .strategy-detail-content {
-    padding: 1rem;
+  // Estados de loading e vazio (aplicado para ambas as abas)
+  .loading-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+    color: $text-secondary;
+    font-family: 'Roboto', sans-serif;
   }
 
-  .action-buttons {
-    flex-wrap: wrap;
-  }
-
-  .actions-right {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: stretch;
-
-    .search-container {
-      width: 100%;
-    }
+  .empty-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+    color: $text-secondary;
+    font-family: 'Roboto', sans-serif;
+    text-align: center;
   }
 }
+
+// Select customizado (usado na aba diretas)
 .custom-select-wrapper {
   position: relative;
   width: 100%;
@@ -404,7 +441,6 @@ $blue-color: #3b82f6;
     -moz-appearance: none;
     outline: none;
 
-    // Placeholder styling
     &:invalid {
       color: $text-secondary;
       opacity: 0.7;
@@ -414,7 +450,6 @@ $blue-color: #3b82f6;
       outline: none;
     }
 
-    // Option styling
     option {
       background: white;
       color: $text-primary;
@@ -454,7 +489,112 @@ $blue-color: #3b82f6;
   }
 }
 
-// Animação quando o select está focado
 .custom-select:focus + .custom-arrow {
   transform: translateY(-50%) rotate(180deg);
+}
+
+// ESTILOS ESPECÍFICOS DA ABA OBJETIVOS
+.objectives-content {
+  .loading-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+    color: $text-secondary;
+    font-family: 'Roboto', sans-serif;
+  }
+
+  .empty-objectives {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+    color: $text-secondary;
+    font-family: 'Roboto', sans-serif;
+    text-align: center;
+    font-style: italic;
+  }
+
+  .objectives-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    .objective-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: $card-background;
+      border: 1px solid $border-color;
+      border-radius: 0.5rem;
+      transition: all 0.2s;
+
+      &:hover {
+        border-color: darken($border-color, 10%);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .objective-content {
+        flex: 1;
+
+        .objective-name {
+          font-size: 0.875rem;
+          color: $text-primary;
+          font-weight: 500;
+          font-family: 'Roboto', sans-serif;
+        }
+      }
+
+      .remove-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        background: transparent;
+        border: 1px solid $danger-color;
+        border-radius: 0.25rem;
+        color: $danger-color;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+          background-color: $danger-color;
+          color: white;
+        }
+
+        .nav-icon {
+          width: 16px;
+          height: 16px;
+        }
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .strategy-detail-content {
+    padding: 1rem;
+  }
+
+  .action-buttons {
+    flex-wrap: wrap;
+  }
+
+  .actions-right {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+
+    .search-container {
+      width: 100%;
+    }
+  }
+
+  .tabs-container .tabs-list {
+    width: 100%;
+    overflow-x: auto;
+  }
 }

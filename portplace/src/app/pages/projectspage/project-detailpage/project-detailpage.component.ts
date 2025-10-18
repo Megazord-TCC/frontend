@@ -1,16 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BadgeComponent } from "../../../components/badge/badge.component";
 import { FormsModule } from '@angular/forms';
-import { Evaluation, FormField, FormModalConfig, Indicator, Objective, Objectives, Project, ProjectStatusEnum } from '../../../interface/interfacies';
+import { FormField, FormModalConfig, Objectives, Project, ProjectRanking, ProjectStatusEnum } from '../../../interface/interfacies';
+import { mapProjectDtoToProject } from '../../../mappers/projects-mappers';
 import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.component';
 import { ProjetoService } from '../../../service/projeto.service';
 import { retry } from 'rxjs';
 import { FormModalComponentComponent } from '../../../components/form-modal-component/form-modal-component.component';
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../../service/breadcrumb.service';
-
+import { environment } from '../../../environments/environment';
+import { HttpClient } from '@angular/common/http';
 
 
 @Component({
@@ -22,73 +24,23 @@ import { BreadcrumbService } from '../../../service/breadcrumb.service';
     SvgIconComponent,
     BreadcrumbComponent,
     FormModalComponentComponent
-  ],
+],
   templateUrl: './project-detailpage.component.html',
   styleUrl: './project-detailpage.component.scss'
 })
 export class ProjectDetailpageComponent implements OnInit {
-  showEditModal = false;
-  project: any = {
-    id: '1',
-    name: 'Projeto 1',
-    status: 'EM ANÁLISE',
-    statusColor: 'yellow',
-    description: 'Descrição do projeto 1.',
-    startDate: '01/01/2000',
-    endDate: '02/01/2000',
-    lastUpdate: 'Última alteração realizada por Carlos Krefer em 01/01/2025 13:30.'
-  };
+  formTouched = false;
+  project: Project | null = null;
 
-  indicators: Indicator[] = [
-    {
-      id: '1',
-      label: 'Valor Agregado (EV)',
-      value: 'R$ 1.600.000,00',
-      lastUpdate: 'Última alteração realizada em 01/01/2025 13:30'
-    },
-    {
-      id: '2',
-      label: 'Valor Planejado (PV)',
-      value: 'R$ 1.600.000,00',
-      lastUpdate: 'Última alteração realizada em 01/01/2025 13:30'
-    },
-    {
-      id: '3',
-      label: 'Retorno no Investimento (ROI)',
-      value: '3',
-      lastUpdate: 'Última alteração realizada em 01/01/2025 13:30'
-    },
-    {
-      id: '4',
-      label: 'Valor Presente Líquido (VPL)',
-      value: '3',
-      lastUpdate: 'Última alteração realizada em 01/01/2025 13:30'
-    },
-    {
-      id: '5',
-      label: 'Payback (anos)',
-      value: '3',
-      lastUpdate: 'Última alteração realizada em 01/01/2025 13:30'
-    },
-    {
-      id: '6',
-      label: 'Índice de Performance de Custo (CPI)',
-      value: '3',
-      lastUpdate: 'Última alteração realizada em 01/01/2025 13:30'
-    },
-    {
-      id: '7',
-      label: 'Índice de Desemp. de Cronograma (SPI)',
-      value: '3',
-      lastUpdate: 'Última alteração realizada em 01/01/2025 13:30'
-    },
-    {
-      id: '8',
-      label: 'Estimativa de Conclusão (ETC)',
-      value: 'R$ 10,00',
-      lastUpdate: 'Última alteração realizada em 01/01/2025 13:30'
-    }
-  ];
+
+  earnedValue: number = 0;
+  plannedValue: number = 0;
+  actualCost: number = 0;
+  budgetAtCompletion: number = 0;
+  payback: number = 0;
+  roi: number = 0;
+  startDate: string = '';
+  endDate: string = '';
 
   objectives: Objectives[] = [
     { id: '1', name: 'Nome do objetivo 1' },
@@ -96,25 +48,36 @@ export class ProjectDetailpageComponent implements OnInit {
     { id: '3', name: 'Nome do objetivo 3' }
   ];
 
-  // evaluations: Evaluation[] = [
-  //   { id: 1, name: 'Nome do critério 1', weight: 30, value: 700 },
-  //   { id: 2, name: 'Nome do critério 2', weight: 20, value: 700 },
-  //   { id: 3, name: 'Nome do critério 3', weight: 50, value: 700 }
-  // ];
   newProject: Project = {
+    id: 0,
     name: '',
     description: '',
-    portfolio: undefined  ,
+    status: ProjectStatusEnum.IN_ANALYSIS,
+    payback: 0,
+    roi: 0,
     startDate: '',
     endDate: '',
-    status: ProjectStatusEnum.CANDIDATE,
-    projectManager: 1,
-    earnedValue: 0,
     plannedValue: 0,
+    earnedValue: 0,
     actualCost: 0,
-    budget: 0,
-    payback: 0
+    budgetAtCompletion: 0,
+    percentComplete: 0,
+    costPerformanceIndex: 0,
+    schedulePerformanceIndex: 0,
+    estimateAtCompletion: 0,
+    estimateToComplete: 0,
+    portfolioCategory: undefined,
+    portfolioName: '',
+    strategyName: '',
+    scenarioRankingScore: 0,
+    priorityInPortfolio: 0,
+    strategicObjectives: [],
+    evaluations: [],
+    createdAt: '',
+    lastModifiedAt: '',
+    disabled: false
   };
+
   editPortfolioConfig: FormModalConfig = {
     title: 'Editar portfólio',
     fields: [
@@ -138,9 +101,31 @@ export class ProjectDetailpageComponent implements OnInit {
     ],
     validationMessage: 'Os campos marcados com * são obrigatórios.'
   };
-  Projects: Project[] = [];
-  allProjects: Project[] =[];
+
+  cancelProjectConfig: FormModalConfig = {
+    title: 'Cancelar projeto',
+    fields: [
+      {
+        id: 'reason',
+        label: 'Justificativa do cancelamento',
+        type: 'textarea',
+        value: '',
+        required: true,
+        placeholder: 'Digite o motivo do cancelamento...',
+        rows: 4
+      }
+    ],
+    validationMessage: 'A justificativa do cancelamento é obrigatória.'
+  };
+
   activeTab = 'indicadores';
+  showCancelModal = false;
+  showEditModal = false;
+  strategyId = -1;
+  projectRankings: any;
+  httpClient = inject(HttpClient);
+  evaluationGroupId = -1;
+
 
   constructor(
     private route: ActivatedRoute,
@@ -150,28 +135,183 @@ export class ProjectDetailpageComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Este é um componente filho, não precisa configurar breadcrumbs base
-    // Os breadcrumbs base já foram definidos pelo componente pai (/projetos)
-
     const projectIdParam = this.route.snapshot.paramMap.get('id');
+    this.strategyId = Number(this.route.snapshot.paramMap.get('estrategiaId'));
+    this.evaluationGroupId = Number(this.route.snapshot.paramMap.get('grupoAvaliacaoId'));
     const projectId = projectIdParam ? Number(projectIdParam) : null;
     if (projectId) {
       this.loadProjectDetails(projectId);
     }
+    this.getProjectRankings();
+  }
+
+  get cpi(): string {
+    if (!this.project || this.project.actualCost === 0) return 'N/A';
+    const cpi = this.project.earnedValue / this.project.actualCost;
+    return cpi.toFixed(2);
+  }
+
+  get spi(): string {
+    if (!this.project || this.project.plannedValue === 0) return 'N/A';
+    const spi = this.project.earnedValue / this.project.plannedValue;
+    return spi.toFixed(2);
+  }
+
+  get progress(): string {
+    if (!this.project || this.project.plannedValue === 0) return '0%';
+    const progress = (this.project.earnedValue / this.project.plannedValue) * 100;
+    return `${progress.toFixed(1)}%`;
+  }
+
+  get eac(): string {
+    if (!this.project || this.project.actualCost === 0 || this.project.budgetAtCompletion === 0) return 'N/A';
+    const cpi = this.project.earnedValue / this.project.actualCost;
+    if (cpi === 0) return 'N/A';
+    const eac = this.project.budgetAtCompletion / cpi;
+    return this.formatCurrency(eac);
+  }
+
+  get etc(): string {
+    if (!this.project || this.project.actualCost === 0 || this.project.budgetAtCompletion === 0) return 'N/A';
+    const cpi = this.project.earnedValue / this.project.actualCost;
+    if (cpi === 0) return 'N/A';
+    const eac = this.project.budgetAtCompletion / cpi;
+    const etc = eac - this.project.actualCost;
+    return this.formatCurrency(etc);
+  }
+
+  verifyStrategyBond(): boolean {
+    if (!this.project?.portfolioName && !this.project?.strategyName && !this.project?.scenarioRankingScore) return false;
+    return true;
+  }
+
+  formatCurrency(value: number): string {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(value);
   }
 
 
+  onInputChange(): void {
+    this.formTouched = true;
+  }
+
+  onSaveProjeto(): void {
+    if (!this.project) return;
+
+    // function formatDateBR(dateStr?: string): string {
+    //   if (!dateStr) return '';
+    //   const date = new Date(dateStr);
+    //   if (isNaN(date.getTime())) return dateStr;
+    //   const day = String(date.getDate()).padStart(2, '0');
+    //   const month = String(date.getMonth() + 1).padStart(2, '0');
+    //   const year = date.getFullYear();
+    //   return `${day}/${month}/${year}`;
+    // }
+
+    const updatedProject = {
+      name: this.project.name,
+      description: this.project.description,
+      status: this.project.status,
+      earnedValue: this.earnedValue,
+      plannedValue: this.plannedValue,
+      actualCost: this.actualCost,
+      budgetAtCompletion: this.budgetAtCompletion,
+      payback: this.payback,
+      startDate: this.project.startDate,
+      endDate: this.project.endDate
+    };
+
+    console.log('Dados do projeto a serem salvos:', updatedProject);
+    this.projetoService.updateProject(this.project.id, updatedProject)
+    .pipe(retry(5))
+    .subscribe({
+        next: (createdProject) => {
+          this.project = createdProject;
+          this.syncFormValues();
+          this.formTouched = false;
+        },
+        error: (err) => {
+          console.error('Erro ao alterar projeto:', err);
+        }
+      });
+  }
+
+
+
+  updateProjectField(fields: FormField[]): void {
+    if (!this.project) return;
+
+    // Utiliza os valores dos fields recebidos para atualizar o projeto
+    const fieldMap: { [key: string]: any } = {};
+    fields.forEach(field => {
+      fieldMap[field.id] = field.value;
+    });
+
+    function formatDateBR(dateStr?: string): string {
+      if (!dateStr) return '';
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return dateStr;
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+
+    const updatedProject = {
+      name: fieldMap['name'] !== undefined ? fieldMap['name'] : this.project.name,
+      description: fieldMap['description'] !== undefined ? fieldMap['description'] : this.project.description,
+      status: this.project.status,
+      earnedValue: this.earnedValue,
+      plannedValue: this.plannedValue,
+      actualCost: this.actualCost,
+      budgetAtCompletion: this.budgetAtCompletion,
+      payback: this.payback,
+      startDate: formatDateBR(this.project.startDate),
+      endDate: formatDateBR(this.project.endDate)
+    };
+
+    this.projetoService.updateProject(this.project.id, updatedProject)
+      .pipe(retry(3))
+      .subscribe({
+        next: (updatedProject) => {
+          this.project = updatedProject;
+          this.syncFormValues();
+        },
+        error: (err) => {
+          alert('Erro ao salvar. Tente novamente.');
+        }
+      });
+      this.showEditModal = false;
+    }
+
+    private syncFormValues(): void {
+      if (!this.project) return;
+      this.earnedValue = this.project.earnedValue || 0;
+      this.plannedValue = this.project.plannedValue || 0;
+      this.actualCost = this.project.actualCost || 0;
+    this.budgetAtCompletion = this.project.budgetAtCompletion || 0;
+    this.payback = this.project.payback || 0;
+    this.roi = this.project.roi || 0;
+    this.startDate = this.project.startDate || '';
+    this.endDate = this.project.endDate || '';
+
+  }
 
   loadProjectDetails(projectId: number): void {
     this.projetoService.getProjectById(projectId)
       .pipe(retry(5))
       .subscribe({
-        next: (project) => {
-          console.log('Detalhes do projeto:', project);
-          this.project = project;
-          // Adicionar breadcrumb com o nome do projeto
+        next: (projectDto) => {
+          const project = mapProjectDtoToProject(projectDto);
+
+
+          console.log('Detalhes do projeto:', projectDto);
+          this.project = projectDto;
+          this.syncFormValues();
           this.breadcrumbService.addChildBreadcrumb({
-            label: project.name || `Projeto ${projectId}`,
+            label: `Projeto: ${project.name}` || `Projeto ${projectId}`,
             url: `/projetos/${projectId}`,
             isActive: true
           });
@@ -183,7 +323,6 @@ export class ProjectDetailpageComponent implements OnInit {
       });
   }
 
-
   goBack(): void {
     this.router.navigate(['/projetos']);
   }
@@ -192,80 +331,182 @@ export class ProjectDetailpageComponent implements OnInit {
     this.activeTab = tab;
   }
 
-  saveIndicator(indicator: Indicator): void {
-    console.log('Saving indicator:', indicator);
-    // Implement save logic here
-  }
 
+  getProjectRankings(): void {
+
+    const projectRankingsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroupId}/ranking`;
+    const getAllProjectRankings$ = this.httpClient.get<ProjectRanking[]>(projectRankingsRoute);
+    getAllProjectRankings$.subscribe(projectRankings => {
+      this.projectRankings = projectRankings;
+      console.log('📍 Retorno dos rankings de projetos:', projectRankings);
+    });
+  }
   resetNewProject(): void {
     this.newProject = {
+      id: 0,
       name: '',
       description: '',
-      portfolio: undefined  ,
+      status: ProjectStatusEnum.IN_ANALYSIS,
+      payback: 0,
+      roi: 0,
       startDate: '',
       endDate: '',
-      status: ProjectStatusEnum.CANDIDATE,
-      projectManager: 1,
-      earnedValue: 0,
       plannedValue: 0,
+      earnedValue: 0,
       actualCost: 0,
-      budget: 0,
-      payback: 0
+      budgetAtCompletion: 0,
+      percentComplete: 0,
+      costPerformanceIndex: 0,
+      schedulePerformanceIndex: 0,
+      estimateAtCompletion: 0,
+      estimateToComplete: 0,
+      portfolioCategory: undefined,
+      portfolioName: '',
+      strategyName: '',
+      scenarioRankingScore: 0,
+      priorityInPortfolio: 0,
+      strategicObjectives: [],
+      evaluations: [],
+      createdAt: '',
+      lastModifiedAt: '',
+      disabled: false
     };
   }
+
   openEditModal(): void {
-    // Populate form with existing data
+    if (!this.project) return;
     this.editPortfolioConfig.fields[0].value = this.project.name;
     this.editPortfolioConfig.fields[1].value = this.project.description || '';
-
-    // Reset validation
     this.editPortfolioConfig.fields.forEach(field => {
       field.hasError = false;
       field.errorMessage = '';
     });
-
     this.showEditModal = true;
+  }
+
+  onSaveEditPortfolio(fields: FormField[]): void {
+    this.updateProjectField(fields);
+    this.closeEditModal();
   }
 
   closeEditModal(): void {
     this.showEditModal = false;
   }
 
-  onSavePortfolio(fields: FormField[]): void {
-    const projectData = fields.reduce((acc, field) => {
-      acc[field.id] = field.value;
-      return acc;
-    }, {} as any);
 
+  closeCancelModal(): void {
+    this.showCancelModal = false;
+  }
 
-    const newProject: Project = {
-      id: this.project.id,
-      name: projectData.name,
-      description: projectData.description,
-      status: this.project.status || '',
-      earnedValue: this.project.earnedValue || '',
-      plannedValue: this.project.plannedValue || '',
-      actualCost: this.project.actualCost || '',
-      budget: this.project.budget || '',
-      payback: this.project.payback,
-      startDate: this.project.startDate || '',
-      endDate: this.project.endDate || '',
-      projectManager: this.project.projectManager || 1
+  openCancelModal(): void {
+    this.cancelProjectConfig.fields[0].value = '';
+    this.cancelProjectConfig.fields.forEach(field => {
+      field.hasError = false;
+      field.errorMessage = '';
+    });
+    this.showCancelModal = true;
+  }
+
+  isCancelled(): boolean {
+    return this.project?.status === ProjectStatusEnum.CANCELLED;
+  }
+
+  excluirProjeto(): void {
+    if (!this.project) return;
+    this.projetoService.deleteProject(this.project.id)
+      .pipe(retry(3))
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/projetos']);
+        },
+        error: (err) => {
+          alert('Erro ao excluir o projeto. Tente novamente.');
+        }
+      });
+  }
+
+  onUncancelProject(): void {
+    if (!this.project) return;
+    if (this.project.status !== ProjectStatusEnum.CANCELLED) return;
+    const updatedProject = {
+      ...this.project,
+      status: ProjectStatusEnum.IN_ANALYSIS
     };
-    console.log('Dados do projeto a serem atualizados:', newProject);
-    this.projetoService.updateProject(this.project.id, newProject)
-     .pipe(retry(5))
-     .subscribe({
-      next: (createdProject) => {
-        console.log('Projeto alterado:', createdProject);
-        this.loadProjectDetails(this.project.id);
-        this.resetNewProject();
+    this.projetoService.updateProject(this.project.id, updatedProject)
+      .pipe(retry(3))
+      .subscribe({
+        next: (updatedProject) => {
+          this.loadProjectDetails(this.project!.id);
+        },
+        error: (err) => {
+          alert('Erro ao descancelar o projeto. Tente novamente.');
+        }
+      });
+  }
+
+  onCancelProject(fields: FormField[]): void {
+    if (!this.project) return;
+    const cancelReason = fields.find(f => f.id === 'reason')?.value || '';
+
+    const updatedProject = {
+      ...this.project,
+      status: ProjectStatusEnum.CANCELLED,
+      cancellationReason: cancelReason
+    };
+
+    this.projetoService.updateProject(this.project.id, updatedProject)
+    .pipe(retry(3))
+    .subscribe({
+      next: (updatedProject) => {
+        this.closeCancelModal();
+        this.loadProjectDetails(this.project!.id);
+        setTimeout(() => {
+          this.router.navigate(['/projetos']);
+        }, 1000);
       },
       error: (err) => {
-        console.error('Erro ao alterar projeto:', err);
+        console.error('Erro ao cancelar projeto:', err);
+        console.error('Detalhes do erro:', err.error);
+        alert('Erro ao cancelar o projeto. Tente novamente.');
       }
     });
+  }
+  getProjectStatusEnumToText = (statusEnum: any): string => {
+    switch (statusEnum) {
+        case "IN_ANALYSIS": return "EM ANÁLISE";
+        case "CANCELLED": return "CANCELADO";
+        case "IN_PROGRESS": return "EM ANDAMENTO";
+        case "COMPLETED": return "FINALIZADO";
+        default: return "SEM STATUS";
+    }
+}
 
-    this.closeEditModal();
+  getProjectStatusColor(status: any): string {
+    switch (status) {
+      case 'IN_ANALYSIS':
+        return 'yellow';
+      case 'IN_PROGRESS':
+        return 'green';
+      case 'COMPLETED':
+        return 'blue';
+      case 'CANCELLED':
+        return 'gray';
+      default:
+        return 'gray';
+    }
+  }
+  deleteProject(): void {
+    if (!this.project) return;
+    this.projetoService.deleteProject(this.project.id)
+      .pipe(retry(3))
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/projetos']);
+        },
+        error: (err) => {
+          console.error('Erro ao deletar projeto:', err);
+          alert('Erro ao deletar o projeto. Tente novamente.');
+        }
+      });
   }
 }

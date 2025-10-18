@@ -1,11 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CriteriaGroup, EvaluationGroup, EvaluationGroupView } from '../../interface/carlos-interfaces';
+import { CriteriaGroup, EvaluationGroup } from '../../interface/carlos-interfaces';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from '../../environments/environment';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, map } from 'rxjs';
+import { Page } from '../../models/pagination-models';
+import { CriteriaGroupService } from '../../service/criteria-group.service';
+import { EvaluationGroupApiResponse } from '../../interface/interfacies';
 
 @Component({
   selector: 'app-evaluation-group-edit-modal',
@@ -15,7 +18,7 @@ import { firstValueFrom } from 'rxjs';
 })
 export class EvaluationGroupEditModal {
   @Input() isVisible = false;
-  @Input() evaluationGroup: EvaluationGroupView | undefined;
+  @Input({ required: true }) evaluationGroup?: EvaluationGroupApiResponse;
 
   @Output() close = new EventEmitter<void>();
   @Output() updated = new EventEmitter<void>();
@@ -23,14 +26,14 @@ export class EvaluationGroupEditModal {
 
   httpClient = inject(HttpClient);
   route = inject(ActivatedRoute);
-
+  criteriaGroupService = inject(CriteriaGroupService);
   strategyId = -1;
 
   inputName = '';
   inputDescription = '';
   inputCriteriaGroupSelectedId = '';
 
-  inputCriteriaGroupsOptions: CriteriaGroup[] = [];
+  inputCriteriaGroupsOptions: EvaluationGroupApiResponse[] = [];
 
   errorMessage = '';
   isSubmitButtonDisabled = false;
@@ -51,7 +54,7 @@ export class EvaluationGroupEditModal {
     if (this.evaluationGroup) {
       this.inputName = this.evaluationGroup.name || '';
       this.inputDescription = this.evaluationGroup.description || '';
-      this.inputCriteriaGroupSelectedId = this.evaluationGroup.criteriaGroupId?.toString() || '';
+      this.inputCriteriaGroupSelectedId = this.evaluationGroup.criteriaGroup.id.toString() || '';
     }
   }
 
@@ -68,22 +71,31 @@ export class EvaluationGroupEditModal {
 
   async onSave(): Promise<any> {
     let isFormValid = await this.isFormValid();
+    if (!isFormValid) return;
 
-    if (!isFormValid)
-      return;
+    // Monta DTO para atualização do EvaluationGroup
 
-    let evaluationGroupRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps/${this.evaluationGroup?.id}`;
-    let body = {
+
+    // Coletar os IDs dos projetos presentes no grupo (usando evaluation.project.id)
+    const projectIds = (this.evaluationGroup?.evaluations || [])
+      .map(ev => ev.project?.id)
+      .filter((id): id is number => typeof id === 'number');
+
+    const dto = {
       name: this.inputName,
       description: this.inputDescription,
-      criteriaGroupId: Number(this.inputCriteriaGroupSelectedId),
-      strategyId: this.strategyId
-    }
+      strategyId: this.strategyId,
+      status: this.evaluationGroup?.status ,
+      projectIds
+      // status pode ser adicionado se necessário
+    };
 
-    let putEvaluationGroup$ = this.httpClient.put(evaluationGroupRoute, body);
-
-    putEvaluationGroup$.subscribe({
-      error: () => this.errorMessage = 'Ocorreu um erro inesperado. Tente novamente mais tarde.',
+    this.criteriaGroupService.updateEvaluationGroup(
+      this.evaluationGroup!.id,
+      this.strategyId,
+      dto
+    ).subscribe({
+      error: (err) => {this.errorMessage = 'Ocorreu um erro inesperado. Tente novamente mais tarde.'; console.error(err)},
       complete: () => {
         this.updated.emit();
         this.onClose();
@@ -98,7 +110,7 @@ export class EvaluationGroupEditModal {
 
     this.isDeleteButtonDisabled = true;
 
-    let evaluationGroupRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps/${this.evaluationGroup?.id}`;
+    let evaluationGroupRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroup?.id}`;
     let deleteEvaluationGroup$ = this.httpClient.delete(evaluationGroupRoute);
 
     deleteEvaluationGroup$.subscribe({
@@ -142,8 +154,8 @@ export class EvaluationGroupEditModal {
       return true;
     }
 
-    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps`;
-    let getAllEvaluationGroups$ = this.httpClient.get<EvaluationGroup[]>(evaluationGroupsRoute);
+    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups`;
+    let getAllEvaluationGroups$ = this.httpClient.get<Page<EvaluationGroup>>(evaluationGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
     let evaluationGroups = await firstValueFrom(getAllEvaluationGroups$);
     let isUnique = !evaluationGroups.some(evaluationGroup =>
       evaluationGroup.name === this.inputName && evaluationGroup.id !== this.evaluationGroup?.id
@@ -154,20 +166,16 @@ export class EvaluationGroupEditModal {
     return isUnique;
   }
 
-  doesSelectedCriteriaGroupHaveAtLeastOneCriteria(): boolean {
-    let selectedCriteriaGroup = this.getSelectedCriteriaGroupObject();
-    let hasAtLeastOneCriteria = false;
-
-    if (selectedCriteriaGroup)
-      hasAtLeastOneCriteria = selectedCriteriaGroup.criteriaCount > 0;
+  doesSelectedCriteriaGroupHaveAtLeastOneCriteria(selectedCriteriaGroup: any): boolean {
+    let criteriaCount = selectedCriteriaGroup?.criteria?.length ?? 0;
+    let hasAtLeastOneCriteria = criteriaCount > 0;
 
     this.errorMessage = hasAtLeastOneCriteria ? '' : 'O grupo de critérios selecionado não possui critérios. Acesse sua página e realize o cadastro.';
 
     return hasAtLeastOneCriteria;
   }
 
-  doesSelectedCriteriaGroupHaveAllCriteriaComparisons(): boolean {
-    let selectedCriteriaGroup = this.getSelectedCriteriaGroupObject();
+  doesSelectedCriteriaGroupHaveAllCriteriaComparisons(selectedCriteriaGroup: any): boolean {
     let totalCriteriaComparisons = selectedCriteriaGroup?.criteriaComparisonCount ?? 0;
     let totalCriteriaComparisonsExpected = this.getTotalCriteriaComparisonsExpectedByCriteriaQuantity(selectedCriteriaGroup?.criteriaCount ?? 0);
 
@@ -179,10 +187,19 @@ export class EvaluationGroupEditModal {
     return true;
   }
 
-  isCriteriaGroupSelectedValid(): boolean {
-    return this.isCriteriaGroupSelected()
-      && this.doesSelectedCriteriaGroupHaveAtLeastOneCriteria()
-      && this.doesSelectedCriteriaGroupHaveAllCriteriaComparisons();
+  async isCriteriaGroupSelectedValid(): Promise<boolean> {
+    let isValid = this.isCriteriaGroupSelected();
+
+    let selectedCriteriaGroup = await firstValueFrom(this.criteriaGroupService.getCriterioById(Number(this.inputCriteriaGroupSelectedId), this.strategyId));
+    console.log(selectedCriteriaGroup);
+    if (!selectedCriteriaGroup) {
+        this.errorMessage = 'Ocorreu um erro inesperado. Tente novamente mais tarde.';
+        return false;
+    }
+
+    return isValid
+      && this.doesSelectedCriteriaGroupHaveAtLeastOneCriteria(selectedCriteriaGroup)
+      && this.doesSelectedCriteriaGroupHaveAllCriteriaComparisons(selectedCriteriaGroup);
   }
 
   isCriteriaGroupSelected(): boolean {
@@ -193,13 +210,13 @@ export class EvaluationGroupEditModal {
     return isCriteriaGroupSelected;
   }
 
-  getSelectedCriteriaGroupObject(): CriteriaGroup | undefined {
+  getSelectedCriteriaGroupObject(): EvaluationGroupApiResponse | undefined {
     return this.inputCriteriaGroupsOptions.find(criteriaGroup => criteriaGroup.id == Number(this.inputCriteriaGroupSelectedId));
   }
 
   setInputCriteriaGroupOptions() {
     let criteriaGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups`;
-    let getAllCriteriaGroups$ = this.httpClient.get<CriteriaGroup[]>(criteriaGroupsRoute);
+    let getAllCriteriaGroups$ = this.httpClient.get<Page<EvaluationGroupApiResponse>>(criteriaGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
 
     getAllCriteriaGroups$.subscribe(criteriaGroups => {
       this.inputCriteriaGroupsOptions = criteriaGroups;

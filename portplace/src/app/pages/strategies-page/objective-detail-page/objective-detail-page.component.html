@@ -1,0 +1,133 @@
+
+
+<div class="objective-detail-layout">
+
+  <div class="objective-detail-content">
+    <!-- Breadcrumb -->
+    <app-breadcrumb></app-breadcrumb>
+
+    <!-- Header -->
+    <div class="objective-header">
+      <div class="header-top">
+        <button class="back-btn" (click)="goBack()">
+          <app-svg-icon
+          class="nav-icon"
+          [path]="'assets/icon/voltar_vetor.svg'"
+          [size]="18">
+        </app-svg-icon>
+      </button>
+      <h1>{{objective?.name}}</h1>
+        <app-badge [color]="getProjectStatusColor(objective?.status)">{{getProjectStatusEnumToText(objective?.status)}}</app-badge>
+    </div>
+    <p class="objective-description">{{objective?.description}}</p>
+    <div class="action-header">
+      <div class="action-buttons">
+        <button class="action-btn" (click)="openEditModal()">
+
+          Editar
+        </button>
+        <!-- <button class="action-btn cancel" (click)="cancelObjective()">
+
+          Cancelar
+        </button> -->
+        <button class="action-btn delete" (click)="deleteObjective()">
+
+          Excluir
+        </button>
+      </div>
+
+
+      <div class="last-update">
+        Última alteração realizada em {{objective && objective.lastModifiedAt ? (parseDateString(objective.lastModifiedAt) | date: 'dd/MM/yyyy HH:mm') : ''}}.
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-container">
+    <div class="tabs-list">
+      <button
+      class="tab-trigger"
+      [class.active]="activeTab === 'criterios'"
+      (click)="onTabChange('criterios')">
+      <app-svg-icon
+      class="nav-icon"
+      [path]="'assets/icon/p_vetor.svg'"
+      [size]="18">
+        </app-svg-icon>
+        Critérios
+      </button>
+      <button
+        class="tab-trigger"
+        [class.active]="activeTab === 'portfolios'"
+        (click)="onTabChange('portfolios')">
+        <app-svg-icon
+          class="nav-icon"
+          [path]="'assets/icon/metrica_vetor.svg'"
+          [size]="18">
+        </app-svg-icon>
+        Portfólios
+      </button>
+      <button
+        class="tab-trigger"
+        [class.active]="activeTab === 'projetos'"
+        (click)="onTabChange('projetos')">
+        <app-svg-icon
+        class="nav-icon"
+        [path]="'assets/icon/assignment_projetos_vetor.svg'"
+        [size]="18">
+      </app-svg-icon>
+      Projetos
+    </button>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="tab-content">
+
+    <!-- Grupos de Critérios Tab -->
+    <div *ngIf="activeTab === 'criterios'" class="tab-panel">
+      <h3>Grupos de critérios vinculados ao objetivo</h3>
+          <app-table
+            [dataRetrievalMethodRef]="getDataForCriteriaTable"
+            [filterText]="criterionFilterText"
+            [columns]="criterionColumns"
+            (mainColumnRowClick)="openCriteria($event)">
+          </app-table>
+      </div>
+
+      <!-- Grupos de Avaliações Tab -->
+      <div *ngIf="activeTab === 'portfolios'" class="tab-panel">
+        <h3>Portfólios vinculados ao objetivo</h3>
+      <app-table
+            [dataRetrievalMethodRef]="getDataForPortfoliosTable"
+            [filterButtons]="portfoliosFilterButtons"
+            [filterText]="portfoliosFilterText"
+            [columns]="portfoliosColumns"
+            (mainColumnRowClick)="openPortfolio($event)">
+          </app-table>
+      </div>
+      <!-- Projetos Tab -->
+      <div *ngIf="activeTab === 'projetos'" class="tab-panel">
+        <h3>Projetos vinculados ao objetivo</h3>
+        <app-table
+            [dataRetrievalMethodRef]="getDataForProjectsTable"
+            [filterButtons]="portfoliosFilterButtons"
+            [filterText]="portfoliosFilterText"
+            [columns]="portfoliosColumns"
+            (mainColumnRowClick)="openProjeto($event)">
+          </app-table>
+      </div>
+    </div>
+  </div>
+</div>
+  <app-form-modal-component
+    [isVisible]="showEditModal"
+    [config]="editStrategyConfig"
+    (close)="closeEditModal()"
+    (save)="onSaveObjectiveEdit($event)"
+    (cancel)="closeEditModal()">
+  </app-form-modal-component>
+
+</div>
+
+

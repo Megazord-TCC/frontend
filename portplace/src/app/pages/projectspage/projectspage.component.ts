@@ -1,16 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, ViewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CardComponent } from '../../components/card/card.component';
 import { Router } from '@angular/router';
 import { BadgeComponent } from '../../components/badge/badge.component';
-import { FormField, FormModalConfig, Project, ProjectPageableResponse, ProjectStatusEnum } from '../../interface/interfacies';
+import { FormField, FormModalConfig, Project, ProjectPageableResponse, ProjectStatusEnum, ApiError, ValidationError } from '../../interface/interfacies';
 import { SvgIconComponent } from '../../components/svg-icon/svg-icon.component';
 import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../service/breadcrumb.service';
 import { ProjetoService } from '../../service/projeto.service';
-import { retry } from 'rxjs';
+import { map, Observable, retry } from 'rxjs';
 import { FormModalComponentComponent } from '../../components/form-modal-component/form-modal-component.component';
+import { TableComponent } from '../../components/table/table.component';
+import { getActionButton, getColumns, getFilterButtons, getFilterText } from './projects-table-config';
+import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } from '../../models/pagination-models';
+import { mapProjectPageDtoToProjectTableRowPage } from "../../mappers/projects-mappers"
 
 @Component({
   selector: 'app-projectspage',
@@ -21,12 +25,14 @@ import { FormModalComponentComponent } from '../../components/form-modal-compone
     BadgeComponent,
     SvgIconComponent,
     BreadcrumbComponent,
-    FormModalComponentComponent
+    FormModalComponentComponent,
+    TableComponent
   ],
   templateUrl: './projectspage.component.html',
   styleUrl: './projectspage.component.scss'
 })
 export class ProjectsComponent implements OnInit {
+  @ViewChild('tableComponent') tableComponent!: TableComponent;
   showCreateModal = false;
   loadingProjects = false;
   Projects: Project[] = [];
@@ -34,22 +40,43 @@ export class ProjectsComponent implements OnInit {
   searchTerm = '';
   activeFilter = '';
 
+  filterButtons = getFilterButtons();
+  filterText = getFilterText();
+  columns = getColumns();
+  actionButton = getActionButton();
+
+
   newProject: Project = {
+    id: 0,
     name: '',
     description: '',
-    portfolio: undefined  ,
+    status: ProjectStatusEnum.IN_ANALYSIS,
+    payback: 0,
+    roi: 0,
     startDate: '',
     endDate: '',
-    status: ProjectStatusEnum.CANDIDATE,
-    projectManager: 1,
-    earnedValue: 0,
     plannedValue: 0,
+    earnedValue: 0,
     actualCost: 0,
-    budget: 0,
-    payback: 0
+    budgetAtCompletion: 0,
+    percentComplete: 0,
+    costPerformanceIndex: 0,
+    schedulePerformanceIndex: 0,
+    estimateAtCompletion: 0,
+    estimateToComplete: 0,
+    portfolioCategory: undefined,
+    portfolioName: '',
+    strategyName: '',
+    scenarioRankingScore: 0,
+    priorityInPortfolio: 0,
+    strategicObjectives: [],
+    evaluations: [],
+    createdAt: '',
+    lastModifiedAt: '',
+    disabled: false
   };
 
-createProjectConfig: FormModalConfig = {
+  createProjectConfig: FormModalConfig = {
     title: 'Cadastrar novo projeto',
     fields: [
       {
@@ -106,6 +133,14 @@ createProjectConfig: FormModalConfig = {
     this.loadProjects();
   }
 
+  // Usado pelo TableComponent.
+    // Recarrega a tabela de projetos, buscando os dados via requisição HTTP.
+  getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => (
+      this.projetoService.getProjectsPage(queryParams).pipe(
+          map(page => (mapProjectPageDtoToProjectTableRowPage(page)))
+      )
+  );
+
   loadProjects(): void {
     this.loadingProjects = true;
     this.projetoService.getAllProjects()
@@ -131,6 +166,8 @@ createProjectConfig: FormModalConfig = {
   }
 
   createProject(): void {
+    console.log('Dados do projeto sendo enviados:', this.newProject);
+
     this.projetoService.createProject(this.newProject).subscribe({
       next: (createdProject) => {
         console.log('Projeto criado:', createdProject);
@@ -138,7 +175,8 @@ createProjectConfig: FormModalConfig = {
         this.resetNewProject();
       },
       error: (err) => {
-        console.error('Erro ao criar projeto:', err);
+        console.error('Erro completo ao criar projeto:', err);
+        this.handleApiError(err);
       }
     });
   }
@@ -185,10 +223,10 @@ createProjectConfig: FormModalConfig = {
 
     if (this.activeFilter) {
       const filterMap: { [key: string]: ProjectStatusEnum } = {
-        'em-analise': ProjectStatusEnum.CANDIDATE,
-        'em-planejamento': ProjectStatusEnum.PLANNING,
+        'em-analise': ProjectStatusEnum.IN_ANALYSIS,
+        'cancelado': ProjectStatusEnum.CANCELLED,
         'em-andamento': ProjectStatusEnum.IN_PROGRESS,
-        'finalizado': ProjectStatusEnum.FINISHED
+        'finalizado': ProjectStatusEnum.COMPLETED
       };
 
       filtered = filtered.filter(project =>
@@ -206,24 +244,50 @@ createProjectConfig: FormModalConfig = {
   }
 
   onProjectClick(projectId: number): void {
-    this.router.navigate(['/projeto', projectId]);
+    let id: number | undefined;
+    if (typeof projectId === 'object' && projectId !== null && 'id' in projectId) {
+      id = (projectId as { id: number }).id;
+    } else if (typeof projectId === 'number') {
+      id = projectId;
+    }
+    if (id) {
+      this.router.navigate(['/projeto', id]);
+    } else {
+      console.warn('ID da estratégia não encontrado:', projectId);
+    }
   }
 
   resetNewProject(): void {
     this.newProject = {
-      name: '',
-      description: '',
-      portfolio: undefined  ,
-      startDate: '',
-      endDate: '',
-      status: ProjectStatusEnum.CANDIDATE,
-      projectManager: 1,
-      earnedValue: 0,
-      plannedValue: 0,
-      actualCost: 0,
-      budget: 0,
-      payback: 0
-    };
+        id: 0,
+        name: '',
+        description: '',
+        status: ProjectStatusEnum.IN_ANALYSIS,
+        payback: 0,
+        roi: 0,
+        startDate: '',
+        endDate: '',
+        plannedValue: 0,
+        earnedValue: 0,
+        actualCost: 0,
+        budgetAtCompletion: 0,
+        percentComplete: 0,
+        costPerformanceIndex: 0,
+        schedulePerformanceIndex: 0,
+        estimateAtCompletion: 0,
+        estimateToComplete: 0,
+        portfolioCategory: undefined,
+        portfolioName: '',
+        strategyName: '',
+        scenarioRankingScore: 0,
+        priorityInPortfolio: 0,
+        strategicObjectives: [],
+        evaluations: [],
+        createdAt: '',
+        lastModifiedAt: '',
+        disabled: false
+      };
+
   }
 
   openCreateModal(): void {
@@ -241,38 +305,131 @@ createProjectConfig: FormModalConfig = {
   }
 
   onSaveProject(fields: FormField[]): void {
-    // Process form data
     const projectData = fields.reduce((acc, field) => {
       acc[field.id] = field.value;
       return acc;
     }, {} as any);
 
-    const newProject: Project = {
+    const validationResult = this.validateProjectData(projectData);
+    if (!validationResult.isValid) {
+      console.error('Dados inválidos:', validationResult.errors);
+
+      return;
+    }
+
+
+    // Monta apenas os campos esperados pelo backend
+
+    // Função utilitária para formatar data dd/MM/yyyy
+    function formatDateBR(dateStr?: string): string {
+      if (!dateStr) return '';
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return dateStr; // já está formatada
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    }
+
+    const newProject = {
       name: projectData.name,
       description: projectData.description,
-      portfolio: undefined  ,
-      startDate: projectData.startDate,
-      endDate: projectData.endDate,
-      status: ProjectStatusEnum.CANDIDATE,
-      projectManager: 1,
+      status: ProjectStatusEnum.IN_ANALYSIS,
+      payback:  0,
       earnedValue: 0,
       plannedValue: 0,
       actualCost: 0,
-      budget: 0,
-      payback: 0
+      budgetAtCompletion: 0,
+      startDate: formatDateBR(projectData.startDate),
+      endDate: formatDateBR(projectData.endDate)
     };
+
+    console.log('Dados do projeto sendo enviados:', newProject);
 
     this.projetoService.createProject(newProject).subscribe({
       next: (createdProject) => {
         console.log('Projeto criado:', createdProject);
         this.loadProjects();
         this.resetNewProject();
+        this.closeCreateModal();
+        if (this.tableComponent) {
+          this.tableComponent.refresh();
+        }
       },
       error: (err) => {
-        console.error('Erro ao criar projeto:', err);
+        console.error('Erro completo ao criar projeto:', err);
+
+        this.handleApiError(err);
+
+        // Manter o modal aberto para que o usuário possa corrigir
+        // this.closeCreateModal(); // Remover esta linha para não fechar o modal
       }
     });
-    this.closeCreateModal();
+  }
+
+  private validateProjectData(data: any): { isValid: boolean; errors: string[] } {
+    const errors: string[] = [];
+
+    // Validar nome
+    if (!data.name || data.name.trim() === '') {
+      errors.push('Nome é obrigatório');
+    }
+
+    // Validar datas
+    if (!data.startDate) {
+      errors.push('Data de início é obrigatória');
+    }
+
+    if (!data.endDate) {
+      errors.push('Data de fim é obrigatória');
+    }
+
+    if (data.startDate && data.endDate) {
+      const startDate = new Date(data.startDate);
+      const endDate = new Date(data.endDate);
+
+      if (startDate >= endDate) {
+        errors.push('Data de fim deve ser posterior à data de início');
+      }
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  }
+
+  private handleApiError(err: any): void {
+    console.error('Detalhes do erro:', {
+      status: err.status,
+      statusText: err.statusText,
+      url: err.url
+    });
+
+    if (err.error) {
+      const apiError = err.error as ApiError;
+      console.error('Erro da API:', {
+        status: apiError.status || err.status,
+        message: apiError.message,
+        path: apiError.path,
+        method: apiError.method,
+        timestamp: apiError.timestamp
+      });
+
+      // Se houver erros de validação específicos, exiba-os
+      if (apiError.errors && Array.isArray(apiError.errors)) {
+        console.error('Erros de validação específicos:');
+        apiError.errors.forEach((error: ValidationError, index: number) => {
+          console.error(`Erro ${index + 1}:`, {
+            campo: error.field,
+            valorRejeitado: error.rejectedValue,
+            mensagem: error.defaultMessage,
+            codigo: error.code,
+            objeto: error.objectName
+          });
+        });
+      }
+    }
   }
 
   getStatusLabel(status: string |ProjectStatusEnum): string {
@@ -280,13 +437,13 @@ createProjectConfig: FormModalConfig = {
       status = ProjectStatusEnum[status as keyof typeof ProjectStatusEnum];
     }
     switch (status) {
-      case ProjectStatusEnum.CANDIDATE:
+      case ProjectStatusEnum.IN_ANALYSIS:
         return 'EM ANÁLISE';
-      case ProjectStatusEnum.PLANNING:
-        return 'EM PLANEJAMENTO';
+      case ProjectStatusEnum.CANCELLED:
+        return 'CANCELADO';
       case ProjectStatusEnum.IN_PROGRESS:
         return 'EM ANDAMENTO';
-      case ProjectStatusEnum.FINISHED:
+      case ProjectStatusEnum.COMPLETED:
         return 'FINALIZADO';
       default:
         return '';
@@ -298,17 +455,18 @@ createProjectConfig: FormModalConfig = {
       status = ProjectStatusEnum[status as keyof typeof ProjectStatusEnum];
     }
     switch (status) {
-      case ProjectStatusEnum.CANDIDATE:
+      case ProjectStatusEnum.IN_ANALYSIS:
         return 'yellow';
-      case ProjectStatusEnum.PLANNING:
-        return 'blue';
       case ProjectStatusEnum.IN_PROGRESS:
+        return 'blue';
+      case ProjectStatusEnum.COMPLETED:
         return 'green';
-      case ProjectStatusEnum.FINISHED:
+      case ProjectStatusEnum.CANCELLED:
         return 'red';
       default:
         return 'gray';
     }
   }
+
 
 }

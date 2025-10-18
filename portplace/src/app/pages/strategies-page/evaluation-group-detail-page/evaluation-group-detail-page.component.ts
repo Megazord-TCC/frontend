@@ -2,20 +2,19 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BadgeComponent } from '../../../components/badge/badge.component';
 import { CardComponent } from '../../../components/card/card.component';
 import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.component';
-import { FormModalComponentComponent } from '../../../components/form-modal-component/form-modal-component.component';
-import { EvaluationGroupsTabComponent } from '../../../components/evaluation-groups-tab/evaluation-groups-tab.component';
 import { EvaluationGroupEditModal } from '../../../components/evaluation-group-edit-modal/evaluation-group-edit-modal.component';
 import { ProjectEvaluationCreateModal } from '../../../components/evaluation-project-create-modal/evaluation-project-create-modal.component';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { CriteriaGroup, Evaluation, EvaluationGroup, EvaluationGroupView, ProjectRanking, User } from '../../../interface/carlos-interfaces';
-import { filter, forkJoin, map, switchMap, tap, Subscription } from 'rxjs';
+import { CriteriaGroup, EvaluationGroup, ProjectRanking } from '../../../interface/carlos-interfaces';
+import { forkJoin, map, Subscription } from 'rxjs';
 import { EvaluationGroupDeleteModal } from '../../../components/evaluation-group-delete-modal/evaluation-group-delete-modal.component';
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../../service/breadcrumb.service';
+import { Page } from '../../../models/pagination-models';
+import { EvaluationGroupApiResponse } from '../../../interface/interfacies';
 
 @Component({
   selector: 'app-evaluation-group-detail-page',
@@ -23,10 +22,7 @@ import { BreadcrumbService } from '../../../service/breadcrumb.service';
     CommonModule,
     FormsModule,
     CardComponent,
-    BadgeComponent,
     SvgIconComponent,
-    FormModalComponentComponent,
-    EvaluationGroupsTabComponent,
     EvaluationGroupEditModal,
     ProjectEvaluationCreateModal,
     EvaluationGroupDeleteModal,
@@ -36,6 +32,7 @@ import { BreadcrumbService } from '../../../service/breadcrumb.service';
   styleUrl: './evaluation-group-detail-page.component.scss'
 })
 export class EvaluationGroupDetailPageComponent implements OnInit, OnDestroy {
+
   private routeSubscription?: Subscription;
 
   httpClient = inject(HttpClient);
@@ -46,7 +43,7 @@ export class EvaluationGroupDetailPageComponent implements OnInit, OnDestroy {
   strategyId = -1;
   evaluationGroupId = -1;
 
-  evaluationGroup: EvaluationGroupView | undefined;
+  evaluationGroup: EvaluationGroupApiResponse | undefined;
 
   projectRankings: ProjectRanking[] = [];
   filteredProjectRankings: ProjectRanking[] = [];
@@ -85,45 +82,30 @@ export class EvaluationGroupDetailPageComponent implements OnInit, OnDestroy {
   }
 
   setCurrentEvaluationGroupByHttpRequest() {
-    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps`;
-    let criteriaGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups`;
+    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups`;
 
-    let getAllEvaluationGroups$ = this.httpClient.get<EvaluationGroup[]>(evaluationGroupsRoute);
-    let getAllCriteriaGroups$ = this.httpClient.get<CriteriaGroup[]>(criteriaGroupsRoute);
+    this.httpClient.get<Page<EvaluationGroupApiResponse>>(evaluationGroupsRoute, { params: { size: 1000 } })
+        .pipe(map(page => page.content))
+        .subscribe(evaluationGroups => {
+            this.evaluationGroup = evaluationGroups.find(evaluationGroup => evaluationGroup.id == this.evaluationGroupId);
 
-    forkJoin({ evaluationGroups: getAllEvaluationGroups$, criteriaGroups: getAllCriteriaGroups$ })
-      .pipe(
-        map(({ evaluationGroups, criteriaGroups }) => this.getManyEvaluationGroupView(evaluationGroups, criteriaGroups)),
-        map(evaluationGroups => evaluationGroups.find(evaluationGroup => evaluationGroup.id == this.evaluationGroupId))
-      )
-      .subscribe(evaluationGroup => {
-        this.evaluationGroup = evaluationGroup;
-
-        // Usar addChildBreadcrumb para adicionar breadcrumb filho
-        if (evaluationGroup) {
-          this.breadcrumbService.addChildBreadcrumb({
-            label: evaluationGroup.name,
+            // Usar addChildBreadcrumb para adicionar breadcrumb filho
+            if (this.evaluationGroup)
+              this.breadcrumbService.addChildBreadcrumb({
+            label: `Grupo de Avaliação: ${this.evaluationGroup.name}`,
             url: `/estrategia/${this.strategyId}/grupo-avaliacao/${this.evaluationGroupId}`,
             isActive: true
           });
-        }
-      });
-  }
+        });
+      }
 
-  getManyEvaluationGroupView(evaluationGroups: EvaluationGroup[], criteriaGroups: CriteriaGroup[]): EvaluationGroupView[] {
-      return evaluationGroups.map(evaluationGroup => ({
-          ...evaluationGroup,
-          criteriaGroup: criteriaGroups.find(criteriaGroup => criteriaGroup.id == evaluationGroup.criteriaGroupId)
-      }));
-  }
-
-  setProjectRankingsByHttpRequest() {
-    let projectRankingsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps/${this.evaluationGroupId}/ranking`;
-    let getAllProjectRankings$ =  this.httpClient.get<ProjectRanking[]>(projectRankingsRoute);
-
-    getAllProjectRankings$.subscribe(projectRankings => {
-      this.projectRankings = projectRankings;
-      this.filteredProjectRankings = projectRankings;
+      setProjectRankingsByHttpRequest() {
+        let projectRankingsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroupId}/ranking`;
+        let getAllProjectRankings$ =  this.httpClient.get<ProjectRanking[]>(projectRankingsRoute);
+        getAllProjectRankings$.subscribe(projectRankings => {
+          this.projectRankings = projectRankings;
+          this.filteredProjectRankings = projectRankings;
+      console.log('📍 Retorno dos rankings de projetos:', projectRankings);
     });
   }
 
@@ -154,6 +136,15 @@ export class EvaluationGroupDetailPageComponent implements OnInit, OnDestroy {
     this.setProjectRankingsByHttpRequest(); // Recarrega a lista
   }
 
+  // Converte string 'dd/MM/yyyy HH:mm:ss' para Date
+  public parseDateString(dateStr: string): Date | null {
+    if (!dateStr) return null;
+    const [datePart, timePart] = dateStr.split(' ');
+    if (!datePart || !timePart) return null;
+    const [day, month, year] = datePart.split('/').map(Number);
+    const [hour, minute, second = '0'] = timePart.split(':');
+    return new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute), Number(second));
+  }
   // Modal de edição do grupo de avaliação
   openEditModal() {
     this.showEditModal = true;

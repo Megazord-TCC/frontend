@@ -1,0 +1,55 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)" (mousedown)="onOverlayMouseDown($event)">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header">
+            <h2>Editar categoria</h2>
+            <button class="close-btn" (click)="onClose()">
+                <i class="icon-x">✕</i>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+            <div *ngIf="showEntityAlreadyUsedMessage" class="alert-message">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>
+                    Apenas realize ajustes ortográficos ou adicione informações complementares, 
+                    pois esta categoria já foi vinculada a um cenário.
+                </span>
+            </div>
+
+            <!-- Validation Message -->
+            <div *ngIf="errorMessage" class="validation-error">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>{{ errorMessage }}</span>
+            </div>
+
+            <p>Portfólio: <b>{{ portfolioName }}</b></p>
+
+            <!-- Form Fields -->
+            <div class="form-fields" [ngClass]="{'disabled': isSubmitButtonDisabled}">
+                <div class="form-group">
+                    <label>Nome<span class="required-asterisk">*</span></label>
+                    <input [(ngModel)]="inputName" [disabled]="isSubmitButtonDisabled" maxlength="50">
+                </div>
+
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <textarea [(ngModel)]="inputDescription" [disabled]="isSubmitButtonDisabled"
+                        maxlength="255"></textarea>
+                </div>
+
+                <button *ngIf="canBeDeleted" class="btn-exclude" (click)="deleteCategory()">
+                    <app-svg-icon class="nav-icon" path="assets/icon/excluir_vetor.svg" [size]="18"></app-svg-icon>
+                    Remover categoria
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button class="btn-outline" (click)="onClose()">Cancelar</button>
+            <button class="btn-primary" (click)="onSave()" [disabled]="isSubmitButtonDisabled">Salvar</button>
+        </div>
+    </div>
+</div>

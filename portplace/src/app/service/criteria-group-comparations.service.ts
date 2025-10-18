@@ -1,8 +1,10 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { CriteriaComparison, CriteriaGroup } from '../interface/interfacies';
+import { map, Observable } from 'rxjs';
+import { CriteriaComparison } from '../interface/interfacies';
+import { Page, PaginationQueryParams } from '../models/pagination-models';
+import { AuthService } from './auth-service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,17 +13,19 @@ export class GrupoCriterioService {
 
   constructor(private http: HttpClient) { }
 
+  authService = inject(AuthService);
   private getHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    });
+    return this.authService.getHeaders();
+  }
+
+  getCriteriaGroupPage(estrategiaId:number, queryParams?: PaginationQueryParams): Observable<Page<any>> {
+      return this.http.get<Page<any>>(`${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups`, { params: queryParams?.getParamsInHttpParamsFormat() });
   }
 
   // BUSCA DE TODOS OS GRUPOS DE CRITÉRIOS
   getCriteriaComparisons(groupId: number,estrategiaId: number): Observable<CriteriaComparison[]> {
     const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups/${groupId}/criteria-comparisons`;
-    return this.http.get<CriteriaComparison[]>(url, { headers: this.getHeaders() });
+    return this.http.get<Page<CriteriaComparison>>(url, { headers: this.getHeaders(), params: { size: 1000 } }).pipe(map(page => page.content));
   }
 
   // BUSCA DE UM GRUPO DE CRITÉRIOS POR ID

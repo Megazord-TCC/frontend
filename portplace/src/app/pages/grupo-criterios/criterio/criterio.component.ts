@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom, Subscription } from 'rxjs';
 import { CriterioService } from '../../../service/criterio.service';
-import { Criterion, ImportanceScale, CriteriaComparison } from '../../../interface/interfacies';
+import { Criterion, ImportanceScale, CriteriaComparison, Objective } from '../../../interface/interfacies';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BadgeComponent } from '../../../components/badge/badge.component';
@@ -13,6 +13,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { GrupoCriterioService } from '../../../service/criteria-group-comparations.service';
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../../service/breadcrumb.service';
+import { StrategiaObjetivoService } from '../../../service/strategia-objetivo.service';
+import { ObjectivesModalComponent } from '../../../components/objectives-modal/objectives-modal.component';
 
 @Component({
   selector: 'app-criterio',
@@ -24,7 +26,8 @@ import { BreadcrumbService } from '../../../service/breadcrumb.service';
     SvgIconComponent,
     BreadcrumbComponent,
     FormModalComponentComponent,
-    NgSelectModule
+    NgSelectModule,
+    ObjectivesModalComponent
   ],
   templateUrl: './criterio.component.html',
   styleUrl: './criterio.component.scss'
@@ -32,28 +35,8 @@ import { BreadcrumbService } from '../../../service/breadcrumb.service';
 export class CriterioComponent implements OnInit, OnDestroy {
   private routeSubscription?: Subscription;
 
-  deleteFormConfig: any = {
-    title: 'Cancelar grupo de critérios',
-    fields: [
-      {
-        id: 'justification',
-        label: 'Justificativa do cancelamento ',
-        type: 'textarea',
-        value: '',
-        required: true,
-        placeholder: 'Digite a justificativa para o cancelamento',
-        rows: 4
-      }
-    ],
-    validationMessage: 'Os campos marcados com * são obrigatórios.',
-    buttons: [
-      { id: 'cancel', label: 'Cancelar', type: 'button', variant: 'secondary' },
-      { id: 'confirm', label: 'Confirmar Cancelamento', type: 'submit', variant: 'danger' }
-    ]
-  };
-
   editFormConfig: any = {
-    title: 'Editar grupo de critérios',
+    title: 'Editar critério',
     fields: [
       {
         id: 'name',
@@ -116,10 +99,12 @@ export class CriterioComponent implements OnInit, OnDestroy {
 
   showEditModal = false;
   showDeleteModal = false;
+  showObjectiveModal = false;
   estrategiaId!: number;
   criteriaGroupId!: number;
   criteriaId!: number;
   loadingCriterios = false;
+  loadingObjectives = false;
   criteriaGroups: Criterion[] = []
   filteredCriteriaGroups: Criterion[] = []
   activeTab = "diretas"
@@ -127,19 +112,21 @@ export class CriterioComponent implements OnInit, OnDestroy {
   searchTerm = '';
   existingComparisons: CriteriaComparison[] = [];
 
+  // Dados dos objetivos - sempre inicializados
+  linkedObjectives: Objective[] = [];
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private criterioService: CriterioService,
     private criteriaGroupComparationsService: GrupoCriterioService,
-    private breadcrumbService: BreadcrumbService
+    private breadcrumbService: BreadcrumbService,
+    private estrategiaObjetivoService: StrategiaObjetivoService
   ) {}
 
   async ngOnInit(): Promise<void> {
-    // LIMPAR DADOS ANTERIORES PRIMEIRO
     this.clearComponentData();
 
-    // Escutar mudanças nos parâmetros da rota para recarregar quando voltar
     this.routeSubscription = this.route.paramMap.subscribe(async params => {
       const estrategiaIdParam = params.get('estrategiaId');
       this.estrategiaId = estrategiaIdParam ? Number(estrategiaIdParam) : 0;
@@ -147,14 +134,6 @@ export class CriterioComponent implements OnInit, OnDestroy {
       this.criteriaGroupId = grupoIdParam ? Number(grupoIdParam) : 0;
       const criteriaId = params.get('criterioId');
       this.criteriaId = criteriaId ? Number(criteriaId) : 0;
-
-      // COMPONENTE NETO: Simplesmente carrega dados e adiciona seu breadcrumb
-      console.log('📍 Componente neto: Critério inicializando/recarregando');
-
-      console.log('🔄 === INICIALIZANDO/RECARREGANDO COMPONENTE ===');
-      console.log('  - Estratégia ID:', this.estrategiaId);
-      console.log('  - Grupo ID:', this.criteriaGroupId);
-      console.log('  - Critério ID:', this.criteriaId);
 
       // Carregar dados em sequência
       await this.loadCriteria();
@@ -184,11 +163,14 @@ export class CriterioComponent implements OnInit, OnDestroy {
     this.filteredCriteriaGroups = [];
     this.existingComparisons = [];
     this.comparisonValues = {};
+    this.linkedObjectives = [];
 
     // Resetar flags
     this.loadingCriterios = false;
+    this.loadingObjectives = false;
     this.showEditModal = false;
     this.showDeleteModal = false;
+    this.showObjectiveModal = false;
 
     // Limpar filtros
     this.searchTerm = '';
@@ -204,9 +186,12 @@ export class CriterioComponent implements OnInit, OnDestroy {
       this.criteria = criterio;
       console.log('Critério carregado:', criterio);
 
-      // COMPONENTE NETO: Adiciona seu breadcrumb ao array do pai
+      // Sempre garantir que linkedObjectives seja um array
+      this.linkedObjectives = this.criteria?.strategicObjectives ? [...this.criteria.strategicObjectives] : [];
+      console.log('Objetivos vinculados ao critério:', this.linkedObjectives);
+
       this.breadcrumbService.addChildBreadcrumb({
-        label: criterio.name || `Critério ${this.criteriaId}`,
+        label: `Critério: ${criterio.name}` || `Critério ${this.criteriaId}`,
         url: `/estrategia/${this.estrategiaId}/grupo-criterio/${this.criteriaGroupId}/criterio/${this.criteriaId}`,
         isActive: true
       });
@@ -237,16 +222,121 @@ export class CriterioComponent implements OnInit, OnDestroy {
       );
       this.existingComparisons = comparisons || [];
 
-      console.log('📊 Comparações carregadas do servidor:', this.existingComparisons);
-
-      // FILTRAR comparações apenas dos critérios que existem atualmente
       this.filterValidComparisons();
-
       this.initializeComparisonValues();
     } catch (err) {
       console.error('Erro ao carregar avaliações:', err);
       this.existingComparisons = [];
       this.initializeComparisonValues();
+    }
+  }
+
+  // ABRIR MODAL DE OBJETIVOS
+  openObjectiveModal(): void {
+    console.log('🎯 Abrindo modal de objetivos');
+    this.showObjectiveModal = true;
+  }
+
+  // FECHAR MODAL DE OBJETIVOS
+  closeObjectiveModal(): void {
+    console.log('🎯 Fechando modal de objetivos');
+    this.showObjectiveModal = false;
+  }
+
+  // SALVAR VÍNCULO DE OBJETIVO
+  async onSaveObjectiveLink(objectiveId: number): Promise<void> {
+    if (!objectiveId) {
+      alert('Erro: ID do objetivo é inválido.');
+      return;
+    }
+
+    if (!this.criteria) {
+      alert('Erro: Critério não carregado.');
+      return;
+    }
+
+    console.log('🔗 Vinculando objetivo:', objectiveId, 'ao critério:', this.criteria.id);
+
+    try {
+      // Monta o array de IDs dos objetivos já vinculados + o novo (sem duplicar)
+      let ids = this.criteria.strategicObjectives ? this.criteria.strategicObjectives.map(obj => obj.id) : [];
+      if (!ids.includes(objectiveId)) {
+        ids.push(objectiveId);
+      }
+
+      const updatedCriterion = {
+        name: this.criteria.name,
+        description: this.criteria.description,
+        strategicObjectives: ids
+      };
+
+      await firstValueFrom(
+        this.criterioService.updateCriterio(
+          this.criteria.id,
+          updatedCriterion,
+          this.estrategiaId,
+          this.criteriaGroupId
+        )
+      );
+
+      // Recarregar dados do critério para atualizar linkedObjectives
+      await this.loadCriteria();
+      this.closeObjectiveModal();
+
+      console.log('✅ Objetivo vinculado com sucesso');
+    } catch (error) {
+      console.error('❌ Erro ao vincular objetivo:', error);
+      alert('Erro ao vincular objetivo. Tente novamente.');
+    }
+  }
+
+  // REMOVER VÍNCULO DE OBJETIVO
+  async removeObjectiveLink(objectiveId: number): Promise<void> {
+    const objective = this.linkedObjectives.find(obj => obj.id === objectiveId);
+    if (!objective) {
+      console.error('Objetivo não encontrado:', objectiveId);
+      return;
+    }
+
+    const confirmed = confirm(`Tem certeza que deseja remover o vínculo com o objetivo "${objective.name}"?`);
+    if (!confirmed) return;
+
+    if (!this.criteria) {
+      alert('Erro: Critério não carregado.');
+      return;
+    }
+
+    console.log('🗑️ Removendo vínculo do objetivo:', objectiveId, 'do critério:', this.criteria.id);
+
+    try {
+      // Remove o ID do objetivo da lista
+      let ids = this.criteria.strategicObjectives ? this.criteria.strategicObjectives.map(obj => obj.id) : [];
+      if (ids.includes(objectiveId)) {
+        ids.splice(ids.indexOf(objectiveId), 1);
+      }
+
+      const updatedCriterion = {
+        name: this.criteria.name,
+        description: this.criteria.description,
+        strategicObjectives: ids
+      };
+
+      await firstValueFrom(
+        this.criterioService.updateCriterio(
+          this.criteria.id,
+          updatedCriterion,
+          this.estrategiaId,
+          this.criteriaGroupId
+        )
+      );
+
+      // Recarregar dados do critério para atualizar linkedObjectives
+      await this.loadCriteria();
+
+      console.log('✅ Vínculo removido com sucesso');
+    } catch (error) {
+      console.error('❌ Erro ao remover vínculo:', error);
+      alert('Erro ao remover vínculo. Tente novamente.');
     }
   }
 
@@ -394,6 +484,7 @@ export class CriterioComponent implements OnInit, OnDestroy {
     // Chamar o método de mudança de importância
     this.onImportanceChange(criteria, otherCriteria);
   }
+
   async onImportanceChange(criteria: Criterion, otherCriteria: Criterion): Promise<void> {
     if (!criteria?.id || !otherCriteria?.id) {
       console.error('❌ IDs inválidos:', criteria?.id, otherCriteria?.id);
@@ -504,11 +595,7 @@ export class CriterioComponent implements OnInit, OnDestroy {
         }
       }
 
-      console.log(`🏁 === FIM DA MUDANÇA ===\n`);
-
     } catch (error) {
-      console.error('❌ ERRO ao salvar:', error);
-      // Reverter valor em caso de erro
       this.comparisonValues[criteria.id][otherCriteria.id] = '';
       alert('Erro ao salvar comparação. Tente novamente.');
     }
@@ -516,6 +603,7 @@ export class CriterioComponent implements OnInit, OnDestroy {
 
   // Verificar se critério pode ser excluído
   canDeleteCriteria(): boolean {
+    console.log('Verificando se pode excluir critério:', this.criteria);
     if (!this.criteria) return false;
 
     // Verificar se o critério tem comparações (como comparador ou como referência)
@@ -614,21 +702,27 @@ export class CriterioComponent implements OnInit, OnDestroy {
   }
 
   deleteCriteria() {
-    // Verificar se pode deletar antes de tentar
-    if (!this.canDeleteCriteria()) {
-      // Mostrar mensagem de erro do navegador
+    const canDelete = this.canDeleteCriteria();
+
+    if (!canDelete) {
       alert(this.getDeleteErrorMessage());
       return;
     }
-    this.showDeleteModal = true;
+    if (this.criteria) {
+      this.criterioService.deleteCriterio(this.criteria.id, this.estrategiaId, this.criteriaGroupId).subscribe({
+        next: () => {
+          this.loadCriteria();
+          this.router.navigate([`/estrategia`, this.estrategiaId, 'grupo-criterio', this.criteriaGroupId]);
+        },
+        error: (err) => {
+          console.error('Erro ao excluir critério:', err);
+        }
+      });
+    }
   }
 
   closeEditModal(): void {
     this.showEditModal = false;
-  }
-
-  closeDeleteModal(): void {
-    this.showDeleteModal = false;
   }
 
   onSaveByActiveTab(fields: any[]): void {
@@ -659,8 +753,6 @@ export class CriterioComponent implements OnInit, OnDestroy {
         this.criterioService.deleteCriterio(this.criteria.id, this.estrategiaId, this.criteriaGroupId).subscribe({
           next: () => {
             this.loadCriteria();
-            this.closeDeleteModal();
-            this.resetFormFields(this.deleteFormConfig);
             this.router.navigate([`/estrategia`, this.estrategiaId, 'grupo-criterio', this.criteriaGroupId]);
           },
           error: (err) => {
@@ -719,13 +811,17 @@ export class CriterioComponent implements OnInit, OnDestroy {
     return item.criteria.id;
   }
 
+  trackByObjectiveId(index: number, item: Objective): number {
+    return item.id;
+  }
+
   // Método para verificar se os dados estão prontos para renderizar
   isDataReady(): boolean {
     return !this.loadingCriterios &&
-           !!this.criteria &&
-           !!this.criteria.id &&
-           !!this.comparisonValues[this.criteria.id] &&
-           this.filteredCriteriaGroups.length > 0;
+          !!this.criteria &&
+          !!this.criteria.id &&
+          !!this.comparisonValues[this.criteria.id] &&
+          this.filteredCriteriaGroups.length > 0;
   }
 
   // Método auxiliar para garantir que criteria existe (Type Guard)

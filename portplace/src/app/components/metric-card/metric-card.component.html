@@ -1,0 +1,11 @@
+<div class="metric-content">
+    <app-svg-icon class="nav-icon" [path]="card.iconPath" [size]="24">
+    </app-svg-icon>
+    <div class="metric-info-container">
+        <div class="metric-title-row">
+            <p class="metric-title">{{card.title}}</p>
+            <div class="metric-indicator" [class]="'indicator-' + card.color" *ngIf="card.color !== 'none'"></div>
+        </div>
+        <p class="metric-subtitle">{{card.subtitle}}</p>
+    </div>
+</div>

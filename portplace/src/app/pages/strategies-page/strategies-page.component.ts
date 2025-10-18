@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { CardComponent } from '../../components/card/card.component';
 import { FormsModule } from '@angular/forms';
@@ -7,13 +7,15 @@ import { BadgeComponent } from '../../components/badge/badge.component';
 import { SvgIconComponent } from '../../components/svg-icon/svg-icon.component';
 import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../service/breadcrumb.service';
-interface Strategy {
-  id: string;
-  name: string;
-  activeObjectives: number;
-  status: string;
-  statusColor: string;
-}
+import { EstrategiaService } from '../../service/estrategia.service';
+import { FormModalComponentComponent } from '../../components/form-modal-component/form-modal-component.component';
+import { Strategy, StrategyStatusEnum, FormModalConfig, FormField } from '../../interface/interfacies';
+import { Observable, retry, map } from 'rxjs';
+import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } from '../../models/pagination-models';
+import { mapStrategyPageDtoToStrategyTableRowPage } from '../../mappers/strategies-mappers';
+import { TableComponent } from '../../components/table/table.component';
+import { getFilterButtons, getFilterText, getColumns, getActionButton } from './strategies-table-config';
+
 
 @Component({
   selector: 'app-strategies-page',
@@ -23,27 +25,54 @@ interface Strategy {
     FormsModule,
     BadgeComponent,
     SvgIconComponent,
-    BreadcrumbComponent
+    BreadcrumbComponent,
+    FormModalComponentComponent,
+    TableComponent
   ],
   templateUrl: './strategies-page.component.html',
   styleUrl: './strategies-page.component.scss'
 })
 export class StrategiesPageComponent implements OnInit {
+  @ViewChild('tableComponent') tableComponent!: TableComponent;
+  filterButtons = getFilterButtons();
+  filterText = getFilterText();
+  columns = getColumns();
+  actionButton = getActionButton();
   private router = inject(Router);
   private breadcrumbService = inject(BreadcrumbService);
-  strategies: Strategy[] = [
-    {
-      id: '1',
-      name: 'Estratégia 2025',
-      activeObjectives: 1,
-      status: 'ATIVO',
-      statusColor: 'green'
-    }
-  ];
+  private estrategiaService = inject(EstrategiaService);
 
+  strategies: Strategy[] = [];
+  allStrategies: Strategy[] = [];
   filteredStrategies: Strategy[] = [];
   searchTerm = '';
   activeFilter = '';
+  showCreateModal = false;
+  loadingStrategies = false;
+
+  createStrategyConfig: FormModalConfig = {
+    title: 'Cadastrar nova estratégia',
+    fields: [
+      {
+        id: 'name',
+        label: 'Nome',
+        type: 'text',
+        value: '',
+        required: true,
+        placeholder: 'Digite o nome da estratégia'
+      },
+      {
+        id: 'description',
+        label: 'Descrição',
+        type: 'textarea',
+        value: '',
+        required: false,
+        placeholder: 'Digite a descrição da estratégia',
+        rows: 4
+      }
+    ],
+    validationMessage: 'Os campos marcados com * são obrigatórios.'
+  };
 
   ngOnInit(): void {
     // COMPONENTE PAI: Configurar breadcrumbs base
@@ -66,57 +95,116 @@ export class StrategiesPageComponent implements OnInit {
       this.breadcrumbService.removeChildrenAfter('/estrategias');
     }
 
-    this.filteredStrategies = [...this.strategies];
   }
 
-  onFilterChange(filter: string): void {
-    this.activeFilter = this.activeFilter === filter ? '' : filter;
-    this.applyFilters();
-  }
+  // Usado pelo TableComponent.
+  // Recarrega a tabela de estratégias, buscando os dados via requisição HTTP.
+  getDataForTableComponent: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => (
+    this.estrategiaService.getStrategiesPage(queryParams).pipe(
+      map(page => {
+        console.log(page);
+        return mapStrategyPageDtoToStrategyTableRowPage(page);
+      })
+    )
+  );
 
-  onSearchChange(): void {
-    this.applyFilters();
-  }
-
-  applyFilters(): void {
-    let filtered = [...this.strategies];
-
-    if (this.activeFilter) {
-      filtered = filtered.filter(strategy =>
-        strategy.status.toLowerCase() === this.activeFilter.toLowerCase()
-      );
+  onStrategyClick(strategyId: number | { id: number }): void {
+    let id: number | undefined;
+    if (typeof strategyId === 'object' && strategyId !== null && 'id' in strategyId) {
+      id = (strategyId as { id: number }).id;
+    } else if (typeof strategyId === 'number') {
+      id = strategyId;
     }
-
-    if (this.searchTerm) {
-      filtered = filtered.filter(strategy =>
-        strategy.name.toLowerCase().includes(this.searchTerm.toLowerCase())
-      );
+    if (id) {
+      this.router.navigate(['/estrategia', id]);
+    } else {
+      console.warn('ID da estratégia não encontrado:', strategyId);
     }
-
-    this.filteredStrategies = filtered;
-  }
-
-  onStrategyClick(strategyId: string): void {
-    this.router.navigate(['/estrategia', strategyId]);
   }
 
   openCreateModal(): void {
-    // Implementar modal de criação
-  }
-  editStrategy() {
-    console.log('Editar estratégia');
-    // Lógica para edição
-  }
-
-  cancelStrategy() {
-    console.log('Cancelar estratégia');
-    // Lógica para cancelamento
+    // Reset form values
+    this.createStrategyConfig.fields.forEach(field => {
+      field.value = '';
+      field.hasError = false;
+      field.errorMessage = '';
+    });
+    this.showCreateModal = true;
   }
 
-  deleteStrategy() {
-    console.log('Excluir estratégia');
-    // Lógica para exclusão
-    // Pode adicionar um modal de confirmação aqui
+  closeCreateModal(): void {
+    this.showCreateModal = false;
   }
 
+  onSaveStrategy(fields: FormField[]): void {
+    // Process form data
+    const strategyData = fields.reduce((acc, field) => {
+      acc[field.id] = field.value;
+      return acc;
+    }, {} as any);
+
+    // Validar dados antes de enviar
+    const validationResult = this.validateStrategyData(strategyData);
+    if (!validationResult.isValid) {
+      return;
+    }
+
+    const newStrategy: Strategy = {
+      name: strategyData.name,
+      description: strategyData.description,
+    };
+
+
+    this.estrategiaService.createStrategy(newStrategy).subscribe({
+      next: (createdStrategy) => {
+        this.closeCreateModal();
+        if (this.tableComponent) {
+          this.tableComponent.refresh();
+        }
+      },
+      error: (err) => {
+        console.error('Erro ao criar estratégia:', err);
+      }
+    });
+  }
+
+  private validateStrategyData(data: any): { isValid: boolean; errors: string[] } {
+    const errors: string[] = [];
+
+    // Validar nome
+    if (!data.name || data.name.trim() === '') {
+      errors.push('Nome é obrigatório');
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  }
+
+  getStatusLabel(status?: StrategyStatusEnum): string {
+    if (!status) return 'Desconhecido';
+
+    switch (status) {
+      case StrategyStatusEnum.ACTIVE:
+        return 'ATIVO';
+      case StrategyStatusEnum.INACTIVE:
+        return 'INATIVO';
+      default:
+        return 'Desconhecido';
+    }
+  }
+
+  getStatusColor(status?: StrategyStatusEnum): string {
+    if (!status) return 'gray';
+
+    switch (status) {
+      case StrategyStatusEnum.ACTIVE:
+        return 'green';
+      case StrategyStatusEnum.INACTIVE:
+        return 'red';
+      default:
+        return 'gray';
+    }
+  }
 }

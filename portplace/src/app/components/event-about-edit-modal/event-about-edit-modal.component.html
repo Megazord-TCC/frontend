@@ -1,0 +1,74 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)" (mousedown)="onOverlayMouseDown($event)">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header">
+            <h2>Editar evento</h2>
+            <button class="close-btn" (click)="close.emit();">
+                <i class="icon-x">✕</i>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+            <!-- Validation Message -->
+            <div *ngIf="errorMessage" class="validation-error">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>{{ errorMessage }}</span>
+            </div>
+
+            <h3 class="no-top-margin">Dados gerais</h3>
+            <!-- Form Fields -->
+            <div class="form-fields bottom-margin bottom-margin" [ngClass]="{'disabled': isSubmitButtonDisabled}">
+                <div class="form-group">
+                    <label>Informações e documentos necessários</label>
+                    <textarea [(ngModel)]="inputRequiredDocumentsAndGeneralInfo" [disabled]="isSubmitButtonDisabled"
+                        [maxlength]="255"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Tópico de discussão</label>
+                    <textarea [(ngModel)]="inputDiscussionTopic" [disabled]="isSubmitButtonDisabled"
+                        [maxlength]="255"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Motivo do evento</label>
+                    <textarea [(ngModel)]="inputEventReason" [disabled]="isSubmitButtonDisabled"
+                        [maxlength]="255"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Periodicidade<span class="required-asterisk">*</span></label>
+                    <select [(ngModel)]="inputPeriodicitySelected" [disabled]="isSubmitButtonDisabled">
+                        <option *ngFor="let periodicity of inputPeriodicityOptions" [ngValue]="periodicity"
+                            [hidden]="periodicity == eventPeriodicity.UNDEFINED">
+                            {{ periodicity }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <h3>Métodos de comunicação</h3>
+            <div class="form-fields" [ngClass]="{'disabled': isSubmitButtonDisabled}">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="email" [(ngModel)]="inputUsesCommunicationMethodEmail" />
+                    <label for="email">E-mail</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="online-meeting" [(ngModel)]="inputUsesCommunicationMethodOnlineMeeting" />
+                    <label for="online-meeting">Reunião online</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="on-site-meeting" [(ngModel)]="inputUsesCommunicationMethodOnSiteMeeting" />
+                    <label for="on-site-meeting">Reunião presencial</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button class="btn-outline" (click)="close.emit();">Cancelar</button>
+            <button class="btn-primary" (click)="onSave()" [disabled]="isSubmitButtonDisabled">Salvar</button>
+        </div>
+    </div>
+</div>

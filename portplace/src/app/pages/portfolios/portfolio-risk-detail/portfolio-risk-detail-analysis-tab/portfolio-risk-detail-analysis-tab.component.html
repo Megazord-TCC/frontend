@@ -1,0 +1,40 @@
+<div class="tab-content">
+    <div>
+        <h3>
+            Severidade 
+            <app-badge [color]="mapSeverityNumberToBadgeColor(severity)">{{ severity }}</app-badge>
+            <app-tooltip [text]="`A severidade é calculada multiplicando a probabilidade pelo impacto.`">
+            </app-tooltip>
+        </h3>
+    </div>
+    <div>
+        <h3>Probabilidade <app-badge [color]="mapRiskScaleEnumDTOToBadgeColor(probability)">{{ mapRiskScaleEnumDTOToRiskScale(probability) }}</app-badge></h3>
+        <p class="tab-description">
+            <span class="justification">Justificativa: </span>{{ probabilityJustification || 'não informada.' }}
+        </p>
+    </div>
+    <div>
+        <h3>Impacto <app-badge [color]="mapRiskScaleEnumDTOToBadgeColor(impact)">{{ mapRiskScaleEnumDTOToRiskScale(impact) }}</app-badge></h3>
+        <p class="tab-description">
+            <span class="justification">Justificativa: </span>{{ impactJustification || 'não informada.' }}
+        </p>
+    </div>
+    <div>
+        <h3>Plano de prevenção</h3>
+        <p class="tab-description">
+            {{ preventionPlan || 'Não informado.' }}
+        </p>
+    </div>
+    <div>
+        <h3>Plano de contingência</h3>
+        <p class="tab-description">
+            {{ contingencyPlan || 'Não informado.' }}
+        </p>
+        <button class="action-btn" (click)="showEditModal = true">Editar análise</button>   
+    </div>
+</div>
+
+<app-risk-analysis-edit-modal *ngIf="showEditModal" 
+    (close)="showEditModal = false"
+    (edit)="fillFormDataByHttpRequest(); showEditModal = false">
+</app-risk-analysis-edit-modal>

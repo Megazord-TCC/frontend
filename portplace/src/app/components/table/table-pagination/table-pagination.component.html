@@ -1,0 +1,24 @@
+<div *ngIf="page" class="pagination">
+    <p class="pagination-info">{{ getCurrentPageElementsCounterText() }}</p>
+    <div class="pagination-controls">
+        <button class="pagination-btn" [disabled]="page.first" (click)="goToFirstPage()">
+            <i class="icon-chevron-left">‹‹</i>
+        </button>
+        <button class="pagination-btn" [disabled]="page.first" (click)="goToPreviousPage()">
+            <i class="icon-chevron-left">‹</i>
+        </button>
+        <button class="pagination-btn active">{{ getCurrentPageNumber() }}</button>
+        <button class="pagination-btn" [disabled]="page.last" (click)="goToNextPage()">
+            <i class="icon-chevron-right">›</i>
+        </button>
+        <button class="pagination-btn" [disabled]="page.last" (click)="goToLastPage()">
+            <i class="icon-chevron-right">››</i>
+        </button>
+        <select class="pagination-btn" style="padding-right: 15px;" [(ngModel)]="pageSizeSelected" (change)="onPageSizeChange()">
+            <option *ngFor="let pageSizeOption of pageSizeOptions"
+                [ngValue]="pageSizeOption">
+                {{ pageSizeOption }}
+            </option>
+        </select>
+    </div>
+</div>

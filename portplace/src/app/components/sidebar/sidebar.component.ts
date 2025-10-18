@@ -3,13 +3,10 @@ import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { SvgIconComponent } from '../svg-icon/svg-icon.component';
 import { BreadcrumbService } from '../../service/breadcrumb.service';
+import { AuthService } from '../../service/auth-service';
+import { getAuthorizedMenuItems, MenuItem } from './menu-item';
 
-interface MenuItem {
-  id: string;
-  label: string;
-  icon: string;
-  route: string;
-}
+
 
 @Component({
   selector: 'app-sidebar',
@@ -24,17 +21,16 @@ export class SidebarComponent {
 
   private router = inject(Router);
   private breadcrumbService = inject(BreadcrumbService);
+  authService = inject(AuthService);
 
-  menuItems: MenuItem[] = [
-    { id: 'inicio', label: 'Início', icon: 'assets/icon/home_vetor.svg', route: '/inicio' },
-    { id: 'dashboard', label: 'Dashboard', icon: 'assets/icon/dashboard_vetor.svg', route: '/dashboard' },
-    { id: 'portfolios', label: 'Portfólios', icon: 'assets/icon/hub_portfolios_vetor.svg', route: '/portfolios' },
-    { id: 'projects', label: 'Projetos', icon: 'assets/icon/assignment_projetos_vetor.svg', route: '/projetos' },
-    { id: 'strategies', label: 'Estratégias', icon: 'assets/icon/estrategia_vetor.svg', route: '/estrategias' },
-    { id: 'resources', label: 'Recursos', icon: 'assets/icon/recursos_vetor.svg', route: '/recursos' },
-    { id: 'users', label: 'Usuários', icon: 'assets/icon/usuarios_vetor.svg', route: '/usuarios' }
-  ];
+  menuItems: MenuItem[] = [];
+
   activeNav: string = '';
+
+  ngOnInit(): void {
+    this.menuItems = getAuthorizedMenuItems(this.authService.getAuthorizedPageTypesByRole());
+  }
+
   isActive(route: string): boolean {
     if (this.router.url === route || this.router.url.startsWith(route + '/')) {
       return true;
@@ -83,11 +79,6 @@ export class SidebarComponent {
       }
     }
   }
-
-  closeSidebar(): void {
-    // Implementar lógica para fechar sidebar em mobile
-  }
-
   logout(): void {
     this.router.navigate(['/login']);
   }

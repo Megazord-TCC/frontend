@@ -1,9 +1,89 @@
+export interface Portfolio {
+    id: number;
+    name: string;
+}
+
+export enum ScenarioStatus {
+    AWAITING_AUTHORIZATION,
+    AUTHORIZED,
+    CANCELED
+}
+
+// Dados resumidos de cada cenário exibido na tabela da aba "Cenários" 
+// (esta aba está presenta na página duma estratégia específica)
+export interface ScenariosTableRow {
+    id: number;
+    name: string;
+    budget: string;
+    includedProjectsQuantity: number;
+    status: string;
+    evaluationGroupName: string;
+}
+
+export enum ProjectInclusionStatus {
+    INCLUDED,
+    MANUALLY_INCLUDED,
+    REMOVED,
+    MANUALLY_REMOVED
+}
+
+export enum ProjectStatus {
+    IN_ANALYSIS,
+    IN_PROGRESS,
+    COMPLETED,
+    CANCELED,
+}
+
+export interface ScenarioProjectRow {
+    scenarioRankingId: number;
+    currentOrder: number;
+    initialOrder: number;
+    projectId: number;
+    projectName: string;
+    inclusionStatus: ProjectInclusionStatus;
+    strategicValue: number;
+    estimatedCost: number;
+    categoryId: number;
+    estimatedDurationMonths: number;
+    projectStatus: ProjectStatus
+}
+
+
+export interface ScenarioProject {
+    scenarioRankingId: number;
+    currentOrder: number; // Backend: calculatedPosition
+    initialOrder: number;
+    projectName: string;
+    inclusionStatus: string; // Backend: status
+    strategicValue: number; // Backend: totalScore
+    estimatedCost: string; // Backend: budget
+    portfolioCategoryId: string; // Backend: category (backend não implementado)
+    durationMonths: string;
+    projectStatus: string;
+}
+
+export interface Scenario {
+    id: number;
+    name: string;
+    description: string;
+    userDefinedBudget: number;
+    status: ScenarioStatus;
+    budget?: number;
+    projects: ScenarioProject[];
+    lastModifiedAt: Date;
+
+    portfolioId: number;
+    portfolioName?: string;
+
+    evaluationGroupId: number;
+    evaluationGroupName?: string;
+}
 
 export interface EvaluationGroup {
     id: number;
     name: string;
     description: string;
-    criteriaGroupId: number;
+    criteriaGroup: CriteriaGroup;
     evaluations?: Evaluation[];
     disabled: number;
     createdAt?: Date;
@@ -62,10 +142,6 @@ export const ImportanceScaleValues: Record<ImportanceScale, { value: number, rec
   [ImportanceScale.LESS_IMPORTANT]: { value: 1 / 3.0, reciprocal: 3.0 },
   [ImportanceScale.MUCH_LESS_IMPORTANT]: { value: 1 / 6.0, reciprocal: 6.0 }
 };
-
-export interface EvaluationGroupView extends EvaluationGroup {
-  criteriaGroup: CriteriaGroup | undefined
-}
 
 export interface Evaluation {
     id: string;

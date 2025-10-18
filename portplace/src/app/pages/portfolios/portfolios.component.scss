@@ -1,284 +1,56 @@
-$primary-color: #1e293b;
-$border-color: #e2e8f0;
-$blue-color: #3b82f6;
-$background-color: #f8fafc;
-$card-background: #ffffff;
 $text-primary: #1e293b;
 $text-secondary: #64748b;
 
-.portfolios-container {
-  padding: 32px;
+.info-text {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 4px;
+    line-height: 1.4;
+}
 
-  .breadcrumb {
+.detail-layout {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    color: #64748b;
-    margin-bottom: 16px;
+    height: 100vh;
+    background-color: white;
+}
 
-    text-decoration: none;
-    font-family: 'Roboto', sans-serif;
-    font-weight: 400;
-    .separator {
-      color: #64748b;
-    }
+.detail-content {
+    flex: 1;
+    overflow: auto;
+    padding: 2rem;
 
-    .current {
-      color: #1e293b;
-    }
-  }
+    .page-header {
+        margin-bottom: 24px;
 
-  .page-header {
-    margin-bottom: 24px;
-
-    h1 {
-      font-size: 24px;
-      font-weight: bold;
-      color: #1e293b;
-      margin-bottom: 8px;
-      font-family: 'Inter', sans-serif;
-    }
-
-    p {
-      color: #64748b;
-      font-family: 'Roboto', sans-serif;
-    }
-  }
-
-  .filters-section {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
-
-    .filters-left {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-
-      .filter-label {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: #64748b;
-        font-size: 14px;
-        font-family: 'Roboto', sans-serif;
-        font-weight: 500;
-      }
-
-      .filter-buttons {
-        display: flex;
-        gap: 8px;
-
-        .filter-btn {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          padding: 6px 12px;
-          border: 1px solid #e2e8f0;
-          border-radius: 6px;
-          background: white;
-          color: #64748b;
-          font-size: 14px;
-          cursor: pointer;
-          transition: all 0.2s;
-
-          &:hover {
-            background-color: #f8fafc;
-          }
-
-          &.active {
-            background-color: #3b82f6;
-            color: white;
-            border-color: #3b82f6;
-
-            .filter-indicator {
-              background-color: white;
-            }
-          }
-
-          .filter-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-
-            &.blue {
-              background-color: #3b82f6;
-            }
-          }
-        }
-      }
-    }
-
-    .actions-right {
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-
-      .btn-primary {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 16px;
-        border-color: adjust-color($border-color, $lightness: -5%);
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: background-color 0.2s;
-
-      }
-      .search-container {
-        position: relative;
-        border: 1px solid $border-color;
-        border-radius: 6px;
-        width: 256px;
-        transition: all 0.2s ease;
-        align-items: center;
-        justify-content: center;
-        display: flex;
-
-        &:focus-within {
-          border-color: $blue-color;
-          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-        .nav-icon{
-          display: flex;
-          padding: 0;
-          padding-left: 5px;
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: $text-primary;
+            margin: 0 0 8px 0;
+            font-family: 'Inter', sans-serif;
         }
 
-        input {
-          width: 100%;
-          padding: 8px 12px 8px 10px;
-          border: none;
-          background: transparent;
-          font-size: 14px;
-          font-family: 'Roboto', sans-serif;
-
-          &::placeholder {
+        p {
             color: $text-secondary;
-          }
-
-          &:focus {
-            outline: none;
-          }
+            margin: 0;
+            line-height: 1.5;
+            font-family: 'Roboto', sans-serif;
         }
-
-        @media (max-width: 768px) {
-          width: 100%;
-        }
-      }
-      @media (max-width: 768px) {
-        justify-content: center;
-      }
     }
-  }
+}
 
-  .table-card {
-    margin-bottom: 16px;
+// Tabs
+.tab-content {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0 0 0.75rem 0.75rem;
+    min-height: 400px;
+    padding: 1.5rem;
+}
 
-    .table-container {
-      overflow-x: auto;
-
-      .portfolios-table {
-        width: 100%;
-        border-collapse: collapse;
-
-        thead {
-          background-color: #f8fafc;
-          border-bottom: 1px solid #e2e8f0;
-        }
-
-        .header-cell {
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          font-size: 14px;
-          font-weight: 500;
-          color: #64748b;
-        }
-
-        th, td {
-          padding: 16px;
-          text-align: left;
-        }
-
-        .table-row {
-          border-bottom: 1px solid #e2e8f0;
-          cursor: pointer;
-          transition: background-color 0.2s;
-
-          &:hover {
-            background-color: #f8fafc;
-          }
-
-          .portfolio-link {
-            background: none;
-            border: none;
-            color: #1e293b;
-            font-weight: 500;
-            cursor: pointer;
-            text-decoration: none;
-
-            &:hover {
-              color: #3b82f6;
-            }
-          }
-
-          td {
-            color: #64748b;
-            font-size: 14px;
-          }
-        }
-      }
+// Responsive
+@media (max-width: 768px) {
+    .strategy-detail-content {
+        padding: 1rem;
     }
-  }
-
-  .pagination {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    .pagination-info {
-      font-size: 14px;
-      color: #64748b;
-    }
-
-    .pagination-controls {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-
-      .pagination-btn {
-        padding: 6px 12px;
-        border: 1px solid #e2e8f0;
-        border-radius: 6px;
-        background: white;
-        color: #64748b;
-        cursor: pointer;
-        transition: all 0.2s;
-
-        &:hover:not(:disabled) {
-          background-color: #f8fafc;
-        }
-
-        &.active {
-          background-color: #3b82f6;
-          color: white;
-          border-color: #3b82f6;
-        }
-
-        &:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-      }
-    }
-  }
 }

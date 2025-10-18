@@ -1,0 +1,15 @@
+<app-breadcrumb></app-breadcrumb>
+
+<app-page-header [title]="name" [description]="description" [goBackButtonPathToNavigate]="goBackButtonPathToNavigate"
+    [visibleActionButtons]="visibleActionButtons" [lastUpdate]="lastUpdate"
+    (editClick)="isEditModalVisible = true" (deleteClick)="isDeleteModalVisible = true">
+</app-page-header>
+
+<app-event-edit-modal *ngIf="isEditModalVisible" [portfolioId]="portfolioId" [eventId]="eventId"
+    (close)="isEditModalVisible = false"
+    (eventEdit)="this.loadEventAndPortfolioDetails(); isEditModalVisible = false">
+</app-event-edit-modal>
+
+<app-event-delete-modal *ngIf="isDeleteModalVisible" [portfolioId]="portfolioId" [eventId]="eventId"
+    (close)="isDeleteModalVisible = false">
+</app-event-delete-modal>

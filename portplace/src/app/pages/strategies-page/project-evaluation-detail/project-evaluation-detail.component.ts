@@ -11,7 +11,6 @@ import {
   CriteriaGroup,
   Evaluation,
   EvaluationGroup,
-  EvaluationGroupView,
   Project
 } from '../../../interface/carlos-interfaces';
 import { forkJoin, map, firstValueFrom, Subscription } from 'rxjs';
@@ -19,6 +18,7 @@ import { ProjectCriteriaEvaluationModal } from '../../../components/project-crit
 import { Criterion } from '../../../interface/interfacies';
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../../service/breadcrumb.service';
+import { Page } from '../../../models/pagination-models';
 
 // Interface local para combinar dados de critério com avaliação
 interface CriteriaEvaluation {
@@ -58,7 +58,7 @@ export class ProjectEvaluationDetailComponent implements OnInit, OnDestroy {
 
   // Dados carregados
   project: Project | undefined;
-  evaluationGroup: EvaluationGroupView | undefined;
+  evaluationGroup: EvaluationGroup | undefined;
   criteriaEvaluations: CriteriaEvaluation[] = [];
 
   // Estados do componente
@@ -113,7 +113,7 @@ export class ProjectEvaluationDetailComponent implements OnInit, OnDestroy {
 
         // Usar addChildBreadcrumb para adicionar breadcrumb filho
         this.breadcrumbService.addChildBreadcrumb({
-          label: project.name || `Projeto ${this.projectId}`,
+          label: `Projeto: ${project.name}` || `Projeto ${this.projectId}`,
           url: `/estrategia/${this.strategyId}/grupo-avaliacao/${this.evaluationGroupId}/projeto/${this.projectId}`,
           isActive: true
         });
@@ -125,42 +125,16 @@ export class ProjectEvaluationDetailComponent implements OnInit, OnDestroy {
   }
 
   loadEvaluationGroup(): void {
-    const evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps`;
+    const evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups`;
     const criteriaGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups`;
 
     console.log('🔍 Buscando grupo de avaliação e critérios...');
 
-    const getAllEvaluationGroups$ = this.httpClient.get<EvaluationGroup[]>(evaluationGroupsRoute);
-    const getAllCriteriaGroups$ = this.httpClient.get<CriteriaGroup[]>(criteriaGroupsRoute);
-
-    forkJoin({
-      evaluationGroups: getAllEvaluationGroups$,
-      criteriaGroups: getAllCriteriaGroups$
-    })
-      .pipe(
-        map(({ evaluationGroups, criteriaGroups }) =>
-          this.getManyEvaluationGroupView(evaluationGroups, criteriaGroups)
-        ),
-        map(evaluationGroups =>
-          evaluationGroups.find(evaluationGroup => evaluationGroup.id == this.evaluationGroupId)
-        )
-      )
-      .subscribe({
-        next: (evaluationGroup) => {
-          console.log('✅ Grupo de avaliação carregado:', evaluationGroup);
-          this.evaluationGroup = evaluationGroup;
-        },
-        error: (error) => {
-          console.error('❌ Erro ao carregar grupo de avaliação:', error);
-        }
-      });
-  }
-
-  getManyEvaluationGroupView(evaluationGroups: EvaluationGroup[], criteriaGroups: CriteriaGroup[]): EvaluationGroupView[] {
-    return evaluationGroups.map(evaluationGroup => ({
-      ...evaluationGroup,
-      criteriaGroup: criteriaGroups.find(criteriaGroup => criteriaGroup.id == evaluationGroup.criteriaGroupId)
-    }));
+    this.httpClient.get<Page<EvaluationGroup>>(evaluationGroupsRoute, { params: { size: 1000 } })
+        .pipe(map(page => page.content))
+        .subscribe(evaluationGroups => {
+            this.evaluationGroup = evaluationGroups.find(evaluationGroup => evaluationGroup.id == this.evaluationGroupId);
+        });
   }
 
   async loadCriteriaEvaluations(): Promise<void> {
@@ -168,25 +142,25 @@ export class ProjectEvaluationDetailComponent implements OnInit, OnDestroy {
       console.log('📋 Carregando critérios e avaliações...');
 
       // 1. Buscar grupo de avaliação para obter criteriaGroupId
-      const evaluationGroupRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps/${this.evaluationGroupId}`;
+      const evaluationGroupRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroupId}`;
       const evaluationGroup = await firstValueFrom(
-        this.httpClient.get<EvaluationGroup>(evaluationGroupRoute)
+        this.httpClient.get<any>(evaluationGroupRoute)
       );
 
       console.log('📊 Grupo de avaliação encontrado:', evaluationGroup);
 
       // 2. Buscar critérios do grupo usando criteriaGroupId
-      const criteriaRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups/${evaluationGroup.criteriaGroupId}/criteria`;
+      const criteriaRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups/${evaluationGroup?.criteriaGroup?.id}/criteria`;
       const criteria = await firstValueFrom(
-        this.httpClient.get<Criterion[]>(criteriaRoute) // CORRIGIDO: usar Criterion[]
+        this.httpClient.get<Page<Criterion>>(criteriaRoute, { params: { size: 1000 } }).pipe(map(page => page.content))
       );
 
       console.log('📝 Critérios encontrados:', criteria);
 
       // 3. Buscar avaliações existentes para este projeto
-      const evaluationsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps/${this.evaluationGroupId}/evaluations`;
+      const evaluationsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroupId}/evaluations`;
       const evaluations = await firstValueFrom(
-        this.httpClient.get<Evaluation[]>(evaluationsRoute)
+        this.httpClient.get<Page<any>>(evaluationsRoute, { params: { size: 1000 } }).pipe(map(page => page.content))
       );
 
       console.log('⭐ Avaliações encontradas:', evaluations);
@@ -194,7 +168,7 @@ export class ProjectEvaluationDetailComponent implements OnInit, OnDestroy {
       // 4. Combinar critérios com avaliações existentes - CORRIGIDO: ATRIBUIR AO this.criteriaEvaluations
       this.criteriaEvaluations = criteria.map(criterion => {
         const evaluation = evaluations.find(e =>
-          e.criterionId === criterion.id && this.project && e.projectId === this.project.id
+          e.criterionId === criterion.id && this.project && e?.project?.id === this.project.id
         );
         return {
           id: criterion.id,

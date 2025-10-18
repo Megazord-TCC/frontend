@@ -1,0 +1,56 @@
+$text-primary: #1e293b;
+$text-secondary: #64748b;
+
+.info-text {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 4px;
+    line-height: 1.4;
+}
+
+.detail-layout {
+    display: flex;
+    height: 100vh;
+    background-color: white;
+}
+
+.detail-content {
+    flex: 1;
+    overflow: auto;
+    padding: 2rem;
+
+    .page-header {
+        margin-bottom: 24px;
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: $text-primary;
+            margin: 0 0 8px 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        p {
+            color: $text-secondary;
+            margin: 0;
+            line-height: 1.5;
+            font-family: 'Roboto', sans-serif;
+        }
+    }
+}
+
+// Tabs
+.tab-content {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0 0 0.75rem 0.75rem;
+    min-height: 400px;
+    padding: 1.5rem;
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .strategy-detail-content {
+        padding: 1rem;
+    }
+}

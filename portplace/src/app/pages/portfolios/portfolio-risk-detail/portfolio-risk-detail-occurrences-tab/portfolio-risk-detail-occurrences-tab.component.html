@@ -1,0 +1,21 @@
+<div class="tab-content">
+    <div>
+        <h3>Ocorrências do risco</h3>
+    </div>
+    <app-table [dataRetrievalMethodRef]="this.getDataForTableComponent" [filterText]="filterText" [columns]="columns"
+        [actionButton]="actionButton" (actionButtonClick)="showCreateModal = true"
+        (mainColumnRowClick)="selectedParticipantId = $event.id; showEditModal = true">
+    </app-table>
+</div>
+
+<app-risk-occurrence-create-modal *ngIf="showCreateModal" [riskId]="riskId" [portfolioId]="portfolioId"
+    (close)="showCreateModal = false"
+    (create)="change.emit(); tableComponent?.sendHttpGetRequestAndPopulateTable(); showCreateModal = false">
+</app-risk-occurrence-create-modal>
+
+<app-risk-occurrence-edit-modal *ngIf="showEditModal" [riskId]="riskId" [portfolioId]="portfolioId"
+    [occurrenceId]="selectedParticipantId"
+    (close)="showEditModal = false"
+    (edit)="change.emit(); tableComponent?.sendHttpGetRequestAndPopulateTable(); showEditModal = false"
+    (delete)="change.emit(); tableComponent?.sendHttpGetRequestAndPopulateTable(); showEditModal = false">
+</app-risk-occurrence-edit-modal>

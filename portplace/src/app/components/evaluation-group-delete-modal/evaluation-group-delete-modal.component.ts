@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
-import { EvaluationGroupView } from '../../interface/carlos-interfaces';
+import { EvaluationGroup } from '../../interface/carlos-interfaces';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from '../../environments/environment';
+import { EvaluationGroupApiResponse } from '../../interface/interfacies';
 
 @Component({
   selector: 'app-evaluation-group-delete-modal',
@@ -13,7 +14,7 @@ import { environment } from '../../environments/environment';
 })
 export class EvaluationGroupDeleteModal {
   @Input() isVisible = false;
-  @Input() evaluationGroup: EvaluationGroupView | undefined;
+  @Input({ required: true }) evaluationGroup?: EvaluationGroupApiResponse;
 
   @Output() close = new EventEmitter<void>();
   @Output() deleted = new EventEmitter<void>();
@@ -33,7 +34,6 @@ export class EvaluationGroupDeleteModal {
 
   ngOnChanges() {
     if (this.isVisible) {
-      console.log('🗑️ Modal de exclusão aberto para:', this.evaluationGroup);
       this.clearMessages();
     }
   }
@@ -54,50 +54,37 @@ export class EvaluationGroupDeleteModal {
 
   async onDelete(): Promise<void> {
     if (!this.evaluationGroup || !this.evaluationGroup.id) {
-      console.log('❌ Grupo de avaliação não encontrado');
       this.errorMessage = 'Erro: grupo de avaliação não encontrado.';
       return;
     }
+    if (this.evaluationGroup.evaluations && this.evaluationGroup.evaluations.length > 0) {
+      this.errorMessage = 'Não é possível excluir este grupo pois existem avaliações associadas a ele.';
+      return;
+    }
 
-    console.log('🗑️ Iniciando exclusão do grupo:', this.evaluationGroup.name);
 
     this.isDeleteButtonDisabled = true;
     this.isDeleting = true;
     this.clearMessages();
 
     try {
-      const evaluationGroupRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps/${this.evaluationGroup.id}`;
-      console.log('🔍 URL de exclusão:', evaluationGroupRoute);
+      const evaluationGroupRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroup.id}`;
 
       const deleteEvaluationGroup$ = this.httpClient.delete(evaluationGroupRoute);
 
       deleteEvaluationGroup$.subscribe({
         next: (response) => {
-          console.log('✅ Grupo de avaliação excluído com sucesso:', response);
           this.deleted.emit();
           this.onClose();
         },
         error: (error) => {
-          console.error('❌ Erro ao excluir grupo de avaliação:', error);
-
-          // Mensagens de erro específicas baseadas no status
-          if (error.status === 409) {
-            this.errorMessage = 'Não é possível excluir este grupo pois existem avaliações associadas a ele.';
-          } else if (error.status === 404) {
-            this.errorMessage = 'Grupo de avaliação não encontrado.';
-          } else if (error.status === 403) {
-            this.errorMessage = 'Você não tem permissão para excluir este grupo.';
-          } else {
-            this.errorMessage = 'Ocorreu um erro inesperado ao excluir. Tente novamente mais tarde.';
-          }
-
           this.isDeleteButtonDisabled = false;
           this.isDeleting = false;
         }
       });
 
     } catch (error) {
-      console.error('❌ Erro no processo de exclusão:', error);
+      console.error(' Erro no processo de exclusão:', error);
       this.errorMessage = 'Erro inesperado. Tente novamente mais tarde.';
       this.isDeleteButtonDisabled = false;
       this.isDeleting = false;
@@ -108,12 +95,6 @@ export class EvaluationGroupDeleteModal {
     this.errorMessage = '';
     this.isDeleteButtonDisabled = false;
     this.isDeleting = false;
-  }
-
-  hasEvaluations(): boolean {
-    // Aqui você pode adicionar lógica para verificar se o grupo tem avaliações
-    // Por enquanto, assumindo que sempre pode haver avaliações
-    return true;
   }
 
   getConfirmationMessage(): string {

@@ -1,3 +1,4 @@
+<!-- criterio.component.html -->
 <div class="strategy-detail-layout">
   <div class="strategy-detail-content">
 
@@ -60,6 +61,18 @@
           <span class="tab-number">2.</span>
           Comparações recíprocas
         </button>
+        <button
+          class="tab-trigger"
+          [class.active]="activeTab === 'objetivos'"
+          (click)="onTabChange('objetivos')">
+          <app-svg-icon
+            class="nav-icon"
+            [path]="'assets/icon/p_vetor.svg'"
+            [size]="18">
+          </app-svg-icon>
+          <span class="tab-number">3.</span>
+          Objetivos
+        </button>
       </div>
 
       <div class="tab-content">
@@ -86,7 +99,6 @@
           </div>
 
           <div class="table-container">
-            <!-- Cabeçalho como div -->
             <div class="table-header">
               <div class="header-row">
                 <div class="header-cell">
@@ -110,14 +122,11 @@
               </div>
             </div>
 
-            <!-- Corpo da tabela como div -->
             <div class="table-body">
-              <!-- Loading -->
               <div *ngIf="loadingCriterios" class="loading-state">
                 <p>Carregando critérios...</p>
               </div>
 
-              <!-- Conteúdo principal - com verificação se dados estão prontos -->
               <ng-container *ngIf="!loadingCriterios && isDataReady() && criteria">
                 <div *ngFor="let otherCriteria of getOtherCriteria(); trackBy: trackByCriteriaId" class="table-row">
                   <div class="table-cell">{{criteria!.name}}</div>
@@ -139,7 +148,6 @@
                 </div>
               </ng-container>
 
-              <!-- Estado vazio -->
               <div *ngIf="!loadingCriterios && (!isDataReady() || getOtherCriteria().length === 0)" class="empty-state">
                 <p *ngIf="!isDataReady()">Carregando dados de comparação...</p>
                 <p *ngIf="isDataReady() && getOtherCriteria().length === 0">Não há outros critérios neste grupo para comparação.</p>
@@ -171,7 +179,6 @@
           </div>
 
           <div class="table-container">
-            <!-- Cabeçalho -->
             <div class="table-header">
               <div class="header-row">
                 <div class="header-cell">
@@ -195,14 +202,11 @@
               </div>
             </div>
 
-            <!-- Corpo da tabela -->
             <div class="table-body">
-              <!-- Loading -->
               <div *ngIf="loadingCriterios" class="loading-state">
                 <p>Carregando critérios...</p>
               </div>
 
-              <!-- Conteúdo principal - com verificação se dados estão prontos -->
               <ng-container *ngIf="!loadingCriterios && isDataReady() && criteria">
                 <div *ngFor="let reciprocal of getReciprocalComparisons(); trackBy: trackByReciprocalId" class="table-row">
                   <div class="table-cell">
@@ -225,10 +229,53 @@
                 </div>
               </ng-container>
 
-              <!-- Estado vazio -->
               <div *ngIf="!loadingCriterios && (!isDataReady() || getOtherCriteria().length === 0)" class="empty-state">
                 <p *ngIf="!isDataReady()">Carregando dados de comparação...</p>
                 <p *ngIf="isDataReady() && getOtherCriteria().length === 0">Não há outros critérios neste grupo para comparações recíprocas.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ABA OBJETIVOS -->
+        <div *ngIf="activeTab === 'objetivos'" class="tab-panel">
+          <h3>Objetivos vinculados ao critério</h3>
+          <p class="tab-description">
+            Objetivos que estão vinculados a este critério. Clique em "Cadastrar novo vínculo" para adicionar mais objetivos.
+          </p>
+
+          <div class="actions-right">
+            <button class="btn-primary" (click)="openObjectiveModal()">
+              <app-svg-icon
+                class="nav-icon"
+                [path]="'assets/icon/cadastrar_vetor.svg'"
+                [size]="16">
+              </app-svg-icon>
+              Cadastrar novo vínculo
+            </button>
+          </div>
+
+          <div class="objectives-content">
+            <div *ngIf="loadingObjectives" class="loading-state">
+              <p>Carregando objetivos...</p>
+            </div>
+
+            <div *ngIf="!loadingObjectives && (!linkedObjectives || linkedObjectives.length === 0)" class="empty-objectives">
+              <p>Nenhum objetivo vinculado a este critério.</p>
+            </div>
+
+            <div *ngIf="!loadingObjectives && linkedObjectives && linkedObjectives.length > 0" class="objectives-list">
+              <div *ngFor="let objective of linkedObjectives; trackBy: trackByObjectiveId" class="objective-item">
+                <div class="objective-content">
+                  <span class="objective-name">{{objective.name}}</span>
+                </div>
+                <button class="remove-btn" (click)="removeObjectiveLink(objective.id)" [title]="'Remover vínculo com ' + objective.name">
+                  <app-svg-icon
+                    class="nav-icon"
+                    [path]="'assets/icon/x_vetor.svg'"
+                    [size]="16">
+                  </app-svg-icon>
+                </button>
               </div>
             </div>
           </div>
@@ -238,15 +285,7 @@
     </div>
   </div>
 
-  <!-- Modais -->
-  <app-form-modal-component
-    [isVisible]="showDeleteModal"
-    [config]="deleteFormConfig"
-    (close)="closeDeleteModal()"
-    (save)="onSaveByActiveTab($event)"
-    (cancel)="closeDeleteModal()">
-  </app-form-modal-component>
-
+  <!-- Modal de Edição -->
   <app-form-modal-component
     [isVisible]="showEditModal"
     [config]="editFormConfig"
@@ -254,4 +293,12 @@
     (save)="onSaveByActiveTab($event)"
     (cancel)="closeEditModal()">
   </app-form-modal-component>
+
+  <!-- Modal de Objetivos -->
+  <objectives-modal
+    [isVisible]="showObjectiveModal"
+    [linkedObjectives]="linkedObjectives"
+    (close)="closeObjectiveModal()"
+    (saved)="onSaveObjectiveLink($event)">
+  </objectives-modal>
 </div>

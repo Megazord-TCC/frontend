@@ -6,12 +6,67 @@
     <!-- Header -->
     <div class="page-header">
       <h1>Recursos</h1>
-      <p>Gerencie os recursos do sistema.</p>
+      <p>Gerencie os recursos humanos da organização</p>
     </div>
 
-    <!-- Content -->
-    <div class="resources-content-area">
-      <p>resources-page works!</p>
+    <!-- Tabs -->
+    <div class="tabs-container" >
+      <div class="tabs-list"  *ngIf="!this.isProjectManager">
+        <button
+          class="tab-trigger"
+          [class.active]="activeTab === 'pedidos'"
+          (click)="onTabChange('pedidos')">
+          <app-svg-icon
+            class="nav-icon"
+            [path]="'assets/icon/pedido_vetor.svg'"
+            [size]="18">
+          </app-svg-icon>
+          Pedidos de recursos
+        </button>
+        <button
+          class="tab-trigger"
+          [class.active]="activeTab === 'pool'"
+          (click)="onTabChange('pool')">
+          <app-svg-icon
+            class="nav-icon"
+            [path]="'assets/icon/pool_vetor.svg'"
+            [size]="18">
+          </app-svg-icon>
+          Pool de recursos
+        </button>
+        <button
+          class="tab-trigger"
+          [class.active]="activeTab === 'Cargos'"
+          (click)="onTabChange('Cargos')">
+          <app-svg-icon
+            class="nav-icon"
+            [path]="'assets/icon/cargos_vetor.svg'"
+            [size]="18">
+          </app-svg-icon>
+          Cargos
+        </button>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <resources-request *ngIf="activeTab === 'pedidos'"></resources-request>
+        <div  *ngIf="authService.getAuthorizedPageTypesByRole().includes(pageType.RESOURCES)">
+
+          <resources-pool *ngIf="activeTab === 'pool'" ></resources-pool>
+          <resources-position *ngIf="activeTab === 'Cargos'"></resources-position>
+        </div>
+      </div>
     </div>
+
   </div>
+
+  <!-- Form Modal -->
+  <app-form-modal-component
+    [isVisible]="showCreateModal"
+    [config]="createResourcesConfig"
+    (close)="closeCreateModal()"
+    (save)="onSaveProject($event)"
+    (cancel)="closeCreateModal()">
+  </app-form-modal-component>
+
 </div>

@@ -1,11 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CriteriaGroup, EvaluationGroup } from '../../interface/carlos-interfaces';
+import { CriteriaGroup, EvaluationGroup, EvaluationGroupApiResponse } from '../../interface/interfacies';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../environments/environment';
-import { filter, firstValueFrom, map, Observable } from 'rxjs';
+import { CriteriaGroupService } from '../../service/criteria-group.service';
+import { firstValueFrom, map, Observable } from 'rxjs';
+import { Page } from '../../models/pagination-models';
+import { TableComponent } from '../table/table.component';
 
 @Component({
   selector: 'app-evaluation-group-create-modal',
@@ -15,10 +18,12 @@ import { filter, firstValueFrom, map, Observable } from 'rxjs';
 })
 export class EvaluationGroupCreateModal {
   @Input() isVisible = false;
-
+  @Input() evaluationGroup?: EvaluationGroupApiResponse;
   @Output() close = new EventEmitter<void>();
+  @Output() saved = new EventEmitter<void>();
 
   httpClient = inject(HttpClient);
+  criteriaGroupService = inject(CriteriaGroupService);
   route = inject(ActivatedRoute);
   router = inject(Router);
 
@@ -62,16 +67,16 @@ export class EvaluationGroupCreateModal {
     if (!isFormValid)
       return;
 
-    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps`;
+    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups`;
     let body = {
       name: this.inputName,
       description: this.inputDescription,
       criteriaGroupId: Number(this.inputCriteriaGroupSelectedId),
       strategyId: this.strategyId
     }
-
+    console.log(body);
     let postEvaluationGroup$ = this.httpClient.post(evaluationGroupsRoute, body);
-
+    this.saved.emit();
     postEvaluationGroup$.subscribe({
       error: () => this.errorMessage = 'Ocorreu um erro inesperado. Tente novamente mais tarde.',
       complete: () => this.goToEvaluationGroupDetailPage()
@@ -87,11 +92,14 @@ export class EvaluationGroupCreateModal {
     });
   }
 
-  getNewlyCreatedEvaluationGroupByHttpRequest(): Observable<EvaluationGroup | undefined> {
-    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps`;
+  getNewlyCreatedEvaluationGroupByHttpRequest(): Observable<EvaluationGroupApiResponse | undefined> {
+    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups`;
 
-    return this.httpClient.get<EvaluationGroup[]>(evaluationGroupsRoute)
-      .pipe(map(evaluationGroups => evaluationGroups.find(evaluationGroup => evaluationGroup.name == this.inputName)));
+    return this.httpClient.get<Page<EvaluationGroupApiResponse>>(evaluationGroupsRoute, { params: { size: 1000 } })
+      .pipe(
+        map(page => page.content),
+        map(evaluationGroups => evaluationGroups.find(evaluationGroup => evaluationGroup.name == this.inputName))
+    );
   }
 
   clearForm() {
@@ -103,7 +111,7 @@ export class EvaluationGroupCreateModal {
   }
 
   async isFormValid(): Promise<boolean> {
-    return this.isNameFilled() 
+    return this.isNameFilled()
       && await this.isNameUnique()
       && this.isCriteriaGroupSelectedValid();
   }
@@ -117,8 +125,8 @@ export class EvaluationGroupCreateModal {
   }
 
   async isNameUnique(): Promise<boolean> {
-    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/ahps`;
-    let getAllEvaluationGroups$ = this.httpClient.get<EvaluationGroup[]>(evaluationGroupsRoute);
+    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups`;
+    let getAllEvaluationGroups$ = this.httpClient.get<Page<EvaluationGroupApiResponse>>(evaluationGroupsRoute, { params: { size: 1000 } }).pipe(map(page => page.content));
     let evaluationGroups = await firstValueFrom(getAllEvaluationGroups$);
     let isUnique = !evaluationGroups.some(evaluationGroup => evaluationGroup.name == this.inputName);
 
@@ -127,35 +135,41 @@ export class EvaluationGroupCreateModal {
     return isUnique;
   }
 
-  doesSelectedCriteriaGroupHaveAtLeastOneCriteria(): boolean {
-    let selectedCriteriaGroup = this.getSelectedCriteriaGroupObject();
-    let hasAtLeastOneCriteria = false;
-
-    if (selectedCriteriaGroup)
-      hasAtLeastOneCriteria = selectedCriteriaGroup.criteriaCount > 0;
+  doesSelectedCriteriaGroupHaveAtLeastOneCriteria(selectedCriteriaGroup: any): boolean {
+    let criteriaCount = selectedCriteriaGroup?.criteria?.length ?? 0;
+    let hasAtLeastOneCriteria = criteriaCount > 0;
 
     this.errorMessage = hasAtLeastOneCriteria ? '' : 'O grupo de critérios selecionado não possui critérios. Acesse sua página e realize o cadastro.';
 
     return hasAtLeastOneCriteria;
   }
 
-  doesSelectedCriteriaGroupHaveAllCriteriaComparisons(): boolean {
-    let selectedCriteriaGroup = this.getSelectedCriteriaGroupObject();
-    let totalCriteriaComparisons = selectedCriteriaGroup?.criteriaComparisonCount ?? 0;
-    let totalCriteriaComparisonsExpected = this.getTotalCriteriaComparisonsExpectedByCriteriaQuantity(selectedCriteriaGroup?.criteriaCount ?? 0);
+  doesSelectedCriteriaGroupHaveAllCriteriaComparisons(selectedCriteriaGroup: any): boolean {
+    let criteriaCount = selectedCriteriaGroup?.criteria?.length ?? 0;
+    let totalCriteriaComparisons = selectedCriteriaGroup?.criteriaComparisons?.length ?? 0;
+    let totalCriteriaComparisonsExpected = this.getTotalCriteriaComparisonsExpectedByCriteriaQuantity(criteriaCount);
 
-    if (totalCriteriaComparisons != totalCriteriaComparisonsExpected) {
-      this.errorMessage = 'Os critérios do grupo de critérios selecionado não foram totalmente comparados entre si. Acesse sua página e finalize a comparação. Ou, selecione outro grupo de critério.';
-      return false;
+      if (totalCriteriaComparisons != totalCriteriaComparisonsExpected) {
+        this.errorMessage = 'Os critérios do grupo de critérios selecionado não foram totalmente comparados entre si. Acesse sua página e finalize a comparação. Ou, selecione outro grupo de critério.';
+        return false;
+      }
+
+      return true;
     }
 
-    return true;
-  }
+  async isCriteriaGroupSelectedValid(): Promise<boolean> {
+    let isValid = this.isCriteriaGroupSelected();
 
-  isCriteriaGroupSelectedValid(): boolean {
-    return this.isCriteriaGroupSelected()
-      && this.doesSelectedCriteriaGroupHaveAtLeastOneCriteria()
-      && this.doesSelectedCriteriaGroupHaveAllCriteriaComparisons();
+    let selectedCriteriaGroup = await firstValueFrom(this.criteriaGroupService.getCriterioById(Number(this.inputCriteriaGroupSelectedId), this.strategyId));
+
+    if (!selectedCriteriaGroup) {
+        this.errorMessage = 'Ocorreu um erro inesperado. Tente novamente mais tarde.';
+        return false;
+    }
+
+    return isValid
+      && this.doesSelectedCriteriaGroupHaveAtLeastOneCriteria(selectedCriteriaGroup)
+      && this.doesSelectedCriteriaGroupHaveAllCriteriaComparisons(selectedCriteriaGroup);
   }
 
   isCriteriaGroupSelected(): boolean {
@@ -167,18 +181,19 @@ export class EvaluationGroupCreateModal {
   }
 
   getSelectedCriteriaGroupObject(): CriteriaGroup | undefined {
-    return this.inputCriteriaGroupsOptions.find(criteriaGroup => criteriaGroup.id == Number(this.inputCriteriaGroupSelectedId));
+    const selected = this.inputCriteriaGroupsOptions.find(criteriaGroup => criteriaGroup.id == Number(this.inputCriteriaGroupSelectedId));
+    console.log('getSelectedCriteriaGroupObject:', {
+      inputCriteriaGroupsOptions: this.inputCriteriaGroupsOptions,
+      inputCriteriaGroupSelectedId: this.inputCriteriaGroupSelectedId,
+      selected
+    });
+    return selected;
   }
 
   setInputCriteriaGroupOptions() {
-    let criteriaGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups`;
-    let getAllCriteriaGroups$ = this.httpClient.get<CriteriaGroup[]>(criteriaGroupsRoute);
-
-    // TODO: Adicionar regra para "O grupo de critérios selecionado não possui critérios. Acesse sua página e realize o cadastro.".
-    // TODO: Adicionar regra para "Os critérios do grupo de critérios selecionado não foram totalmente comparados entre si. Acesse sua página e finalize a comparação.".
-    getAllCriteriaGroups$.subscribe(criteriaGroups => {
+    this.criteriaGroupService.getAllCriterios(this.strategyId).subscribe(criteriaGroups => {
       this.inputCriteriaGroupsOptions = criteriaGroups;
-
+      console.log('this.inputCriteriaGroupsOptions', this.inputCriteriaGroupsOptions);
       if (!criteriaGroups.length) {
         this.errorMessage = 'Nenhum grupo de critérios foi cadastrado. Realize seu cadastro na página de critérios.';
         this.isSubmitButtonDisabled = true;
@@ -189,6 +204,6 @@ export class EvaluationGroupCreateModal {
   getTotalCriteriaComparisonsExpectedByCriteriaQuantity(criteriaQuantity: number): number {
     let n = criteriaQuantity;
 
-    return n * (n - 1) / 2 
+    return n * (n - 1) / 2
   }
 }

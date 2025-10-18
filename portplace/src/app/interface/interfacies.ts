@@ -1,20 +1,190 @@
-export interface Project {
-  id?: number;
+// Interface baseada no objeto retornado pela API de grupos de avaliação
+export interface EvaluationGroupApiResponse {
+  id: number;
   name: string;
   description: string;
-  portfolio?: string | undefined;
-  startDate?: string;
-  endDate?: string;
-  status: ProjectStatusEnum;
-  projectManager?: number;
-  earnedValue?: number;
-  plannedValue?: number;
-  actualCost?: number;
-  budget?: number;
-  payback?: number;
-  disable?: boolean;
+  status: string;
+  disabled: boolean;
+  createdAt: string;
+  lastModifiedAt: string;
+  criteriaGroup: {
+    id: number;
+    name: string;
+    description: string;
+    status: string;
+    strategy: {
+      id: number;
+      name: string;
+      description: string;
+      status: string;
+      activeObjectivesCount: number;
+      cancellationReason: string | null;
+      disabled: boolean;
+      createdAt: string;
+      lastModifiedAt: string;
+    };
+    criteria: Array<{
+      id: number;
+      name: string;
+      description: string;
+      criteriaGroupId: number;
+      weight: number;
+      disabled: boolean;
+      createdAt: string;
+      lastModifiedAt: string;
+      relatedStrategicObjectivesCount: number;
+      strategicObjectives: Array<{
+        id: number;
+        name: string;
+        description: string;
+        status: string;
+        strategyId: number;
+        criteriaCount: number;
+        activePortfolioCount: number;
+        activeProjectsCount: number;
+        disabled: boolean;
+        createdAt: string;
+        lastModifiedAt: string;
+      }>;
+    }>;
+    criteriaComparisons: Array<{
+      id: number;
+      comparedCriterionId: number;
+      referenceCriterionId: number;
+      importanceScale: string;
+      criteriaGroupId: number;
+      disabled: boolean;
+      createdAt: string;
+      lastModifiedAt: string;
+    }>;
+    relatedObjectivesCount: number;
+    relatedEvaluationGroupsCount: number;
+    lastModifiedAt: string;
+    lastModifiedBy: any;
+    createdAt: string;
+    disabled: boolean;
+  };
+  evaluations: Array<{
+    id: number;
+    score: number;
+    project: {
+      id: number;
+      name: string;
+      description: string;
+      status: string;
+      payback: number;
+      roi: number;
+      startDate: string;
+      endDate: string;
+      cancellationReason: string | null;
+      plannedValue: number;
+      earnedValue: number;
+      actualCost: number;
+      budgetAtCompletion: number;
+      percentComplete: number;
+      costPerformanceIndex: number;
+      schedulePerformanceIndex: number;
+      estimateAtCompletion: number;
+      estimateToComplete: number;
+      portfolioCategory: {
+        id: number;
+        name: string;
+        description: string;
+        portfolioId: number;
+        canBeDeleted: boolean;
+        disabled: boolean;
+        createdAt: string;
+        lastModifiedAt: string;
+        lastModifiedBy: any;
+        createdBy: any;
+      };
+      portfolioName: string;
+      strategyName: string;
+      scenarioRankingScore: number;
+      priorityInPortfolio: number;
+      strategicObjectives: any;
+      evaluations: any;
+      createdAt: string;
+      lastModifiedAt: string;
+      disabled: boolean;
+    };
+    criterionId: number;
+    evaluationGroupId: number;
+    lastModifiedAt: string;
+    createdAt: string;
+    disabled: boolean;
+  }>;
+}
+export interface EvaluationGroupView {
+  id: number;
+  name: string;
+  description: string;
+  status: string;
+  statusText: string;
+  disabled: boolean;
+  createdAt: string;
+  lastModifiedAt: string;
+  criteriaGroup?: CriteriaGroup;
+  evaluations: any[]; // Ajuste para o tipo correto se houver
+  statusColor: 'green' | 'gray' | 'red';
+  // lastUpdatedBy?: any; // Descomente e ajuste se necessário
+}
+
+
+export interface StrategicObjective {
+  id: number;
+  name: string;
+  description?: string;
+  status: string;
+  strategyId: number;
+  criteriaCount: number;
+  activePortfolioCount: number;
+  activeProjectsCount: number;
+  disabled: boolean;
   createdAt?: string;
   lastModifiedAt?: string;
+  // evaluationGroups?: any[];
+  // objectives?: any[];
+}
+export interface Project {
+  id: number;
+  name: string;
+  description: string;
+  status: string;
+  payback: number;
+  roi: number;
+  startDate: string; // dd/MM/yyyy
+  endDate: string;   // dd/MM/yyyy
+  plannedValue: number;
+  earnedValue: number;
+  actualCost: number;
+  budgetAtCompletion: number;
+  percentComplete: number;
+  costPerformanceIndex: number;
+  schedulePerformanceIndex: number;
+  estimateAtCompletion: number;
+  estimateToComplete: number;
+  portfolioCategory?: any; // Ajuste para o tipo correto se houver
+  portfolioName?: string;
+  strategyName?: string;
+  scenarioRankingScore?: number;
+  priorityInPortfolio?: number;
+  strategicObjectives?: any[]; // Ajuste para o tipo correto se houver
+  evaluations?: Evaluation[]; // Ajuste para o tipo correto se houver
+  createdAt: string; // dd/MM/yyyy HH:mm:ss
+  lastModifiedAt: string; // dd/MM/yyyy HH:mm:ss
+  disabled: boolean;
+}
+
+export interface Evaluation {
+  id: number;
+  score: number;
+  project: Project;
+  criterionId: number;
+  evaluationGroupId?: string;
+  lastModifiedAt?: string;
+  createdAt?: string;
+  disabled?: boolean;
 }
 
 export interface ProjectPageableResponse {
@@ -47,10 +217,10 @@ export interface ProjectPageableResponse {
 }
 
 export enum ProjectStatusEnum {
-  CANDIDATE = 'CANDIDATE',
-  PLANNING = 'PLANNING',
+  IN_ANALYSIS = 'IN_ANALYSIS',
   IN_PROGRESS = 'IN_PROGRESS',
-  FINISHED = 'FINISHED'
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED'
 }
 
 export interface Evaluation {
@@ -75,16 +245,34 @@ export interface Indicator {
   label: string;
   value: string;
   lastUpdate: string;
+  displayValue?: string;
+  isEditable?: boolean;
+  fieldName?: string;
+}
+
+export interface Portfolio {
+  id: number;
+  name: string;
+  description?: string;
+  createdAt: string;
+  lastModifiedAt: string;
+  status: "ATIVADO" | "CANCELADO";
+  statusColor: "green" | "gray";
 }
 
 export interface Objective {
-  id: string
-  name: string
-  linkedCriteria: number
-  activePortfolios: number
-  activeProjects: number
-  status: "ATIVADO" | "CANCELADO"
-  statusColor: "green" | "gray"
+  id: number;
+  name: string;
+  description?: string;
+  status: string;
+  strategyId: number;
+  criteriaCount: number;
+  activePortfolioCount: number;
+  activeProjectsCount: number;
+  disabled: boolean;
+  createdAt?: string;
+  lastModifiedAt?: string;
+  statusColor: 'green' | 'gray' | 'red';
 }
 
 export interface Objectives {
@@ -122,7 +310,7 @@ export interface EvaluationGroup {
 }
 
 export interface EvaluationGroupView extends EvaluationGroup {
-  criteriaGroup?: CriteriaGroup;
+  // criteriaGroup?: CriteriaGroup; // Removido para evitar duplicidade
 }
 
 export interface Scenario {
@@ -139,12 +327,19 @@ export interface CriteriaGroup {
   id?: number;
   name: string;
   description?: string;
-  disabled: boolean;
+  criteriaList?: Criterion[];
+  criteriaComparisons?: CriteriaComparison[];
+  status?: CriteriaGroupStatusEnum;
   lastModifiedAt?: Date;
-  lastModifiedBy?: User;
   createdAt?: Date;
-  criteriaCount?: number;
-  criteriaComparisonCount?: number;
+  disabled?: boolean;
+  relatedObjectivesCount?: number;
+  relatedEvaluationGroupsCount?: number;
+}
+
+export enum CriteriaGroupStatusEnum {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE'
 }
 
 export interface Criterion {
@@ -153,18 +348,29 @@ export interface Criterion {
   description?: string;
   criteriaGroupId: number;
   weight: number;
-  disabled?: boolean;
+  disabled: boolean;
   lastModifiedAt?: Date;
   lastModifiedBy?: User;
   createdAt?: Date;
+  strategicObjectives?: Objective[];
 }
 
 export interface Strategy {
-  id: string;
+  id?: number;
   name: string;
-  activeObjectives: number;
-  status: string;
-  statusColor: string;
+  description?: string;
+  status?: StrategyStatusEnum;
+  activeObjectivesCount?: number;
+  disabled?: boolean;
+  createdAt?: Date;
+  lastModifiedAt?: string;
+  activeObjectives?: number;
+  statusColor?: string;
+}
+
+export enum StrategyStatusEnum {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE'
 }
 
 export interface CriteriaComparison {
@@ -217,4 +423,40 @@ export interface BreadcrumbItem {
   label: string;
   url: string;
   isActive: boolean;
+}
+
+export interface MetricCard {
+  title: string;
+  subtitle: string;
+  color: string;
+  value?: string;
+  icon: string;
+}
+
+export interface Risk {
+  code: number;
+  name: string;
+  probability: number;
+  impact: number;
+  severity: number;
+  resolvedOccurrences: number;
+  unresolvedOccurrences: number;
+}
+
+// Interfaces para tratamento de erros da API
+export interface ApiError {
+  status: number;
+  message: string;
+  path: string;
+  method: string;
+  timestamp: string;
+  errors?: ValidationError[];
+}
+
+export interface ValidationError {
+  field?: string;
+  rejectedValue?: any;
+  defaultMessage?: string;
+  code?: string;
+  objectName?: string;
 }
