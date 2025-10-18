@@ -5,6 +5,7 @@ import { map, Observable, of, switchMap } from 'rxjs';
 import { Page, PaginationQueryParams } from '../models/pagination-models';
 import { CommunicationMethodDTO, EventCreateDTO, EventPeriodicity, EventPeriodicityDTO, EventReadDTO, EventUpdateDTO } from '../interface/carlos-portfolio-events-interfaces';
 import { mapEventPeriodicityToEventPeriodicityDTO } from '../mappers/portfolio-events-mappers';
+import { AuthService } from './auth-service';
 
 @Injectable({
     providedIn: 'root'
@@ -12,8 +13,9 @@ import { mapEventPeriodicityToEventPeriodicityDTO } from '../mappers/portfolio-e
 export class PortfolioEventsService {
     http = inject(HttpClient);
 
+    authService = inject(AuthService);
     private getHeaders(): HttpHeaders {
-        return new HttpHeaders({ 'Content-Type': 'application/json', 'Accept': 'application/json' });
+      return this.authService.getHeaders();
     }
 
     private getPortfolioEventsUrl(portfolioId: number): string {
@@ -28,7 +30,7 @@ export class PortfolioEventsService {
     // UPDATE - Editar os dados básicos (nome, descrição) de um evento de comunicação do portfólio
     updateEventBasicInformation(portfolioId: number, eventId: number, eventName: string, eventDescription: string): Observable<any> {
         const url = `${this.getPortfolioEventsUrl(portfolioId)}/${eventId}`;
-        
+
         return this.getPortfolioEventById(portfolioId, eventId).pipe(switchMap(event => {
             const body: EventUpdateDTO = {
                 ...event,

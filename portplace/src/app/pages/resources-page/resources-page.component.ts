@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../service/breadcrumb.service';
 import { SvgIconComponent } from '../../components/svg-icon/svg-icon.component';
@@ -12,7 +12,10 @@ import { CardComponent } from '../../components/card/card.component';
 import { TableComponent } from '../../components/table/table.component';
 import { ResourcesRequestComponent } from './resources-request/resources-request.component';
 import { ResourcesPositionComponent } from './resources-position/resources-position.component';
-import { ResourcesPoolComponent } from './resources-pool/resources-pool.component';
+
+import { AuthService } from '../../service/auth-service';
+import { PageType } from '../../interface/carlos-auth-interfaces';
+import { ResourcePoolComponent } from './resources-pool/resources-pool.component';
 
 @Component({
   selector: 'app-resources-page',
@@ -27,12 +30,14 @@ import { ResourcesPoolComponent } from './resources-pool/resources-pool.componen
     TableComponent,
     ResourcesRequestComponent,
     ResourcesPositionComponent,
-    ResourcesPoolComponent
+    ResourcePoolComponent
   ],
   templateUrl: './resources-page.component.html',
   styleUrl: './resources-page.component.scss'
 })
 export class ResourcesPageComponent implements OnInit {
+  authService = inject(AuthService);
+  pageType = PageType;
   showCreateModal = false;
   activeFilter = '';
   activeTab = "pedidos";
@@ -40,6 +45,7 @@ export class ResourcesPageComponent implements OnInit {
   allResources: Project[] = [];
   searchTerm: string = '';
   Resources: Project[] = [];
+  isProjectManager = false;
   createResourcesConfig: FormModalConfig = {
     title: 'Cadastrar novo projeto',
     fields: [
@@ -88,9 +94,11 @@ export class ResourcesPageComponent implements OnInit {
       { label: 'Início', url: '/inicio', isActive: false },
       { label: 'Recursos', url: '/recursos', isActive: true }
     ]);
-
+    const authorizedPages = this.authService.getAuthorizedPageTypesByRole();
     // Remover breadcrumbs filhos quando retorna para esta página
     this.breadcrumbService.removeChildrenAfter('/recursos');
+    this.isProjectManager = authorizedPages.length === 3 && authorizedPages.includes(PageType.PROJECTS) && authorizedPages.includes(PageType.RESOURCES);
+
   }
 
   openCreateModal(): void {

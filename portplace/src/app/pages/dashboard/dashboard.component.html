@@ -2,17 +2,6 @@
   <div class="dashboard-header">
     <h1>Dashboard de portfólio</h1>
   </div>
-
-  <div *ngIf="!hasPortfolio" class="no-portfolio">
-    <p>
-      Nenhum portfólio em andamento.
-      <button class="link-btn" (click)="onHasPortfolioChange()">
-        Acesse a página de Portfólios
-      </button>
-      e realize o cadastro.
-    </p>
-  </div>
-
   <div *ngIf="hasPortfolio" class="dashboard-content">
     <!-- Portfolio Selector -->
     <div class="portfolio-selector">
@@ -22,7 +11,8 @@
         <option *ngFor="let portfolio of portfolios" [value]="portfolio.id">{{portfolio.name}}</option>
       </select>
       <button *ngIf="authService.getAuthorizedPageTypesByRole().includes(pageType.PORTFOLIOS)"
-        class="add-portfolio-btn">
+        class="add-portfolio-btn"
+        (click)="openPortfolio(selectedPortfolioId)">
         Acessar portfólio
       </button>
     </div>
@@ -38,7 +28,7 @@
         </app-svg-icon>
         <div class="metric-info-container">
           <div class="metric-title-row">
-            <p class="metric-title">{{portfolioDetails?.status}}</p>
+            <p class="metric-title">{{getPortfolioStatusEnumToText(portfolioDetails?.status)}}</p>
             <div class="metric-indicator" [class]="'indicator-' + portfolioDetails?.budgetHealth" ></div>
           </div>
           <p class="metric-subtitle">Status progresso</p>
@@ -54,7 +44,7 @@
           </app-svg-icon>
           <div class="metric-info-container">
             <div class="metric-title-row">
-              <p class="metric-title">XXX</p>
+              <p class="metric-title">{{getPortfolioHealthEnumToText(portfolioDetails?.budgetHealth)}}</p>
               <div class="metric-indicator" [class]="'indicator-' + portfolioDetails?.budgetHealth" ></div>
             </div>
             <p class="metric-subtitle">Status custo</p>
@@ -85,7 +75,7 @@
           </app-svg-icon>
           <div class="metric-info-container">
             <div class="metric-title-row">
-              <p class="metric-title">{{portfolioDetails?.budget}}</p>
+              <p class="metric-title">{{portfolioDetails?.budget | currency:'BRL':'symbol':'1.2-2'}}</p>
             </div>
             <p class="metric-subtitle">Orçamento</p>
           </div>
@@ -159,13 +149,13 @@
             </thead>
             <tbody>
               <tr *ngFor="let risk of risks">
-                <td>{{risk.code}}</td>
+                <td>{{risk.id}}</td>
                 <td class="risk-name">{{risk.name}}</td>
-                <td>{{risk.probability}}</td>
-                <td>{{risk.impact}}</td>
+                <td>{{getRiskSeverityEnumToText(risk.probability)}}</td>
+                <td>{{getRiskSeverityEnumToText(risk.impact)}}</td>
                 <td>{{risk.severity}}</td>
-                <td [class.text-red]="risk.resolvedOccurrences > 3">{{risk.resolvedOccurrences}}</td>
-                <td [class.text-red]="risk.unresolvedOccurrences > 1">{{risk.unresolvedOccurrences}}</td>
+                <td [class.text-red]="getOccurrencesSolvedCount(risk) > 3">{{getOccurrencesSolvedCount(risk)}}</td>
+                <td [class.text-red]="getOccurrencesNotSolvedCount(risk) > 1">{{getOccurrencesNotSolvedCount(risk)}}</td>
               </tr>
             </tbody>
           </table>
@@ -230,5 +220,8 @@
         </div>
       </app-card>
     </div>
+  </div>
+  <div *ngIf="!hasPortfolio" class="dashboard-content">
+      Não há portfólios cadastrados.
   </div>
 </div>

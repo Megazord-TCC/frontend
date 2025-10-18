@@ -1,0 +1,94 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)" (mousedown)="onOverlayMouseDown($event)">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header">
+            <h2>Análise de pedido de recurso</h2>
+            <button class="close-btn" (click)="close.emit()">
+                <i class="icon-x">✕</i>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+            <!-- Validation Message -->
+            <div *ngIf="errorMessage" class="validation-error">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>{{ errorMessage }}</span>
+            </div>
+
+            <!-- Info Fields -->
+            <div class="info-section">
+                <p>Projeto: <b>{{ projectName }}</b></p>
+                <p>Solicitante: <b>{{ requesterName }}</b></p>
+            </div>
+
+            <!-- Form Fields -->
+            <div class="form-fields" [ngClass]="{'disabled': isSubmitButtonDisabled}">
+                  <div class="form-group">
+                    <label>Cargo desejado<span class="required-asterisk">*</span></label>
+                    <select [(ngModel)]="selectedPosition" [disabled]="isSubmitButtonDisabled">
+                        <option [value]="0" disabled selected>Selecione...</option>
+                        <option *ngFor="let option of positionOptions" [ngValue]="option.id">
+                            {{ option.name }}
+                        </option>
+                    </select>
+                </div>
+
+
+                <div class="form-group">
+                    <label>Recursos<span class="required-asterisk">*</span></label>
+                    <select [(ngModel)]="selectedCollaborator" [disabled]="isSubmitButtonDisabled">
+                        <option [value]="0" disabled selected>Selecione...</option>
+                        <option *ngFor="let option of collaboratorOptions" [ngValue]="option.id">
+                            {{ option.name }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                  <label>Horas semanais<span class="required-asterisk">*</span></label>
+                    <div class="custom-select-wrapper">
+                      <div class="custom-select" (click)="toggleDropdown()">
+                        {{ selectedHours || 'Selecione...' }}
+                      </div>
+                      <div class="custom-options" *ngIf="isOpen">
+                        <div
+                          class="custom-option"
+                          *ngFor="let option of hoursOptions"
+                          (click)="selectOption(option)">
+                          {{ option.name }}
+                        </div>
+                      </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Início<span class="required-asterisk">*</span></label>
+                    <input type="date" [ngModel]="formatDateForInput(startDate)" (ngModelChange)="startDate = $event" [disabled]="isSubmitButtonDisabled">
+                </div>
+
+                <div class="form-group">
+                    <label>Fim<span class="required-asterisk">*</span></label>
+                    <input type="date" [ngModel]="formatDateForInput(endDate)" (ngModelChange)="endDate = $event" [disabled]="isSubmitButtonDisabled">
+                </div>
+
+                <div class="form-group">
+                    <label>Prioridade<span class="required-asterisk">*</span></label>
+                    <select [(ngModel)]="priority" [disabled]="isSubmitButtonDisabled">
+                        <option [value]="0" disabled selected>Selecione...</option>
+                        <option *ngFor="let option of priorityOptions" [ngValue]="option.id">
+                            {{ option.name }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button class="btn-outline" (click)="onCancel()">Cancelar</button>
+            <button class="btn-danger" (click)="onReject()" [disabled]="isSubmitButtonDisabled">Rejeitar pedido</button>
+            <button class="btn-primary" (click)="onSave()" [disabled]="isSubmitButtonDisabled">Alocar recurso</button>
+        </div>
+    </div>
+</div>

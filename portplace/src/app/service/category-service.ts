@@ -1,9 +1,10 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { map, Observable } from 'rxjs';
 import { Page, PaginationQueryParams } from '../models/pagination-models';
 import { PortfolioCategoryReadDTO } from '../interface/carlos-category-interfaces';
+import { AuthService } from './auth-service';
 
 @Injectable({
     providedIn: 'root'
@@ -11,11 +12,9 @@ import { PortfolioCategoryReadDTO } from '../interface/carlos-category-interface
 export class CategoryService {
     constructor(private http: HttpClient) { }
 
+    authService = inject(AuthService);
     private getHeaders(): HttpHeaders {
-        return new HttpHeaders({
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        });
+      return this.authService.getHeaders();
     }
 
     private getPortfolioCategoriesUrl(portfolioId: number): string {

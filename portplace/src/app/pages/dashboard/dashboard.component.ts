@@ -15,7 +15,7 @@ import { PageType } from '../../interface/carlos-auth-interfaces';
 import { Page } from '../../models/pagination-models';
 import { PortfolioService } from '../../service/portfolio-service';
 import { ProjectReadDTO2 } from '../../interface/carlos-project-dtos';
-import { PortfolioListReadDTO, PortfolioReadDTO } from '../../interface/carlos-portfolio-interfaces';
+import { PortfolioListReadDTO, PortfolioReadDTO, RiskOccurrenceStatusEnum, RiskReadDTO } from '../../interface/carlos-portfolio-interfaces';
 import { PaginationQueryParams } from '../../models/pagination-models';
 
 @Component({
@@ -32,6 +32,7 @@ import { PaginationQueryParams } from '../../models/pagination-models';
   ],
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
+
   private objetivoService = inject(StrategiaObjetivoService);
   objetivos: Objective[] = [];
   @ViewChild('costChart', { static: false }) costChartRef!: ElementRef<HTMLCanvasElement>;
@@ -50,39 +51,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   hasPortfolio = true;
   expandedSections: string[] = [];
-  selectedPortfolioId: number | null = null;
+  selectedPortfolioId: number = 0;
   portfolios: PortfolioListReadDTO[] = [];
 
 
-  risks: Risk[] = [
-    {
-      code: 3,
-      name: 'Mudança estratégia',
-      probability: 1,
-      impact: 3,
-      severity: 3,
-      resolvedOccurrences: 3,
-      unresolvedOccurrences: 1
-    },
-    {
-      code: 6,
-      name: 'Escassez de recursos',
-      probability: 2,
-      impact: 3,
-      severity: 6,
-      resolvedOccurrences: 4,
-      unresolvedOccurrences: 2
-    },
-    {
-      code: 8,
-      name: 'Escassez de recursos',
-      probability: 2,
-      impact: 3,
-      severity: 6,
-      resolvedOccurrences: 4,
-      unresolvedOccurrences: 2
-    }
-  ];
+  risks: RiskReadDTO[] = [];
 
   objectives = [
     { name: 'Nome do objetivo 1', description: 'Descrição do objetivo.' },
@@ -113,19 +86,35 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     // Os gráficos só serão criados após carregar os dados do portfólio selecionado
   }
+  openPortfolio(id: number) {
+    this.router.navigate(['/portfolio', id]);
+  }
 
+
+  loadPortfoliosAnalytics(portfolioId: number) {
+    console.log('Loading portfolio analytics for portfolio ID:', portfolioId);
+    if (portfolioId) {
+      this.portfolioService.getPortfolioAnalytics(portfolioId).subscribe(details => {
+        this.risks = details.risks;
+        console.log('Risks loaded:', this.risks);
+        console.log(details);
+      });
+    }
+  }
 
   loadPortfolios() {
     const queryParams = new PaginationQueryParams();
     this.portfolioService.getPortfoliosPage(queryParams).subscribe(page => {
       this.portfolios = page.content;
+      console.log('Portfolios loaded:', this.portfolios);
       if (this.portfolios.length > 0) {
         this.hasPortfolio = true;
         this.selectedPortfolioId = this.portfolios[0].id;
         this.loadPortfolioDetails(this.selectedPortfolioId);
+        this.loadPortfoliosAnalytics(this.selectedPortfolioId);
       } else {
         this.hasPortfolio = false;
-        this.selectedPortfolioId = null;
+        this.selectedPortfolioId = 0;
       }
     });
   }
@@ -363,7 +352,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     // Verificar se o elemento canvas existe e está acessível
     if (!this.riskBubbleChartRef || !this.riskBubbleChartRef.nativeElement) {
       console.warn('Risk bubble chart canvas element not found or not accessible, retrying...');
-      // Tentar novamente após um breve delay
       setTimeout(() => {
         if (this.riskBubbleChartRef && this.riskBubbleChartRef.nativeElement) {
           this.createRiskBubbleChart();
@@ -387,58 +375,38 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       this.riskBubbleChart.destroy();
     }
 
+    // Mapeamento de probabilidade e impacto para valores numéricos
+    const probMap: any = { LOW: 1, MEDIUM: 3, HIGH: 5 };
+    const impactMap: any = { LOW: 1, MEDIUM: 3, HIGH: 5 };
+    const colors = [
+      { bg: 'rgba(255, 206, 86, 0.6)', border: 'rgba(255, 206, 86, 1)' },
+      { bg: 'rgba(255, 99, 132, 0.6)', border: 'rgba(255, 99, 132, 1)' },
+      { bg: 'rgba(54, 162, 235, 0.6)', border: 'rgba(54, 162, 235, 1)' }
+    ];
+
     try {
       const ctx = canvasElement.getContext('2d');
-
       if (!ctx) {
         console.error('Cannot get 2D context from risk bubble chart canvas');
         return;
       }
 
+      const datasets = this.risks.slice(0, 3).map((risk, i) => ({
+        label: risk.name,
+        data: [{
+          x: probMap[risk.probability] ?? 0,
+          y: impactMap[risk.impact] ?? 0,
+          r: Math.max(8, Math.min(30, risk.severity ?? 8))
+        }],
+        backgroundColor: colors[i % colors.length].bg,
+        borderColor: colors[i % colors.length].border,
+        borderWidth: 2
+      }));
+
       this.riskBubbleChart = new Chart(ctx, {
         type: 'bubble',
         data: {
-          datasets: [
-            {
-              label: 'Risco 3 - Mudança estratégia',
-              data: [
-                {
-                  x: 1, // Probabilidade (1-5)
-                  y: 3, // Impacto (1-5)
-                  r: 8 // Severidade (tamanho da bolha)
-                }
-              ],
-              backgroundColor: 'rgba(255, 206, 86, 0.6)',
-              borderColor: 'rgba(255, 206, 86, 1)',
-              borderWidth: 2
-            },
-            {
-              label: 'Risco 6 - Escassez de recursos',
-              data: [
-                {
-                  x: 2, // Probabilidade (1-5)
-                  y: 3, // Impacto (1-5)
-                  r: 15 // Severidade (tamanho da bolha)
-                }
-              ],
-              backgroundColor: 'rgba(255, 99, 132, 0.6)',
-              borderColor: 'rgba(255, 99, 132, 1)',
-              borderWidth: 2
-            },
-            {
-              label: 'Risco 8 - Mudança de escopo',
-              data: [
-                {
-                  x: 2, // Probabilidade (1-5)
-                  y: 3, // Impacto (1-5)
-                  r: 15 // Severidade (tamanho da bolha)
-                }
-              ],
-              backgroundColor: 'rgba(54, 162, 235, 0.6)',
-              borderColor: 'rgba(54, 162, 235, 1)',
-              borderWidth: 2
-            }
-          ]
+          datasets: datasets
         },
         options: {
           responsive: true,
@@ -508,6 +476,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     if (portfolioId != null) {
       this.selectedPortfolioId = portfolioId;
       this.loadPortfolioDetails(portfolioId);
+      this.loadPortfoliosAnalytics(portfolioId);
     }
   }
 
@@ -540,5 +509,40 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.projetos || this.projetos.length === 0) return 0;
     const total = this.projetos.reduce((sum, p) => sum + (p.percentComplete || 0), 0);
     return Math.round(total / this.projetos.length);
+  }
+  getPortfolioStatusEnumToText = (statusEnum: any): string => {
+    switch (statusEnum) {
+          case "EMPTY": return "SEM PROJETOS";
+          case "IN_PROGRESS": return "EM ANDAMENTO";
+          case "COMPLETED": return "FINALIZADO";
+          case "CANCELLED": return "CANCELADO";
+          default: return "SEM STATUS";
+      }
+  }
+  getPortfolioHealthEnumToText = (healthEnum: any): string => {
+      switch (healthEnum) {
+          case "RED": return "Fora do planejado";
+          case "YELLOW": return "Requer atenção";
+          case "GREEN": return "OK";
+          default: return "Sem status";
+      }
+  }
+  getRiskSeverityEnumToText = (severityEnum: any): string => {
+      switch (severityEnum) {
+          case "LOW": return "BAIXA";
+          case "MEDIUM": return "MÉDIA";
+          case "HIGH": return "ALTA";
+          case "VERY_HIGH": return "MUITO ALTA";
+          default: return "SEM STATUS";
+      }
+  }
+  getOccurrencesSolvedCount(risk: RiskReadDTO): number {
+    if (!risk.occurrences) return 0;
+    return risk.occurrences.filter(o => o.status === RiskOccurrenceStatusEnum.SOLVED).length;
+  }
+
+  getOccurrencesNotSolvedCount(risk: RiskReadDTO): number {
+    if (!risk.occurrences) return 0;
+    return risk.occurrences.filter(o => o.status === RiskOccurrenceStatusEnum.NOT_SOLVED).length;
   }
 }

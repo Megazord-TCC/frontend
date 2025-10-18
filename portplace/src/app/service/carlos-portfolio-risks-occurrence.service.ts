@@ -5,6 +5,7 @@ import { count, filter, map, Observable } from 'rxjs';
 import { Page, PaginationQueryParams } from '../models/pagination-models';
 import { RiskOccurrenceCreateDTO, RiskOccurrenceReadDTO, RiskOccurrenceStatusEnumDTO, RiskOccurrenceUpdateDTO } from '../interface/carlos-risk-occurrence-interfaces';
 import { CarlosPortfolioRisksService } from './carlos-portfolio-risks.service';
+import { AuthService } from './auth-service';
 
 @Injectable({
     providedIn: 'root'
@@ -13,11 +14,9 @@ export class CarlosPortfolioRiskOccurrenceService {
     http = inject(HttpClient);
     riskService = inject(CarlosPortfolioRisksService);
 
+    authService = inject(AuthService);
     private getHeaders(): HttpHeaders {
-        return new HttpHeaders({
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        });
+      return this.authService.getHeaders();
     }
 
     private getOccurrencesUrl(portfolioId: number, riskId: number): string {
@@ -25,7 +24,7 @@ export class CarlosPortfolioRiskOccurrenceService {
     }
 
     // GET - Buscar página com todas ocorrências do risco
-    getRiskOccurrencesPage(portfolioId: number, riskId: number, queryParams?: PaginationQueryParams): Observable<Page<RiskOccurrenceReadDTO>> {   
+    getRiskOccurrencesPage(portfolioId: number, riskId: number, queryParams?: PaginationQueryParams): Observable<Page<RiskOccurrenceReadDTO>> {
         const url = this.getOccurrencesUrl(portfolioId, riskId);
         const params = PaginationQueryParams.sortByThisIfNotSortedYet('status', queryParams).getParamsInHttpParamsFormat();
         return this.http.get<Page<RiskOccurrenceReadDTO>>(url, { headers: this.getHeaders(), params });
@@ -33,10 +32,10 @@ export class CarlosPortfolioRiskOccurrenceService {
 
     // POST - Criar nova ocorrência de risco
     createRiskOccurrence(
-        portfolioId: number, 
-        riskId: number, 
-        occurrenceDate: string, 
-        description: string, 
+        portfolioId: number,
+        riskId: number,
+        occurrenceDate: string,
+        description: string,
         resolutionDate?: string
     ): Observable<RiskOccurrenceReadDTO> {
         const url = this.getOccurrencesUrl(portfolioId, riskId);
@@ -72,7 +71,7 @@ export class CarlosPortfolioRiskOccurrenceService {
         const url = `${this.getOccurrencesUrl(portfolioId, riskId)}/${occurrenceId}/hard-delete`;
         return this.http.delete<void>(url, { headers: this.getHeaders() });
     }
-    
+
     // GET - Buscar ocorrência de risco pelo ID
     getRiskOccurrenceById(portfolioId: number, riskId: number, occurrenceId: number): Observable<RiskOccurrenceReadDTO> {
         const url = `${this.getOccurrencesUrl(portfolioId, riskId)}/${occurrenceId}`;

@@ -6,6 +6,7 @@ import { Page, PaginationQueryParams } from '../models/pagination-models';
 import { ScenarioService } from './scenario-service';
 import { UserGetResponseDTO, UserStatusEnumDTO } from '../interface/carlos-user-interfaces';
 import { RoleDTO } from '../interface/carlos-auth-interfaces';
+import { AuthService } from './auth-service';
 
 @Injectable({
     providedIn: 'root'
@@ -14,8 +15,9 @@ export class UserService {
     http = inject(HttpClient);
     scenarioService = inject(ScenarioService);
 
+    authService = inject(AuthService);
     private getHeaders(): HttpHeaders {
-        return new HttpHeaders({ 'Content-Type': 'application/json', 'Accept': 'application/json' });
+      return this.authService.getHeaders();
     }
 
     private getUserUrl(): string {

@@ -1,1 +1,26 @@
-<p>resources-position works!</p>
+<div class="resources-layout">
+
+  <div class="resources-content">
+
+    <h1>Cargos</h1>
+    <p class="description">Listagem de cargos do pool de recursos..</p>
+    <app-table
+        #tableComponent
+        [dataRetrievalMethodRef]="this.getDataForTableComponent"
+        [filterText]="filterText"
+        [columns]="columns"
+        [actionButton]="actionButton"
+        (mainColumnRowClick)="openPosition($event)"
+        (actionButtonClick)="showCreateModal = true">
+    </app-table>
+  </div>
+
+  <!-- Form Modal -->
+  <app-form-modal-component
+    [isVisible]="showCreateModal"
+    [config]="createProjectConfig"
+    (close)="closeCreateModal()"
+    (save)="onSavePosition($event)"
+    (cancel)="closeCreateModal()">
+  </app-form-modal-component>
+</div>
