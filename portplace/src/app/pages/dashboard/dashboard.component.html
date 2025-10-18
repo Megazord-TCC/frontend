@@ -15,6 +15,20 @@
         (click)="openPortfolio(selectedPortfolioId)">
         Acessar portfólio
       </button>
+
+    </div>
+    <div class="format-selector">
+
+      <span>Formato:</span>
+      <select [(ngModel)]="selectedFormatry" (change)="onPortfolioChange(selectedPortfolioId)">
+        <option *ngFor="let format of availableFormats" [value]="format">{{format}}</option>
+      </select>
+      <button *ngIf="authService.getAuthorizedPageTypesByRole().includes(pageType.PORTFOLIOS)"
+        class="add-format-btn"
+        (click)="openPortfolio(selectedPortfolioId)">
+        Extrair relatório
+      </button>
+
     </div>
 
     <!-- Metrics Cards -->

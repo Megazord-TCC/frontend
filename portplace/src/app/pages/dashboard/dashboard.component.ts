@@ -52,6 +52,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   hasPortfolio = true;
   expandedSections: string[] = [];
   selectedPortfolioId: number = 0;
+  selectedFormatry: string = 'pdf';
+  availableFormats: string[] = ['pdf', 'excel'];
   portfolios: PortfolioListReadDTO[] = [];
 
 

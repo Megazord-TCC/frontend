@@ -133,4 +133,22 @@ export class PortfolioService {
         queryParams = PaginationQueryParams.sortByThisIfNotSortedYet('name', queryParams);
         return this.http.get<Page<PortfolioListReadDTO>>(url, { params: queryParams?.getParamsInHttpParamsFormat() });
     }
+
+    // GET - Exportar analytics para Excel
+    exportAnalyticsToExcel(portfolioId: number): Observable<Blob> {
+        const url = `${this.getPortfolioDetailUrl(portfolioId)}/analytics/excel`;
+        return this.http.get(url, {
+            headers: this.getHeaders(),
+            responseType: 'blob'
+        });
+    }
+
+    // GET - Exportar portfolio para PDF
+    exportPortfolioPdf(portfolioId: number): Observable<Blob> {
+        const url = `${this.getPortfolioDetailUrl(portfolioId)}/analytics/pdf`;
+        return this.http.get(url, {
+            headers: this.getHeaders(),
+            responseType: 'blob'
+        });
+    }
 }
