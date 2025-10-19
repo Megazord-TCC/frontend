@@ -69,6 +69,43 @@ $text-secondary: #64748b;
         }
       }
     }
+    .format-selector {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      span {
+        font-family: 'Roboto', sans-serif;
+        color: #64748b;
+      }
+
+      select {
+        width: 192px;
+        padding: 8px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: bold;
+        font-family: 'Roboto', sans-serif;
+      }
+
+      .add-format-btn {
+        padding: 8px 16px;
+        background-color: #1e293b;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        font-family: 'Roboto', sans-serif;
+
+        &:hover {
+          background-color: #1e3a8a;
+        }
+      }
+    }
 
     .metrics-grid {
       display: grid;
@@ -118,16 +155,21 @@ $text-secondary: #64748b;
 
           }
 
+          .indicator-RED {
+            background-color: #e53935;
+          }
+          .indicator-YELLOW {
+            background-color: #fbc02d;
+          }
+          .indicator-GREEN {
+            background-color: #43a047;
+          }
           .metric-indicator {
-            width: 8px;
-            height: 8px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
-            flex-shrink: 0;
-
-            // Cores dos indicadores
-            &.indicator-green { background-color: #10b981; }
-            &.indicator-red { background-color: #ef4444; }
-            &.indicator-yellow { background-color: #f59e0b; }
+            display: inline-block;
+            margin-left: 8px;
           }
 
           .metric-subtitle {

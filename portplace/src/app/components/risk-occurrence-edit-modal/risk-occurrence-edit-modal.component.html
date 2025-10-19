@@ -1,0 +1,63 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)" (mousedown)="onOverlayMouseDown($event)">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header">
+            <h2>Editar ocorrência de risco</h2>
+            <button class="close-btn" (click)="this.close.emit();">
+                <i class="icon-x">✕</i>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+            <!-- Validation Message -->
+            <div *ngIf="errorMessage" class="validation-error">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>{{ errorMessage }}</span>
+            </div>
+
+            <p class="key-value">Risco: <b>{{ riskName }}</b></p>
+
+            <!-- Form Fields -->
+            <div class="form-fields" [ngClass]="{'disabled': isSubmitButtonDisabled}">
+                <div class="form-group">
+                    <label for="occurenceInput">Data da ocorrência<span class="required-asterisk">*</span></label>
+                    <div class="date-input-group">
+                        <input type="datetime-local" id="occurenceInput" [(ngModel)]="inputOccurrenceDate">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Descrição da ocorrência</label>
+                    <textarea [(ngModel)]="inputOccurrenceDescription" [disabled]="isSubmitButtonDisabled"
+                        maxlength="255"></textarea>
+                </div>
+
+                <div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="isUserActive" [(ngModel)]="inputIsOccurrenceResolved" />
+                        <label for="isUserActive">Ocorrência resolvida</label>
+                    </div>
+                </div>
+
+                <div *ngIf="inputIsOccurrenceResolved" class="form-group">
+                    <label for="occurenceInput">Data da resolução</label>
+                    <div class="date-input-group">
+                        <input type="datetime-local" id="occurenceInput" [(ngModel)]="inputResolutionDate">
+                    </div>
+                </div>
+
+                <button class="btn-exclude" (click)="onDelete()">
+                    <app-svg-icon class="nav-icon" path="assets/icon/excluir_vetor.svg" [size]="18"></app-svg-icon>
+                    Remover ocorrência de risco
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button class="btn-outline" (click)="this.close.emit();">Cancelar</button>
+            <button class="btn-primary" (click)="onSave()" [disabled]="isSubmitButtonDisabled">Salvar</button>
+        </div>
+    </div>
+</div>

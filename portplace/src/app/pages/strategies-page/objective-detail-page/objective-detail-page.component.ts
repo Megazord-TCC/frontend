@@ -7,7 +7,8 @@ import { CardComponent } from '../../../components/card/card.component';
 import { EvaluationGroupsTabComponent } from '../../../components/evaluation-groups-tab/evaluation-groups-tab.component';
 import { FormModalComponentComponent } from '../../../components/form-modal-component/form-modal-component.component';
 import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.component';
-import { Objective, CriteriaGroup, EvaluationGroup, Scenario, Criterion, Portfolio } from '../../../interface/interfacies';
+import { Objective, CriteriaGroup, EvaluationGroup, Scenario, Criterion, Portfolio, FormModalConfig } from '../../../interface/interfacies';
+import { FormField } from '../../../interface/interfacies';
 import { StrategyStatusEnum } from '../../../interface/interfacies';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Project } from '../../../interface/carlos-interfaces';
@@ -41,9 +42,33 @@ import { getColumns as getProjectColumns, getFilterButtons as getProjectFilterBu
   styleUrl: './objective-detail-page.component.scss'
 })
 export class ObjectiveDetailPageComponent implements OnInit {
+   editStrategyConfig: FormModalConfig = {
+      title: 'Editar estratégia',
+      fields: [
+        {
+          id: 'name',
+          label: 'Nome',
+          type: 'text',
+          value: '',
+          required: true,
+          placeholder: 'Digite o nome da estratégia'
+        },
+        {
+          id: 'description',
+          label: 'Descrição',
+          type: 'textarea',
+          value: '',
+          required: false,
+          placeholder: 'Digite a descrição da estratégia',
+          rows: 4
+        }
+      ],
+      validationMessage: 'Os campos marcados com * são obrigatórios.'
+    };
   loadingCriteria = false;
   loadingPortfolios = false;
   loadingProjects = false;
+
   // Tab and filter states
   activeTab = "criterios"
   objectiveFilter = ""
@@ -125,11 +150,16 @@ export class ObjectiveDetailPageComponent implements OnInit {
     try {
       const obj = await this.objetivoService.getObjectiveById(this.estrategiaId, this.objectiveId).toPromise();
       this.objective = obj;
+      console.log('Objetivo carregado:', this.objective);
       this.breadcrumbService.addChildBreadcrumb({
           label: `Objetivo: ${this.objective?.name}`,
           url: `/estrategia/${this.estrategiaId}/objetivo/${this.objective!.name}`,
           isActive: true
         });
+      const currentBreadcrumbs = this.breadcrumbService.getCurrentBreadcrumbs();
+      if (currentBreadcrumbs.length > 4) {
+        this.breadcrumbService.removeChildrenAfter(`/estrategia/${this.estrategiaId}`);
+      }
     } catch (err) {
       console.error('Erro ao buscar objetivo:', err);
     }
@@ -184,14 +214,56 @@ export class ObjectiveDetailPageComponent implements OnInit {
     this.router.navigate([`/estrategia`, this.estrategiaId]);
   }
   editObjective() {
-    console.log('Editar objetivo');
-    // Lógica para edição
+    this.objetivoService.updateObjective(this.estrategiaId, this.objectiveId, {
+      name: this.objective?.name || '',
+      description: this.objective?.description || '',
+    }).subscribe({
+      next: () => {
+        console.log('Objetivo editado com sucesso');
+        this.loadObjective();
+      },
+      error: (err) => {
+        console.error('Erro ao editar objetivo:', err);
+      }
+    });
   }
 
-  cancelObjective() {
-    console.log('Cancelar objetivo');
-    // Lógica para cancelamento
+  onSaveObjectiveEdit(fields: FormField[]): void {
+    const objectiveData = fields.reduce((acc, field) => {
+      acc[field.id] = field.value;
+      return acc;
+    }, {} as any);
+
+    const updatedObjective = {
+      ...this.objective,
+      name: objectiveData.name,
+      description: objectiveData.description
+    };
+
+    // Se quiser sanitizar, crie uma função sanitizeObjectiveData similar à sanitizeStrategyData
+    // const sanitizedObjective = this.sanitizeObjectiveData(updatedObjective);
+    const sanitizedObjective = updatedObjective;
+
+    console.log('Dados do objetivo a serem atualizados:', sanitizedObjective);
+
+    this.objetivoService.updateObjective(this.estrategiaId, this.objectiveId, sanitizedObjective)
+      .subscribe({
+        next: (updatedObjective) => {
+          console.log('Objetivo alterado:', updatedObjective);
+          this.loadObjective();
+          this.closeEditModal();
+          this.loadObjective();
+        },
+        error: (err) => {
+          console.error('Erro ao alterar objetivo:', err);
+          if (err.error) {
+            console.error('Detalhes do erro:', err.error);
+          }
+        }
+      });
   }
+
+
 
   deleteObjective() {
     this.objetivoService.disableObjective(this.estrategiaId, this.objectiveId).subscribe({
@@ -222,6 +294,14 @@ export class ObjectiveDetailPageComponent implements OnInit {
     // Implementar modal de projeto
   }
   openEditModal(): void {
+    this.editStrategyConfig.fields[0].value = this.objective?.name || '';
+    this.editStrategyConfig.fields[1].value = this.objective?.description || '';
+
+    this.editStrategyConfig.fields.forEach(field => {
+      field.hasError = false;
+      field.errorMessage = '';
+    });
+
     this.showEditModal = true;
   }
 
@@ -260,5 +340,13 @@ export class ObjectiveDetailPageComponent implements OnInit {
       default:
         return 'gray';
     }
+  }
+  public parseDateString(dateStr: string | undefined): Date | null {
+    if (!dateStr) return null;
+    const [datePart, timePart] = dateStr.split(' ');
+    if (!datePart || !timePart) return null;
+    const [day, month, year] = datePart.split('/').map(Number);
+    const [hour, minute, second = '0'] = timePart.split(':');
+    return new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute), Number(second));
   }
 }

@@ -2,50 +2,116 @@
   <div class="dashboard-header">
     <h1>Dashboard de portfólio</h1>
   </div>
-
-  <div *ngIf="!hasPortfolio" class="no-portfolio">
-    <p>
-      Nenhum portfólio em andamento.
-      <button class="link-btn" (click)="onHasPortfolioChange()">
-        Acesse a página de Portfólios
-      </button>
-      e realize o cadastro.
-    </p>
-  </div>
-
   <div *ngIf="hasPortfolio" class="dashboard-content">
     <!-- Portfolio Selector -->
     <div class="portfolio-selector">
 
       <span>Portfólio:</span>
-      <select [(ngModel)]="selectedPortfolio" (change)="onPortfolioChange(selectedPortfolio)">
-        <option value="portfolio1">Portfólio 1</option>
-        <option value="portfolio2">Portfólio 2</option>
+      <select [(ngModel)]="selectedPortfolioId" (change)="onPortfolioChange(selectedPortfolioId)">
+        <option *ngFor="let portfolio of portfolios" [value]="portfolio.id">{{portfolio.name}}</option>
       </select>
-      <button *ngIf="authService.getAuthorizedPageTypesByRole().includes(pageType.PORTFOLIOS)" 
-        class="add-portfolio-btn">
+      <button *ngIf="authService.getAuthorizedPageTypesByRole().includes(pageType.PORTFOLIOS)"
+        class="add-portfolio-btn"
+        (click)="openPortfolio(selectedPortfolioId)">
         Acessar portfólio
       </button>
+
+    </div>
+    <div class="format-selector">
+
+      <span>Formato:</span>
+      <select [(ngModel)]="selectedFormatry" (change)="onPortfolioChange(selectedPortfolioId)">
+        <option *ngFor="let format of availableFormats" [value]="format">{{format}}</option>
+      </select>
+      <button *ngIf="authService.getAuthorizedPageTypesByRole().includes(pageType.PORTFOLIOS)"
+        class="add-format-btn"
+        (click)="downloadFile(selectedFormatry)">
+        Extrair relatório
+      </button>
+
     </div>
 
     <!-- Metrics Cards -->
     <div class="metrics-grid">
-      <app-card *ngFor="let card of metricCards" class="metric-card">
+      <app-card class="metric-card">
         <div class="metric-content">
           <app-svg-icon
-            class="nav-icon"
-            [path]="card.icon"
+          class="nav-icon"
+          [path]="'assets/icon/calendario_vetor.svg'"
+          [size]="24">
+        </app-svg-icon>
+        <div class="metric-info-container">
+          <div class="metric-title-row">
+            <p class="metric-title">{{getPortfolioStatusEnumToText(portfolioDetails?.status)}}</p>
+            <div class="metric-indicator" [class]="'indicator-' + portfolioDetails?.budgetHealth" ></div>
+          </div>
+          <p class="metric-subtitle">Status progresso</p>
+        </div>
+      </div>
+    </app-card>
+    <app-card class="metric-card">
+      <div class="metric-content">
+        <app-svg-icon
+        class="nav-icon"
+        [path]="'assets/icon/paid_vetor.svg'"
             [size]="24">
           </app-svg-icon>
           <div class="metric-info-container">
             <div class="metric-title-row">
-              <p class="metric-title">{{card.title}}</p>
-              <div class="metric-indicator" [class]="'indicator-' + card.color" *ngIf="card.color !== 'none'"></div>
+              <p class="metric-title">{{getPortfolioHealthEnumToText(portfolioDetails?.budgetHealth)}}</p>
+              <div class="metric-indicator" [class]="'indicator-' + portfolioDetails?.budgetHealth" ></div>
             </div>
-            <p class="metric-subtitle">{{card.subtitle}}</p>
+            <p class="metric-subtitle">Status custo</p>
           </div>
         </div>
       </app-card>
+      <app-card class="metric-card">
+        <div class="metric-content">
+          <app-svg-icon
+          class="nav-icon"
+            [path]="'assets/icon/estrategia_vetor.svg'"
+            [size]="24">
+          </app-svg-icon>
+          <div class="metric-info-container">
+            <div class="metric-title-row">
+              <p class="metric-title">{{portfolioDetails?.strategy?.name}}</p>
+            </div>
+            <p class="metric-subtitle">Estratégia</p>
+          </div>
+        </div>
+      </app-card>
+      <app-card class="metric-card">
+        <div class="metric-content">
+          <app-svg-icon
+          class="nav-icon"
+          [path]="'assets/icon/porco_vetor.svg'"
+          [size]="24">
+          </app-svg-icon>
+          <div class="metric-info-container">
+            <div class="metric-title-row">
+              <p class="metric-title">{{portfolioDetails?.budget | currency:'BRL':'symbol':'1.2-2'}}</p>
+            </div>
+            <p class="metric-subtitle">Orçamento</p>
+          </div>
+        </div>
+      </app-card>
+      <app-card class="metric-card">
+        <div class="metric-content">
+          <app-svg-icon
+          class="nav-icon"
+          [path]="'assets/icon/user_vetor.svg'"
+          [size]="24">
+          </app-svg-icon>
+          <div class="metric-info-container">
+            <div class="metric-title-row">
+              <!-- <p class="metric-title">{{portfolioDetails?.owners[0]?.name}}</p> -->
+              <p class="metric-title">Nome do responsável</p>
+            </div>
+            <p class="metric-subtitle">Responsável</p>
+          </div>
+        </div>
+      </app-card>
+
     </div>
 
     <!-- Expandable Sections -->
@@ -57,21 +123,13 @@
             [path]="isSectionExpanded('progress') ? 'assets/icon/setaBaixo_vetor.svg' : 'assets/icon/seta_vetor.svg'"
             [size]="14">
           </app-svg-icon>
-          <span>Progresso do portfólio (50%)</span>
+          <span>Progresso do portfólio ({{getPortfolioProgress()}}%)</span>
         </div>
       </button>
       <div class="section-content" *ngIf="isSectionExpanded('progress')">
-        <div class="progress-item">
-          <span>Projeto 1 (50%)</span>
-          <app-progress class="progess" [value]="80"></app-progress>
-        </div>
-        <div class="progress-item">
-          <span>Projeto 2 (50%)</span>
-          <app-progress [value]="50"></app-progress>
-        </div>
-        <div class="progress-item">
-          <span>Projeto 3 (50%)</span>
-          <app-progress [value]="50"></app-progress>
+        <div class="progress-item" *ngFor="let projeto of projetos">
+          <span>{{projeto.name}} ({{projeto.percentComplete | number:'1.0-0'}}%)</span>
+          <app-progress [value]="projeto.percentComplete"></app-progress>
         </div>
       </div>
     </app-card>
@@ -105,13 +163,13 @@
             </thead>
             <tbody>
               <tr *ngFor="let risk of risks">
-                <td>{{risk.code}}</td>
+                <td>{{risk.id}}</td>
                 <td class="risk-name">{{risk.name}}</td>
-                <td>{{risk.probability}}</td>
-                <td>{{risk.impact}}</td>
+                <td>{{getRiskSeverityEnumToText(risk.probability)}}</td>
+                <td>{{getRiskSeverityEnumToText(risk.impact)}}</td>
                 <td>{{risk.severity}}</td>
-                <td [class.text-red]="risk.resolvedOccurrences > 3">{{risk.resolvedOccurrences}}</td>
-                <td [class.text-red]="risk.unresolvedOccurrences > 1">{{risk.unresolvedOccurrences}}</td>
+                <td [class.text-red]="getOccurrencesSolvedCount(risk) > 3">{{getOccurrencesSolvedCount(risk)}}</td>
+                <td [class.text-red]="getOccurrencesNotSolvedCount(risk) > 1">{{getOccurrencesNotSolvedCount(risk)}}</td>
               </tr>
             </tbody>
           </table>
@@ -133,7 +191,7 @@
       </button>
       <div class="section-content" *ngIf="isSectionExpanded('objectives')">
         <div class="objectives-list">
-          <div class="objective-item" *ngFor="let objective of objectives">
+          <div class="objective-item" *ngFor="let objective of objetivos">
             <app-svg-icon
               class="nav-icon"
               [path]="'assets/icon/p_vetor.svg'"
@@ -150,31 +208,34 @@
 
     <div class="charts-grid">
       <app-card class="chart-card">
-        <h3>Custo por Trimestre</h3>
+        <h3>Custo</h3>
         <div class="chart-container">
           <canvas #costChart></canvas>
         </div>
       </app-card>
 
       <app-card class="chart-card">
-        <h3>Projetos: Payback vs Alinhamento Estratégico</h3>
+        <h3>Retorno vinculado a estratégia</h3>
         <div class="chart-container">
           <canvas #projectBubbleChart></canvas>
         </div>
         <div class="chart-description">
-          <p>O tamanho da bolha representa o valor do projeto. Eixo X: Payback em meses, Eixo Y: Alinhamento estratégico (1-10).</p>
+          <p>O tamanho da bolha indica o ROI. Bolhas brancas indicam ROI negativo.</p>
         </div>
       </app-card>
 
       <app-card class="chart-card">
-        <h3>Riscos: Impacto vs Probabilidade</h3>
+        <h3>Riscos com maior severidade</h3>
         <div class="chart-container">
           <canvas #riskBubbleChart></canvas>
         </div>
         <div class="chart-description">
-          <p>O tamanho da bolha representa a severidade do risco. Eixo X: Probabilidade (1-5), Eixo Y: Impacto (1-5).</p>
+          <p>O tamanho da bolha representa a severidade do risco.</p>
         </div>
       </app-card>
     </div>
+  </div>
+  <div *ngIf="!hasPortfolio" class="dashboard-content">
+      Não há portfólios cadastrados.
   </div>
 </div>

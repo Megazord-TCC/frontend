@@ -28,6 +28,8 @@ export class PortfolioEditModalComponent {
     inputName = '';
     inputDescription = '';
 
+    portfolioDTO?: PortfolioReadDTO;
+
     errorMessage = '';
 
     isSubmitButtonDisabled = false;
@@ -47,6 +49,7 @@ export class PortfolioEditModalComponent {
         this.portfolioService.getPortfolioById(this.portfolioId).subscribe((portfolio: PortfolioReadDTO) => {
             this.inputName = portfolio.name;
             this.inputDescription = portfolio.description;
+            this.portfolioDTO = portfolio;
         });
     }
 
@@ -75,7 +78,8 @@ export class PortfolioEditModalComponent {
 
         const body: PortfolioUpdateDTO = {
             name: this.inputName,
-            description: this.inputDescription
+            description: this.inputDescription,
+            communicationStorageDescription: this.portfolioDTO?.communicationStorageDescription || ''
         };
 
         this.portfolioService

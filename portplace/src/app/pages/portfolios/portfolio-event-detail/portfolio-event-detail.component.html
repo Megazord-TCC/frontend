@@ -1,0 +1,11 @@
+<div class="strategy-detail-layout">
+
+    <div class="strategy-detail-content">
+        <app-portfolio-event-detail-header></app-portfolio-event-detail-header>
+
+        <app-portfolio-event-detail-tab-buttons (change)="activeTab = $event"></app-portfolio-event-detail-tab-buttons>
+
+        <app-portfolio-event-detail-about-tab *ngIf="activeTab == 'about'"></app-portfolio-event-detail-about-tab>
+        <app-portfolio-event-detail-participants-tab *ngIf="activeTab == 'participants'"></app-portfolio-event-detail-participants-tab>
+    </div>
+</div>

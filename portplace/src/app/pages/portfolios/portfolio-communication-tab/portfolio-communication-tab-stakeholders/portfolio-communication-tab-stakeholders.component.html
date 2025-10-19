@@ -1,0 +1,8 @@
+<app-table [dataRetrievalMethodRef]="this.getDataForTableComponent"
+    [filterText]="filterText" [columns]="columns" [actionButton]="actionButton"
+    (mainColumnRowClick)="navigateToStakeholderDetailPage($event.id)"
+    (actionButtonClick)="isCreateModalVisible = true">
+</app-table>
+
+<app-stakeholder-create-modal *ngIf="isCreateModalVisible" [portfolioId]="portfolioId" (close)="isCreateModalVisible = false">
+</app-stakeholder-create-modal>

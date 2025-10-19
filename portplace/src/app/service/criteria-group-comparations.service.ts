@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { CriteriaComparison } from '../interface/interfacies';
 import { Page, PaginationQueryParams } from '../models/pagination-models';
+import { AuthService } from './auth-service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,12 +13,11 @@ export class GrupoCriterioService {
 
   constructor(private http: HttpClient) { }
 
+  authService = inject(AuthService);
   private getHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    });
+    return this.authService.getHeaders();
   }
+
   getCriteriaGroupPage(estrategiaId:number, queryParams?: PaginationQueryParams): Observable<Page<any>> {
       return this.http.get<Page<any>>(`${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups`, { params: queryParams?.getParamsInHttpParamsFormat() });
   }

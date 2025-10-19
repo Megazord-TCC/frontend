@@ -314,7 +314,7 @@ $overlay-bg: rgba(0, 0, 0, 0.5);
 
       &:hover:not(:disabled) {
         background-color: #f9fafb;
-        border-color: darken($border-color, 10%);
+        border-color: adjust-color($border-color, $lightness: -10%);
         color: $text-primary;
       }
 
@@ -342,7 +342,7 @@ $overlay-bg: rgba(0, 0, 0, 0.5);
       justify-content: center;
 
       &:hover:not(:disabled) {
-        background-color: darken($danger-color, 10%);
+        border-color: adjust-color($border-color, $lightness: -10%);
         transform: translateY(-1px);
         box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3);
       }

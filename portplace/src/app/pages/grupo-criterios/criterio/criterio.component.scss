@@ -181,7 +181,7 @@ $danger-color: #f44336;
     transition: background-color 0.2s;
 
     &:hover {
-      background-color: darken($primary-color, 10%);
+      border-color: adjust-color($border-color, $lightness: -10%);
     }
   }
 

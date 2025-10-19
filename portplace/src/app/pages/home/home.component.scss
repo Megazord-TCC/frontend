@@ -92,7 +92,7 @@ $transition: all 0.2s ease;
   &:hover {
     transform: translateY(-2px);
     box-shadow: $shadow-hover;
-    border-color: darken($border-color, 10%);
+    border-color: adjust-color($border-color, $lightness: -10%);
     background-color: #f8fafc;
     color: #3B82F6;
 

@@ -1,0 +1,143 @@
+// Variables
+$background-color: #fff;
+$card-background: #ffffff;
+$text-primary: #1e293b;
+$text-secondary: #64748b;
+$border-color: #e2e8f0;
+$primary-color: #1e293b;
+$blue-color: #3b82f6;
+
+.resources-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: $background-color;
+
+  .resources-content {
+    flex: 1;
+    padding: 32px;
+    .resource-pool-container {
+      padding: 24px;
+      background: #fff;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .description {
+      color: #666;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 1024px) {
+      margin-left: 0;
+      padding: 24px;
+    }
+  }
+}
+
+.filters-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.filter-icon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.filter-icon .material-icons {
+  font-size: 20px;
+}
+
+.filter-select,
+.filter-date {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 14px;
+  min-width: 150px;
+}
+
+.date-separator {
+  color: #666;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: 24px;
+}
+
+.tab {
+  padding: 12px 24px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: -2px;
+}
+
+.tab.active {
+  color: #1976d2;
+  border-bottom-color: #1976d2;
+}
+
+.content {
+  margin-top: 24px;
+}
+
+.table-container {
+  margin-top: 24px;
+}
+
+.table-filters {
+  margin-bottom: 16px;
+}
+
+.status-filters {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.status-filters .material-icons {
+  font-size: 20px;
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.filter-option input[type="radio"] {
+  display: none;
+}
+
+.circle {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+}
+
+.filter-option input[type="radio"]:checked + .circle.active {
+  background: #4caf50;
+  border-color: #4caf50;
+}
+
+.filter-option input[type="radio"]:checked + .circle.inactive {
+  background: #999;
+  border-color: #999;
+}

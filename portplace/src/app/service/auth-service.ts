@@ -42,10 +42,11 @@ export class AuthService {
         else setTimeout(() => this.checkTokenExpiration(), (this.tokenPaylod.exp - now) * 1000);
     }
 
-    private getHeaders(): HttpHeaders {
+    public getHeaders(): HttpHeaders {
         return new HttpHeaders({
             'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${this.token}`
         });
     }
 
@@ -62,7 +63,7 @@ export class AuthService {
                     this.tokenPaylod = decodeToken<TokenPayload>(this.token);
                     this.name = this.tokenPaylod?.name ?? '';
                     this.roleFrontend = fromRolesDTOToRoles(this.tokenPaylod?.role);
-
+                    console.log(this.roleFrontend);
                     if (this.isLocalStorageAcessible())
                         localStorage.setItem('userData', JSON.stringify({
                             token: this.token,

@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { Criterion } from '../interface/interfacies';
 import { Page, PaginationQueryParams } from '../models/pagination-models';
+import { AuthService } from './auth-service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,12 +13,9 @@ export class CriterioService {
 
   constructor(private http: HttpClient) { }
 
-  // Headers com Content-Type JSON
+  authService = inject(AuthService);
   private getHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    });
+    return this.authService.getHeaders();
   }
 
   getCriteriaPage(estrategiaId:number, groupId: number, queryParams?: PaginationQueryParams): Observable<Page<any>> {

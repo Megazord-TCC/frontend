@@ -19,6 +19,11 @@ import { ScenarioDetailPageComponent } from './pages/strategies-page/scenario-de
 import { ObjectiveDetailPageComponent } from './pages/strategies-page/objective-detail-page/objective-detail-page.component';
 import { PageType } from './interface/carlos-auth-interfaces';
 import { RoleGuard } from './guards/role-guard';
+import { PortfolioEventDetailComponent } from './pages/portfolios/portfolio-event-detail/portfolio-event-detail.component';
+import { PortfolioStakeholderDetailComponent } from './pages/portfolios/portfolio-stakeholder-detail/portfolio-stakeholder-detail.component';
+import { PortfolioRiskDetailComponent } from './pages/portfolios/portfolio-risk-detail/portfolio-risk-detail.component';
+import { ResourcesPositionDetailComponent } from './pages/resources-page/resources-position/resources-position-detail/resources-position-detail.component';
+import { ResourcesDetailComponent } from './pages/resources-page/resources-pool/resources-detail/resources-detail.component';
 
 export const routes: Routes = [
 
@@ -27,6 +32,9 @@ export const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent, canActivate: [RoleGuard], data: { pageType: PageType.DASHBOARD } },
   { path: 'portfolios', component: PortfoliosComponent, canActivate: [RoleGuard], data: { pageType: PageType.PORTFOLIOS } },
   { path: 'portfolio/:id', component: PortfolioDetailComponent, canActivate: [RoleGuard], data: { pageType: PageType.PORTFOLIOS } },
+  { path: 'portfolio/:portfolioId/evento/:eventoId', component: PortfolioEventDetailComponent, canActivate: [RoleGuard], data: { pageType: PageType.PORTFOLIOS } },
+  { path: 'portfolio/:portfolioId/interessado/:interessadoId', component: PortfolioStakeholderDetailComponent, canActivate: [RoleGuard], data: { pageType: PageType.PORTFOLIOS } },
+  { path: 'portfolio/:portfolioId/risco/:riscoId', component: PortfolioRiskDetailComponent, canActivate: [RoleGuard], data: { pageType: PageType.PORTFOLIOS } },
   { path: 'projetos', component: ProjectsComponent, canActivate: [RoleGuard], data: { pageType: PageType.PROJECTS } },
   { path: 'projeto/:id', component: ProjectDetailpageComponent, canActivate: [RoleGuard], data: { pageType: PageType.PROJECTS } },
   { path: 'estrategias', component: StrategiesPageComponent, canActivate: [RoleGuard], data: { pageType: PageType.STRATEGIES } },
@@ -39,7 +47,9 @@ export const routes: Routes = [
   { path: 'estrategia/:estrategiaId/grupo-avaliacao/:grupoAvaliacaoId', component: EvaluationGroupDetailPageComponent, canActivate: [RoleGuard], data: { pageType: PageType.STRATEGIES } },
   { path: 'estrategia/:estrategiaId/grupo-avaliacao/:grupoAvaliacaoId/projeto/:projetoId', component: ProjectEvaluationDetailComponent, canActivate: [RoleGuard], data: { pageType: PageType.STRATEGIES } },
   { path: 'estrategia/:estrategiaId/cenario/:cenarioId', component: ScenarioDetailPageComponent, canActivate: [RoleGuard], data: { pageType: PageType.STRATEGIES } },
-  
+  { path: 'recurso/position/:positionId', component: ResourcesPositionDetailComponent, canActivate: [RoleGuard], data: { pageType: PageType.RESOURCES } },
+  { path: 'recurso/:resourceId', component: ResourcesDetailComponent, canActivate: [RoleGuard], data: { pageType: PageType.RESOURCES } },
+
   // Redireciona qualquer URL diferente dos de cima para o início
   { path: '**', redirectTo: 'inicio', pathMatch: 'full' }
 ];

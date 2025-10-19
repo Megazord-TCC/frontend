@@ -1,0 +1,40 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)" (mousedown)="onOverlayMouseDown($event)">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <!-- Header -->
+        <div class="modal-header">
+            <h2>Editar participante</h2>
+            <button class="close-btn" (click)="close.emit()">
+                <i class="icon-x">✕</i>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+            <!-- Validation Message -->
+            <div *ngIf="errorMessage" class="validation-error">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>{{ errorMessage }}</span>
+            </div>
+
+            <!-- Form Fields -->
+            <div class="form-fields" [ngClass]="{'disabled': isSubmitButtonDisabled}">
+                <p class="key-value">Evento: <b>{{ eventName || '...' }}</b></p>
+                <p class="key-value">Participante: <b>{{ participant?.stakeholder?.name || '...' }}</b></p>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="isResponsible" [(ngModel)]="inputIsResponsible" [disabled]="isSubmitButtonDisabled"/>
+                    <label for="isResponsible">Responsável pelo evento</label>
+                </div>
+                <button class="btn-exclude" (click)="onDelete()">
+                    <app-svg-icon class="nav-icon" path="assets/icon/excluir_vetor.svg" [size]="18"></app-svg-icon>
+                    Remover participante do evento
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+            <button class="btn-outline" (click)="close.emit()">Cancelar</button>
+            <button class="btn-primary" (click)="onEdit()" [disabled]="isSubmitButtonDisabled">Salvar</button>
+        </div>
+    </div>
+</div>

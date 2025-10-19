@@ -6,7 +6,7 @@ export enum StrategyDTOStatusEnum {
 
 export class StrategyReadDTO {
     id = 0;
-    name = '';
+    name? = '';
     description = '';
     status?: StrategyDTOStatusEnum;
     activeObjectivesCount = 0;

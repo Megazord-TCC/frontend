@@ -1,0 +1,18 @@
+<div class="tab-panel">
+    <h3>Usuários responsáveis pelo portfólio</h3>
+
+    <p class="tab-description">Defina os responsáveis para fins informativos.</p>
+
+    <app-table [dataRetrievalMethodRef]="this.getDataForTableComponent"
+        [filterText]="filterText" [columns]="columns" [actionButton]="actionButton"
+        (actionButtonClick)="isCreateModalVisible = true"
+        (mainColumnRowClick)="selectedSupervisorId = $event.id; isDeleteModalVisible = true">
+    </app-table>
+</div>
+<app-portfolio-supervisor-create-modal *ngIf="isCreateModalVisible" (close)="isCreateModalVisible = false"
+    (supervisorCreate)="tableComponent?.sendHttpGetRequestAndPopulateTable(); isCreateModalVisible = false">
+</app-portfolio-supervisor-create-modal>
+<app-portfolio-supervisor-delete-modal *ngIf="isDeleteModalVisible" [supervisorId]="selectedSupervisorId"
+    (close)="isDeleteModalVisible = false"
+    (supervisorDelete)="tableComponent?.sendHttpGetRequestAndPopulateTable(); isDeleteModalVisible = false">
+</app-portfolio-supervisor-delete-modal>

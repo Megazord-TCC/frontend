@@ -1,0 +1,15 @@
+<div class="tab-panel">
+    <h3>Riscos do portfólio</h3>
+
+    <app-table
+        [dataRetrievalMethodRef]="this.getDataForTableComponent" 
+        [filterText]="filterText"
+        [columns]="columns" 
+        [actionButton]="actionButton" 
+        (mainColumnRowClick)="router.navigate([`/portfolio/${portfolioId}/risco/${$event.id}`])"
+        (actionButtonClick)="showCreateModal = true">
+    </app-table>
+</div>
+
+<app-risk-create-modal *ngIf="showCreateModal" [portfolioId]="portfolioId" (close)="showCreateModal = false">
+</app-risk-create-modal>

@@ -1,16 +1,23 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { environment } from '../environments/environment';
 import { map, Observable } from 'rxjs';
 import { CriteriaGroup } from '../interface/interfacies';
 import { Page, PaginationQueryParams } from '../models/pagination-models';
+import { AuthService } from './auth-service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CriteriaGroupService {
 
-  // Atualizar EvaluationGroup (PUT)
+  constructor(private http: HttpClient) { }
+
+  authService = inject(AuthService);
+  private getHeaders(): HttpHeaders {
+    return this.authService.getHeaders();
+  }
+
   updateEvaluationGroup(
     evaluationGroupId: number,
     strategyId: number,
@@ -20,17 +27,6 @@ export class CriteriaGroupService {
     return this.http.put<any>(url, dto, { headers: this.getHeaders() });
   }
 
-  constructor(private http: HttpClient) { }
-
-  // Headers com Content-Type JSON
-  private getHeaders(): HttpHeaders {
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    });
-  }
-
-  // Cadastrar novo projeto (POST)
   createCriterio(criterio: CriteriaGroup, estrategiaId: number): Observable<CriteriaGroup> {
     const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups`;
     return this.http.post<CriteriaGroup>(url, criterio, { headers: this.getHeaders() });
