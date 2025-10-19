@@ -165,7 +165,7 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
   activeTab = "objetivos"
   objectiveFilter = ""
   objectiveSearchTerm = ""
-  criteriaSearchTerm = ""
+  // criteriaSearchTerm = "" // Removido pois não é usado para a tabela paginada
   evaluationSearchTerm = ""
   scenarioFilter = ""
   scenarioSearchTerm = ""
@@ -200,21 +200,34 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
     }
   }
 
- //critérios Método de busca para o app-table de grupos de
-  getDataForCriteriaGroupsTable: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => {
-    return this.criterioService.getCriteriaGroupPage(this.strategy.id!, queryParams).pipe(
-      map(page => {
-        console.log('[LOG] Retorno da API getCriteriaGroupPage:', page);
-        return mapCriteriaGroupPageDtoToCriteriaGroupTableRowPage(page);
-      })
-    );
-  };
   // Método de busca para o app-table de grupos de objetivos
   getDataForObjetivesTable: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams) => {
+    console.log('getDataForObjetivesTable called with queryParams:', queryParams);
     return this.objetivoService.getObjectivesPage(this.strategy.id!, queryParams).pipe(
       map(page => {
         console.log('[LOG] Retorno da API getObjectivesPage:', page);
         return mapObjectivePageDtoToObjectiveTableRowPage(page);
+      })
+    );
+  };
+  
+  getDataForCriteriaGroupsTable: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => {
+    console.log('=== DEBUG CRITERIA GROUPS ===');
+    console.log('queryParams completo:', queryParams);
+    console.log('queryParams.getParamsInHttpParamsFormat():', queryParams?.getParamsInHttpParamsFormat());
+
+    // Log de cada parâmetro individual
+    if (queryParams) {
+      const httpParams = queryParams.getParamsInHttpParamsFormat();
+      httpParams.keys().forEach(key => {
+        console.log(`Parâmetro ${key}:`, httpParams.get(key));
+      });
+    }
+
+    return this.criterioService.getCriteriaGroupPage(this.strategy.id!, queryParams).pipe(
+      map(page => {
+        console.log('[LOG] Retorno da API getCriteriaGroupPage:', page);
+        return mapCriteriaGroupPageDtoToCriteriaGroupTableRowPage(page);
       })
     );
   };
@@ -436,38 +449,10 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
     this.closeCreateModal();
   }
 
-
-
-  onSearchCriterios(): void {
-    let filtered = [...this.criteriaGroups];
-    filtered = filtered.filter(criterio =>
-      criterio.name.toLowerCase().includes(this.criteriaSearchTerm.toLowerCase())
-    );
-    this.filteredCriteriaGroups = filtered;
-  }
-
-
-
   closeCreateModal(): void {
     this.showCreateModal = false;
   }
   // Criteria methods
-  onCriteriaSearchChange(): void {
-    this.onSearchCriterios()
-  }
-
-  applyCriteriaFilters(): void {
-    let filtered = [...this.criteriaGroups]
-
-    if (this.criteriaSearchTerm) {
-      filtered = filtered.filter(
-        (criteria) =>
-          criteria.name.toLowerCase().includes(this.criteriaSearchTerm.toLowerCase())
-      )
-    }
-
-    this.filteredCriteriaGroups = filtered
-  }
 
   openCriteriaGroup(criteriaGroupId: number | { id: number }): void {
     let id: number | undefined;
@@ -631,8 +616,6 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
   }
   getAvalicoesCoutntPorId(groupId: number): number {
     const group = this.criteriaGroups.find(g => g.id === groupId);
-    // console.log('Group:', group);
-    // console.log('Group criteria comparisons:', group?.relatedEvaluationGroupsCount);
     return group?.relatedEvaluationGroupsCount || 0;
   }
   getStatusLabelByDisabled(status?: CriteriaGroupStatusEnum): string {
