@@ -25,7 +25,7 @@
       </select>
       <button *ngIf="authService.getAuthorizedPageTypesByRole().includes(pageType.PORTFOLIOS)"
         class="add-format-btn"
-        (click)="openPortfolio(selectedPortfolioId)">
+        (click)="downloadFile(selectedFormatry)">
         Extrair relatório
       </button>
 

@@ -92,6 +92,28 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['/portfolio', id]);
   }
 
+  downloadFile(type: string) {
+    if(type === 'pdf') {
+      this.portfolioService.exportPortfolioPdf(this.selectedPortfolioId).subscribe(blob => {
+        this.downloadBlob(blob, `portfolio_${this.selectedPortfolioId}.pdf`);
+      });
+    } else if(type === 'excel') {
+      this.portfolioService.exportPortfolioExcel(this.selectedPortfolioId).subscribe(blob => {
+        this.downloadBlob(blob, `portfolio_${this.selectedPortfolioId}.xlsx`);
+      });
+    }
+  }
+
+  private downloadBlob(blob: Blob, filename: string) {
+    const url = globalThis.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    globalThis.URL.revokeObjectURL(url);
+  }
 
   loadPortfoliosAnalytics(portfolioId: number) {
     console.log('Loading portfolio analytics for portfolio ID:', portfolioId);

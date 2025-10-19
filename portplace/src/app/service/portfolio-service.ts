@@ -135,7 +135,7 @@ export class PortfolioService {
     }
 
     // GET - Exportar analytics para Excel
-    exportAnalyticsToExcel(portfolioId: number): Observable<Blob> {
+    exportPortfolioExcel(portfolioId: number): Observable<Blob> {
         const url = `${this.getPortfolioDetailUrl(portfolioId)}/analytics/excel`;
         return this.http.get(url, {
             headers: this.getHeaders(),

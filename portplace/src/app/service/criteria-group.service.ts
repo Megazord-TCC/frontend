@@ -11,7 +11,13 @@ import { AuthService } from './auth-service';
 })
 export class CriteriaGroupService {
 
-  // Atualizar EvaluationGroup (PUT)
+  constructor(private http: HttpClient) { }
+
+  authService = inject(AuthService);
+  private getHeaders(): HttpHeaders {
+    return this.authService.getHeaders();
+  }
+
   updateEvaluationGroup(
     evaluationGroupId: number,
     strategyId: number,
@@ -21,14 +27,6 @@ export class CriteriaGroupService {
     return this.http.put<any>(url, dto, { headers: this.getHeaders() });
   }
 
-  constructor(private http: HttpClient) { }
-
-  authService = inject(AuthService);
-  private getHeaders(): HttpHeaders {
-    return this.authService.getHeaders();
-  }
-
-  // Cadastrar novo projeto (POST)
   createCriterio(criterio: CriteriaGroup, estrategiaId: number): Observable<CriteriaGroup> {
     const url = `${environment.apiUrl}/strategies/${estrategiaId}/criteria-groups`;
     return this.http.post<CriteriaGroup>(url, criterio, { headers: this.getHeaders() });
