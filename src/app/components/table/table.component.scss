@@ -3,6 +3,11 @@ $border-color: #0a1420;
 $primary-color: #1e293b;
 $blue-color: #3b82f6;
 
+.required-indicator {
+    font-weight: 600;
+    color: #ef4444;
+}
+
 .nav-icon {
     height: 18px;
 }
@@ -34,13 +39,17 @@ $blue-color: #3b82f6;
                         cursor: pointer;
 
                         &:hover {
-                            opacity: 55%;
+                            background-color: #f1f1f1;
                         }
+                    }
+
+                    &.error {
+                        border: 3px solid rgb(255, 130, 130);
                     }
 
                     &.sorted {
                         color: #3b82f6;
-                        background-color: #efefef;
+                        background-color: #e7e7e7;
                     }
 
                     .header-cell {

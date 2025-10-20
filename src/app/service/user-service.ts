@@ -45,7 +45,7 @@ export class UserService {
     }
 
     // UPDATE - Editar um usuário
-    editUser(userId: number, name: string, password: string, role: RoleDTO, status: UserStatusEnumDTO): Observable<any> {
+    editUser(userId: number, name: string, password: string | null, role: RoleDTO, status: UserStatusEnumDTO): Observable<any> {
         const url = `${this.getUserUrl()}/${userId}`;
         const body = { name, password, role, status };
 

@@ -9,6 +9,7 @@ import { TablePaginationComponent } from './table-pagination/table-pagination.co
 import { TableFilterButtonsComponent } from './table-filter-buttons/table-filter-buttons.component';
 import { TableActionTextFilterComponent } from './table-action-text-filter/table-action-text-filter.component';
 import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } from '../../models/pagination-models';
+import { TooltipComponent } from '../tooltip/tooltip.component';
 
 @Component({
     selector: 'app-table',
@@ -20,7 +21,8 @@ import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } fro
         CommonModule,
         TablePaginationComponent,
         TableFilterButtonsComponent,
-        TableActionTextFilterComponent
+        TableActionTextFilterComponent,
+        TooltipComponent
     ],
     templateUrl: './table.component.html',
     styleUrl: './table.component.scss'

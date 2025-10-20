@@ -71,6 +71,7 @@ export const getColumns = (): TableColumn[] => {
     column.isSortable = true;
     column.frontendAttributeName = 'currentOrder';
     column.backendAttributeName = 'currentPosition';
+    column.tooltip = 'Prioridade dos projetos considerando as alterações que o usuário possa ter realizado na coluna "Inclusão".';
     columns.push(column);
 
     column = new TableColumn();
@@ -79,10 +80,11 @@ export const getColumns = (): TableColumn[] => {
     column.isSortable = true;
     column.frontendAttributeName = 'initialOrder';
     column.backendAttributeName = 'calculatedPosition';
+    column.tooltip = 'Prioridade inicial dos projetos, NÃO considerando as alterações que o usuário possa ter realizado na coluna "Inclusão".';
     columns.push(column);
 
     column = new TableColumn();
-    column.label = 'Nome projeto';
+    column.label = 'Projeto';
     column.order = 3;
     column.frontendAttributeName = 'projectName';
     columns.push(column);
@@ -95,6 +97,8 @@ export const getColumns = (): TableColumn[] => {
     column.backendAttributeName = 'status';
     column.selectButtonConfiguration = getSelectButtonConfigurations();
     column.badgeConfiguration = getBadgeConfigurations();
+    column.required = true;
+    column.tooltip = 'Define se o projeto deverá ser incluído ou removido do portfólio. É obrigatório incluir pelo menos um.';
     columns.push(column);
 
     column = new TableColumn();
@@ -103,13 +107,16 @@ export const getColumns = (): TableColumn[] => {
     column.isSortable = true;
     column.frontendAttributeName = 'strategicValue';
     column.backendAttributeName = 'totalScore';
+    column.tooltip = 'Pontuação do projeto no cenário de avaliação, através da análise AHP.';
     columns.push(column);
 
     column = new TableColumn();
     column.label = 'Categoria';
     column.order = 6;
     column.frontendAttributeName = 'portfolioCategoryId';
-    column.backendAttributeName = 'portfolioCategoryId'; // TODO: Ainda não existe no backend
+    column.backendAttributeName = 'portfolioCategoryId';
+    column.required = true;
+    column.tooltip = 'Define a categoria do projeto, para fins de balanceamento. É obrigatório selecionar a categoria dos projetos incluídos.';
 
     // Obs: as <options> do <select> são carregadas após a requisição de categorias, no <ngOnInit>.
     column.selectButtonConfiguration = getPortfolioCategorySelectButtonConfigurations();
@@ -121,16 +128,18 @@ export const getColumns = (): TableColumn[] => {
     // column.isSortable = true; // Comentado pois backend não permite ordenação por este campo
     column.frontendAttributeName = 'estimatedCost';
     // column.backendAttributeName = 'budgetAtCompletion';
+    column.tooltip = 'Valor do indicador EAC do projeto. Se for indefinido, é exibido o BAC.';
     columns.push(column);
 
     column = new TableColumn();
     column.label = 'Duração estimada';
     column.order = 8;
     column.frontendAttributeName = 'durationMonths';
+    column.tooltip = 'Considera o início e fim planejado do projeto.';
     columns.push(column);
 
     column = new TableColumn();
-    column.label = 'Status projeto';
+    column.label = 'Status';
     column.order = 9;
     column.frontendAttributeName = 'projectStatus';
     columns.push(column);

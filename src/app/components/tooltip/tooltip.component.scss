@@ -12,6 +12,7 @@
     position: relative;
     margin-left: 6px;
     transition: background 0.2s;
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
 
     &:hover {
         color: white;
@@ -51,5 +52,26 @@
     &:hover .tooltip-text {
         visibility: visible;
         opacity: 1;
+    }
+}
+
+/* New: when .bottom class is present, show tooltip below and flip arrow */
+.tooltip-circle.bottom {
+    .tooltip-text {
+        /* place below */
+        top: 125%;
+        bottom: auto;
+        left: 50%;
+        transform: translateX(-50%);
+        /* arrow flipped */
+        &::after {
+            top: auto;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: transparent transparent #1e293b transparent;
+        }
     }
 }

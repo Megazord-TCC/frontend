@@ -38,6 +38,11 @@
                 </div>
             </div>
 
+            <div *ngIf="errorMessage" class="validation-error">
+                <i class="icon-alert-triangle">⚠️</i>
+                <span>{{ errorMessage }}</span>
+            </div>
+
             <app-table [dataRetrievalMethodRef]="this.getDataForTableComponent" [filterText]="filterText"
                 [columns]="columns" [actionButton]="actionButton" (selectChange)="onSelectChange($event)"
                 (actionButtonClick)="isScenarioAuthorizationModalVisible = true" (selectClick)="onSelectClick($event)">
@@ -70,6 +75,8 @@
 </app-cancel-scenario-modal>
 
 <app-scenario-authorization-modal *ngIf="isScenarioAuthorizationModalVisible"
-    (scenarioAuthorized)="loadScenarioByIdAndStrategyByIdAndSetupBreadcrumbs(); this.isScenarioAuthorizationModalVisible = false;"
-    (close)="isScenarioAuthorizationModalVisible = false">
+    (scenarioAuthorized)="onScenarioAuthorized()"
+    (close)="onAuthorizationModalClose()"
+    (noIncludedProjects)="onNoIncludedProjects()"
+    (projectWithoutCategory)="onProjectWithoutCategory()">
 </app-scenario-authorization-modal>

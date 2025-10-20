@@ -15,12 +15,15 @@
             <thead>
                 <tr>
                     <th *ngFor="let column of getDesiredAndExistingColumnsToPrint()" (click)="onColumnHeaderClick(column)"
-                        [class.sortable]="column.isSortable" [class.sorted]="isColumnCurrentlySorted(column)">
+                        [class.sortable]="column.isSortable" [class.sorted]="isColumnCurrentlySorted(column)"
+                        [class.error]="column.error">
                         <div class="header-cell">
                             {{ column.label }}
+                            <span *ngIf="column.required" class="required-indicator">*</span>
                             <app-svg-icon *ngIf="column.isSortable" class="nav-icon" [path]="getSortIconPath(column)"
                                 [size]="18">
                             </app-svg-icon>
+                            <app-tooltip *ngIf="column.tooltip" [text]="column.tooltip" [isTextOnTop]="false"></app-tooltip>
                         </div>
                     </th>
                 </tr>

@@ -36,6 +36,8 @@ export class CarlosPortfolioRiskOccurrenceService {
         riskId: number,
         occurrenceDate: string,
         description: string,
+        isResolutionSameAsContingencyPlan: boolean,
+        resolutionDescription: string,
         resolutionDate?: string
     ): Observable<RiskOccurrenceReadDTO> {
         const url = this.getOccurrencesUrl(portfolioId, riskId);
@@ -43,7 +45,9 @@ export class CarlosPortfolioRiskOccurrenceService {
             description,
             dateOfOccurrence: occurrenceDate,
             solvedAt: resolutionDate ?? null,
-            riskId  : riskId
+            riskId  : riskId,
+            followedContingencyPlan: isResolutionSameAsContingencyPlan,
+            contingencyActions: resolutionDescription || null
         };
         return this.http.post<RiskOccurrenceReadDTO>(url, body, { headers: this.getHeaders() });
     }
@@ -55,13 +59,17 @@ export class CarlosPortfolioRiskOccurrenceService {
         occurrenceId: number,
         occurrenceDate: string,
         description: string,
+        isResolutionSameAsContingencyPlan: boolean,
+        resolutionDescription: string,
         resolutionDate?: string
     ): Observable<RiskOccurrenceReadDTO> {
         const url = `${this.getOccurrencesUrl(portfolioId, riskId)}/${occurrenceId}`;
         const body: RiskOccurrenceUpdateDTO = {
             description,
             dateOfOccurrence: occurrenceDate,
-            solvedAt: resolutionDate ?? null
+            solvedAt: resolutionDate ?? null,
+            followedContingencyPlan: isResolutionSameAsContingencyPlan,
+            contingencyActions: resolutionDescription || null
         };
         return this.http.put<RiskOccurrenceReadDTO>(url, body, { headers: this.getHeaders() });
     }

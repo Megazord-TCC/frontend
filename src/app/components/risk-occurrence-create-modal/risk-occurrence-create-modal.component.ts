@@ -27,11 +27,14 @@ export class RiskOccurrenceCreateModalComponent {
     occurrenceService = inject(CarlosPortfolioRiskOccurrenceService);
 
     riskName = '';
+    riskContingencyPlan = '';
 
     inputOccurrenceDate = '';
     inputOccurrenceDescription = '';
     inputResolutionDate = '';
     inputIsOccurrenceResolved = '';
+    inputIsResolutionSameAsContingencyPlan = false;
+    inputResolutionDescription = '';
 
     errorMessage = '';
     isSubmitButtonDisabled = false;
@@ -43,7 +46,7 @@ export class RiskOccurrenceCreateModalComponent {
     }
 
     restartForm() {
-        this.getRiskNameByHttpRequest();
+        this.getRiskNameAndContingencyPlanByHttpRequest();
         this.clearForm();
     }
 
@@ -51,8 +54,11 @@ export class RiskOccurrenceCreateModalComponent {
         if (!this.inputIsOccurrenceResolved) this.inputIsOccurrenceResolved = '';
     }
 
-    getRiskNameByHttpRequest() {
-        this.riskService.getRiskById(this.portfolioId, this.riskId).subscribe(risk => this.riskName = risk.name);
+    getRiskNameAndContingencyPlanByHttpRequest() {
+        this.riskService.getRiskById(this.portfolioId, this.riskId).subscribe(risk => {
+            this.riskName = risk.name;
+            this.riskContingencyPlan = risk.contingencyPlan;
+        });
     }
 
     onOverlayClick(event: MouseEvent): void {
@@ -69,10 +75,12 @@ export class RiskOccurrenceCreateModalComponent {
         if (!isFormValid) return;
 
         this.occurrenceService.createRiskOccurrence(
-            this.portfolioId, 
-            this.riskId, 
-            this.inputOccurrenceDate, 
-            this.inputOccurrenceDescription, 
+            this.portfolioId,
+            this.riskId,
+            this.inputOccurrenceDate,
+            this.inputOccurrenceDescription,
+            this.inputIsResolutionSameAsContingencyPlan,
+            this.inputResolutionDescription.trim(),
             this.inputIsOccurrenceResolved ? this.inputResolutionDate : undefined
         ).subscribe({
             next: _ => this.create.emit(),
@@ -88,6 +96,8 @@ export class RiskOccurrenceCreateModalComponent {
         this.inputOccurrenceDescription = '';
         this.errorMessage = '';
         this.isSubmitButtonDisabled = false;
+        this.inputIsResolutionSameAsContingencyPlan = false;
+        this.inputResolutionDescription = '';
     }
 
     async isFormValid(): Promise<boolean> {
@@ -105,5 +115,13 @@ export class RiskOccurrenceCreateModalComponent {
         let isOccurrenceResolutionValid = !this.inputIsOccurrenceResolved || !!this.inputResolutionDate.trim();
         this.errorMessage = isOccurrenceResolutionValid ? '' : 'Os campos marcados com * são obrigatórios.';
         return isOccurrenceResolutionValid;
+    }
+
+    onIsResolutionSameAsContingencyPlanChange() {
+        if (this.inputIsResolutionSameAsContingencyPlan && !this.inputResolutionDescription.trim())
+            this.inputResolutionDescription = this.riskContingencyPlan;
+
+        if (!this.inputIsResolutionSameAsContingencyPlan && this.inputResolutionDescription.trim() == this.riskContingencyPlan)
+            this.inputResolutionDescription = '';
     }
 }

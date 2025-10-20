@@ -84,7 +84,7 @@ export class UserEditModalComponent {
 
         let status = this.inputIsUserActive ? UserStatusEnumDTO.ACTIVE : UserStatusEnumDTO.INACTIVE
 
-        this.userService.editUser(this.userId, this.inputName, this.inputPassword, role, status).subscribe({
+        this.userService.editUser(this.userId, this.inputName, this.inputPassword || null, role, status).subscribe({
             next: _ => this.userEdit.emit(),
             error: _ => this.errorMessage = 'Ocorreu um erro inesperado. Tente novamente mais tarde.',
         });
@@ -124,14 +124,11 @@ export class UserEditModalComponent {
     }
 
     isPasswordValid(): boolean {
-        return this.isPasswordFilled() && this.isPasswordSizeValid();
+        return this.isPasswordFilled() ? this.isPasswordSizeValid() : true;
     }
 
     isPasswordFilled(): boolean {
         let isPasswordFilled = !!this.inputPassword.trim();
-
-        this.errorMessage = isPasswordFilled ? '' : 'Os campos marcados com * são obrigatórios.';
-
         return isPasswordFilled;
     }
 

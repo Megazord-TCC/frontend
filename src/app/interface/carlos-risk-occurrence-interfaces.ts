@@ -30,12 +30,16 @@ export class RiskOccurrenceReadDTO {
     createdAt = '';
     lastModifiedBy = '';
     lastModifiedAt = '';
+    followedContingencyPlan = false;
+    contingencyActions: string | null = null;
 }
 
 export class RiskOccurrenceUpdateDTO {
     description = '';
     dateOfOccurrence = '';
     solvedAt: string | null = null;
+    followedContingencyPlan = false;
+    contingencyActions: string | null = null;
 }
 
 export class RiskOccurrenceCreateDTO {
@@ -43,4 +47,6 @@ export class RiskOccurrenceCreateDTO {
     dateOfOccurrence = '';
     solvedAt: string | null = null;
     riskId = 0;
+    followedContingencyPlan = false;
+    contingencyActions: string | null = null;
 }

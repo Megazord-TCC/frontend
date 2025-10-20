@@ -86,6 +86,9 @@ export class TableColumn {
     selectButtonConfiguration?: SelectButtonConfiguration;
     badgeConfiguration: BadgeConfiguration[] = [];
     formatter?: (value: any, row?: any) => string;
+    tooltip = '';
+    required = false;
+    error = false;
 }
 
 

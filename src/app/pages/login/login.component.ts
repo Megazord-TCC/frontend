@@ -26,8 +26,10 @@ export class LoginComponent {
         this.authService.authenticate(this.email, this.password).subscribe({
             next: _ => this.redirectUser(),
             error: err => {
-                if (this.isErrorStatus500(err)) this.errorMessage = 'Ocorreu um erro. Tente novamente mais tarde.';
-                else this.errorMessage = 'E-mail ou senha incorretos ou sem cadastro.';
+                if (this.isErrorStatus500s(err)) this.errorMessage = 'Ocorreu um erro. Tente novamente mais tarde.';
+                else if (this.isErrorStatus403(err)) this.errorMessage = 'Usuário desativado pelo administrador.';
+                else if (this.isErrorStatus401(err)) this.errorMessage = 'Senha incorreta.';
+                else this.errorMessage = 'Não há cadastro para o e-mail informado.';
             }
         });
     }
@@ -42,7 +44,7 @@ export class LoginComponent {
         }
     }
 
-    isErrorStatus500(err: any): boolean {
+    isErrorStatus500s(err: any): boolean {
         if (!err.status) return false;
         return err.status >= 500 && err.status < 600;
     }
@@ -68,5 +70,13 @@ export class LoginComponent {
         return isValid;
     }
 
+    isErrorStatus403(err: any): boolean {
+        if (!err.status) return false;
+        return err.status == 403;
+    }
 
+    isErrorStatus401(err: any): boolean {
+        if (!err.status) return false;
+        return err.status == 401;
+    }
 }

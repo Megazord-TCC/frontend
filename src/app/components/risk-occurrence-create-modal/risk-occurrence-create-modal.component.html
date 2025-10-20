@@ -35,7 +35,8 @@
 
                 <div>
                     <div class="checkbox-group">
-                        <input type="checkbox" id="isUserActive" [(ngModel)]="inputIsOccurrenceResolved" (change)="onCheckboxChange()"/>
+                        <input type="checkbox" id="isUserActive" [(ngModel)]="inputIsOccurrenceResolved"
+                            (change)="onCheckboxChange()" />
                         <label for="isUserActive">Ocorrência resolvida</label>
                     </div>
                 </div>
@@ -45,6 +46,20 @@
                     <div class="date-input-group">
                         <input type="datetime-local" id="occurenceInput" [(ngModel)]="inputResolutionDate">
                     </div>
+                </div>
+
+                <div *ngIf="inputIsOccurrenceResolved">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="isResolutionSameAsContingencyPlan"
+                            [(ngModel)]="inputIsResolutionSameAsContingencyPlan"
+                            (change)="onIsResolutionSameAsContingencyPlanChange()" />
+                        <label for="isResolutionSameAsContingencyPlan">Resolução conforme plano de contingência</label>
+                    </div>
+                </div>
+
+                <div *ngIf="inputIsOccurrenceResolved" class="form-group">
+                    <label>Descrição da resolução</label>
+                    <textarea [(ngModel)]="inputResolutionDescription" maxlength="255"></textarea>
                 </div>
             </div>
         </div>

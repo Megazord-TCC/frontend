@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, ParamMap, Router, RouterLink } from '@angular/router';
 import { debounceTime, forkJoin, map, Observable, of, Subject, Subscription, tap } from 'rxjs';
@@ -23,7 +23,6 @@ import { WarningInformationModalComponent } from '../../../components/warning-in
 import { TooltipComponent } from '../../../components/tooltip/tooltip.component';
 import { CancelScenarioModalComponent } from '../../../components/cancel-scenario-modal/cancel-scenario-modal.component';
 import { ScenarioAuthorizationModalComponent } from '../../../components/scenario-authorization-modal/scenario-authorization-modal.component';
-import { PortfolioService } from '../../../service/portfolio-service';
 import { CategoryService } from '../../../service/category-service';
 import { ProjectCategoryChangeHandler } from './project-category-change-handler';
 import { getDateObjectFromDDMMYYYYHHMMSS } from '../../../helpers/date-helper';
@@ -94,6 +93,8 @@ export class ScenarioDetailPageComponent {
     isBudgetWarningVisible = false;
     isCategoryWarningVisible = false;
     hasWarningInformationModalAlreadyDisplayed = false;
+
+    errorMessage = '';
 
     private sendBudgetUpdateRequestThenRepopulateTableSubject = new Subject<void>();
 
@@ -342,6 +343,45 @@ export class ScenarioDetailPageComponent {
         this.isScenarioEditModalVisible = false;
         this.loadScenarioByIdAndStrategyByIdAndSetupBreadcrumbs();
         this.tableComponent?.sendHttpGetRequestAndPopulateTable();
+    }
+
+    onScenarioAuthorized() {
+        this.isScenarioAuthorizationModalVisible = false;
+        this.loadScenarioByIdAndStrategyByIdAndSetupBreadcrumbs();
+        this.errorMessage = '';
+        this.columns = this.columns.map(column => {
+            column.error = false;
+            return column;
+        });
+    }
+
+    onAuthorizationModalClose() {
+        this.isScenarioAuthorizationModalVisible = false;
+        this.errorMessage = '';
+        this.columns = this.columns.map(column => {
+            column.error = false;
+            return column;
+        });
+    }
+
+    onNoIncludedProjects() {
+        this.isScenarioAuthorizationModalVisible = false; 
+        this.errorMessage = 'Selecione a opção INCLUIR na coluna INCLUSÃO para pelo menos um projeto.';
+        this.columns = this.columns.map(column => {
+            if (column.frontendAttributeName == 'inclusionStatus') column.error = true;
+            else column.error = false;
+            return column;
+        });
+    }
+
+    onProjectWithoutCategory() {
+        this.isScenarioAuthorizationModalVisible = false; 
+        this.errorMessage = 'Selecione uma opção na coluna CATEGORIA para cada um dos projetos incluídos.';
+        this.columns = this.columns.map(column => {
+            if (column.frontendAttributeName == 'portfolioCategoryId') column.error = true;
+            else column.error = false;
+            return column;
+        });
     }
 
 }

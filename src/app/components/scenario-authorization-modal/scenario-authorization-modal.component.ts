@@ -16,6 +16,8 @@ import { PortfolioService } from '../../service/portfolio-service';
 })
 export class ScenarioAuthorizationModalComponent {
     @Output() close = new EventEmitter<void>();
+    @Output() projectWithoutCategory = new EventEmitter<void>();
+    @Output() noIncludedProjects = new EventEmitter<void>();
     @Output() scenarioAuthorized = new EventEmitter<void>();
 
     route = inject(ActivatedRoute);
@@ -172,8 +174,13 @@ export class ScenarioAuthorizationModalComponent {
     }
 
     onConfirmButtonClick(): void {
-        if (this.currentModalPage === 'categoryWarning' || this.currentModalPage === 'inclusionWarning') {
-            this.onClose();
+        if (this.currentModalPage === 'inclusionWarning') {
+            this.noIncludedProjects.emit();
+            return;
+        }
+
+        if (this.currentModalPage === 'categoryWarning') {
+            this.projectWithoutCategory.emit();
             return;
         }
 
