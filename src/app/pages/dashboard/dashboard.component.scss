@@ -119,6 +119,7 @@ $text-secondary: #64748b;
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
+      
 
         .metric-content {
           display: flex;
@@ -227,7 +228,9 @@ $text-secondary: #64748b;
 
       .section-content {
         padding: 16px;
-
+        max-height: 100px;
+        overflow-y: auto;
+        background-color: #fff;
         .progress-item {
           margin-bottom: 8px;
           .progress{

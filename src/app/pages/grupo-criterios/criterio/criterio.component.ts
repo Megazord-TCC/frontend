@@ -1,8 +1,8 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom, Subscription } from 'rxjs';
 import { CriterioService } from '../../../service/criterio.service';
-import { Criterion, ImportanceScale, CriteriaComparison, Objective } from '../../../interface/interfacies';
+import { Criterion, ImportanceScale, CriteriaComparison, Objective, Strategy, CriteriaGroup } from '../../../interface/interfacies';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BadgeComponent } from '../../../components/badge/badge.component';
@@ -15,6 +15,8 @@ import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.c
 import { BreadcrumbService } from '../../../service/breadcrumb.service';
 import { StrategiaObjetivoService } from '../../../service/strategia-objetivo.service';
 import { ObjectivesModalComponent } from '../../../components/objectives-modal/objectives-modal.component';
+import { CriteriaGroupService } from '../../../service/criteria-group.service';
+import { EstrategiaService } from '../../../service/estrategia.service';
 
 @Component({
   selector: 'app-criterio',
@@ -111,20 +113,37 @@ export class CriterioComponent implements OnInit, OnDestroy {
   criteria?: Criterion;
   searchTerm = '';
   existingComparisons: CriteriaComparison[] = [];
+  strategy?: Strategy;
+  criteriaGroup?: CriteriaGroup;
 
   // Dados dos objetivos - sempre inicializados
+  readonly strategyService = inject(EstrategiaService);
+
   linkedObjectives: Objective[] = [];
 
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private criterioService: CriterioService,
-    private criteriaGroupComparationsService: GrupoCriterioService,
-    private breadcrumbService: BreadcrumbService,
-    private estrategiaObjetivoService: StrategiaObjetivoService
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly criterioService: CriterioService,
+    private readonly criterioGroupService: CriteriaGroupService,
+    private readonly breadcrumbService: BreadcrumbService,
+    private readonly criteriaGroupComparationsService: GrupoCriterioService
   ) {}
 
-  async ngOnInit(): Promise<void> {
+  private updateBreadcrumbs(): void {
+    const strategyName = this.strategy?.name;
+    const groupName = this.criteriaGroup?.name;
+
+    this.breadcrumbService.setBreadcrumbs([
+      { label: 'Início', url: '/inicio', isActive: false },
+      { label: 'Estratégias', url: '/estrategias', isActive: false },
+      { label: strategyName ? `Estratégia: ${strategyName}` : 'Estratégia', url: `/estrategia/${this.estrategiaId}`, isActive: false },
+      { label: groupName ? `Grupo de critérios: ${groupName}` : (this.criteriaGroupId ? `Grupo ${this.criteriaGroupId}` : 'Grupo de critérios'), url: `/estrategia/${this.estrategiaId}/grupo-criterio/${this.criteriaGroupId}`, isActive: false },
+      { label: `Critério: ${this.criteria?.name}` , url:  `/estrategia/${this.estrategiaId}/grupo-criterio/${this.criteriaGroupId}/criterio/${this.criteriaId}`, isActive: true }
+    ]);
+  }
+
+  ngOnInit(): void {
     this.clearComponentData();
 
     this.routeSubscription = this.route.paramMap.subscribe(async params => {
@@ -137,8 +156,9 @@ export class CriterioComponent implements OnInit, OnDestroy {
 
       // Carregar dados em sequência
       await this.loadCriteria();
-      await this.loadAllGroupCriteria();
+      await this.loadGroupCriteria();
       await this.loadExistingComparisons();
+      this.updateBreadcrumbs();
     });
   }
 
@@ -188,13 +208,8 @@ export class CriterioComponent implements OnInit, OnDestroy {
 
       // Sempre garantir que linkedObjectives seja um array
       this.linkedObjectives = this.criteria?.strategicObjectives ? [...this.criteria.strategicObjectives] : [];
-      console.log('Objetivos vinculados ao critério:', this.linkedObjectives);
 
-      this.breadcrumbService.addChildBreadcrumb({
-        label: `Critério: ${criterio.name}` || `Critério ${this.criteriaId}`,
-        url: `/estrategia/${this.estrategiaId}/grupo-criterio/${this.criteriaGroupId}/criterio/${this.criteriaId}`,
-        isActive: true
-      });
+
     } catch (err) {
       console.error('Erro ao buscar critério:', err);
     } finally {
@@ -202,13 +217,14 @@ export class CriterioComponent implements OnInit, OnDestroy {
     }
   }
 
-  async loadAllGroupCriteria(): Promise<void> {
+  async loadGroupCriteria(): Promise<void> {
     try {
       const criteriaGroup = await firstValueFrom(
-        this.criterioService.getAllCriterios(this.estrategiaId, this.criteriaGroupId)
+        this.criterioGroupService.getCriterioById(this.criteriaGroupId, this.estrategiaId)
       );
-      this.filteredCriteriaGroups = criteriaGroup;
-      this.criteriaGroups = criteriaGroup;
+
+      this.criteriaGroup = criteriaGroup;
+
       console.log('Todos os critérios carregados:', criteriaGroup);
     } catch (err) {
       console.error('Erro ao buscar grupo de critérios:', err);
@@ -220,7 +236,7 @@ export class CriterioComponent implements OnInit, OnDestroy {
       const comparisons = await firstValueFrom(
         this.criteriaGroupComparationsService.getCriteriaComparisons(this.criteriaGroupId, this.estrategiaId)
       );
-      this.existingComparisons = comparisons || [];
+      this.existingComparisons = Array.isArray(comparisons) ? comparisons : [];
 
       this.filterValidComparisons();
       this.initializeComparisonValues();
@@ -438,7 +454,7 @@ export class CriterioComponent implements OnInit, OnDestroy {
     const otherCriteria = this.getOtherCriteria();
     console.log(`Outros critérios para comparar: ${otherCriteria.length}`);
 
-    otherCriteria.forEach(otherCriterion => {
+    for (const otherCriterion of otherCriteria) {
       console.log(`\n🔍 Verificando par: ${this.criteria!.id} vs ${otherCriterion.id}`);
 
       const { comparison, isInverted } = this.getBidirectionalComparison(this.criteria!.id, otherCriterion.id);
@@ -459,7 +475,7 @@ export class CriterioComponent implements OnInit, OnDestroy {
         this.comparisonValues[this.criteria!.id][otherCriterion.id] = '';
         console.log(`❌ Sem comparação`);
       }
-    });
+    }
 
     console.log(`✅ Valores inicializados para critério ${this.criteria.id}:`, this.comparisonValues[this.criteria.id]);
     console.log(`📊 Estado completo de comparisonValues:`, this.comparisonValues);
@@ -514,7 +530,7 @@ export class CriterioComponent implements OnInit, OnDestroy {
 
         const { comparison, isInverted } = this.getBidirectionalComparison(criteria.id, otherCriteria.id);
 
-        if (!comparison || !comparison.id) {
+        if (!comparison?.id) {
           console.error('❌ ERRO: Comparação existe mas não foi encontrada!');
           return;
         }
@@ -553,7 +569,7 @@ export class CriterioComponent implements OnInit, OnDestroy {
         // Atualizar localmente
         const index = this.existingComparisons.findIndex(c => c.id === comparison.id);
         if (index !== -1) {
-          if (updatedComparison && updatedComparison.id) {
+          if (updatedComparison?.id) {
             this.existingComparisons[index] = updatedComparison;
             console.log('✅ UPDATE bem-sucedido no servidor');
           } else {
@@ -586,7 +602,7 @@ export class CriterioComponent implements OnInit, OnDestroy {
           )
         );
 
-        if (newComparison && newComparison.id) {
+        if (newComparison?.id) {
           this.existingComparisons.push(newComparison);
           console.log('✅ CREATE bem-sucedido:', newComparison);
         } else {
@@ -596,6 +612,7 @@ export class CriterioComponent implements OnInit, OnDestroy {
       }
 
     } catch (error) {
+      console.error('❌ Erro ao salvar comparação:', error);
       this.comparisonValues[criteria.id][otherCriteria.id] = '';
       alert('Erro ao salvar comparação. Tente novamente.');
     }
@@ -640,14 +657,14 @@ export class CriterioComponent implements OnInit, OnDestroy {
       if (comparison) {
         hasComparison = true;
 
-        if (!isInverted) {
-          // Comparação direta: otherCriteria comparou com criteria atual
-          comparisonText = this.importanceScaleMap[comparison.importanceScale];
-        } else {
+        if (isInverted) {
           // Comparação inversa: criteria atual comparou com otherCriteria
           // Mostrar o inverso (como seria na perspectiva do otherCriteria)
           const invertedScale = this.importanceScaleInverseMap[comparison.importanceScale];
           comparisonText = this.importanceScaleMap[invertedScale];
+        } else {
+          // Comparação direta: otherCriteria comparou com criteria atual
+          comparisonText = this.importanceScaleMap[comparison.importanceScale];
         }
       }
 
@@ -685,14 +702,14 @@ export class CriterioComponent implements OnInit, OnDestroy {
 
   editCriteria() {
     if (this.criteria) {
-      this.editFormConfig.fields.forEach((field: any) => {
+      for (const field of this.editFormConfig?.fields ?? []) {
         if (field.id === 'name') {
           field.value = this.criteria?.name;
         }
         if (field.id === 'description') {
           field.value = this.criteria?.description;
         }
-      });
+      }
     }
     this.showEditModal = true;
   }
@@ -765,10 +782,8 @@ export class CriterioComponent implements OnInit, OnDestroy {
   }
 
   resetFormFields(formConfig: any): void {
-    if (formConfig && formConfig.fields) {
-      formConfig.fields.forEach((field: any) => {
-        field.value = '';
-      });
+    for (const field of formConfig?.fields ?? []) {
+      field.value = '';
     }
   }
 

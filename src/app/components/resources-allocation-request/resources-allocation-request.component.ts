@@ -50,9 +50,8 @@ export class ResourcesAllocationRequestComponent {
   route = inject(ActivatedRoute);
   httpClient = inject(HttpClient);
 
-  // Dados do projeto
-  projectName = 'Portfólio 1';
-  requesterName = 'Carlos Krefer';
+
+  requesterName = '';
 
   positionOptions: PositionReadDTO[] = [];
   projectOptions: Project[] = [];
@@ -115,7 +114,9 @@ export class ResourcesAllocationRequestComponent {
             this.projectOptions = [];
         }
     });
+
     this.setUserDataFromLocalStorage();
+    this.requesterName = this.name;
   }
 
   ngOnDestroy(): void {

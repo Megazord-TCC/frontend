@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BadgeComponent } from '../../../components/badge/badge.component';
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
@@ -7,7 +7,7 @@ import { CardComponent } from '../../../components/card/card.component';
 import { EvaluationGroupsTabComponent } from '../../../components/evaluation-groups-tab/evaluation-groups-tab.component';
 import { FormModalComponentComponent } from '../../../components/form-modal-component/form-modal-component.component';
 import { SvgIconComponent } from '../../../components/svg-icon/svg-icon.component';
-import { Objective, CriteriaGroup, EvaluationGroup, Scenario, Criterion, Portfolio, FormModalConfig } from '../../../interface/interfacies';
+import { Objective, CriteriaGroup, EvaluationGroup, Scenario, Criterion, Portfolio, FormModalConfig, Strategy } from '../../../interface/interfacies';
 import { FormField } from '../../../interface/interfacies';
 import { StrategyStatusEnum } from '../../../interface/interfacies';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -24,6 +24,7 @@ import { mapProjectPageDtoToProjectTableRowPage } from '../../../mappers/project
 import { getColumns as getCriterionColumns, getFilterButtons as getCriterionFilterButtons, getFilterText as getCriterionFilterText, getActionButton as getCriterionActionButton } from './criteria-table-config';
 import { getColumns as getPortfoliosColumns, getFilterButtons as getPortfoliosFilterButtons, getFilterText as getPortfoliosFilterText, getActionButton as getPortfoliosActionButton } from './portfolio-table-config';
 import { getColumns as getProjectColumns, getFilterButtons as getProjectFilterButtons, getFilterText as getProjectFilterText, getActionButton as getProjectActionButton } from './portfolio-table-config';
+import { EstrategiaService } from '../../../service/estrategia.service';
 
 @Component({
   selector: 'app-objective-detail-page',
@@ -42,7 +43,7 @@ import { getColumns as getProjectColumns, getFilterButtons as getProjectFilterBu
   styleUrl: './objective-detail-page.component.scss'
 })
 export class ObjectiveDetailPageComponent implements OnInit {
-   editStrategyConfig: FormModalConfig = {
+  editStrategyConfig: FormModalConfig = {
       title: 'Editar estratégia',
       fields: [
         {
@@ -112,6 +113,8 @@ export class ObjectiveDetailPageComponent implements OnInit {
   objective?: Objective;
   showEditModal = false;
   showDeleteModal = false;
+  strategyService = inject(EstrategiaService);
+  strategy: Strategy | undefined;
 
 
   constructor (
@@ -126,6 +129,7 @@ export class ObjectiveDetailPageComponent implements OnInit {
     this.route.paramMap.subscribe(params => {
       const estrategiaIdParam = params.get('estrategiaId');
       this.estrategiaId = estrategiaIdParam ? Number(estrategiaIdParam) : 0;
+      this.getStrategyById(this.estrategiaId);
       const objectiveIdParam = params.get('objetivoId');
       this.objectiveId = objectiveIdParam ? Number(objectiveIdParam) : 0;
       this.loadObjective();
@@ -148,18 +152,26 @@ export class ObjectiveDetailPageComponent implements OnInit {
       map((page: Page<any>) => mapProjectPageDtoToProjectTableRowPage(page))
     );
   };
-
+  getStrategyById(estrategiaId: number): void {
+    this.strategyService.getStrategyById(estrategiaId)
+      .subscribe(strategy => {
+        this.strategy = strategy;
+      });
+  }
 
   async loadObjective(): Promise<void> {
     try {
       const obj = await this.objetivoService.getObjectiveById(this.estrategiaId, this.objectiveId).toPromise();
       this.objective = obj;
       console.log('Objetivo carregado:', this.objective);
-      this.breadcrumbService.addChildBreadcrumb({
-          label: `Objetivo: ${this.objective?.name}`,
-          url: `/estrategia/${this.estrategiaId}/objetivo/${this.objective!.name}`,
-          isActive: true
-        });
+
+
+      this.breadcrumbService.setBreadcrumbs([
+        { label: 'Início', url: '/inicio', isActive: false },
+        { label: 'Estratégias', url: '/estrategias', isActive: false },
+        { label: `Estratégia: ${this.strategy?.name}` || 'Estratégia', url: `/estrategia/${this.estrategiaId}`, isActive: false },
+        { label: `Objetivo: ${this.objective?.name}` || 'Objetivo', url: `/estrategia/${this.estrategiaId}/objetivo/${this.objective!.name}`, isActive: true }
+      ]);
       const currentBreadcrumbs = this.breadcrumbService.getCurrentBreadcrumbs();
       if (currentBreadcrumbs.length > 4) {
         this.breadcrumbService.removeChildrenAfter(`/estrategia/${this.estrategiaId}`);

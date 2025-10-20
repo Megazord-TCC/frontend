@@ -14,7 +14,8 @@ import { EvaluationGroupDeleteModal } from '../../../components/evaluation-group
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../../service/breadcrumb.service';
 import { Page } from '../../../models/pagination-models';
-import { EvaluationGroupApiResponse } from '../../../interface/interfacies';
+import { EvaluationGroupApiResponse, Strategy } from '../../../interface/interfacies';
+import { EstrategiaService } from '../../../service/estrategia.service';
 
 @Component({
   selector: 'app-evaluation-group-detail-page',
@@ -39,15 +40,16 @@ export class EvaluationGroupDetailPageComponent implements OnInit, OnDestroy {
   route = inject(ActivatedRoute);
   router = inject(Router);
   breadcrumbService = inject(BreadcrumbService);
+  strategyService = inject(EstrategiaService);
+  strategy: Strategy | undefined;
 
-  strategyId = -1;
+  estrategiaId = -1;
   evaluationGroupId = -1;
 
   evaluationGroup: EvaluationGroupApiResponse | undefined;
 
   projectRankings: ProjectRanking[] = [];
   filteredProjectRankings: ProjectRanking[] = [];
-
   searchTerm = '';
 
   showCreateModal = false;
@@ -57,12 +59,11 @@ export class EvaluationGroupDetailPageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Escutar mudanças nos parâmetros da rota para recarregar quando voltar
     this.routeSubscription = this.route.paramMap.subscribe(params => {
-      this.strategyId = Number(params.get('estrategiaId'));
+      const estrategiaIdParam = params.get('estrategiaId');
+      this.estrategiaId = estrategiaIdParam ? Number(estrategiaIdParam) : 0;
       this.evaluationGroupId = Number(params.get('grupoAvaliacaoId'));
 
-      // COMPONENTE FILHO: Recarregar dados quando parâmetros mudam
-      console.log('📍 Componente filho: Grupo de Avaliação inicializando/recarregando');
-
+      this.getStrategyById(this.estrategiaId)
       this.setCurrentEvaluationGroupByHttpRequest();
       this.setProjectRankingsByHttpRequest();
     });
@@ -75,14 +76,17 @@ export class EvaluationGroupDetailPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  private setupBreadcrumbs(): void {
-    // Usar buildChildBreadcrumbs para construir baseado no pai atual
-    // O breadcrumb do grupo será adicionado quando os dados estiverem carregados
-    console.log('📍 Configurando breadcrumbs para grupo de avaliação');
+
+
+  getStrategyById(estrategiaId: number): void {
+    this.strategyService.getStrategyById(estrategiaId)
+      .subscribe(strategy => {
+        this.strategy = strategy;
+      });
   }
 
   setCurrentEvaluationGroupByHttpRequest() {
-    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups`;
+    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.estrategiaId}/evaluation-groups`;
 
     this.httpClient.get<Page<EvaluationGroupApiResponse>>(evaluationGroupsRoute, { params: { size: 1000 } })
         .pipe(map(page => page.content))
@@ -91,16 +95,22 @@ export class EvaluationGroupDetailPageComponent implements OnInit, OnDestroy {
 
             // Usar addChildBreadcrumb para adicionar breadcrumb filho
             if (this.evaluationGroup)
-              this.breadcrumbService.addChildBreadcrumb({
+            this.breadcrumbService.addChildBreadcrumb({
             label: `Grupo de Avaliação: ${this.evaluationGroup.name}`,
-            url: `/estrategia/${this.strategyId}/grupo-avaliacao/${this.evaluationGroupId}`,
+            url: `/estrategia/${this.estrategiaId}/grupo-avaliacao/${this.evaluationGroupId}`,
             isActive: true
           });
+          this.breadcrumbService.setBreadcrumbs([
+              { label: 'Início', url: '/inicio', isActive: false },
+              { label: 'Estratégias', url: '/estrategias', isActive: false },
+              { label: `Estratégia: ${this.strategy?.name}` || 'Estratégia', url: `/estrategia/${this.estrategiaId}`, isActive: false },
+              { label: `Grupo de Avaliação: ${this.evaluationGroup?.name}` || 'Grupo de Avaliação', url: `/estrategia/${this.estrategiaId}/grupo-avaliacao/${this.evaluationGroupId}`, isActive: true }
+            ]);
         });
       }
 
       setProjectRankingsByHttpRequest() {
-        let projectRankingsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups/${this.evaluationGroupId}/ranking`;
+        let projectRankingsRoute = `${environment.apiUrl}/strategies/${this.estrategiaId}/evaluation-groups/${this.evaluationGroupId}/ranking`;
         let getAllProjectRankings$ =  this.httpClient.get<ProjectRanking[]>(projectRankingsRoute);
         getAllProjectRankings$.subscribe(projectRankings => {
           this.projectRankings = projectRankings;
@@ -119,8 +129,8 @@ export class EvaluationGroupDetailPageComponent implements OnInit, OnDestroy {
 
   goBack(): void {
     // Remover o breadcrumb do grupo de avaliação antes de navegar
-    this.breadcrumbService.removeBreadcrumbByUrl(`/estrategia/${this.strategyId}/grupo-avaliacao/${this.evaluationGroupId}`);
-    this.router.navigateByUrl(`estrategia/${this.strategyId}`);
+    this.breadcrumbService.removeBreadcrumbByUrl(`/estrategia/${this.estrategiaId}/grupo-avaliacao/${this.evaluationGroupId}`);
+    this.router.navigateByUrl(`estrategia/${this.estrategiaId}`);
   }
 
   // Modal de criação de avaliação de projeto
@@ -172,7 +182,7 @@ export class EvaluationGroupDetailPageComponent implements OnInit, OnDestroy {
   onEvaluationGroupDeleted(): void {
 
     // Redirecionar para a página de estratégias após exclusão
-    this.router.navigateByUrl(`estrategia/${this.strategyId}`);
+    this.router.navigateByUrl(`estrategia/${this.estrategiaId}`);
   }
 
   // Método para abrir modal de avaliação individual do projeto
@@ -187,7 +197,7 @@ export class EvaluationGroupDetailPageComponent implements OnInit, OnDestroy {
 
     // Navegar para a página de avaliação do projeto
     this.router.navigate([
-      `/estrategia/${this.strategyId}/grupo-avaliacao/${this.evaluationGroupId}/projeto/${projectRanking.projectId}`
+      `/estrategia/${this.estrategiaId}/grupo-avaliacao/${this.evaluationGroupId}/projeto/${projectRanking.projectId}`
     ]);
   }
 

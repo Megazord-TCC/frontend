@@ -17,6 +17,7 @@ import { PortfolioService } from '../../service/portfolio-service';
 import { ProjectReadDTO2 } from '../../interface/carlos-project-dtos';
 import { PortfolioListReadDTO, PortfolioReadDTO, RiskOccurrenceStatusEnum, RiskReadDTO } from '../../interface/carlos-portfolio-interfaces';
 import { PaginationQueryParams } from '../../models/pagination-models';
+import { UserGetResponseDTO } from '../../interface/carlos-user-dtos';
 
 @Component({
   selector: 'app-dashboard',
@@ -55,15 +56,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedFormatry: string = 'pdf';
   availableFormats: string[] = ['pdf', 'excel'];
   portfolios: PortfolioListReadDTO[] = [];
+  responsaveis: UserGetResponseDTO[] = [];
 
 
   risks: RiskReadDTO[] = [];
-
-  objectives = [
-    { name: 'Nome do objetivo 1', description: 'Descrição do objetivo.' },
-    { name: 'Nome do objetivo 2', description: 'Descrição do objetivo.' },
-    { name: 'Nome do objetivo 3', description: 'Descrição do objetivo.' }
-  ];
   portfolioDetails: PortfolioReadDTO | null = null;
   projetos: ProjectReadDTO2[] = [];
 
@@ -148,25 +144,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       this.portfolioDetails = details.portfolio;
       console.log('Portfolio details loaded:', this.portfolioDetails);
       this.projetos = details.portfolio.projects;
-      this.objetivos = [];
-      // Buscar objetivos de cada estratégia ligada ao portfólio
-      let strategies: any[] = [];
-      if (this.portfolioDetails?.strategy) {
-        if (Array.isArray(this.portfolioDetails.strategy)) {
-          strategies = this.portfolioDetails.strategy;
-        } else {
-          strategies = [this.portfolioDetails.strategy];
-        }
-      }
-      strategies.forEach((strategy) => {
-        if (strategy && strategy.id) {
-          this.objetivoService.getObjectivesPage(strategy.id).subscribe((objPage: Page<Objective>) => {
-            if (objPage && objPage.content) {
-              this.objetivos = [...this.objetivos, ...objPage.content];
-            }
-          });
-        }
-      });
+      this.responsaveis = details.portfolio.owners;
+      this.objetivos = (details?.strategicObjectives ?? []).map((o: any) => ({
+        name: o?.name ?? '',
+        description: o?.description ?? ''
+      }));
       setTimeout(() => {
         this.createCostChart();
         this.createProjectBubbleChart();

@@ -101,13 +101,10 @@ export class EstrategiaService {
   }
 
   // Método legado - manter compatibilidade
-  getStrategyById(id: number): Observable<Strategy> {
-    return of({
-      id: 1,
-      name: 'Estratégia 2024',
-      activeObjectives: 1,
-      status: StrategyStatusEnum.ACTIVE,
-      statusColor: 'green'
+  getStrategyById(strategyId: number): Observable<Strategy> {
+    const url = `${this.apiUrl}/${strategyId}`;
+    return this.http.get<Strategy>(url, {
+      headers: this.getHeaders()
     });
   }
 }

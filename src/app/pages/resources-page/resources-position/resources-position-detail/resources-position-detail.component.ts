@@ -62,11 +62,12 @@ export class ResourcesPositionDetailComponent {
 
           console.log('Detalhes da posição:', positionDto);
           this.position = positionDto;
-          this.breadCrumbService.addChildBreadcrumb({
-            label: `Recurso: ${this.position.name}`,
-            url: `/recursos/${this.position.id}`,
-            isActive: true
-          });
+
+          this.breadCrumbService.setBreadcrumbs([
+            { label: 'Início', url: '/inicio', isActive: false },
+            { label: 'Recursos', url: '/recursos', isActive: false },
+            { label: `Detalhes do recurso: ${this.position?.name}`, url: `/recursos/${this.position?.id}`, isActive: true }
+          ]);
         },
         error: (err) => {
           console.error('Erro ao buscar detalhes do projeto:', err);

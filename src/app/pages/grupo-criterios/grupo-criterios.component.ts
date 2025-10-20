@@ -4,19 +4,20 @@ import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } fro
 import { Observable, map } from 'rxjs';
 import { mapCriterionPageDtoToCriterionTableRowPage } from '../../mappers/criterion-mappers';
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BadgeComponent } from '../../components/badge/badge.component';
 import { CardComponent } from '../../components/card/card.component';
 import { FormModalComponentComponent } from '../../components/form-modal-component/form-modal-component.component';
 import { SvgIconComponent } from '../../components/svg-icon/svg-icon.component';
-import { CriteriaComparison, CriteriaGroup, CriteriaGroupStatusEnum, Criterion, ImportanceScale, Objective, RoleEnum, User } from '../../interface/interfacies';
+import { CriteriaComparison, CriteriaGroup, CriteriaGroupStatusEnum, Criterion, ImportanceScale, Objective, RoleEnum, Strategy, User } from '../../interface/interfacies';
 import { ActivatedRoute, Router } from '@angular/router';
 import { firstValueFrom, Subscription } from 'rxjs';
 import { CriterioService } from '../../service/criterio.service';
 import { CriteriaGroupService } from '../../service/criteria-group.service';
 import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../service/breadcrumb.service';
+import { EstrategiaService } from '../../service/estrategia.service';
 
 @Component({
   selector: 'app-grupo-criterios',
@@ -92,22 +93,43 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
   criterionFilterText = getCriterionFilterText();
   criterionActionButton = getCriterionActionButton();
 
+  readonly strategyService = inject(EstrategiaService);
+  strategy: Strategy | undefined;
+
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private criterioService: CriterioService,
-    private criterioGroupService: CriteriaGroupService,
-    private breadcrumbService: BreadcrumbService
+    private readonly route: ActivatedRoute,
+    private readonly router: Router,
+    private readonly criterioService: CriterioService,
+    private readonly criterioGroupService: CriteriaGroupService,
+    private readonly breadcrumbService: BreadcrumbService
   ) {}
+
+  private updateBreadcrumbs(): void {
+    const strategyName = this.strategy?.name;
+    const groupName = this.criteriaGroup?.name;
+    let groupLabel = 'Grupo de critérios';
+    if (groupName) {
+      groupLabel = `Grupo de critérios: ${groupName}`;
+    } else if (this.criteriaGroupId) {
+      groupLabel = `Grupo ${this.criteriaGroupId}`;
+    }
+
+    this.breadcrumbService.setBreadcrumbs([
+      { label: 'Início', url: '/inicio', isActive: false },
+      { label: 'Estratégias', url: '/estrategias', isActive: false },
+      { label: strategyName ? `Estratégia: ${strategyName}` : 'Estratégia', url: `/estrategia/${this.estrategiaId}`, isActive: false },
+      { label: groupLabel, url: `/estrategia/${this.estrategiaId}/grupo-criterio/${this.criteriaGroupId}`, isActive: true }
+    ]);
+  }
   ngOnInit(): void {
     // Escutar mudanças nos parâmetros da rota para recarregar quando voltar
     this.routeSubscription = this.route.paramMap.subscribe(params => {
       const estrategiaIdParam = params.get('estrategiaId');
       this.estrategiaId = estrategiaIdParam ? Number(estrategiaIdParam) : 0;
-      const grupoIdParam = params.get('grupoId');
-      this.criteriaGroupId = grupoIdParam ? Number(grupoIdParam) : 0;""
+  const grupoIdParam = params.get('grupoId');
+  this.criteriaGroupId = grupoIdParam ? Number(grupoIdParam) : 0;
 
-
+      this.getStrategyById(this.estrategiaId);
       this.loadGruopCriteriaById();
     });
   }
@@ -128,19 +150,20 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
       })
     );
   };
-
+  getStrategyById(estrategiaId: number): void {
+    this.strategyService.getStrategyById(estrategiaId)
+      .subscribe(strategy => {
+        this.strategy = strategy;
+        this.updateBreadcrumbs();
+      });
+  }
 
   async loadGruopCriteriaById(): Promise<void> {
     try {
       const criteriaGroup = await firstValueFrom(this.criterioGroupService.getCriterioById(this.criteriaGroupId,this.estrategiaId));
       this.criteriaGroup = criteriaGroup;
       console.log('Grupo de critérios carregado:', this.criteriaGroup);
-      // COMPONENTE FILHO: Adiciona seu breadcrumb ao array do pai
-      this.breadcrumbService.addChildBreadcrumb({
-        label: `Grupo de critérios: ${criteriaGroup.name}` || `Grupo ${this.criteriaGroupId}`,
-        url: `/estrategia/${this.estrategiaId}/grupo-criterio/${this.criteriaGroupId}`,
-        isActive: true
-      });
+      this.updateBreadcrumbs();
 
     } catch (err) {
       console.error('Erro ao buscar grupo de criterios:', err);
@@ -179,14 +202,14 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
   }
   editCriteriaGroup() {
     if (this.criteriaGroup) {
-      this.editFormConfig.fields.forEach((field: any) => {
+      for (const field of this.editFormConfig?.fields ?? []) {
         if (field.id === 'name') {
           field.value = this.criteriaGroup?.name;
         }
         if (field.id === 'description') {
           field.value = this.criteriaGroup?.description;
         }
-      });
+      }
     }
     this.showEditModal = true;
   }
@@ -291,16 +314,14 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
 
   // Move resetFormFields outside of onSaveByActiveTab as a class method
   resetFormFields(formConfig: any): void {
-    if (formConfig && formConfig.fields) {
-      formConfig.fields.forEach((field: any) => {
-        field.value = '';
-      });
+    for (const field of formConfig?.fields ?? []) {
+      field.value = '';
     }
   }
 
   formatWeightAsPercentage(weight: number | null | undefined): string {
     // Verifica se o valor é válido
-    if (weight == null || weight === undefined || isNaN(weight)) {
+    if (weight == null || weight === undefined || Number.isNaN(weight)) {
       return '0%';
     }
 

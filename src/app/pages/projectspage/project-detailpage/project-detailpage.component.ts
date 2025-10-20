@@ -42,12 +42,6 @@ export class ProjectDetailpageComponent implements OnInit {
   startDate: string = '';
   endDate: string = '';
 
-  objectives: Objectives[] = [
-    { id: '1', name: 'Nome do objetivo 1' },
-    { id: '2', name: 'Nome do objetivo 2' },
-    { id: '3', name: 'Nome do objetivo 3' }
-  ];
-
   newProject: Project = {
     id: 0,
     name: '',
@@ -310,11 +304,12 @@ export class ProjectDetailpageComponent implements OnInit {
           console.log('Detalhes do projeto:', projectDto);
           this.project = projectDto;
           this.syncFormValues();
-          this.breadcrumbService.addChildBreadcrumb({
-            label: `Projeto: ${project.name}` || `Projeto ${projectId}`,
-            url: `/projetos/${projectId}`,
-            isActive: true
-          });
+        
+          this.breadcrumbService.setBreadcrumbs([
+            { label: 'Início', url: '/inicio', isActive: false },
+            { label: 'Projetos', url: '/projetos', isActive: false },
+            { label: `Projeto: ${project.name}` || `Projeto ${projectId}`, url: `/projetos/${projectId}`, isActive: true }
+          ]);
         },
         error: (err) => {
           console.error('Erro ao buscar detalhes do projeto:', err);

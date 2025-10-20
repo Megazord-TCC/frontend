@@ -15,10 +15,11 @@ import {
 } from '../../../interface/carlos-interfaces';
 import { forkJoin, map, firstValueFrom, Subscription } from 'rxjs';
 import { ProjectCriteriaEvaluationModal } from '../../../components/project-criteria-evaluation-modal/project-criteria-evaluation-modal.component';
-import { Criterion } from '../../../interface/interfacies';
+import { Criterion, EvaluationGroupApiResponse, Strategy } from '../../../interface/interfacies';
 import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../../service/breadcrumb.service';
 import { Page } from '../../../models/pagination-models';
+import { EstrategiaService } from '../../../service/estrategia.service';
 
 // Interface local para combinar dados de critério com avaliação
 interface CriteriaEvaluation {
@@ -46,23 +47,39 @@ interface CriteriaEvaluation {
 export class ProjectEvaluationDetailComponent implements OnInit, OnDestroy {
   private routeSubscription?: Subscription;
 
-  httpClient = inject(HttpClient);
-  route = inject(ActivatedRoute);
-  router = inject(Router);
-  breadcrumbService = inject(BreadcrumbService);
+  readonly httpClient = inject(HttpClient);
+  readonly route = inject(ActivatedRoute);
+  readonly router = inject(Router);
+  readonly breadcrumbService = inject(BreadcrumbService);
 
-  // Parâmetros da rota
+
   strategyId = -1;
   evaluationGroupId = -1;
   projectId = -1;
 
-  // Dados carregados
+
   project: Project | undefined;
   evaluationGroup: EvaluationGroup | undefined;
   criteriaEvaluations: CriteriaEvaluation[] = [];
 
-  // Estados do componente
+
+  readonly strategyService = inject(EstrategiaService);
+  strategy: Strategy | undefined;
   showEvaluationModal = false;
+
+  private updateBreadcrumbs(): void {
+    const strategyName = this.strategy?.name;
+    const groupName = this.evaluationGroup?.name;
+    const projectName = this.project?.name;
+
+    this.breadcrumbService.setBreadcrumbs([
+      { label: 'Início', url: '/inicio', isActive: false },
+      { label: 'Estratégias', url: '/estrategias', isActive: false },
+      { label: strategyName ? `Estratégia: ${strategyName}` : 'Estratégia', url: `/estrategia/${this.strategyId}`, isActive: false },
+      { label: groupName ? `Grupo de Avaliação: ${groupName}` : 'Grupo de Avaliação', url: `/estrategia/${this.strategyId}/grupo-avaliacao/${this.evaluationGroupId}`, isActive: false },
+      { label: projectName ? `Projeto: ${projectName}` : `Projeto ${this.projectId}`, url: `/estrategia/${this.strategyId}/grupo-avaliacao/${this.evaluationGroupId}/projeto/${this.projectId}`, isActive: true }
+    ]);
+  }
 
   ngOnInit(): void {
     console.log('🚀 Inicializando ProjectEvaluationDetailComponent');
@@ -73,17 +90,8 @@ export class ProjectEvaluationDetailComponent implements OnInit, OnDestroy {
       this.strategyId = Number(params.get('estrategiaId'));
       this.evaluationGroupId = Number(params.get('grupoAvaliacaoId'));
       this.projectId = Number(params.get('projetoId'));
-
-      // COMPONENTE NETO: Recarregar dados quando parâmetros mudam
-      console.log('📍 Componente neto: Projeto de Avaliação inicializando/recarregando');
-
-      console.log('📊 Parâmetros da rota:', {
-        strategyId: this.strategyId,
-        evaluationGroupId: this.evaluationGroupId,
-        projectId: this.projectId
-      });
-
       // Carregar todos os dados necessários
+      this.getStrategyById(this.strategyId);
       this.loadData();
     });
   }
@@ -94,12 +102,28 @@ export class ProjectEvaluationDetailComponent implements OnInit, OnDestroy {
       this.routeSubscription.unsubscribe();
     }
   }
+  getStrategyById(estrategiaId: number): void {
+    this.strategyService.getStrategyById(estrategiaId)
+      .subscribe(strategy => {
+        this.strategy = strategy;
+        this.updateBreadcrumbs();
+      });
+  }
+  getGroupById(grupoAvaliacaoId: number): void {
+    let evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups`;
 
+    this.httpClient.get<Page<EvaluationGroup>>(evaluationGroupsRoute, { params: { size: 1000 } })
+        .pipe(map(page => page.content))
+        .subscribe(evaluationGroups => {
+            this.evaluationGroup = evaluationGroups.find(evaluationGroup => evaluationGroup.id == grupoAvaliacaoId);
+            console.log('Grupo de Avaliação carregado:', this.evaluationGroup);
+        });
+  }
   loadData(): void {
     console.log('📋 Carregando dados do projeto e avaliações...');
-    this.loadProject();
-    this.loadEvaluationGroup();
     this.loadCriteriaEvaluations();
+    this.loadEvaluationGroup();
+    this.loadProject();
   }
 
   loadProject(): void {
@@ -109,14 +133,10 @@ export class ProjectEvaluationDetailComponent implements OnInit, OnDestroy {
     this.httpClient.get<Project>(projectRoute).subscribe({
       next: (project) => {
         console.log('✅ Projeto carregado:', project);
+        console.log('Grupo de avaliação atual:', this.evaluationGroup);
         this.project = project;
+        this.updateBreadcrumbs();
 
-        // Usar addChildBreadcrumb para adicionar breadcrumb filho
-        this.breadcrumbService.addChildBreadcrumb({
-          label: `Projeto: ${project.name}` || `Projeto ${this.projectId}`,
-          url: `/estrategia/${this.strategyId}/grupo-avaliacao/${this.evaluationGroupId}/projeto/${this.projectId}`,
-          isActive: true
-        });
       },
       error: (error) => {
         console.error('❌ Erro ao carregar projeto:', error);
@@ -126,14 +146,12 @@ export class ProjectEvaluationDetailComponent implements OnInit, OnDestroy {
 
   loadEvaluationGroup(): void {
     const evaluationGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/evaluation-groups`;
-    const criteriaGroupsRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups`;
-
-    console.log('🔍 Buscando grupo de avaliação e critérios...');
 
     this.httpClient.get<Page<EvaluationGroup>>(evaluationGroupsRoute, { params: { size: 1000 } })
         .pipe(map(page => page.content))
         .subscribe(evaluationGroups => {
             this.evaluationGroup = evaluationGroups.find(evaluationGroup => evaluationGroup.id == this.evaluationGroupId);
+      this.updateBreadcrumbs();
         });
   }
 
@@ -146,8 +164,9 @@ export class ProjectEvaluationDetailComponent implements OnInit, OnDestroy {
       const evaluationGroup = await firstValueFrom(
         this.httpClient.get<any>(evaluationGroupRoute)
       );
-
-      console.log('📊 Grupo de avaliação encontrado:', evaluationGroup);
+      this.evaluationGroup = evaluationGroup;
+      console.log('📊 Grupo de avaliação encontrado:', this.evaluationGroup);
+      this.updateBreadcrumbs();
 
       // 2. Buscar critérios do grupo usando criteriaGroupId
       const criteriaRoute = `${environment.apiUrl}/strategies/${this.strategyId}/criteria-groups/${evaluationGroup?.criteriaGroup?.id}/criteria`;

@@ -156,7 +156,7 @@ export class ResourcesAllocationCreateComponent {
         next: (data: AllocationRequestReadDTO) => {
             console.log("allocation request data", data);
             this.selectedPosition = data.position?.id ?? 0;
-            // this.selectedCollaborator = data.collaborator?.id ?? 0;
+            this.selectedCollaborator = data.allocation?.resource?.id ?? 0;
             this.selectedHours = data.dailyHours ?? 0;
             this.selectedProject = data.project?.id ?? 0;
             this.startDate = data.startDate ?? '';
