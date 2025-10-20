@@ -88,7 +88,7 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
   searchTerm = '';
   // Propriedades para o app-table de critérios
   criterionColumns = getCriterionColumns();
-  criterionFilterButtons = getCriterionFilterButtons();
+  criterionFilterButtons = []; //getCriterionFilterButtons(); // Remove filtros pois na página de critérios não há status. 
   criterionFilterText = getCriterionFilterText();
   criterionActionButton = getCriterionActionButton();
 

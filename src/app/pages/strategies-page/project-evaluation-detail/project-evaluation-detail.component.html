@@ -12,7 +12,7 @@
                 </button>
                 <h1>{{project?.name}}</h1>
             </div>
-            <p class="strategy-description">Descrição da avaliação do projeto {{project?.name}}.</p>
+            <!-- <p class="strategy-description">Descrição da avaliação do projeto {{project?.name}}.</p> -->
 
             <!-- Action Buttons -->
             <div class="action-header">
@@ -47,11 +47,11 @@
                             </app-svg-icon>
                             Avaliar
                         </button>
-                        <div class="search-container">
+                        <!-- <div class="search-container">
                             <app-svg-icon class="nav-icon" [path]="'assets/icon/search_vetor.svg'" [size]="18">
                             </app-svg-icon>
                             <input type="text" placeholder="Buscar em todas colunas">
-                        </div>
+                        </div> -->
                     </div>
 
                     <!-- Criteria Evaluation Table -->
@@ -63,31 +63,16 @@
                                         <th>
                                             <div class="header-cell">
                                                 Nome do critério
-                                                <app-svg-icon
-                                                  class="nav-icon"
-                                                  [path]="'assets/icon/sort-alt.svg'"
-                                                  [size]="18">
-                                                </app-svg-icon>
                                             </div>
                                         </th>
                                         <th>
                                             <div class="header-cell">
                                                 Nota atribuída (0 a 1000)
-                                                <app-svg-icon
-                                                  class="nav-icon"
-                                                  [path]="'assets/icon/sort-alt.svg'"
-                                                  [size]="18">
-                                                </app-svg-icon>
                                             </div>
                                         </th>
                                         <th>
                                             <div class="header-cell">
                                                 Peso do critério
-                                                <app-svg-icon
-                                                  class="nav-icon"
-                                                  [path]="'assets/icon/sort-alt.svg'"
-                                                  [size]="18">
-                                                </app-svg-icon>
                                             </div>
                                         </th>
                                     </tr>

@@ -95,7 +95,11 @@ export class ObjectiveDetailPageComponent implements OnInit {
   criterionActionButton = getCriterionActionButton();
   // Propriedades para o app-table de portfolios
   portfoliosColumns = getPortfoliosColumns();
-  portfoliosFilterButtons = getPortfoliosFilterButtons();
+
+  // Back não tem implementado esse filtro. Por isso foi desativado.
+  // portfoliosFilterButtons = getPortfoliosFilterButtons();
+  portfoliosFilterButtons = [];
+
   portfoliosFilterText = getPortfoliosFilterText();
   portfoliosActionButton = getPortfoliosActionButton();
   // Propriedades para o app-table de projetos
@@ -187,19 +191,8 @@ export class ObjectiveDetailPageComponent implements OnInit {
     );
     this.filteredProjetos = filtered;
   }
-  openCriteria(criteriaId?: number): void {
-    let id: number | undefined;
-    if (typeof criteriaId === 'object' && criteriaId !== null && 'id' in criteriaId) {
-      id = (criteriaId as { id: number }).id;
-    } else if (typeof criteriaId === 'number') {
-      id = criteriaId;
-    }
-    if (id) {
-      this.router.navigate([`/estrategia`, this.estrategiaId, 'grupo-criterio', this.criteriaGroupId,'criterio',id]);
-    } else {
-      console.warn('ID da estratégia não encontrado:', criteriaId);
-    }
-
+  openCriteria(criteria?: any): void {
+      this.router.navigate([`/estrategia`, this.estrategiaId, 'grupo-criterio', criteria.criteriaGroupId,'criterio', criteria.id]);
   }
 
   getStatusColorByDisabled(disabled: boolean): string {
@@ -285,13 +278,11 @@ export class ObjectiveDetailPageComponent implements OnInit {
     console.log("Opening scenario modal", scenario)
     // Implementar modal de cenário
   }
-  openPortfolio(portfolio?: number): void {
-    console.log("Opening portfolio modal", portfolio)
-    // Implementar modal de portfólio
+  openPortfolio(portfolio?: any): void {
+    this.router.navigate([`/portfolio`, portfolio.id]);
   }
-  openProjeto(projeto?: Project): void {
-    console.log("Opening projeto modal", projeto)
-    // Implementar modal de projeto
+  openProjeto(projeto?: any): void {
+    this.router.navigate([`/projeto`, projeto.id]);
   }
   openEditModal(): void {
     this.editStrategyConfig.fields[0].value = this.objective?.name || '';

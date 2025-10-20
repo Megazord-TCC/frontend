@@ -86,7 +86,7 @@
 
     <!-- Grupos de Critérios Tab -->
     <div *ngIf="activeTab === 'criterios'" class="tab-panel">
-      <h3>Grupos de critérios vinculados ao objetivo</h3>
+      <h3>Critérios vinculados ao objetivo</h3>
           <app-table
             [dataRetrievalMethodRef]="getDataForCriteriaTable"
             [filterText]="criterionFilterText"
@@ -112,7 +112,7 @@
         <app-table
             [dataRetrievalMethodRef]="getDataForProjectsTable"
             [filterButtons]="portfoliosFilterButtons"
-            [filterText]="portfoliosFilterText"
+            [filterText]="projectFilterText"
             [columns]="portfoliosColumns"
             (mainColumnRowClick)="openProjeto($event)">
           </app-table>

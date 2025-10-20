@@ -66,7 +66,7 @@ export const getColumns = (): TableColumn[] => {
 
 export const getFilterText = (): InputFilter => {
     let input = new InputFilter();
-    input.label = 'Buscar pelo nome do portfólio';
+    input.label = 'Buscar pelo nome';
     input.queryParam = { name: 'searchQuery', value: '' };
     return input;
 };

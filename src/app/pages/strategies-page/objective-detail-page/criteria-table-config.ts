@@ -40,8 +40,8 @@ export const getColumns = (): TableColumn[] => {
 
 export const getFilterText = (): InputFilter => {
   let input = new InputFilter();
-  input.label = 'Buscar pelo nome do critério';
-  input.queryParam = { name: 'name', value: '' };
+  input.label = 'Buscar pelo nome';
+  input.queryParam = { name: 'searchQuery', value: '' };
   return input;
 };
 

@@ -735,7 +735,8 @@ export class CriterioComponent implements OnInit, OnDestroy {
       if (this.criteria) {
         const updatedCriterio = {
           ...this.criteria,
-          ...criterioData
+          ...criterioData,
+          strategicObjectives: this.criteria.strategicObjectives ? this.criteria.strategicObjectives.map(obj => obj.id) : []
         };
         this.criterioService.updateCriterio(this.criteria.id, updatedCriterio, this.estrategiaId, this.criteriaGroupId).subscribe({
           next: () => {

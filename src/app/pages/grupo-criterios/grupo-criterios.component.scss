@@ -160,6 +160,40 @@ $blue-color: #3b82f6;
     line-height: 1.5;
     font-family: 'Roboto', sans-serif;
   }
+
+// Validation Error
+.validation-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: #f2f5fe;
+  border: 1px solid #caebfe;
+  border-radius: 8px;
+  animation: errorSlideIn 0.3s ease-out;
+  margin-bottom: 24px;
+
+  @keyframes errorSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  i {
+    font-size: 16px;
+  }
+
+  span {
+    font-size: 14px;
+    color: #3f6bb1;
+    font-weight: 500;
+  }
+}
 }
 
 .actions-right {

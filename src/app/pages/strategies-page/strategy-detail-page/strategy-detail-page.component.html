@@ -100,7 +100,6 @@
           <h3>Objetivos estratégicos</h3>
           <p class="tab-description">
             Cadastre os objetivos desta estratégia, os quais são utilizados como base para os critérios de avaliação.
-            Somente uma estratégia pode estar ativa, a qual tem efeito apenas para fins de organização.
           </p>
           <app-table
             #objectivesTableComponent
@@ -119,7 +118,7 @@
         <div *ngIf="activeTab === 'criterios'" class="tab-panel">
           <h3>Grupos de critérios</h3>
           <p class="tab-description">
-            Cadastre grupos de critérios a partir de objetivos estratégicos. Esses critérios são utilizados para gerar avaliações.
+            Cadastre grupos de critérios, utilizados para criar grupos de avaliações.
           </p>
           <!-- Criteria Groups Table -->
           <app-table

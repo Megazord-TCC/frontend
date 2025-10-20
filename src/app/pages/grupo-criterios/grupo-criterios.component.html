@@ -37,7 +37,7 @@
         </div>
 
          <div class="last-update">
-            Última alteração realizada em {{criteriaGroup?.lastModifiedAt | date: 'dd/MM/yyyy HH:mm'}}.
+            Última alteração realizada em {{ criteriaGroup?.lastModifiedAt }}.
         </div>
       </div>
     </div>
@@ -45,8 +45,13 @@
       <div class="tab-content">
           <h3>Critérios do grupo</h3>
           <p class="tab-description">
-            Cadastre os critérios deste grupo. Com base neles serão criados os critérios de avaliação.
+            Cadastre e compare os critérios deste grupo.
           </p>
+
+          <div class="validation-error">
+              <i class="icon-alert-triangle">ℹ️</i>
+              <span>Recomenda-se que não sejam incluídos mais que 5 critérios, pois isso reduz a quantidade de comparações.</span>
+          </div>
 
           <app-table
             #tableComponent
