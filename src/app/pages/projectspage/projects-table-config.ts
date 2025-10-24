@@ -18,7 +18,7 @@ const getBadgeConfigurations = (): BadgeConfiguration[] => {
 
     badgeConfig = new BadgeConfiguration();
     badgeConfig.color = 'green';
-    badgeConfig.triggeringValues = ['AUTORIZADO'];
+    badgeConfig.triggeringValues = ['CONLUÍDO'];
     badgeConfigs.push(badgeConfig);
 
     badgeConfig = new BadgeConfiguration();
@@ -28,7 +28,12 @@ const getBadgeConfigurations = (): BadgeConfiguration[] => {
 
     badgeConfig = new BadgeConfiguration();
     badgeConfig.color = 'yellow';
-    badgeConfig.triggeringValues = ['AGUARDANDO AUTORIZAÇÃO'];
+    badgeConfig.triggeringValues = ['EM ANDAMENTO'];
+    badgeConfigs.push(badgeConfig);
+
+    badgeConfig = new BadgeConfiguration();
+    badgeConfig.color = 'blue';
+    badgeConfig.triggeringValues = ['EM ANÁLISE'];
     badgeConfigs.push(badgeConfig);
 
     return badgeConfigs;
@@ -108,13 +113,18 @@ export const getFilterButtons = (): InputFilter[] => {
     let input: InputFilter;
 
     input = new InputFilter();
-    input.label = 'Aguardando autorização';
-    input.queryParam = { name: 'status', value: "WAITING_AUTHORIZATION" };
+    input.label = 'Em análise';
+    input.queryParam = { name: 'status', value: "IN_ANALYSIS" };
     inputs.push(input);
 
     input = new InputFilter();
-    input.label = 'Autorizado';
-    input.queryParam = { name: 'status', value: "AUTHORIZED" };
+    input.label = 'Em andamento';
+    input.queryParam = { name: 'status', value: "IN_PROGRESS" };
+    inputs.push(input);
+
+    input = new InputFilter();
+    input.label = 'Concluído';
+    input.queryParam = { name: 'status', value: "COMPLETED" };
     inputs.push(input);
 
     input = new InputFilter();
