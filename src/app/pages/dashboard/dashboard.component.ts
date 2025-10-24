@@ -197,6 +197,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       const plannedValues = this.projetos.slice(0,3).map(p => p.plannedValue ?? 0);
       const earnedValues = this.projetos.slice(0,3).map(p => p.earnedValue ?? 0);
 
+
       this.costChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -293,17 +294,22 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         { bg: 'rgba(54, 162, 235, 0.6)', border: 'rgba(54, 162, 235, 1)' },
         { bg: 'rgba(75, 192, 192, 0.6)', border: 'rgba(75, 192, 192, 1)' }
       ];
-      const datasets = projetos.map((p, i) => ({
-        label: p.name,
-        data: [{
-          x: p.payback ?? 0,
-          y: p.scenarioRankingScore ?? 0,
-          r: Math.max(20, Math.min(60, Math.round((p.budgetAtCompletion ?? 0) / 1000)))
-        }],
-        backgroundColor: colors[i % colors.length].bg,
-        borderColor: colors[i % colors.length].border,
-        borderWidth: 2
-      }));
+      const datasets = projetos.map((p, i) => {
+        const roi = p.roi ?? 0;
+        const backgroundColor = roi < 0 ? 'rgba(255, 255, 255, 1)' : colors[i % colors.length].bg;
+
+        return {
+          label: p.name,
+          data: [{
+            x: p.payback ?? 0,
+            y: p.scenarioRankingScore ?? 0,
+            r: Math.max(20, Math.min(60, Math.round((p.budgetAtCompletion ?? 0) / 1000)))
+          }],
+          backgroundColor: backgroundColor,
+          borderColor: colors[i % colors.length].border,
+          borderWidth: 2
+        };
+      });
 
       this.projectBubbleChart = new Chart(ctx, {
         type: 'bubble',
