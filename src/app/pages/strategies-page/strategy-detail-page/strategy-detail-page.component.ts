@@ -52,7 +52,7 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
 
   // Propriedades para o app-table de objetivos
   objectivesColumns = getObjectivesColumns();
-  objectivesFilterButtons = getObjectivesFilterButtons();
+//   objectivesFilterButtons = getObjectivesFilterButtons();
   objectivesFilterText = getObjectivesFilterText();
   objectivesActionButton = getObjectivesActionButton();
 

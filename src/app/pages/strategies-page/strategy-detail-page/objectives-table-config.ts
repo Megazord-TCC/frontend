@@ -70,14 +70,14 @@ export const getColumns = (): TableColumn[] => {
   column.backendAttributeName = 'activeProjectsCount';
   columns.push(column);
 
-  column = new TableColumn();
-  column.label = 'Status';
-  column.order = 5;
-  column.isSortable = true;
-  column.frontendAttributeName = 'status';
-  column.backendAttributeName = 'status';
-  column.badgeConfiguration = getBadgeConfigurations();
-  columns.push(column);
+//   column = new TableColumn();
+//   column.label = 'Status';
+//   column.order = 5;
+//   column.isSortable = true;
+//   column.frontendAttributeName = 'status';
+//   column.backendAttributeName = 'status';
+//   column.badgeConfiguration = getBadgeConfigurations();
+//   columns.push(column);
 
   return columns;
 };

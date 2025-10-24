@@ -471,7 +471,7 @@ export class ProjectDetailpageComponent implements OnInit {
         case "IN_ANALYSIS": return "EM ANÁLISE";
         case "CANCELLED": return "CANCELADO";
         case "IN_PROGRESS": return "EM ANDAMENTO";
-        case "COMPLETED": return "FINALIZADO";
+        case "COMPLETED": return "CONCLUÍDO";
         default: return "SEM STATUS";
     }
 }
@@ -479,11 +479,11 @@ export class ProjectDetailpageComponent implements OnInit {
   getProjectStatusColor(status: any): string {
     switch (status) {
       case 'IN_ANALYSIS':
-        return 'yellow';
-      case 'IN_PROGRESS':
-        return 'green';
-      case 'COMPLETED':
         return 'blue';
+      case 'IN_PROGRESS':
+        return 'yellow';
+      case 'COMPLETED':
+        return 'green';
       case 'CANCELLED':
         return 'gray';
       default:

@@ -49,7 +49,7 @@ export const getColumns = (): TableColumn[] => {
   column = new TableColumn();
   column.label = 'Objetivos vinculados';
   column.order = 3;
-  column.isSortable = true;
+//   column.isSortable = true;
   column.frontendAttributeName = 'strategicObjectives';
   column.backendAttributeName = 'strategicObjectives';
   columns.push(column);
