@@ -130,17 +130,17 @@ $blue-color: #3b82f6;
 .tabs-container {
   .tabs-list {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 684px;
-    height: 44px;
+    // justify-content: center;
+    // align-items: center;
+    // height: 44px;
     background: #e5e5e5;
     border-radius: 0.5rem;
     overflow-x: auto;
     margin-bottom: 1.5rem;
     padding: 5px; // Padding interno de 5px
     gap: 4px; // Gap entre os botões
-    box-sizing: border-box; // Para incluir o padding no cálculo da largura
+    // box-sizing: border-box;
+    max-width: 700px;
 
     .tab-trigger {
       display: flex;
@@ -620,12 +620,12 @@ $blue-color: #3b82f6;
     }
   }
 
-  .tabs-list {
-    .tab-trigger {
-      padding: 0.5rem 0.5rem;
-      font-size: 0.75rem;
-    }
-  }
+//   .tabs-list {
+//     .tab-trigger {
+//       padding: 0.5rem 0.5rem;
+//       font-size: 0.75rem;
+//     }
+//   }
 
   .tab-panel {
     padding: 1rem;
