@@ -35,7 +35,7 @@ function traduzirPrioridade(priority: string | undefined): string {
 export function mapAllocationReadDTOToTableRow(dto: AllocationReadDTO): AllocationTableRow {
   return {
     id: dto.id,
-    projeto: dto.resource?.name ?? '-',
+    projeto: dto.projectName ?? '-',
     horasDia: dto.dailyHours ?? 0,
     solicitante: dto.createdBy ?? '-',
     inicio: dto.startDate ?? '-',

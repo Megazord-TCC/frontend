@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableComponent } from '../../../components/table/table.component';
 import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } from '../../../models/pagination-models';
-import { PageType } from '../../../interface/carlos-auth-interfaces';
+import { PageType, Role } from '../../../interface/carlos-auth-interfaces';
 import { map, Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { getActionButton, getColumns, getFilterButtons, getFilterText } from './request-allocation-config';
@@ -82,11 +82,8 @@ export class ResourcesRequestComponent implements OnInit {
   statusFilter = 'ACTIVE';
 
   ngOnInit(): void {
-
-    const authorizedPages = this.authService.getAuthorizedPageTypesByRole();
-    console.log("authorized pages", authorizedPages);
-    this.isPMO = authorizedPages.includes(PageType.DASHBOARD) && authorizedPages.includes(PageType.RESOURCES) && !authorizedPages.includes(PageType.USERS);
-    this.isProjectManager = authorizedPages.length === 3 && authorizedPages.includes(PageType.PROJECTS) && authorizedPages.includes(PageType.RESOURCES);
+    this.isPMO = this.authService.roleFrontend == Role.PMO || this.authService.roleFrontend == Role.PMO_ADM;
+    this.isProjectManager = this.authService.roleFrontend == Role.PROJECT_MANAGER;
     if (this.isProjectManager) {
       this.actionButton = getActionButton();
     }

@@ -34,8 +34,7 @@ export const getColumns = (): TableColumn[] => {
   column.order = 1;
   column.isSortable = true;
   column.frontendAttributeName = 'projeto';
-  column.backendAttributeName = 'resource.project.name';
-  column.isClickableMainColumn = true;
+  column.backendAttributeName = 'allocationRequest.project.name';
   columns.push(column);
 
   column = new TableColumn();
@@ -95,7 +94,7 @@ export const getColumns = (): TableColumn[] => {
 export const getFilterText = (): InputFilter => {
   let input = new InputFilter();
   input.label = 'Buscar pelo nome do projeto';
-  input.queryParam = { name: 'nome', value: '' };
+  input.queryParam = { name: 'searchQuery', value: '' };
   return input;
 };
 

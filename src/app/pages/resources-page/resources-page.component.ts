@@ -14,7 +14,7 @@ import { ResourcesRequestComponent } from './resources-request/resources-request
 import { ResourcesPositionComponent } from './resources-position/resources-position.component';
 
 import { AuthService } from '../../service/auth-service';
-import { PageType } from '../../interface/carlos-auth-interfaces';
+import { PageType, Role } from '../../interface/carlos-auth-interfaces';
 import { ResourcePoolComponent } from './resources-pool/resources-pool.component';
 
 @Component({
@@ -94,10 +94,9 @@ export class ResourcesPageComponent implements OnInit {
       { label: 'Início', url: '/inicio', isActive: false },
       { label: 'Recursos', url: '/recursos', isActive: true }
     ]);
-    const authorizedPages = this.authService.getAuthorizedPageTypesByRole();
     // Remover breadcrumbs filhos quando retorna para esta página
     this.breadcrumbService.removeChildrenAfter('/recursos');
-    this.isProjectManager = authorizedPages.length === 3 && authorizedPages.includes(PageType.PROJECTS) && authorizedPages.includes(PageType.RESOURCES);
+    this.isProjectManager = this.authService.roleFrontend == Role.PROJECT_MANAGER;
 
   }
 

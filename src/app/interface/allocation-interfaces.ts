@@ -14,6 +14,7 @@ export interface AllocationReadDTO {
   createdAt: string; // formato dd/MM/yyyy HH:mm:ss
   lastModifiedAt: string; // formato dd/MM/yyyy HH:mm:ss
   status: AllocationStatusEnum;
+  projectName: string;
 }
 export enum AllocationStatusEnum {
 

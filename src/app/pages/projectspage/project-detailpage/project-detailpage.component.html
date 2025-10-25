@@ -203,6 +203,7 @@
                                 </app-svg-icon>
                                 <div class="link-info">
                                     <span class="link-title">{{project?.portfolioName || "Sem valor"}}</span>
+                                    <span class="link-subtitle">Portfólio atual</span>
                                 </div>
                             </div>
 
@@ -219,8 +220,8 @@
                                 <app-svg-icon class="nav-icon" [path]="'assets/icon/estrategia_vetor.svg'" [size]="24">
                                 </app-svg-icon>
                                 <div class="link-info">
-                                    <span class="link-title">700/1000</span>
-                                    <span class="link-subtitle">{{project?.scenarioRankingScore || "Sem valor"}}</span>
+                                    <span class="link-title">{{(project?.scenarioRankingScore | number:'1.0-0') || "Sem valor"}} / 1000</span>
+                                    <span class="link-subtitle">Valor estratégico</span>
                                 </div>
                             </div>
 
@@ -228,8 +229,8 @@
                                 <app-svg-icon class="nav-icon" [path]="'assets/icon/prioridade_vetor.svg'" [size]="24">
                                 </app-svg-icon>
                                 <div class="link-info">
-                                    <span class="link-title">1°/15</span>
-                                    <span class="link-subtitle">{{project?.priorityInPortfolio || "Sem valor"}}</span>
+                                    <span class="link-title">{{project?.priorityInPortfolio || "Sem valor"}}°</span>
+                                    <span class="link-subtitle">Prioridade no portfólio</span>
                                 </div>
                             </div>
                             <div class="link-item">
@@ -238,9 +239,8 @@
                                 </app-svg-icon>
 
                                 <div class="link-info">
-                                    <span class="link-title">Categoria</span>
-                                    <span class="link-subtitle">{{project?.portfolioCategory.name || "Sem
-                                        valor"}}</span>
+                                    <span class="link-title">{{project?.portfolioCategory.name || "Sem valor"}}</span>
+                                    <span class="link-subtitle">Categoria do portfólio</span>
                                 </div>
                             </div>
                         </div>

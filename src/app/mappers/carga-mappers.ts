@@ -21,11 +21,21 @@ export function mapPositionReadDTOPageToResourcesPositionTableRowPage(page: Page
     };
 }
 
+// Função para traduzir status
+function traduzirStatus(status: string | undefined): string {
+    if (!status) return '-';
+    switch (status) {
+        case 'ACTIVE': return  'Ativo';
+        case 'INACTIVE': return 'Inativo';
+        default: return status;
+    }
+}
+
 export function mapPositionReadDTOToResourcesPositionTableRow(position: PositionReadDTO): ResourcesPositionTableRow {
     return {
         id: position.id,
         name: position.name,
-        status: position.status,
+        status: traduzirStatus(position.status),
         resourcesCount: position.resourcesCount,
         disabled: position.disabled,
         createdAt: position.createdAt,

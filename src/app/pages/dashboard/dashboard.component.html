@@ -10,7 +10,7 @@
       <select [(ngModel)]="selectedPortfolioId" (change)="onPortfolioChange(selectedPortfolioId)">
         <option *ngFor="let portfolio of portfolios" [value]="portfolio.id">{{portfolio.name}}</option>
       </select>
-      <button *ngIf="authService.getAuthorizedPageTypesByRole().includes(pageType.DASHBOARD)"
+      <button *ngIf="authService.getAuthorizedPageTypesByRole().includes(pageType.PORTFOLIOS)"
         class="add-portfolio-btn"
         (click)="openPortfolio(selectedPortfolioId)">
         Acessar portfólio
