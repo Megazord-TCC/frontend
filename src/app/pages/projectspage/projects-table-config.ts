@@ -18,7 +18,7 @@ const getBadgeConfigurations = (): BadgeConfiguration[] => {
 
     badgeConfig = new BadgeConfiguration();
     badgeConfig.color = 'green';
-    badgeConfig.triggeringValues = ['CONLUÍDO'];
+    badgeConfig.triggeringValues = ['CONCLUÍDO'];
     badgeConfigs.push(badgeConfig);
 
     badgeConfig = new BadgeConfiguration();
