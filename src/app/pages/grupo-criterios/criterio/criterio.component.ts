@@ -218,20 +218,58 @@ export class CriterioComponent implements OnInit, OnDestroy {
   }
 
   async loadGroupCriteria(): Promise<void> {
+    console.log('\n📥 === CARREGANDO GRUPO DE CRITÉRIOS ===');
+    console.log('  - criteriaGroupId:', this.criteriaGroupId);
+    console.log('  - estrategiaId:', this.estrategiaId);
+
     try {
       const criteriaGroup = await firstValueFrom(
         this.criterioGroupService.getCriterioById(this.criteriaGroupId, this.estrategiaId)
       );
 
+      console.log('  📦 Grupo recebido (OBJETO COMPLETO):', JSON.stringify(criteriaGroup, null, 2));
+      console.log('  � Chaves do objeto:', Object.keys(criteriaGroup || {}));
+      console.log('  �📋 criteriaGroup.criteriaList:', criteriaGroup?.criteriaList);
+
       this.criteriaGroup = criteriaGroup;
 
-      console.log('Todos os critérios carregados:', criteriaGroup);
-    } catch (err) {
-      console.error('Erro ao buscar grupo de critérios:', err);
-    }
-  }
+      // 🐛 TENTATIVA 1: Tentar múltiplos nomes de propriedade
+      let criteriaArray: Criterion[] | undefined;
 
-  async loadExistingComparisons(): Promise<void> {
+      if (criteriaGroup) {
+        // Tentar diferentes nomes de propriedades
+        criteriaArray = (criteriaGroup as any).criteriaList
+                    || (criteriaGroup as any).criteria
+                    || (criteriaGroup as any).criterions
+                    || (criteriaGroup as any).items
+                    || (criteriaGroup as any).list;
+
+        console.log('  🔍 Propriedade encontrada:', criteriaArray ? 'SIM' : 'NÃO');
+      }
+
+      if (criteriaArray && Array.isArray(criteriaArray)) {
+        this.criteriaGroups = [...criteriaArray];
+        this.filteredCriteriaGroups = [...criteriaArray];
+        console.log('  ✅ Critérios carregados:', this.criteriaGroups.length);
+        console.log('  📝 IDs dos critérios:', this.criteriaGroups.map(c => `${c.id} (${c.name})`));
+      } else {
+        this.criteriaGroups = [];
+        this.filteredCriteriaGroups = [];
+        console.log('  ⚠️ Nenhum critério encontrado no grupo');
+        console.log('  ❓ Array de critérios encontrado?', !!criteriaArray);
+        console.log('  ❓ É um array?', Array.isArray(criteriaArray));
+      }
+
+      console.log('  📊 Estado final:');
+      console.log('    - criteriaGroups.length:', this.criteriaGroups.length);
+      console.log('    - filteredCriteriaGroups.length:', this.filteredCriteriaGroups.length);
+      console.log('📥 === FIM CARREGAMENTO ===\n');
+    } catch (err) {
+      console.error('❌ Erro ao buscar grupo de critérios:', err);
+      this.criteriaGroups = [];
+      this.filteredCriteriaGroups = [];
+    }
+  }  async loadExistingComparisons(): Promise<void> {
     try {
       const comparisons = await firstValueFrom(
         this.criteriaGroupComparationsService.getCriteriaComparisons(this.criteriaGroupId, this.estrategiaId)
@@ -439,12 +477,19 @@ export class CriterioComponent implements OnInit, OnDestroy {
 
   // Método para inicializar valores de comparação - VERSÃO ROBUSTA
   initializeComparisonValues(): void {
+    console.log('\n🔧 === INICIALIZANDO VALORES DE COMPARAÇÃO ===');
+    console.log('📊 Estado inicial:');
+    console.log('  - this.criteria:', this.criteria);
+    console.log('  - this.filteredCriteriaGroups:', this.filteredCriteriaGroups);
+    console.log('  - this.filteredCriteriaGroups.length:', this.filteredCriteriaGroups?.length);
+
     if (!this.criteria || !this.filteredCriteriaGroups) {
       console.log('⚠️ Inicialização cancelada: dados não disponíveis');
+      console.log('  - criteria existe?', !!this.criteria);
+      console.log('  - filteredCriteriaGroups existe?', !!this.filteredCriteriaGroups);
       return;
     }
 
-    console.log(`\n🔧 === INICIALIZANDO VALORES DE COMPARAÇÃO ===`);
     console.log(`Critério atual: ${this.criteria.name} (ID: ${this.criteria.id})`);
     console.log(`Comparações existentes válidas: ${this.existingComparisons.length}`);
 
@@ -801,8 +846,27 @@ export class CriterioComponent implements OnInit, OnDestroy {
   }
 
   getOtherCriteria(): Criterion[] {
-    if (!this.criteria || !this.filteredCriteriaGroups) return [];
-    return this.filteredCriteriaGroups.filter(c => c.id !== this.criteria?.id);
+    console.log('🔍 === DEBUG getOtherCriteria ===');
+    console.log('  - criteria atual:', this.criteria);
+    console.log('  - criteria.id:', this.criteria?.id);
+    console.log('  - filteredCriteriaGroups:', this.filteredCriteriaGroups);
+    console.log('  - filteredCriteriaGroups.length:', this.filteredCriteriaGroups.length);
+
+    if (!this.criteria || !this.filteredCriteriaGroups) {
+      console.log('  ❌ Retornando vazio: criteria ou filteredCriteriaGroups não existe');
+      return [];
+    }
+
+    const filtered = this.filteredCriteriaGroups.filter(c => {
+      const isDifferent = c.id !== this.criteria?.id;
+      console.log(`  - Critério ${c.id} (${c.name}): isDifferent=${isDifferent} (comparando com ${this.criteria?.id})`);
+      return isDifferent;
+    });
+
+    console.log('  ✅ Retornando:', filtered.length, 'critérios');
+    console.log('🔍 === FIM DEBUG ===\n');
+
+    return filtered;
   }
 
   setComparisonValue(criteriaId: number, otherCriteriaId: number, value: ImportanceScale): void {
@@ -833,11 +897,22 @@ export class CriterioComponent implements OnInit, OnDestroy {
 
   // Método para verificar se os dados estão prontos para renderizar
   isDataReady(): boolean {
-    return !this.loadingCriterios &&
+    const ready = !this.loadingCriterios &&
           !!this.criteria &&
           !!this.criteria.id &&
           !!this.comparisonValues[this.criteria.id] &&
           this.filteredCriteriaGroups.length > 0;
+
+    console.log('🔍 isDataReady():', {
+      loadingCriterios: this.loadingCriterios,
+      hasCriteria: !!this.criteria,
+      criteriaId: this.criteria?.id,
+      hasComparisonValues: this.criteria?.id ? !!this.comparisonValues[this.criteria.id] : false,
+      filteredLength: this.filteredCriteriaGroups.length,
+      ready
+    });
+
+    return ready;
   }
 
   // Método auxiliar para garantir que criteria existe (Type Guard)
