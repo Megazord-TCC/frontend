@@ -526,7 +526,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     switch (statusEnum) {
           case "EMPTY": return "SEM PROJETOS";
           case "IN_PROGRESS": return "EM ANDAMENTO";
-          case "COMPLETED": return "FINALIZADO";
+          case "COMPLETED": return "CONCLUÍDO";
           case "CANCELLED": return "CANCELADO";
           default: return "SEM STATUS";
       }

@@ -118,7 +118,7 @@ export const getFilterButtons = (): InputFilter[] => {
     inputs.push(input);
 
     input = new InputFilter();
-    input.label = 'Finalizado';
+    input.label = 'Concluído';
     input.queryParam = { name: 'status', value: PortfolioDTOStatus.FINALIZADO };
     inputs.push(input);
 

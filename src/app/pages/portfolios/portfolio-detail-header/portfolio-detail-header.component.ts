@@ -14,6 +14,7 @@ import { PortfolioEditModalComponent } from '../../../components/portfolio-edit-
 import { PortfolioCancelModalComponent } from '../../../components/portfolio-cancel-modal/portfolio-cancel-modal.component';
 import { PortfolioDeleteModalComponent } from '../../../components/portfolio-delete-modal/portfolio-delete-modal.component';
 import { getDateObjectFromDDMMYYYYHHMMSS } from '../../../helpers/date-helper';
+import { PortfolioCompleteModalComponent } from '../../../components/portfolio-complete-modal/portfolio-complete-modal.component';
 
 @Component({
     selector: 'app-portfolio-detail-header',
@@ -26,7 +27,8 @@ import { getDateObjectFromDDMMYYYYHHMMSS } from '../../../helpers/date-helper';
         PageHeaderComponent,
         PortfolioEditModalComponent,
         PortfolioCancelModalComponent,
-        PortfolioDeleteModalComponent
+        PortfolioDeleteModalComponent,
+        PortfolioCompleteModalComponent
     ],
     standalone: true
 })
@@ -52,6 +54,7 @@ export class PortfolioDetailHeaderComponent {
     isPortfolioEditModalVisible = false;
     isPortfolioDeleteModalVisible = false;
     isPortfolioCancelModalVisible = false;
+    isPortfolioCompleteModalVisible = false;
 
     ngOnInit() {
         this.routeSubscription = this.route.paramMap.subscribe(params => {
@@ -110,6 +113,9 @@ export class PortfolioDetailHeaderComponent {
 
         if (this.portfolioDTO.canBeDeleted)
             buttons.push('delete');
+
+        if (this.portfolioDTO.status != PortfolioDTOStatus.FINALIZADO)
+            buttons.push('complete');
 
         this.visibleActionButtons = buttons;
     }

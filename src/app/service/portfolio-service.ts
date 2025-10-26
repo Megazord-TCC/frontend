@@ -151,4 +151,9 @@ export class PortfolioService {
             responseType: 'blob'
         });
     }
+
+    completePortfolio(portfolioId: number): Observable<void> {
+        const url = `${this.getPortfolioDetailUrl(portfolioId)}/complete`;
+        return this.http.patch<void>(url, {}, { headers: this.getHeaders() });
+    }    
 }

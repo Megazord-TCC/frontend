@@ -10,7 +10,8 @@
     [cancellationReason]="cancellationReason"
     (editClick)="isPortfolioEditModalVisible = true" 
     (deleteClick)="isPortfolioDeleteModalVisible = true"
-    (cancelClick)="isPortfolioCancelModalVisible = true">
+    (cancelClick)="isPortfolioCancelModalVisible = true"
+    (completeClick)="isPortfolioCompleteModalVisible = true">
 </app-page-header>
 
 <app-portfolio-edit-modal *ngIf="isPortfolioEditModalVisible" 
@@ -31,3 +32,8 @@
     (close)="isPortfolioCancelModalVisible = false"
     (portfolioCancelled)="isPortfolioCancelModalVisible = false; loadPortfolioDTO()">
 </app-portfolio-cancel-modal>
+
+<app-portfolio-complete-modal *ngIf="isPortfolioCompleteModalVisible"
+    (close)="isPortfolioCompleteModalVisible = false"
+    (portfolioComplete)="isPortfolioCompleteModalVisible = false; loadPortfolioDTO()">
+</app-portfolio-complete-modal>

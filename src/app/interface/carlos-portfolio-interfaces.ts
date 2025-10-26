@@ -57,7 +57,7 @@ export class PortfolioAnalyticsReadDTO {
 export enum PortfolioTableRowStatus {
     VAZIO = 'VAZIO',
     EM_ANDAMENTO = 'EM ANDAMENTO',
-    FINALIZADO = 'FINALIZADO',
+    FINALIZADO = 'CONCLUÍDO',
     CANCELADO = 'CANCELADO',
     CARREGANDO = '...'
 }

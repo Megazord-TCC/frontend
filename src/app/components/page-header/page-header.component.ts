@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TooltipComponent } from '../tooltip/tooltip.component';
 
-export type ActionButtons = 'edit' | 'cancel' | 'delete';
+export type ActionButtons = 'edit' | 'cancel' | 'delete' | 'complete';
 
 @Component({
     selector: 'app-page-header',
@@ -35,6 +35,7 @@ export class PageHeaderComponent {
     @Output() editClick = new EventEmitter<void>();
     @Output() cancelClick = new EventEmitter<void>();
     @Output() deleteClick = new EventEmitter<void>();
+    @Output() completeClick = new EventEmitter<void>();
 
     router = inject(Router);
 }

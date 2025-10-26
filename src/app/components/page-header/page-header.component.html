@@ -16,6 +16,7 @@
     <div class="action-header">
         <div *ngIf="visibleActionButtons.length" class="action-buttons">
             <button *ngIf="visibleActionButtons.includes('edit')" class="action-btn" (click)="editClick.emit()">Editar</button>
+            <button *ngIf="visibleActionButtons.includes('complete')" class="action-btn" (click)="completeClick.emit()">Concluir</button>
             <button *ngIf="visibleActionButtons.includes('cancel')" class="action-btn cancel" (click)="cancelClick.emit()">Cancelar</button>
             <button *ngIf="visibleActionButtons.includes('delete')" class="action-btn delete" (click)="deleteClick.emit()">Excluir</button>
         </div>
