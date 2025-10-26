@@ -9,23 +9,23 @@ const getBadgeConfigurations = (): BadgeConfiguration[] => {
 
     badgeConfig = new BadgeConfiguration();
     badgeConfig.color = 'green';
-    badgeConfig.triggeringValues = ['ALLOCATED'];
+    badgeConfig.triggeringValues = ['ALOCADO'];
     badgeConfigs.push(badgeConfig);
 
     badgeConfig = new BadgeConfiguration();
-    badgeConfig.color = 'grey';
-    badgeConfig.triggeringValues = ['IN_ANALYSIS'];
+    badgeConfig.color = 'gray';
+    badgeConfig.triggeringValues = ['CANCELADO'];
     badgeConfigs.push(badgeConfig);
 
     badgeConfig = new BadgeConfiguration();
     badgeConfig.color = 'yellow';
-    badgeConfig.triggeringValues = ['REJECTED'];
+    badgeConfig.triggeringValues = ['EM ANÁLISE'];
     badgeConfigs.push(badgeConfig);
 
-    badgeConfig = new BadgeConfiguration();
-    badgeConfig.color = 'red';
-    badgeConfig.triggeringValues = ['CANCELLED'];
-    badgeConfigs.push(badgeConfig);
+    // badgeConfig = new BadgeConfiguration();
+    // badgeConfig.color = 'red';
+    // badgeConfig.triggeringValues = ['REJEITADO'];
+    // badgeConfigs.push(badgeConfig);
 
 
     return badgeConfigs;
@@ -109,7 +109,7 @@ export const getColumns = (isPMO: boolean = false): TableColumn[] => {
 
 export const getFilterText = (): InputFilter => {
 	let input = new InputFilter();
-	input.label = 'Buscar por projeto ou solicitante';
+	input.label = 'Buscar por nome do cargo';
 	input.queryParam = { name: 'searchQuery', value: '' };
 	return input;
 };
@@ -119,19 +119,19 @@ export const getFilterButtons = (): InputFilter[] => {
 	let input: InputFilter;
 
 	input = new InputFilter();
-	input.label = 'Alocado';
-	input.queryParam = { name: 'status', value: AllocationRequestStatusEnum.ALLOCATED };
-	inputs.push(input);
-
-	input = new InputFilter();
 	input.label = 'Em análise';
 	input.queryParam = { name: 'status', value: AllocationRequestStatusEnum.IN_ANALYSIS };
 	inputs.push(input);
 
 	input = new InputFilter();
-	input.label = 'Rejeitado';
-	input.queryParam = { name: 'status', value: AllocationRequestStatusEnum.REJECTED };
+	input.label = 'Alocado';
+	input.queryParam = { name: 'status', value: AllocationRequestStatusEnum.ALLOCATED };
 	inputs.push(input);
+
+	// input = new InputFilter();
+	// input.label = 'Rejeitado';
+	// input.queryParam = { name: 'status', value: AllocationRequestStatusEnum.REJECTED };
+	// inputs.push(input);
 
 	input = new InputFilter();
 	input.label = 'Cancelado';
