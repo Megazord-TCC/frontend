@@ -217,7 +217,10 @@
     color: #64748b;
     flex-grow: 1;
     text-align: center;
-
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    justify-content: center;
 }
 
 .logout-btn {
