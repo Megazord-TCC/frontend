@@ -253,6 +253,9 @@
                                     </app-svg-icon>
                                     <span>{{objective.name}}</span>
                                 </div>
+                                <div *ngIf="!project?.strategicObjectives?.length" style="color: #64748b">
+                                    Nenhum objetivo estratégico foi vinculado a este projeto.
+                                </div>
                             </div>
                         </div>
                     </ng-container>
