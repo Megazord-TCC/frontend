@@ -31,7 +31,7 @@ import { CargosService } from '../../../service/cargos.service';
 })
 export class ResourcesPositionComponent {
   createProjectConfig: FormModalConfig = {
-      title: 'Cadastrar novo projeto',
+      title: 'Cadastrar novo cargo',
       fields: [
         {
           id: 'name',
