@@ -420,36 +420,11 @@ export class ProjectDetailpageComponent implements OnInit {
       });
   }
 
-  onUncancelProject(): void {
-    if (!this.project) return;
-    if (this.project.status !== ProjectStatusEnum.CANCELLED) return;
-    const updatedProject = {
-      ...this.project,
-      status: ProjectStatusEnum.IN_ANALYSIS
-    };
-    this.projetoService.updateProject(this.project.id, updatedProject)
-      .pipe(retry(3))
-      .subscribe({
-        next: (updatedProject) => {
-          this.loadProjectDetails(this.project!.id);
-        },
-        error: (err) => {
-          alert('Erro ao descancelar o projeto. Tente novamente.');
-        }
-      });
-  }
-
   onCancelProject(fields: FormField[]): void {
     if (!this.project) return;
     const cancelReason = fields.find(f => f.id === 'reason')?.value || '';
 
-    const updatedProject = {
-      ...this.project,
-      status: ProjectStatusEnum.CANCELLED,
-      cancellationReason: cancelReason
-    };
-
-    this.projetoService.updateProject(this.project.id, updatedProject)
+    this.projetoService.cancelProject(this.project.id, cancelReason)
     .pipe(retry(3))
     .subscribe({
       next: (updatedProject) => {

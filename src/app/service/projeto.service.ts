@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
 import { Page, PaginationQueryParams } from '../models/pagination-models';
 import { AuthService } from './auth-service';
+import { ProjectCancelationPatchDTO } from '../interface/carlos-project-dtos';
 
 @Injectable({
   providedIn: 'root'
@@ -53,5 +54,14 @@ export class ProjetoService {
     if (portfolioId !== undefined) params['portfolioId'] = portfolioId;
     if (status && status.length > 0) params['status'] = status;
     return this.http.get<Project[]>(`${this.apiUrl}/unpaged`, { params, headers: this.getHeaders() });
+  }
+
+  // Cancelar projeto (PATCH)
+  cancelProject(id: number, cancellationReason: string): Observable<Project> {
+    
+    let body = new ProjectCancelationPatchDTO();
+    body.cancellationReason = cancellationReason;
+
+    return this.http.patch<Project>(`${this.apiUrl}/${id}/cancel`, body, { headers: this.getHeaders() });
   }
 }

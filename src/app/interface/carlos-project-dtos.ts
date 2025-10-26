@@ -83,3 +83,7 @@ export class ProjectReadDTO2 {
     disabled = false;
     estimateAtCompletion = 0;
 }
+
+export class ProjectCancelationPatchDTO {
+    cancellationReason = '';
+}

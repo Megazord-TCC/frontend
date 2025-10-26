@@ -174,6 +174,7 @@ export interface Project {
   createdAt: string; // dd/MM/yyyy HH:mm:ss
   lastModifiedAt: string; // dd/MM/yyyy HH:mm:ss
   disabled: boolean;
+  cancellationReason?: string;
 }
 
 export interface Evaluation {
