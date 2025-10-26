@@ -120,7 +120,7 @@ export class ScenarioDetailPageComponent {
                 this.tableComponent?.disableAllTableSelectButtons();
                 break;
             case ScenarioStatusEnum.AUTHORIZED:
-                this.visibleActionButtons = ['edit'];
+                this.visibleActionButtons = [];
                 this.cancelAllActions = true;
                 this.actionButton = undefined;
                 this.tableComponent?.disableAllTableSelectButtons();
