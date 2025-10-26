@@ -14,7 +14,7 @@ const getBadgeConfigurations = (): BadgeConfiguration[] => {
     let badgeConfig: BadgeConfiguration;
     
     badgeConfig = new BadgeConfiguration();
-    badgeConfig.color = 'blue';
+    badgeConfig.color = 'green';
     badgeConfig.triggeringValues = [PortfolioProjectTableRowProjectStatus.COMPLETED];
     badgeConfigs.push(badgeConfig);
 
@@ -24,12 +24,12 @@ const getBadgeConfigurations = (): BadgeConfiguration[] => {
     badgeConfigs.push(badgeConfig);
 
     badgeConfig = new BadgeConfiguration();
-    badgeConfig.color = 'yellow';
+    badgeConfig.color = 'blue';
     badgeConfig.triggeringValues = [PortfolioProjectTableRowProjectStatus.IN_ANALYSIS];
     badgeConfigs.push(badgeConfig);
 
     badgeConfig = new BadgeConfiguration();
-    badgeConfig.color = 'green';
+    badgeConfig.color = 'yellow';
     badgeConfig.triggeringValues = [PortfolioProjectTableRowProjectStatus.IN_PROGRESS];
     badgeConfigs.push(badgeConfig);
 
@@ -121,16 +121,6 @@ export const getFilterButtons = (): InputFilter[] => {
     let input: InputFilter;
 
     input = new InputFilter();
-    input.label = 'Cancelado';
-    input.queryParam = { name: 'status', value: ProjectStatusEnumDTO2.CANCELLED };
-    inputs.push(input);
-
-    input = new InputFilter();
-    input.label = 'Finalizado';
-    input.queryParam = { name: 'status', value: ProjectStatusEnumDTO2.COMPLETED };
-    inputs.push(input);
-
-    input = new InputFilter();
     input.label = 'Em análise';
     input.queryParam = { name: 'status', value: ProjectStatusEnumDTO2.IN_ANALYSIS };
     inputs.push(input);
@@ -138,6 +128,16 @@ export const getFilterButtons = (): InputFilter[] => {
     input = new InputFilter();
     input.label = 'Em andamento';
     input.queryParam = { name: 'status', value: ProjectStatusEnumDTO2.IN_PROGRESS };
+    inputs.push(input);
+
+    input = new InputFilter();
+    input.label = 'Concluído';
+    input.queryParam = { name: 'status', value: ProjectStatusEnumDTO2.COMPLETED };
+    inputs.push(input);
+
+    input = new InputFilter();
+    input.label = 'Cancelado';
+    input.queryParam = { name: 'status', value: ProjectStatusEnumDTO2.CANCELLED };
     inputs.push(input);
 
     return inputs;

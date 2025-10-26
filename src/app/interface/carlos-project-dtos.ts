@@ -37,7 +37,7 @@ export interface ProjectReadDTO {
 export enum PortfolioProjectTableRowProjectStatus {
     IN_ANALYSIS = 'EM ANÁLISE',
     IN_PROGRESS = 'EM ANDAMENTO',
-    COMPLETED = 'FINALIZADO',
+    COMPLETED = 'CONCLUÍDO',
     CANCELLED = 'CANCELADO'
 }
 
