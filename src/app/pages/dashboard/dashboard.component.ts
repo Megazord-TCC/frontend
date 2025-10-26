@@ -328,7 +328,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
               callbacks: {
                 label: function(context: any) {
                   const label = context.dataset.label || '';
-                  return `${label}: Payback ${context.parsed.x} meses, Alinhamento ${context.parsed.y}`;
+                  return `${label}: Payback ${context.parsed.x} anos, Alinhamento ${context.parsed.y}`;
                 }
               }
             }
@@ -549,12 +549,12 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       }
   }
   getOccurrencesSolvedCount(risk: RiskReadDTO): number {
-    if (!risk.occurrences) return 0;
-    return risk.occurrences.filter(o => o.status === RiskOccurrenceStatusEnum.SOLVED).length;
+    if (!risk.occurrences || risk.occurrences.length === 0) return 0;
+    return risk.occurrences.filter(o => o.solvedAt !== null).length;
   }
 
   getOccurrencesNotSolvedCount(risk: RiskReadDTO): number {
-    if (!risk.occurrences) return 0;
-    return risk.occurrences.filter(o => o.status === RiskOccurrenceStatusEnum.NOT_SOLVED).length;
+    if (!risk.occurrences || risk.occurrences.length === 0) return 0;
+    return risk.occurrences.filter(o => o.solvedAt === null).length;
   }
 }
