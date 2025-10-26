@@ -178,7 +178,11 @@
             [size]="14">
           </app-svg-icon>
           <span>Acompanhamento dos riscos</span>
-          <app-badge class="risk-badge">4 ocorrências</app-badge>
+          <app-badge [color]="risksOccurrencesUnsolvedCount == 0 ? 'green' : 'red'" class="risk-badge">
+            {{risksOccurrencesUnsolvedCount}} 
+            ocorrência{{risksOccurrencesUnsolvedCount != 1 ? 's' : ''}} 
+            não resolvida{{risksOccurrencesUnsolvedCount != 1 ? 's' : ''}} 
+          </app-badge>
         </div>
       </button>
       <div class="section-content" *ngIf="isSectionExpanded('risks')">

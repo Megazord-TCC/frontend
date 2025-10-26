@@ -60,6 +60,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   risks: RiskReadDTO[] = [];
+  risksOccurrencesUnsolvedCount: number = 0;
   portfolioDetails: PortfolioReadDTO | null = null;
   projetos: ProjectReadDTO2[] = [];
 
@@ -116,6 +117,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     if (portfolioId) {
       this.portfolioService.getPortfolioAnalytics(portfolioId).subscribe(details => {
         this.risks = details.risks;
+        this.risksOccurrencesUnsolvedCount = this.risks.flatMap(r => r.occurrences).filter(o => !o.solvedAt).length;
         console.log('Risks loaded:', this.risks);
         console.log(details);
       });
