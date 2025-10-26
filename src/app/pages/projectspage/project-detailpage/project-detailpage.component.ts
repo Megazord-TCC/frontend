@@ -152,9 +152,11 @@ export class ProjectDetailpageComponent implements OnInit {
   }
 
   get progress(): string {
-    if (!this.project || this.project.plannedValue === 0) return '0%';
-    const progress = (this.project.earnedValue / this.project.plannedValue) * 100;
-    return `${progress.toFixed(1)}%`;
+    // if (!this.project || this.project.plannedValue === 0) return '0%';
+    // const progress = (this.project.earnedValue / this.project.plannedValue) * 100;
+    // return `${progress.toFixed(1)}%`;
+
+    return this.project?.percentComplete ? `${this.project.percentComplete.toFixed(1)}%` : '0%';
   }
 
   get eac(): string {
