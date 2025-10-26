@@ -66,7 +66,7 @@ export const mapProjectStatusEnumToText = (projectStatusEnum: any): string => {
     switch(projectStatusEnum) {
         case 'IN_ANALYSIS': return 'EM ANÁLISE';
         case 'IN_PROGRESS': return 'EM ANDAMENTO';
-        case 'COMPLETED': return 'FINALIZADO';
+        case 'COMPLETED': return 'CONCLUÍDO';
         case 'CANCELLED': return 'CANCELADO';
         default: return 'ERRO';
     }
