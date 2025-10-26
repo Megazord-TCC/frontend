@@ -94,7 +94,7 @@ export class RiskOccurrenceEditModalComponent {
             this.inputOccurrenceDate,
             this.inputOccurrenceDescription,
             this.inputIsResolutionSameAsContingencyPlan,
-            this.inputResolutionDescription.trim(),
+            this.inputResolutionDescription?.trim(),
             this.inputIsOccurrenceResolved ? this.inputResolutionDate : undefined
         ).subscribe({
             next: _ => this.edit.emit(),
@@ -140,10 +140,10 @@ export class RiskOccurrenceEditModalComponent {
     }
 
     onIsResolutionSameAsContingencyPlanChange() {
-        if (this.inputIsResolutionSameAsContingencyPlan && !this.inputResolutionDescription.trim())
+        if (this.inputIsResolutionSameAsContingencyPlan && !this.inputResolutionDescription?.trim())
             this.inputResolutionDescription = this.riskContingencyPlan;
 
-        if (!this.inputIsResolutionSameAsContingencyPlan && this.inputResolutionDescription.trim() == this.riskContingencyPlan)
+        if (!this.inputIsResolutionSameAsContingencyPlan && this.inputResolutionDescription?.trim() == this.riskContingencyPlan)
             this.inputResolutionDescription = '';
     }
 }
