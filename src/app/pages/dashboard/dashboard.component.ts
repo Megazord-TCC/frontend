@@ -195,9 +195,14 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
-      const labels = this.projetos.slice(0,3).map(p => p.name);
-      const plannedValues = this.projetos.slice(0,3).map(p => p.plannedValue ?? 0);
-      const earnedValues = this.projetos.slice(0,3).map(p => p.earnedValue ?? 0);
+      // Pegar os 3 projetos com maior valor planejado
+      const top3ProjectsByPlannedValue = [...this.projetos]
+        .sort((a, b) => (b.plannedValue ?? 0) - (a.plannedValue ?? 0))
+        .slice(0, 3);
+
+      const labels = top3ProjectsByPlannedValue.map(p => p.name);
+      const plannedValues = top3ProjectsByPlannedValue.map(p => p.plannedValue ?? 0);
+      const earnedValues = top3ProjectsByPlannedValue.map(p => p.earnedValue ?? 0);
 
 
       this.costChart = new Chart(ctx, {
@@ -228,6 +233,18 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
             legend: {
               display: true,
               position: 'top'
+            },
+            title: {
+              display: true,
+              text: 'Exibindo os 3 projetos com maior Valor Planejado',
+              font: {
+                size: 12,
+                weight: 'normal'
+              },
+              color: '#64748b',
+              padding: {
+                bottom: 10
+              }
             }
           },
           scales: {
@@ -267,17 +284,17 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
      * return minSize + 0 * (maxSize - minSize);
      * Ou seja:
      * return 5       + 0 * (60      - 5      ) = 5
-     * 
+     *
      * MAIOR BOLHA POSSÍVEL
      * return minSize + 1 * (maxSize - minSize);
      * Ou seja:
      * return 5       + 1 * (60      - 5      ) = 60
-     * 
+     *
      * BOLHA INTERMEDIÁRIA
      * Precisamos que o valor que mudou entre a MAIOR e MENOR BOLHA POSSÍVEL varie entre 0 e 1, então fazemos:
      * (currentRoi / maxRoi)
      * Assim, se currentRoi for metade de maxRoi, teremos 0.5
-     * 
+     *
      * Dessa maneira, garantimos um tamanho mínimo de bolha, um tamanho máximo, e um tamanho proporcional ao ROI do projeto:
      * return minSize + ((currentRoi / maxRoi)) * (maxSize - minSize);
      */
@@ -323,7 +340,12 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
-      const projetos = this.projetos.slice(0, 3);
+      // Pegar os 3 projetos com maior alinhamento estratégico
+      const top3ProjectsByAlignment = [...this.projetos]
+        .sort((a, b) => (b.scenarioRankingScore ?? 0) - (a.scenarioRankingScore ?? 0))
+        .slice(0, 3);
+
+      const projetos = top3ProjectsByAlignment;
       const colors = [
         { bg: 'rgba(255, 99, 132, 0.6)', border: 'rgba(255, 99, 132, 1)' },
         { bg: 'rgba(54, 162, 235, 0.6)', border: 'rgba(54, 162, 235, 1)' },
@@ -358,6 +380,18 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
             legend: {
               display: true,
               position: 'top'
+            },
+            title: {
+              display: true,
+              text: 'Exibindo os 3 projetos com maior Alinhamento Estratégico (tamanho da bolha = ROI)',
+              font: {
+                size: 12,
+                weight: 'normal'
+              },
+              color: '#64748b',
+              padding: {
+                bottom: 10
+              }
             },
             tooltip: {
               callbacks: {
@@ -438,7 +472,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
-      const threeBiggestRisks = this.risks
+      const threeBiggestRisks = [...this.risks]
         .sort((a, b) => (b.severity || 0) - (a.severity || 0))
         .slice(0, 3);
 
@@ -466,6 +500,18 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
             legend: {
               display: true,
               position: 'top'
+            },
+            title: {
+              display: true,
+              text: 'Exibindo os 3 riscos com maior severidade (tamanho da bolha = severidade)',
+              font: {
+                size: 12,
+                weight: 'normal'
+              },
+              color: '#64748b',
+              padding: {
+                bottom: 10
+              }
             },
             tooltip: {
               callbacks: {
