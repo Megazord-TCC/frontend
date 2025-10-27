@@ -254,6 +254,39 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  getProjectBubbleRadiusByProject(project: ProjectReadDTO2): number {
+    const allRois = this.projetos.map(p => p.roi || 0);
+    const allRoisAbsoluteValues = allRois.map(r => Math.abs(r)); // ROIs negativos tem que ter tamanho proporcional de bolha também.
+    const maxRoi = Math.max(...allRoisAbsoluteValues);
+    const minSize = 5;
+    const maxSize = 60;
+    const currentRoi = Math.abs(project.roi || 0);
+
+    /**
+     * MENOR BOLHA POSSÍVEL
+     * return minSize + 0 * (maxSize - minSize);
+     * Ou seja:
+     * return 5       + 0 * (60      - 5      ) = 5
+     * 
+     * MAIOR BOLHA POSSÍVEL
+     * return minSize + 1 * (maxSize - minSize);
+     * Ou seja:
+     * return 5       + 1 * (60      - 5      ) = 60
+     * 
+     * BOLHA INTERMEDIÁRIA
+     * Precisamos que o valor que mudou entre a MAIOR e MENOR BOLHA POSSÍVEL varie entre 0 e 1, então fazemos:
+     * (currentRoi / maxRoi)
+     * Assim, se currentRoi for metade de maxRoi, teremos 0.5
+     * 
+     * Dessa maneira, garantimos um tamanho mínimo de bolha, um tamanho máximo, e um tamanho proporcional ao ROI do projeto:
+     * return minSize + ((currentRoi / maxRoi)) * (maxSize - minSize);
+     */
+
+    if (maxRoi == 0) return minSize; // Evitar divisão por zero
+
+    return minSize + ((currentRoi / maxRoi)) * (maxSize - minSize);
+  }
+
   createProjectBubbleChart() {
     // Verificar se o elemento canvas existe e está acessível
     if (!this.projectBubbleChartRef || !this.projectBubbleChartRef.nativeElement) {
@@ -305,7 +338,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           data: [{
             x: p.payback ?? 0,
             y: p.scenarioRankingScore ?? 0,
-            r: Math.max(20, Math.min(60, Math.round((p.budgetAtCompletion ?? 0) / 1000)))
+            r: this.getProjectBubbleRadiusByProject(p)
           }],
           backgroundColor: backgroundColor,
           borderColor: colors[i % colors.length].border,
@@ -330,7 +363,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
               callbacks: {
                 label: function(context: any) {
                   const label = context.dataset.label || '';
-                  return `${label}: Payback ${context.parsed.x} anos, Alinhamento ${context.parsed.y}`;
+                  return `${label}: Payback ${context.parsed.x} anos, Alinhamento ${Math.trunc(context.parsed.y)}, ROI ${projetos[context.datasetIndex].roi ?? 0}%`;
                 }
               }
             }

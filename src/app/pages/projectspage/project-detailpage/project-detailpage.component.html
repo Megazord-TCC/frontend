@@ -19,7 +19,6 @@
             <div class="project-dates">
                 <span>Início planejado: {{project?.startDate}}</span>
                 <span>Fim planejado: {{project?.endDate}}</span>
-                <span *ngIf="project?.roi">ROI: {{project?.roi | number:'1.2-2'}}%</span>
             </div>
 
             <div *ngIf="project?.cancellationReason" class="project-dates">
@@ -68,7 +67,7 @@
                     <h3>Indicadores</h3>
                     <p class="tab-description">
                         <strong>Campos editáveis:</strong> Atualize os valores base do projeto (EV, PV, AC, BAC,
-                        Payback).<br>
+                        Payback e ROI).<br>
                         <strong>Campos calculados:</strong> São atualizados automaticamente com base nos valores
                         editáveis.
                     </p>
@@ -128,6 +127,17 @@
                                     placeholder="Digite o payback em anos">
                             </div>
                             <p class="last-update-text">Valor atual: {{payback || 0}} anos</p>
+                        </div>
+
+                        <!-- ROI -->
+                        <div class="indicator-item">
+                            <label>Retorno Sobre o Investimento (ROI) em 5 anos - Editável</label>
+                            <div class="indicator-input-group">
+                                <input type="number" [(ngModel)]="roi" (ngModelChange)="onInputChange()"
+                                    class="indicator-input" step="0.01" min="0" [value]="roi || 0"
+                                    placeholder="Digite o retorno sobre o investimento">
+                            </div>
+                            <p class="last-update-text">Valor atual: {{roi || 0}}%</p>
                         </div>
 
                     </div>

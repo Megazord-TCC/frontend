@@ -216,7 +216,8 @@ export class ProjectDetailpageComponent implements OnInit {
       budgetAtCompletion: this.budgetAtCompletion,
       payback: this.payback,
       startDate: this.project.startDate,
-      endDate: this.project.endDate
+      endDate: this.project.endDate,
+      roi: this.roi
     };
 
     console.log('Dados do projeto a serem salvos:', updatedProject);
