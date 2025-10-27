@@ -14,6 +14,7 @@ import { AllocationRequestCreateDTO, AllocationRequestReadDTO, AllocationRequest
 import { Project } from '../../interface/interfacies';
 import { ProjetoService } from '../../service/projeto.service';
 import { AllocationService } from '../../service/allocation.service';
+import { ResourceStatusEnum } from '../../interface/resources-interface';
 
 
 @Component({
@@ -144,7 +145,9 @@ export class ResourcesAllocationCreateComponent {
         console.log("resources", resources);
           this.collaboratorOptions = [
               { id: '', name: 'Selecione um colaborador' },
-              ...resources.map(r => ({ id: r.id, name: r.name }))
+              ...resources
+                .filter(r => r.status == ResourceStatusEnum.ACTIVE)
+                .map(r => ({ id: r.id, name: r.name }))
           ];
       },
       error: () => {
