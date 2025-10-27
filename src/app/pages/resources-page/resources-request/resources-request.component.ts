@@ -108,7 +108,7 @@ export class ResourcesRequestComponent implements OnInit {
       this.tableComponent.refresh();
   }
   openResource(event: any): void {
-    if (this.isPMO) {
+
       if (event.status === 'CANCELADO') {
         Swal.fire({
           title: 'Ação não permitida',
@@ -122,12 +122,11 @@ export class ResourcesRequestComponent implements OnInit {
       this.selectedAllocationRequestId = event.id;
       this.showAllocationModal = true;
 
-    }
   }
 
   handleMainColumnClick(event: any): void {
-    if (this.isPMO) {
-      this.openResource(event);
-    }
+
+    this.openResource(event);
+
   }
 }

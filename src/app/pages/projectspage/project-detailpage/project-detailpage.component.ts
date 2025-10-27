@@ -307,7 +307,7 @@ export class ProjectDetailpageComponent implements OnInit {
           console.log('Detalhes do projeto:', projectDto);
           this.project = projectDto;
           this.syncFormValues();
-        
+
           this.breadcrumbService.setBreadcrumbs([
             { label: 'Início', url: '/inicio', isActive: false },
             { label: 'Projetos', url: '/projetos', isActive: false },

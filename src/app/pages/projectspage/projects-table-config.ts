@@ -53,7 +53,7 @@ export const getColumns = (): TableColumn[] => {
     columns.push(column);
 
     column = new TableColumn();
-    column.label = 'EV';
+    column.label = 'EV (R$)';
     column.order = 2;
     column.isSortable = true;
     column.frontendAttributeName = 'earnedValue';
@@ -61,7 +61,7 @@ export const getColumns = (): TableColumn[] => {
     columns.push(column);
 
     column = new TableColumn();
-    column.label = 'PV';
+    column.label = 'PV (R$)';
     column.order = 3;
     column.isSortable = true;
     column.frontendAttributeName = 'plannedValue';

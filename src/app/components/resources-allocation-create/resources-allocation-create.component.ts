@@ -15,6 +15,8 @@ import { Project } from '../../interface/interfacies';
 import { ProjetoService } from '../../service/projeto.service';
 import { AllocationService } from '../../service/allocation.service';
 import { ResourceStatusEnum } from '../../interface/resources-interface';
+import { AuthService } from '../../service/auth-service';
+import { Role } from '../../interface/carlos-auth-interfaces';
 
 
 @Component({
@@ -121,15 +123,18 @@ export class ResourcesAllocationCreateComponent {
   priority: PriorityEnum = PriorityEnum.LOW;
   isOpen = false;
   allocationRequestStatus: AllocationRequestStatusEnum | null = null;
-
+  readonly authService = inject(AuthService);
   errorMessage = '';
   isSubmitButtonDisabled = false;
   mouseDownOnOverlay = false;
   routeSubscription?: Subscription;
   buttonSaveText:string = 'Alocar recurso';
+  isPmo:boolean = false;
 
   ngOnInit() {
-
+    this.isPmo = this.authService.roleFrontend == Role.PMO || this.authService.roleFrontend == Role.PMO_ADM;
+    console.log("isPmo", this.isPmo);
+    console.log("roleFrontend", this.authService.roleFrontend);
     this.cargosService.getPositionsUnpaged().subscribe({
       next: (positions) => {
           this.positionOptions = positions;
@@ -176,6 +181,9 @@ export class ResourcesAllocationCreateComponent {
             } else if (this.allocationRequestStatus === AllocationRequestStatusEnum.ALLOCATED) {
               this.buttonSaveText = 'Atualizar alocação';
             }
+            if (this.allocationRequestStatus === AllocationRequestStatusEnum.IN_ANALYSIS && !this.isPmo) {
+              this.buttonSaveText = 'Reenviar pedido';
+            }
         },
         error: () => {
             this.errorMessage = 'Erro ao carregar dados da solicitação.';
@@ -209,11 +217,13 @@ export class ResourcesAllocationCreateComponent {
         positionId: Number(this.selectedPosition),
         status: AllocationRequestStatusEnum.ALLOCATED,
     };
-    if(this.allocationRequestStatus === AllocationRequestStatusEnum.ALLOCATED){
+
+    if(this.allocationRequestStatus === AllocationRequestStatusEnum.IN_ANALYSIS && !this.isPmo){
 
 
       this.isSubmitButtonDisabled = true;
-      this.errorMessage = '';
+
+      allocationRequestDto.status = AllocationRequestStatusEnum.IN_ANALYSIS;
 
       // Se allocationRequestId, faz PUT antes do create
       if (this.allocationRequestId) {
@@ -231,7 +241,8 @@ export class ResourcesAllocationCreateComponent {
           });
         });
       }
-    } else if(this.allocationRequestStatus === AllocationRequestStatusEnum.IN_ANALYSIS){
+    }
+    if(this.allocationRequestStatus === AllocationRequestStatusEnum.IN_ANALYSIS && this.isPmo){
 
       // Monta DTO de criação de alocação
       const allocationDto = {
@@ -242,6 +253,26 @@ export class ResourcesAllocationCreateComponent {
         allocationRequestId: this.allocationRequestId
       };
       this.allocationService.create(allocationDto).subscribe({
+        next: () => {
+          this.clearForm();
+          this.close.emit();
+        },
+        error: (err) => {
+          this.errorMessage = 'Erro ao criar pedido de alocação.';
+          this.isSubmitButtonDisabled = false;
+        }
+      });
+    }
+    if(this.allocationRequestStatus === AllocationRequestStatusEnum.ALLOCATED && this.isPmo){
+      // Monta DTO de criação de alocação
+      const allocationDto = {
+        startDate: allocationRequestDto.startDate,
+        endDate: allocationRequestDto.endDate,
+        dailyHours: allocationRequestDto.dailyHours,
+        resourceId: this.selectedCollaborator,
+        allocationRequestId: this.allocationRequestId
+      };
+      this.allocationService.update(this.allocationRequestId, allocationDto).subscribe({
         next: () => {
           this.clearForm();
           this.close.emit();

@@ -1,5 +1,6 @@
 import { Page } from "../models/pagination-models";
 import { Project } from '../interface/interfacies';
+import { formatToBRL } from "../helpers/money-helper";
 
 // Mapper para converter o DTO do backend para o modelo Project
 export function mapProjectDtoToProject(dto: any): Project {
@@ -12,8 +13,8 @@ export function mapProjectDtoToProject(dto: any): Project {
     roi: dto.roi,
     startDate: dto.startDate,
     endDate: dto.endDate,
-    plannedValue: dto.plannedValue,
-    earnedValue: dto.earnedValue,
+    plannedValue: formatToBRL(dto.plannedValue),
+    earnedValue: formatToBRL(dto.earnedValue),
     actualCost: dto.actualCost,
     budgetAtCompletion: dto.budgetAtCompletion,
     percentComplete: dto.percentComplete,

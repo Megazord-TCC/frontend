@@ -44,7 +44,7 @@ export const getColumns = (isPMO: boolean = false): TableColumn[] => {
 	column.isSortable = true;
 	column.frontendAttributeName = 'cargoDesejado';
 	column.backendAttributeName = 'position.name';
-  column.isClickableMainColumn = isPMO;
+  column.isClickableMainColumn = true;
 	columns.push(column);
 
 	column = new TableColumn();

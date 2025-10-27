@@ -233,18 +233,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
             legend: {
               display: true,
               position: 'top'
-            },
-            title: {
-              display: true,
-              text: 'Exibindo os 3 projetos com maior Valor Planejado',
-              font: {
-                size: 12,
-                weight: 'normal'
-              },
-              color: '#64748b',
-              padding: {
-                bottom: 10
-              }
             }
           },
           scales: {
@@ -381,18 +369,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
               display: true,
               position: 'top'
             },
-            title: {
-              display: true,
-              text: 'Exibindo os 3 projetos com maior Alinhamento Estratégico (tamanho da bolha = ROI)',
-              font: {
-                size: 12,
-                weight: 'normal'
-              },
-              color: '#64748b',
-              padding: {
-                bottom: 10
-              }
-            },
             tooltip: {
               callbacks: {
                 label: function(context: any) {
@@ -500,18 +476,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
             legend: {
               display: true,
               position: 'top'
-            },
-            title: {
-              display: true,
-              text: 'Exibindo os 3 riscos com maior severidade (tamanho da bolha = severidade)',
-              font: {
-                size: 12,
-                weight: 'normal'
-              },
-              color: '#64748b',
-              padding: {
-                bottom: 10
-              }
             },
             tooltip: {
               callbacks: {

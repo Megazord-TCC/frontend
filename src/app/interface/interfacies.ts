@@ -155,8 +155,8 @@ export interface Project {
   roi: number;
   startDate: string; // dd/MM/yyyy
   endDate: string;   // dd/MM/yyyy
-  plannedValue: number;
-  earnedValue: number;
+  plannedValue: any;
+  earnedValue: any;
   actualCost: number;
   budgetAtCompletion: number;
   percentComplete: number;

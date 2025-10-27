@@ -19,30 +19,24 @@
     </div>
     <div class="format-selector">
 
-      <span>Formato:</span>
+      <span>Extrair:</span>
       <img
         src="assets/pdf.png"
         alt="PDF"
-        [style.opacity]="selectedFormatry === 'pdf' ? '1' : '0.5'"
         [style.cursor]="'pointer'"
         [style.width.px]="26"
         [style.height.px]="26"
         [style.margin]="'0 8px'"
-        (click)="selectedFormatry = 'pdf'">
+        (click)="downloadFile('pdf')">
       <img
         src="assets/excel.png"
         alt="Excel"
-        [style.opacity]="selectedFormatry === 'excel' ? '1' : '0.5'"
         [style.cursor]="'pointer'"
         [style.width.px]="26"
         [style.height.px]="26"
         [style.margin]="'0 8px'"
-        (click)="selectedFormatry = 'excel'">
-      <button
-        class="add-format-btn"
-        (click)="downloadFile(selectedFormatry)">
-        Extrair relatório
-      </button>
+        (click)="downloadFile('excel')">
+
 
     </div>
 
@@ -179,9 +173,9 @@
           </app-svg-icon>
           <span>Acompanhamento dos riscos</span>
           <app-badge [color]="risksOccurrencesUnsolvedCount == 0 ? 'green' : 'red'" class="risk-badge">
-            {{risksOccurrencesUnsolvedCount}} 
-            ocorrência{{risksOccurrencesUnsolvedCount != 1 ? 's' : ''}} 
-            não resolvida{{risksOccurrencesUnsolvedCount != 1 ? 's' : ''}} 
+            {{risksOccurrencesUnsolvedCount}}
+            ocorrência{{risksOccurrencesUnsolvedCount != 1 ? 's' : ''}}
+            não resolvida{{risksOccurrencesUnsolvedCount != 1 ? 's' : ''}}
           </app-badge>
         </div>
       </button>
@@ -256,6 +250,9 @@
         <div class="chart-container">
           <canvas #costChart></canvas>
         </div>
+        <div class="chart-description">
+          <p>Exibindo os 3 projetos com maior Valor Planejado</p>
+        </div>
       </app-card>
 
       <app-card class="chart-card">
@@ -264,7 +261,7 @@
           <canvas #projectBubbleChart></canvas>
         </div>
         <div class="chart-description">
-          <p>O tamanho da bolha indica o ROI em 5 anos. Bolhas brancas indicam ROI negativo.</p>
+          <p>Exibindo os 3 projetos com maior Alinhamento Estratégico (Bolhas brancas indicam ROI negativo)</p>
         </div>
       </app-card>
 
@@ -274,7 +271,7 @@
           <canvas #riskBubbleChart></canvas>
         </div>
         <div class="chart-description">
-          <p>O tamanho da bolha representa a severidade do risco. São exibidos no máximo 3 riscos.</p>
+          <p>Exibindo os 3 riscos com maior severidade (tamanho da bolha = severidade)</p>
         </div>
       </app-card>
     </div>
