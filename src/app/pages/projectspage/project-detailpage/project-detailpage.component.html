@@ -66,13 +66,60 @@
                 <div *ngIf="activeTab === 'indicadores'" class="tab-panel">
                     <h3>Indicadores</h3>
                     <p class="tab-description">
-                        <strong>Campos editáveis:</strong> Atualize os valores base do projeto (EV, PV, AC, BAC,
-                        Payback e ROI).<br>
+                        
                         <strong>Campos calculados:</strong> São atualizados automaticamente com base nos valores
                         editáveis.
                     </p>
+                    <div class="strategic-links">
+                        <!-- CPI -->
+                        <div class="link-item">
 
+                            <div class="link-info">
+                                <span class="link-title">{{cpi}}</span>
+                                <span class="link-subtitle">CPI (EV ÷ AC)</span>
+                            </div>
+                        </div>
 
+                        <!-- SPI -->
+                        <div class="link-item">
+
+                            <div class="link-info">
+                                <span class="link-title">{{spi}}</span>
+                                <span class="link-subtitle">SPI (EV ÷ PV)</span>
+                            </div>
+                        </div>
+
+                        <!-- Progresso -->
+                        <div class="link-item">
+
+                            <div class="link-info">
+                                <span class="link-title">{{progress}}</span>
+                                <span class="link-subtitle">Progresso (%)</span>
+                            </div>
+                        </div>
+
+                        <!-- EAC -->
+                        <div class="link-item">
+
+                            <div class="link-info">
+                                <span class="link-title">{{eac}}</span>
+                                <span class="link-subtitle">EAC (BAC ÷ CPI)</span>
+                            </div>
+                        </div>
+
+                        <!-- ETC -->
+                        <div class="link-item">
+
+                            <div class="link-info">
+                                <span class="link-title">{{etc}}</span>
+                                <span class="link-subtitle">ETC (EAC - AC)</span>
+                            </div>
+                        </div>
+                    </div>
+                     <p class="tab-description">
+                        <strong>Campos editáveis:</strong> Atualize os valores base do projeto (EV, PV, AC, BAC,
+                        Payback e ROI).
+                    </p>
                     <div class="indicators-grid">
                         <!-- Valor Agregado (EV) -->
                         <div class="indicator-item">
@@ -147,52 +194,7 @@
                         </app-svg-icon>
                         Salvar indicadores
                     </button>
-                    <div class="strategic-links">
-                        <!-- CPI -->
-                        <div class="link-item">
 
-                            <div class="link-info">
-                                <span class="link-title">{{cpi}}</span>
-                                <span class="link-subtitle">CPI (EV ÷ AC)</span>
-                            </div>
-                        </div>
-
-                        <!-- SPI -->
-                        <div class="link-item">
-
-                            <div class="link-info">
-                                <span class="link-title">{{spi}}</span>
-                                <span class="link-subtitle">SPI (EV ÷ PV)</span>
-                            </div>
-                        </div>
-
-                        <!-- Progresso -->
-                        <div class="link-item">
-
-                            <div class="link-info">
-                                <span class="link-title">{{progress}}</span>
-                                <span class="link-subtitle">Progresso (%)</span>
-                            </div>
-                        </div>
-
-                        <!-- EAC -->
-                        <div class="link-item">
-
-                            <div class="link-info">
-                                <span class="link-title">{{eac}}</span>
-                                <span class="link-subtitle">EAC (BAC ÷ CPI)</span>
-                            </div>
-                        </div>
-
-                        <!-- ETC -->
-                        <div class="link-item">
-
-                            <div class="link-info">
-                                <span class="link-title">{{etc}}</span>
-                                <span class="link-subtitle">ETC (EAC - AC)</span>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Vínculo Estratégico Tab -->

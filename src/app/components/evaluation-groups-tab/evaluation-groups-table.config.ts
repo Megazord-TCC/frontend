@@ -35,7 +35,7 @@ export const getEvaluationColumns = (): TableColumn[] => {
 export const getEvaluationFilterText = (): InputFilter => {
   let input = new InputFilter();
   input.label = 'Buscar pelo nome da avaliação';
-  input.queryParam = { name: 'evaluationName', value: '' };
+  input.queryParam = { name: 'searchQuery', value: '' };
   return input;
 };
 
