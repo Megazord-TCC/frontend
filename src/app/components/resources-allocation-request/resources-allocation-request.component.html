@@ -31,6 +31,7 @@
                             {{ option.name }}
                         </option>
                     </select>
+                    <p class="info-text">Somente projetos em andamento estão disponíveis para seleção.</p>
                 </div>
                 <div class="form-group">
                     <label>Cargo desejado<span class="required-asterisk">*</span></label>
@@ -40,10 +41,11 @@
                             {{ option.name }}
                         </option>
                     </select>
+                    <p class="info-text">Somente cargos ativos estão disponíveis para seleção.</p>
                 </div>
 
                 <div class="form-group">
-                  <label>Horas/dia contrato<span class="required-asterisk">*</span></label>
+                  <label>Horas/dia<span class="required-asterisk">*</span></label>
                   <div class="custom-select-wrapper">
                       <div class="custom-select" (click)="toggleDropdown()" (keydown)="onCustomSelectKeyDown($event)">
                           {{ selectedHours || 'Selecione...' }}
@@ -84,7 +86,7 @@
         <!-- Footer -->
         <div class="modal-footer">
             <button class="btn-outline" (click)="onCancel()">Cancelar</button>
-            <button class="btn-primary" (click)="onSave()" [disabled]="isSubmitButtonDisabled">Alocar recurso</button>
+            <button class="btn-primary" (click)="onSave()" [disabled]="isSubmitButtonDisabled">Pedir recurso</button>
         </div>
     </div>
 </div>

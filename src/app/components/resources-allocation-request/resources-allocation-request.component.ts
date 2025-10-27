@@ -8,7 +8,7 @@ import { CarlosPortfolioRisksService } from '../../service/carlos-portfolio-risk
 import { Subscription } from 'rxjs';
 import { ResourcesService } from '../../service/resources.service';
 import { CargosService } from '../../service/cargos.service';
-import { PositionReadDTO } from '../../interface/cargos-interfaces';
+import { PositionReadDTO, PositionStatusEnum } from '../../interface/cargos-interfaces';
 import { AllocationRequestService } from '../../service/allocation-request.service';
 import { PriorityEnum } from '../../interface/allocation-request-interfaces';
 import { Project } from '../../interface/interfacies';
@@ -100,7 +100,7 @@ export class ResourcesAllocationRequestComponent {
   ngOnInit() {
     this.cargosService.getPositionsUnpaged().subscribe({
             next: (positions) => {
-                this.positionOptions = positions;
+                this.positionOptions = positions.filter(p => p.status == PositionStatusEnum.ACTIVE);
             },
             error: () => {
                 this.positionOptions = [];
@@ -108,7 +108,7 @@ export class ResourcesAllocationRequestComponent {
         });
     this.projectService.getProjectsUnpaged().subscribe({
         next: (projects) => {
-            this.projectOptions = projects;
+            this.projectOptions = projects.filter(p => p.status == 'IN_PROGRESS');
         },
         error: () => {
             this.projectOptions = [];
