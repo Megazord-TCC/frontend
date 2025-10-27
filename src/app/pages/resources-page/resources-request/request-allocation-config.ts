@@ -39,7 +39,7 @@ export const getColumns = (isPMO: boolean = false): TableColumn[] => {
 	let column: TableColumn;
 
 	column = new TableColumn();
-	column.label = 'Cargo desejado';
+	column.label = 'Cargo';
 	column.order = 1;
 	column.isSortable = true;
 	column.frontendAttributeName = 'cargoDesejado';

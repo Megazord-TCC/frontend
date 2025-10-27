@@ -7,6 +7,10 @@ $border-color: #e2e8f0;
 $primary-color: #1e293b;
 $blue-color: #3b82f6;
 
+.no-margin-bottom {
+    margin-bottom: 0px !important;
+}
+
 .resources-layout {
   display: flex;
   min-height: 100vh;

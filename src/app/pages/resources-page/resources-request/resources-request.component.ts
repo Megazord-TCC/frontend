@@ -27,10 +27,11 @@ import Swal from 'sweetalert2';
   styleUrl: './resources-request.component.scss'
 })
 export class ResourcesRequestComponent implements OnInit {
-  private readonly authService = inject(AuthService);
+  readonly authService = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
   private readonly allocationRequestService = inject(AllocationRequestService);
   private readonly router = inject(Router);
+  role = Role;
   isPMO = false;
   isProjectManager = false;
   selectedAllocationRequestId: number = 0;

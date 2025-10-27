@@ -3,7 +3,12 @@
   <div class="resources-content">
 
     <h1>Pedidos de recursos</h1>
-    <p class="description">Listagem de recursos solicitados para projetos. Clique em um item da coluna Cargo desejado para alocar, editar ou rejeitar o pedido.</p>
+    <p class="description" [ngClass]="{ 'no-margin-bottom': authService.roleFrontend != role.PROJECT_MANAGER  }">
+        Listagem de recursos solicitados para projetos.
+    </p>
+    <p *ngIf="authService.roleFrontend != role.PROJECT_MANAGER" class="description">
+        Clique em um item da coluna <b>Cargo</b> para gerenciar o pedido ou alocação.
+    </p>
   <app-table
         #tableComponent
         [dataRetrievalMethodRef]="this.getDataForTableComponent"
