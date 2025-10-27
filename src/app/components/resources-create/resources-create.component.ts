@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ResourcesService } from '../../service/resources.service';
 import { ResourceCreateDTO } from '../../interface/resources-interface';
 import { CargosService } from '../../service/cargos.service';
-import { PositionReadDTO } from '../../interface/cargos-interfaces';
+import { PositionReadDTO, PositionStatusEnum } from '../../interface/cargos-interfaces';
 
 @Component({
     selector: 'app-resources-create',
@@ -42,7 +42,7 @@ export class ResourcesCreateComponent {
     ngOnInit() {
         this.cargosService.getPositionsUnpaged().subscribe({
             next: (positions) => {
-                this.positionOptions = positions;
+                this.positionOptions = positions.filter(p => p.status == PositionStatusEnum.ACTIVE);
             },
             error: () => {
                 this.positionOptions = [];

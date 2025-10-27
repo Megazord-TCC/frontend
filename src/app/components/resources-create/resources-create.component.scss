@@ -1,3 +1,10 @@
+.info-text {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: -2px;
+    margin-bottom: 0px;
+    line-height: 1.4;
+}
 
 .custom-select-wrapper {
     position: relative;
@@ -137,7 +144,7 @@
 .form-fields {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 24px;
 
     &.disabled {
         opacity: 0.6;
@@ -149,7 +156,6 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
-    max-height: 60px;
 
     label {
         font-size: 14px;

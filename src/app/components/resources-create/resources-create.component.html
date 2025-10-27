@@ -26,7 +26,10 @@
 
               <div class="form-group">
                 <label>Descrição</label>
-                <textarea [(ngModel)]="description" [disabled]="isSubmitButtonDisabled" placeholder="Digite a descrição do recurso"></textarea>
+                <textarea [(ngModel)]="description" 
+                    style="font-family: inherit; border-radius: 6px; height: 96px;"
+                    [disabled]="isSubmitButtonDisabled" 
+                    placeholder="Digite a descrição do recurso"></textarea>
               </div>
 
               <div class="form-group">
@@ -53,6 +56,7 @@
                           {{ option.name }}
                       </option>
                   </select>
+                  <p class="info-text">Somente cargos ativos estão disponíveis para seleção.</p>
               </div>
             </div>
         </div>
