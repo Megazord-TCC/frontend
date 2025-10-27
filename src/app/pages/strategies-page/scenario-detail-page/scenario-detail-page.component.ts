@@ -293,7 +293,20 @@ export class ScenarioDetailPageComponent {
             .pipe(
                 debounceTime(1000), // espera 500ms após o último keydown
                 tap(_ => this.updateScenarioBudgetByHttpRequest().subscribe(
-                    _ => this.tableComponent?.sendHttpGetRequestAndPopulateTable()
+                    _ => {
+                        this.tableComponent?.sendHttpGetRequestAndPopulateTable();
+
+                        // Xunxo pra atualizar as somas dos orçamentos quando o usuário mexe no orçamento
+                        setTimeout(() => {
+                            this.scenarioService.getScenarioById(this.strategyId, this.scenarioId).subscribe(
+                                scenario => {
+                                    this.allProjectsBudget = formatToBRL(this.calculateAllProjectsBudget(scenario));
+                                    this.allIncludedProjectsBudget = formatToBRL(this.calculateAllIncludedProjectsBudget(scenario));
+                                }
+                            )
+                        }, 1000);
+                    }
+
                 ))
             )
             .subscribe();
