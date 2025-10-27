@@ -43,7 +43,7 @@ export const getColumns = (isPMO: boolean = false): TableColumn[] => {
 	column.order = 1;
 	column.isSortable = true;
 	column.frontendAttributeName = 'cargoDesejado';
-	column.backendAttributeName = 'cargo';
+	column.backendAttributeName = 'position.name';
   column.isClickableMainColumn = isPMO;
 	columns.push(column);
 
@@ -68,7 +68,7 @@ export const getColumns = (isPMO: boolean = false): TableColumn[] => {
 	column.order = 4;
 	column.isSortable = true;
 	column.frontendAttributeName = 'solicitante';
-	column.backendAttributeName = 'requester.name';
+	column.backendAttributeName = 'createdBy';
 	columns.push(column);
 
 	column = new TableColumn();
