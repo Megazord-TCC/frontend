@@ -26,7 +26,7 @@
             <div class="form-fields" [ngClass]="{'disabled': isSubmitButtonDisabled}">
                   <div class="form-group">
                     <label>Cargo desejado<span class="required-asterisk">*</span></label>
-                    <select [(ngModel)]="selectedPosition" [disabled]="isSubmitButtonDisabled">
+                    <select [(ngModel)]="selectedPosition" [disabled]="true">
                         <option [value]="0" disabled selected>Selecione...</option>
                         <option *ngFor="let option of positionOptions" [ngValue]="option.id">
                             {{ option.name }}
@@ -88,7 +88,7 @@
         <div class="modal-footer">
             <button class="btn-outline" (click)="onCancel()">Fechar</button>
             <button class="btn-danger" (click)="onReject()" [disabled]="isSubmitButtonDisabled">Cancelar pedido</button>
-            <button class="btn-primary" (click)="onSave()" [disabled]="isSubmitButtonDisabled">Alocar recurso</button>
+            <button class="btn-primary" (click)="onSave()" [disabled]="isSubmitButtonDisabled">{{buttonSaveText}}</button>
         </div>
     </div>
 </div>

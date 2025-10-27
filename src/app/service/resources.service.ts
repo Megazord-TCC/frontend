@@ -32,9 +32,13 @@ export class ResourcesService {
   updateResource(resourceId: number, dto: ResourceUpdateDTO): Observable<ResourceReadDTO> {
     return this.http.put<ResourceReadDTO>(`${this.getResourceUrl()}/${resourceId}`, dto, { headers: this.getHeaders() });
   }
+  // UPDATE
+  disableResource(resourceId: number): Observable<ResourceReadDTO> {
+    return this.http.patch<ResourceReadDTO>(`${this.getResourceUrl()}/${resourceId}/inactivate`, { headers: this.getHeaders() });
+  }
 
   // DELETE (disable)
-  disableResource(resourceId: number): Observable<void> {
+  deleteNotHardResource(resourceId: number): Observable<void> {
     return this.http.delete<void>(`${this.getResourceUrl()}/${resourceId}`, { headers: this.getHeaders() });
   }
 

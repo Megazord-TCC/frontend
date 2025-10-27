@@ -119,11 +119,13 @@ export class ResourcesAllocationCreateComponent {
   endDate: string = '';
   priority: PriorityEnum = PriorityEnum.LOW;
   isOpen = false;
+  allocationRequestStatus: AllocationRequestStatusEnum | null = null;
 
   errorMessage = '';
   isSubmitButtonDisabled = false;
   mouseDownOnOverlay = false;
   routeSubscription?: Subscription;
+  buttonSaveText:string = 'Alocar recurso';
 
   ngOnInit() {
 
@@ -164,6 +166,13 @@ export class ResourcesAllocationCreateComponent {
             this.priority = data.priority ?? PriorityEnum.LOW;
             this.projectName = data.project?.name ?? '';
             this.requesterName = data.createdBy ?? '';
+            this.allocationRequestStatus = data.status;
+            console.log("allocation request status", this.allocationRequestStatus);
+            if(this.allocationRequestStatus === AllocationRequestStatusEnum.IN_ANALYSIS){
+              this.buttonSaveText = 'Alocar recurso';
+            } else if (this.allocationRequestStatus === AllocationRequestStatusEnum.ALLOCATED) {
+              this.buttonSaveText = 'Atualizar alocação';
+            }
         },
         error: () => {
             this.errorMessage = 'Erro ao carregar dados da solicitação.';
@@ -188,7 +197,6 @@ export class ResourcesAllocationCreateComponent {
   async onSave(): Promise<any> {
     let isFormValid = this.isFormValid();
     if (!isFormValid) return;
-
     // Monta DTO para PUT da allocation request
     const allocationRequestDto = {
         startDate: this.formatDateToDDMMYYYY(this.startDate),
@@ -198,42 +206,49 @@ export class ResourcesAllocationCreateComponent {
         positionId: Number(this.selectedPosition),
         status: AllocationRequestStatusEnum.ALLOCATED,
     };
+    if(this.allocationRequestStatus === AllocationRequestStatusEnum.ALLOCATED){
 
-    this.isSubmitButtonDisabled = true;
-    this.errorMessage = '';
 
-    // Se allocationRequestId, faz PUT antes do create
-    if (this.allocationRequestId) {
-      await new Promise<void>((resolve, reject) => {
-        this.allocationRequestService.update(this.allocationRequestId, allocationRequestDto).subscribe({
-          next: () => resolve(),
-          error: (err) => {
-              this.errorMessage = 'Erro ao atualizar solicitação.';
-              this.isSubmitButtonDisabled = false;
-              reject(err);
-          }
+      this.isSubmitButtonDisabled = true;
+      this.errorMessage = '';
+
+      // Se allocationRequestId, faz PUT antes do create
+      if (this.allocationRequestId) {
+        await new Promise<void>((resolve, reject) => {
+          this.allocationRequestService.update(this.allocationRequestId, allocationRequestDto).subscribe({
+            next: () => {
+              this.clearForm();
+              this.close.emit();
+            },
+            error: (err) => {
+                this.errorMessage = 'Erro ao atualizar solicitação.';
+                this.isSubmitButtonDisabled = false;
+                reject(err);
+            }
+          });
         });
+      }
+    } else if(this.allocationRequestStatus === AllocationRequestStatusEnum.IN_ANALYSIS){
+
+      // Monta DTO de criação de alocação
+      const allocationDto = {
+        startDate: allocationRequestDto.startDate,
+        endDate: allocationRequestDto.endDate,
+        dailyHours: allocationRequestDto.dailyHours,
+        resourceId: this.selectedCollaborator,
+        allocationRequestId: this.allocationRequestId
+      };
+      this.allocationService.create(allocationDto).subscribe({
+        next: () => {
+          this.clearForm();
+          this.close.emit();
+        },
+        error: (err) => {
+          this.errorMessage = 'Erro ao criar pedido de alocação.';
+          this.isSubmitButtonDisabled = false;
+        }
       });
     }
-
-    // Monta DTO de criação de alocação
-    const allocationDto = {
-      startDate: allocationRequestDto.startDate,
-      endDate: allocationRequestDto.endDate,
-      dailyHours: allocationRequestDto.dailyHours,
-      resourceId: this.selectedCollaborator,
-      allocationRequestId: this.allocationRequestId
-    };
-    this.allocationService.create(allocationDto).subscribe({
-      next: () => {
-        this.clearForm();
-        this.close.emit();
-      },
-      error: (err) => {
-        this.errorMessage = 'Erro ao criar pedido de alocação.';
-        this.isSubmitButtonDisabled = false;
-      }
-    });
   }
 
   onCancel(): void {
@@ -241,32 +256,12 @@ export class ResourcesAllocationCreateComponent {
   }
 
   async onReject(): Promise<any> {
-    // mudar status para cancelado
-    let isFormValid = this.isFormValid();
-    if (!isFormValid) return;
-
-    // Monta DTO para PUT da allocation request
-    const allocationRequestDto = {
-        startDate: this.formatDateToDDMMYYYY(this.startDate),
-        endDate: this.formatDateToDDMMYYYY(this.endDate),
-        dailyHours: Number(this.selectedHours),
-        priority: this.priority,
-        positionId: Number(this.selectedPosition),
-        projectId: Number(this.selectedProject),
-        collaboratorId: Number(this.selectedCollaborator),
-        status: AllocationRequestStatusEnum.CANCELLED
-    };
-
-    this.isSubmitButtonDisabled = true;
-    this.errorMessage = '';
-
-    // Se allocationRequestId, faz PUT antes do create
     if (this.allocationRequestId) {
       await new Promise<void>((resolve, reject) => {
-        this.allocationRequestService.update(this.allocationRequestId, allocationRequestDto).subscribe({
+        this.allocationRequestService.cancelRequest(this.allocationRequestId).subscribe({
           next: () => resolve(),
           error: (err) => {
-              this.errorMessage = 'Erro ao atualizar solicitação.';
+              this.errorMessage = 'Erro ao cancelar solicitação.';
               this.isSubmitButtonDisabled = false;
               reject(err);
           }

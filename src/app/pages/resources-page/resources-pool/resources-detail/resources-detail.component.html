@@ -13,6 +13,14 @@
       <p class="resource-description">{{this.resource?.description}}</p>
 
     </div>
+    <div class="header-actions">
+
+        <button class="btn-outline" (click)="openCancelModal()" >
+            <app-svg-icon class="nav-icon height-18" [path]="'assets/icon/cancel_vetor.svg'" [size]="18">
+            </app-svg-icon>
+            Cancelar recurso
+        </button>
+    </div>
 
     <div class="resource-pool-container">
       <h1>Contrato: </h1>
@@ -69,22 +77,14 @@
           </app-table>
         </div>
       </div>
-      <app-resources-create
-        *ngIf="showCreateModal"
-        (close)="closeCreateModal()">
-      </app-resources-create>
+
     </div>
 
 
   </div>
 
-  <!-- Form Modal -->
-  <app-form-modal-component
-    [isVisible]="showCreateModal"
-    [config]="createResourcesConfig"
-    (close)="closeCreateModal()"
-    (save)="onSaveProject($event)"
-    (cancel)="closeCreateModal()">
-  </app-form-modal-component>
 
+  <app-form-modal-component [isVisible]="showCancelModal" [config]="cancelProjectConfig"
+    (close)="closeCancelModal()" (save)="onCancelResource()" (cancel)="closeCancelModal()">
+  </app-form-modal-component>
 </div>

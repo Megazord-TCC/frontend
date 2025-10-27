@@ -26,6 +26,7 @@ import { get } from 'http';
 import { AllocationRequestService } from '../../../../service/allocation-request.service';
 import { mapAllocationReadDTOPageToTableRowPage } from '../../../../mappers/allocation-mappers';
 import { ProjetoService } from '../../../../service/projeto.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-resources-detail',
@@ -83,6 +84,10 @@ export class ResourcesDetailComponent implements OnInit {
     ],
     validationMessage: 'Os campos marcados com * são obrigatórios.'
   };
+  cancelProjectConfig: FormModalConfig = {
+    title: 'Todas alocações não concluídas deste recurso também serão canceladas.Esta ação não é reversível.',
+    fields: []
+  };
   breadcrumbService = inject(BreadcrumbService);
   resourceService = inject(ResourcesService);
   allocationRequestService = inject(AllocationRequestService);
@@ -100,6 +105,7 @@ export class ResourcesDetailComponent implements OnInit {
   startDate: string;
   endDate: string;
   statusFilter = 'ACTIVE';
+  showCancelModal = false;
 
   columns = getColumns();
   filterButtons = getFilterButtons();
@@ -196,29 +202,7 @@ export class ResourcesDetailComponent implements OnInit {
     this.showCreateModal = true;
   }
 
-  closeCreateModal(): void {
-    this.showCreateModal = false;
-  }
 
-  onSaveProject(fields: FormField[]): void {
-    // Process form data
-    const projectData = fields.reduce((acc, field) => {
-      acc[field.id] = field.value;
-      return acc;
-    }, {} as any);
-
-    // this.projetoService.createProject(newProject).subscribe({
-    //   next: (createdProject) => {
-    //     console.log('Projeto criado:', createdProject);
-    //     this.loadResources();
-    //     this.resetNewProject();
-    //   },
-    //   error: (err) => {
-    //     console.error('Erro ao criar projeto:', err);
-    //   }
-    // });
-    this.closeCreateModal();
-  }
 
   goBack(): void {
     this.router.navigate(['/recursos']);
@@ -242,6 +226,56 @@ export class ResourcesDetailComponent implements OnInit {
       this.tableComponent.refresh();
     }
   }
+  openCancelModal(): void {
+
+    // this.showCancelModal = true;
+    const swalWithBootstrapButtons = Swal.mixin({
+      customClass: {
+        confirmButton: "btn btn-success",
+        cancelButton: "btn btn-danger"
+      },
+      buttonsStyling: false
+    });
+    swalWithBootstrapButtons.fire({
+      title:  "Está açãonão é reversível",
+      text: "Todas alocações não concluídas deste recurso também serão canceladas.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Confirmar",
+      cancelButtonText: "Cancelar",
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.onCancelResource();
+        swalWithBootstrapButtons.fire({
+          text: "Recurso cancelado.",
+          icon: "success"
+        });
+      }
+    });
+  }
+  closeCancelModal(): void {
+    this.showCancelModal = false;
+  }
+  onCancelResource(): void {
+    if (!this.resource) return;
 
 
+    this.resourceService.disableResource(this.resource.id)
+    .pipe(retry(3))
+    .subscribe({
+      next: (updatedResource) => {
+        this.closeCancelModal();
+        this.loadResourceDetail(this.resource!.id);
+        setTimeout(() => {
+          this.router.navigate(['/recursos']);
+        }, 1000);
+      },
+      error: (err) => {
+        console.error('Erro ao cancelar projeto:', err);
+        console.error('Detalhes do erro:', err.error);
+        alert('Erro ao cancelar o projeto. Tente novamente.');
+      }
+    });
+  }
 }

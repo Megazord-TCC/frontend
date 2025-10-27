@@ -40,7 +40,9 @@ export class AllocationRequestService {
   disable(id: number): Observable<void> {
     return this.http.delete<void>(`${this.getAllocationRequestUrl()}/${id}`, { headers: this.getHeaders() });
   }
-
+  cancelRequest(id: number): Observable<AllocationRequestReadDTO> {
+    return this.http.patch<AllocationRequestReadDTO>(`${this.getAllocationRequestUrl()}/${id}/cancel`, {}, { headers: this.getHeaders() });
+  }
   // DELETE (hard)
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.getAllocationRequestUrl()}/${id}/hard-delete`, { headers: this.getHeaders() });

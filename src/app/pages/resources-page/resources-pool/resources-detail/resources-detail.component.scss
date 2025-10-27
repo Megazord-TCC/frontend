@@ -6,6 +6,9 @@ $text-secondary: #64748b;
 $border-color: #e2e8f0;
 $primary-color: #1e293b;
 $blue-color: #3b82f6;
+$danger-color: #ef4444;
+$success-color: #22c55e;
+
 
 .resources-page-layout {
   display: flex;
@@ -121,7 +124,44 @@ $blue-color: #3b82f6;
   align-items: center;
   gap: 16px;
   margin-bottom: 16px;
+
 }
+.header-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    .btn-outline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border: 1px solid black;
+      border-radius: 6px;
+      background: white;
+      color: black;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Roboto', sans-serif;
+
+      &:hover {
+          background-color: #f8fafc;
+      }
+
+      &.btn-danger {
+          color: $danger-color;
+          border-color: $danger-color;
+          font-family: 'Roboto', sans-serif;
+
+          &:hover {
+              background-color: #fef2f2;
+          }
+      }
+    }
+}
+
+
 
 .back-btn {
     background: none;
@@ -478,4 +518,65 @@ h1 {
 .tab.active {
   color: #1976d2;
   border-bottom-color: #1976d2;
+}
+
+
+
+::ng-deep {
+  .swal2-actions{
+    gap:8px;
+  }
+  .swal2-confirm.btn.btn-success {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid $success-color;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Roboto', sans-serif;
+    color: white;
+    background-color: $success-color;
+
+    &:hover {
+      background-color: darken($success-color, 8%);
+      border-color: darken($success-color, 8%);
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.3);
+    }
+  }
+
+  .swal2-cancel.btn.btn-danger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid $danger-color;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Roboto', sans-serif;
+    color: white;
+    background-color: $danger-color;
+
+    &:hover {
+      background-color: darken($danger-color, 8%);
+      border-color: darken($danger-color, 8%);
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3);
+    }
+  }
 }
