@@ -234,6 +234,11 @@ $text-secondary: #64748b;
         max-height: 100px;
         overflow-y: auto;
         background-color: #fff;
+
+        &.section-content-risks {
+            max-height: 300px;
+        }
+
         .progress-item {
           margin-bottom: 8px;
           .progress{

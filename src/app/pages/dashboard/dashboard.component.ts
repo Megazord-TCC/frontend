@@ -206,14 +206,14 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           labels: labels,
           datasets: [
             {
-              label: 'Custo Planejado (R$)',
+              label: 'Valor Planejado (PV)',
               data: plannedValues,
               backgroundColor: 'rgba(54, 162, 235, 0.6)',
               borderColor: 'rgba(54, 162, 235, 1)',
               borderWidth: 1
             },
             {
-              label: 'Custo Real (R$)',
+              label: 'Valor Agregado (EV)',
               data: earnedValues,
               backgroundColor: 'rgba(255, 99, 132, 0.6)',
               borderColor: 'rgba(255, 99, 132, 1)',
@@ -372,7 +372,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
             x: {
               title: {
                 display: true,
-                text: 'Payback (meses)'
+                text: 'Payback (anos)'
               },
               min: 0,
               max: 15
@@ -423,8 +423,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     // Mapeamento de probabilidade e impacto para valores numéricos
-    const probMap: any = { LOW: 1, MEDIUM: 3, HIGH: 5 };
-    const impactMap: any = { LOW: 1, MEDIUM: 3, HIGH: 5 };
+    const probMap: any = { LOW: 1, MEDIUM: 2, HIGH: 3, VERY_HIGH: 4 };
+    const impactMap: any = { LOW: 1, MEDIUM: 2, HIGH: 3, VERY_HIGH: 4 };
     const colors = [
       { bg: 'rgba(255, 206, 86, 0.6)', border: 'rgba(255, 206, 86, 1)' },
       { bg: 'rgba(255, 99, 132, 0.6)', border: 'rgba(255, 99, 132, 1)' },
@@ -438,12 +438,16 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
-      const datasets = this.risks.slice(0, 3).map((risk, i) => ({
+      const threeBiggestRisks = this.risks
+        .sort((a, b) => (b.severity || 0) - (a.severity || 0))
+        .slice(0, 3);
+
+      const datasets = threeBiggestRisks.map((risk, i) => ({
         label: risk.name,
         data: [{
           x: probMap[risk.probability] ?? 0,
           y: impactMap[risk.impact] ?? 0,
-          r: Math.max(8, Math.min(30, risk.severity ?? 8))
+          r: risk.severity * 4
         }],
         backgroundColor: colors[i % colors.length].bg,
         borderColor: colors[i % colors.length].border,
@@ -476,10 +480,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
             x: {
               title: {
                 display: true,
-                text: 'Probabilidade (1-5)'
+                text: 'Probabilidade (1-4)'
               },
               min: 0,
-              max: 5,
+              max: 4,
               ticks: {
                 stepSize: 1
               }
@@ -487,10 +491,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
             y: {
               title: {
                 display: true,
-                text: 'Impacto (1-5)'
+                text: 'Impacto (1-4)'
               },
               min: 0,
-              max: 5,
+              max: 4,
               ticks: {
                 stepSize: 1
               }

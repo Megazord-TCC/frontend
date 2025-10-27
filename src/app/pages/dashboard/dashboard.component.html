@@ -185,7 +185,7 @@
           </app-badge>
         </div>
       </button>
-      <div class="section-content" *ngIf="isSectionExpanded('risks')">
+      <div class="section-content section-content-risks" *ngIf="isSectionExpanded('risks')">
         <div  class="table-container" *ngIf="!risks || risks.length === 0">
           <p>Nenhum risco encontrado.</p>
         </div>
@@ -274,7 +274,7 @@
           <canvas #riskBubbleChart></canvas>
         </div>
         <div class="chart-description">
-          <p>O tamanho da bolha representa a severidade do risco.</p>
+          <p>O tamanho da bolha representa a severidade do risco. São exibidos no máximo 3 riscos.</p>
         </div>
       </app-card>
     </div>
