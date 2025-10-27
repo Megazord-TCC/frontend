@@ -32,7 +32,7 @@ export class TableComponent {
     @Input({ required: true }) dataRetrievalMethodRef!: DataRetrievalMethodForTableComponent;
 
     // Informa qual é o campo de filtro de texto que deve ser exibido.
-    @Input({ required: true }) filterText!: InputFilter;
+    @Input() filterText?: InputFilter;
 
     // Informa quais são as colunas que devem ser exibidas na tabela.
     @Input({ required: true }) columns: TableColumn[] = [];

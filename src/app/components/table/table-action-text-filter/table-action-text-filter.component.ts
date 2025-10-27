@@ -22,7 +22,7 @@ export class TableActionTextFilterComponent {
     @Input({ required: true }) queryParams!: PaginationQueryParams;
 
     // Informa qual é o campo de filtro de texto que deve ser exibido.
-    @Input({ required: true }) filterText!: InputFilter;
+    @Input() filterText?: InputFilter;
 
     // Informa qual botão de ação deve ser exibido.
     @Input() actionButton?: ActionButton;
@@ -44,8 +44,8 @@ export class TableActionTextFilterComponent {
         this.queryParams.page = 0; // Volta para a primeira página quando muda algum filtro.
         
         // Há texto no input de filtro de texto
-        if (this.filterTextCurrentValue) {
-            let queryParam: QueryParam = { ...this.filterText!.queryParam };
+        if (this.filterTextCurrentValue && this.filterText) {
+            let queryParam: QueryParam = { ...this.filterText?.queryParam };
             queryParam.value = this.filterTextCurrentValue;
             this.queryParams.filterTextQueryParam = queryParam;
         // Não há texto no input de filtro de texto
