@@ -13,7 +13,7 @@ const getBadgeConfigurations = (): BadgeConfiguration[] => {
     badgeConfigs.push(badgeConfig);
 
     badgeConfig = new BadgeConfiguration();
-    badgeConfig.color = 'red';
+    badgeConfig.color = 'gray';
     badgeConfig.triggeringValues = ['CANCELADO'];
     badgeConfigs.push(badgeConfig);
 

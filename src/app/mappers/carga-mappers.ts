@@ -25,8 +25,8 @@ export function mapPositionReadDTOPageToResourcesPositionTableRowPage(page: Page
 function traduzirStatus(status: string | undefined): string {
     if (!status) return '-';
     switch (status) {
-        case 'ACTIVE': return  'Ativo';
-        case 'INACTIVE': return 'Inativo';
+        case 'ACTIVE': return  'ATIVO';
+        case 'INACTIVE': return 'CANCELADO';
         default: return status;
     }
 }

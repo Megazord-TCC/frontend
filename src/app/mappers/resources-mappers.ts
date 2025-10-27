@@ -19,7 +19,7 @@ export function mapResourceReadDTOToResourcesPositionTableRow(dto: ResourceReadD
 		if (!status) return '-';
 		switch (status) {
 			case 'ACTIVE': return 'ATIVO';
-			case 'INACTIVE': return 'INATIVO';
+			case 'INACTIVE': return 'CANCELADO';
 			default: return status;
 		}
 	}

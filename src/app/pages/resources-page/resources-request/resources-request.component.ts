@@ -112,7 +112,7 @@ export class ResourcesRequestComponent implements OnInit {
       if (event.status === 'CANCELADO') {
         Swal.fire({
           title: 'Ação não permitida',
-          text: 'Não é possível alocar um pedido cancelado.',
+          text: 'Não é possível alterar um pedido cancelado.',
           icon: 'warning',
           confirmButtonText: 'Entendi'
         });

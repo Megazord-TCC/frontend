@@ -12,7 +12,7 @@ import { FormModalConfig } from '../../../interface/interfacies';
 import { map, Observable, Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CarlosPortfolioRisksService } from '../../../service/carlos-portfolio-risks.service';
-import { getActionButton, getColumns, getFilterText } from './cargos-table-config';
+import { getActionButton, getColumns, getFilterButtons, getFilterText } from './cargos-table-config';
 import { DataRetrievalMethodForTableComponent, Page, PaginationQueryParams } from '../../../models/pagination-models';
 import { mapPositionReadDTOPageToResourcesPositionTableRowPage } from '../../../mappers/carga-mappers';
 import { CargosService } from '../../../service/cargos.service';
@@ -55,6 +55,7 @@ export class ResourcesPositionComponent {
   filterText = getFilterText();
   columns = getColumns();
   actionButton = getActionButton();
+  filterButtons = getFilterButtons();
 
 
 

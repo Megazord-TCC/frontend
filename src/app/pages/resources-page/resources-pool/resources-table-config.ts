@@ -9,12 +9,12 @@ const getBadgeConfigurations = (): BadgeConfiguration[] => {
 
     badgeConfig = new BadgeConfiguration();
     badgeConfig.color = 'green';
-    badgeConfig.triggeringValues = ['ACTIVE'];
+    badgeConfig.triggeringValues = ['ATIVO'];
     badgeConfigs.push(badgeConfig);
 
     badgeConfig = new BadgeConfiguration();
-    badgeConfig.color = 'grey';
-    badgeConfig.triggeringValues = ['INACTIVE'];
+    badgeConfig.color = 'gray';
+    badgeConfig.triggeringValues = ['CANCELADO'];
     badgeConfigs.push(badgeConfig);
 
 
@@ -94,12 +94,12 @@ export const getFilterButtons = (): InputFilter[] => {
 	let input: InputFilter;
 
 	input = new InputFilter();
-	input.label = 'Ativado';
+	input.label = 'Ativo';
 	input.queryParam = { name: 'status', value: ResourceStatusEnum.ACTIVE };
 	inputs.push(input);
 
 	input = new InputFilter();
-	input.label = 'Desativado';
+	input.label = 'Cancelado';
 	input.queryParam = { name: 'status', value: ResourceStatusEnum.INACTIVE };
 	inputs.push(input);
 

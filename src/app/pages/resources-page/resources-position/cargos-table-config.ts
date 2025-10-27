@@ -17,13 +17,13 @@ const getBadgeConfigurations = (): BadgeConfiguration[] => {
     let badgeConfig: BadgeConfiguration;
 
     badgeConfig = new BadgeConfiguration();
-    badgeConfig.color = 'gray';
-    badgeConfig.triggeringValues = ['ATIVADO'];
+    badgeConfig.color = 'green';
+    badgeConfig.triggeringValues = ['ATIVO'];
     badgeConfigs.push(badgeConfig);
 
     badgeConfig = new BadgeConfiguration();
     badgeConfig.color = 'gray';
-    badgeConfig.triggeringValues = ['DESATIVADO'];
+    badgeConfig.triggeringValues = ['CANCELADO'];
     badgeConfigs.push(badgeConfig);
 
     return badgeConfigs;
@@ -68,3 +68,20 @@ export const getFilterText = (): InputFilter => {
     input.queryParam = { name: 'searchQuery', value: '' };
     return input;
 };
+
+export const getFilterButtons = (): InputFilter[] => {
+    let inputs: InputFilter[] = [];
+    let input: InputFilter;
+
+    input = new InputFilter();
+    input.label = 'Ativo';
+    input.queryParam = { name: 'status', value: "ACTIVE" };
+    inputs.push(input);
+
+    input = new InputFilter();
+    input.label = 'Cancelado';
+    input.queryParam = { name: 'status', value: "INACTIVE" };
+    inputs.push(input);
+
+    return inputs;
+}; 
