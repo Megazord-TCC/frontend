@@ -17,6 +17,7 @@ import { StrategiaObjetivoService } from '../../../service/strategia-objetivo.se
 import { ObjectivesModalComponent } from '../../../components/objectives-modal/objectives-modal.component';
 import { CriteriaGroupService } from '../../../service/criteria-group.service';
 import { EstrategiaService } from '../../../service/estrategia.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-criterio',
@@ -678,14 +679,19 @@ export class CriterioComponent implements OnInit, OnDestroy {
   }
 
   // Obter mensagem de erro de exclusão
-  getDeleteErrorMessage(): string {
-    if (!this.criteria) return '';
+  getDeleteErrorMessage(): void {
+    if (!this.criteria) return;
 
     const comparisonsAsComparator = this.existingComparisons.filter(c => c.comparedCriterionId === this.criteria!.id).length;
     const comparisonsAsReference = this.existingComparisons.filter(c => c.referenceCriterionId === this.criteria!.id).length;
     const totalComparisons = comparisonsAsComparator + comparisonsAsReference;
-
-    return `Este critério não pode ser excluído pois possui ${totalComparisons} avaliação(ões) associada(s). Remova todas as avaliações antes de excluir o critério.`;
+    Swal.fire({
+      title: 'Ação não permitida',
+      text: `Este critério não pode ser excluído pois possui ${totalComparisons} avaliação(ões) associada(s).`,
+      icon: 'warning',
+      confirmButtonText: 'Entendi'
+    });
+    return;
   }
 
   // Método para obter comparações recíprocas (com lógica bidirecional)
@@ -767,7 +773,7 @@ export class CriterioComponent implements OnInit, OnDestroy {
     const canDelete = this.canDeleteCriteria();
 
     if (!canDelete) {
-      alert(this.getDeleteErrorMessage());
+      this.getDeleteErrorMessage();
       return;
     }
     if (this.criteria) {

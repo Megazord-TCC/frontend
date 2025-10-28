@@ -18,6 +18,7 @@ import { CriteriaGroupService } from '../../service/criteria-group.service';
 import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb.component';
 import { BreadcrumbService } from '../../service/breadcrumb.service';
 import { EstrategiaService } from '../../service/estrategia.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-grupo-criterios',
@@ -89,7 +90,7 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
   searchTerm = '';
   // Propriedades para o app-table de critérios
   criterionColumns = getCriterionColumns();
-  criterionFilterButtons = []; //getCriterionFilterButtons(); // Remove filtros pois na página de critérios não há status. 
+  criterionFilterButtons = []; //getCriterionFilterButtons(); // Remove filtros pois na página de critérios não há status.
   criterionFilterText = getCriterionFilterText();
   criterionActionButton = getCriterionActionButton();
 
@@ -219,14 +220,25 @@ export class GrupoCriteriosComponent implements OnInit, OnDestroy {
     try {
       const group = await firstValueFrom(this.criterioGroupService.getCriterioById(this.criteriaGroupId, this.estrategiaId));
       if (group.relatedEvaluationGroupsCount && group.relatedEvaluationGroupsCount > 0) {
-        alert('Este grupo de critérios está atrelado a um grupo de avaliação e não pode ser excluído.');
+        Swal.fire({
+          title: 'Ação não permitida',
+          text: 'Este grupo de critérios está atrelado a um grupo de avaliação e não pode ser excluído.',
+          icon: 'warning',
+          confirmButtonText: 'Entendi'
+        });
         return;
       }
       // Excluir diretamente e voltar para estratégias
       await firstValueFrom(this.criterioGroupService.deleteCriterio(this.criteriaGroupId, this.estrategiaId));
       this.goBack();
     } catch (err) {
-      alert('Erro ao excluir grupo de critérios.');
+      Swal.fire({
+        title: 'Ação não permitida',
+        text: 'Erro ao excluir grupo de critérios.',
+        icon: 'warning',
+        confirmButtonText: 'Entendi'
+      });
+    
       console.error('Erro ao excluir grupo de critérios:', err);
     }
   }

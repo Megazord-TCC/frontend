@@ -21,6 +21,7 @@ import { BreadcrumbComponent } from '../../../components/breadcrumb/breadcrumb.c
 import { BreadcrumbService } from '../../../service/breadcrumb.service';
 import { ScenarioTabComponent } from '../../../components/scenario-tab/scenario-tab.component';
 import { mapCriteriaGroupPageDtoToCriteriaGroupTableRowPage } from '../../../mappers/criteria-group-mappers';
+import Swal from 'sweetalert2';
 
 
 @Component({
@@ -210,7 +211,7 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
       })
     );
   };
-  
+
   getDataForCriteriaGroupsTable: DataRetrievalMethodForTableComponent = (queryParams?: PaginationQueryParams): Observable<Page<any>> => {
     console.log('=== DEBUG CRITERIA GROUPS ===');
     console.log('queryParams completo:', queryParams);
@@ -491,21 +492,53 @@ export class StrategyDetailPageComponent implements OnInit, OnDestroy {
   }
 
   deleteStrategy() {
-    if (confirm('Tem certeza que deseja excluir esta estratégia? Esta ação não pode ser desfeita.')) {
-      this.estrategiaService.deleteStrategy(this.strategy.id!)
-        .pipe(retry(3))
-        .subscribe({
-          next: () => {
-            console.log('Estratégia deletada com sucesso');
-            alert('Estratégia deletada com sucesso');
-            this.router.navigate(['/estrategias']);
-          },
-          error: (err) => {
-            console.error('Erro ao deletar estratégia:', err);
-            alert('Erro ao deletar a estratégia. Tente novamente.');
-          }
-        });
-    }
+    Swal.fire({
+      title: 'Tem certeza?',
+      text: 'Esta ação não pode ser desfeita!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sim, excluir!',
+      cancelButtonText: 'Cancelar',
+      reverseButtons: true,
+      customClass: {
+        confirmButton: 'btn btn-danger',
+        cancelButton: 'btn btn-outline'
+      },
+      buttonsStyling: false
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.estrategiaService.deleteStrategy(this.strategy.id!)
+          .pipe(retry(3))
+          .subscribe({
+            next: () => {
+              Swal.fire({
+                title: 'Excluída!',
+                text: 'A estratégia foi excluída com sucesso.',
+                icon: 'success',
+                confirmButtonText: 'OK',
+                customClass: {
+                  confirmButton: 'btn btn-primary'
+                },
+                buttonsStyling: false
+              });
+              this.router.navigate(['/estrategias']);
+            },
+            error: (err) => {
+              console.error('Erro ao deletar estratégia:', err);
+              Swal.fire({
+                title: 'Erro!',
+                text: 'Não foi possível excluir a estratégia. Tente novamente.',
+                icon: 'error',
+                confirmButtonText: 'OK',
+                customClass: {
+                  confirmButton: 'btn btn-primary'
+                },
+                buttonsStyling: false
+              });
+            }
+          });
+      }
+    });
   }
 
   // Métodos dos modais

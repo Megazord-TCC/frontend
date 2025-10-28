@@ -9,12 +9,17 @@ const getBadgeConfigurations = (): BadgeConfiguration[] => {
 
     badgeConfig = new BadgeConfiguration();
     badgeConfig.color = 'green';
-    badgeConfig.triggeringValues = ['AUTORIZADO'];
+    badgeConfig.triggeringValues = ['ALOCADO'];
     badgeConfigs.push(badgeConfig);
 
     badgeConfig = new BadgeConfiguration();
-    badgeConfig.color = 'gray';
+    badgeConfig.color = 'grey';
     badgeConfig.triggeringValues = ['CANCELADO'];
+    badgeConfigs.push(badgeConfig);
+
+    badgeConfig = new BadgeConfiguration();
+    badgeConfig.color = 'blue';
+    badgeConfig.triggeringValues = ['CONCLUIDO'];
     badgeConfigs.push(badgeConfig);
 
 
@@ -104,13 +109,18 @@ export const getFilterButtons = (): InputFilter[] => {
 
 	input = new InputFilter();
 	input.label = 'Alocado';
-	input.queryParam = { name: 'status', value: AllocationStatusEnum.ALLOCATED };
+	input.queryParam = { name: 'statuses', value: AllocationStatusEnum.ALLOCATED };
 	inputs.push(input);
 
 
 	input = new InputFilter();
 	input.label = 'Cancelado';
-	input.queryParam = { name: 'status', value: AllocationStatusEnum.CANCELLED };
+	input.queryParam = { name: 'statuses', value: AllocationStatusEnum.CANCELLED };
+	inputs.push(input);
+
+	input = new InputFilter();
+	input.label = 'Concluído';
+	input.queryParam = { name: 'statuses', value: AllocationStatusEnum.COMPLETED };
 	inputs.push(input);
   return inputs;
 };

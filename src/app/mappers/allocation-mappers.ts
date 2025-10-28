@@ -18,6 +18,7 @@ function traduzirStatus(status: string | undefined): string {
     case 'ALLOCATED': return 'ALOCADO';
     case 'REJECTED': return 'REJEITADO';
     case 'CANCELLED': return 'CANCELADO';
+    case 'COMPLETED': return 'CONCLUÍDO';
     default: return status;
   }
 }

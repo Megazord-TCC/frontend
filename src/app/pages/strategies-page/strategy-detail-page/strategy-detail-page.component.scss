@@ -5,6 +5,9 @@ $text-secondary: #64748b;
 $border-color: #e2e8f0;
 $primary-color: #1e293b;
 $blue-color: #3b82f6;
+$danger-color: #ef4444;
+$success-color: #22c55e;
+
 .strategy-detail-layout {
   display: flex;
   height: 100vh;
@@ -637,5 +640,85 @@ $blue-color: #3b82f6;
     flex-direction: column;
     gap: 1rem;
     align-items: center;
+  }
+}
+
+// SweetAlert2 Custom Buttons
+::ng-deep {
+  .swal2-confirm.btn.btn-primary,
+  .swal2-confirm.btn.btn-danger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Roboto', sans-serif;
+    margin: 0 4px;
+  }
+
+  .swal2-confirm.btn.btn-primary {
+    color: white;
+    background-color: $primary-color;
+    border-color: $primary-color;
+
+    &:hover {
+      background-color: darken($primary-color, 8%);
+      border-color: darken($primary-color, 8%);
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.3);
+    }
+  }
+
+  .swal2-confirm.btn.btn-danger {
+    color: white;
+    background-color: $danger-color;
+    border-color: $danger-color;
+
+    &:hover {
+      background-color: darken($danger-color, 8%);
+      border-color: darken($danger-color, 8%);
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3);
+    }
+  }
+
+  .swal2-cancel.btn.btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Roboto', sans-serif;
+    background-color: white;
+    color: $text-primary;
+    margin: 0 4px;
+
+    &:hover {
+      background-color: #f8fafc;
+      border-color: $text-primary;
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(226, 232, 240, 0.5);
+    }
   }
 }
