@@ -323,12 +323,8 @@ export class ProjectsComponent implements OnInit {
     // Função utilitária para formatar data dd/MM/yyyy
     function formatDateBR(dateStr?: string): string {
       if (!dateStr) return '';
-      const date = new Date(dateStr);
-      if (isNaN(date.getTime())) return dateStr; // já está formatada
-      const day = String(date.getDate()).padStart(2, '0');
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const year = date.getFullYear();
-      return `${day}/${month}/${year}`;
+      const [ano, mes, dia] = dateStr.split("-");
+      return `${dia}/${mes}/${ano}`;
     }
 
     const newProject = {
