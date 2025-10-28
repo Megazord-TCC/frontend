@@ -54,21 +54,21 @@ export const getColumns = (): TableColumn[] => {
   column.backendAttributeName = 'criteriaCount';
   columns.push(column);
 
-  column = new TableColumn();
-  column.label = 'Portfólios ativos vinculados';
-  column.order = 3;
-  column.isSortable = true;
-  column.frontendAttributeName = 'activePortfolioCount';
-  column.backendAttributeName = 'activePortfolioCount';
-  columns.push(column);
+//   column = new TableColumn();
+//   column.label = 'Portfólios ativos vinculados';
+//   column.order = 3;
+//   column.isSortable = true;
+//   column.frontendAttributeName = 'activePortfolioCount';
+//   column.backendAttributeName = 'activePortfolioCount';
+//   columns.push(column);
 
-  column = new TableColumn();
-  column.label = 'Projetos ativos vinculados';
-  column.order = 4;
-  column.isSortable = true;
-  column.frontendAttributeName = 'activeProjectsCount';
-  column.backendAttributeName = 'activeProjectsCount';
-  columns.push(column);
+//   column = new TableColumn();
+//   column.label = 'Projetos ativos vinculados';
+//   column.order = 4;
+//   column.isSortable = true;
+//   column.frontendAttributeName = 'activeProjectsCount';
+//   column.backendAttributeName = 'activeProjectsCount';
+//   columns.push(column);
 
 //   column = new TableColumn();
 //   column.label = 'Status';
