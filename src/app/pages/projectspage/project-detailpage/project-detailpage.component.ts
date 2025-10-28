@@ -73,7 +73,7 @@ export class ProjectDetailpageComponent implements OnInit {
   };
 
   editPortfolioConfig: FormModalConfig = {
-    title: 'Editar portfólio',
+    title: 'Editar projeto',
     fields: [
       {
         id: 'name',
@@ -91,6 +91,20 @@ export class ProjectDetailpageComponent implements OnInit {
         required: false,
         placeholder: 'Digite a descrição do portfólio',
         rows: 4
+      },
+      {
+        id: 'startDate',
+        label: 'Início planejado',
+        type: 'date',
+        value: '',
+        required: true
+      },
+      {
+        id: 'endDate',
+        label: 'Fim planejado',
+        type: 'date',
+        value: '',
+        required: true
       }
     ],
     validationMessage: 'Os campos marcados com * são obrigatórios.'
@@ -246,14 +260,11 @@ export class ProjectDetailpageComponent implements OnInit {
       fieldMap[field.id] = field.value;
     });
 
+    // Função utilitária para formatar data dd/MM/yyyy
     function formatDateBR(dateStr?: string): string {
       if (!dateStr) return '';
-      const date = new Date(dateStr);
-      if (isNaN(date.getTime())) return dateStr;
-      const day = String(date.getDate()).padStart(2, '0');
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const year = date.getFullYear();
-      return `${day}/${month}/${year}`;
+      const [ano, mes, dia] = dateStr.split("-");
+      return `${dia}/${mes}/${ano}`;
     }
 
     const updatedProject = {
@@ -265,8 +276,8 @@ export class ProjectDetailpageComponent implements OnInit {
       actualCost: this.actualCost,
       budgetAtCompletion: this.budgetAtCompletion,
       payback: this.payback,
-      startDate: formatDateBR(this.project.startDate),
-      endDate: formatDateBR(this.project.endDate)
+      startDate: formatDateBR(fieldMap['startDate']),
+      endDate: formatDateBR(fieldMap['endDate'])
     };
 
     this.projetoService.updateProject(this.project.id, updatedProject)
@@ -375,6 +386,13 @@ export class ProjectDetailpageComponent implements OnInit {
     if (!this.project) return;
     this.editPortfolioConfig.fields[0].value = this.project.name;
     this.editPortfolioConfig.fields[1].value = this.project.description || '';
+
+    let [dia, mes, ano] = this.project.startDate.split("/");
+    this.editPortfolioConfig.fields[2].value = `${ano}-${mes}-${dia}` || '';
+
+    [dia, mes, ano] = this.project.endDate.split("/");
+    this.editPortfolioConfig.fields[3].value = `${ano}-${mes}-${dia}` || '';
+
     this.editPortfolioConfig.fields.forEach(field => {
       field.hasError = false;
       field.errorMessage = '';
