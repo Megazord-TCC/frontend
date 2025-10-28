@@ -14,6 +14,7 @@ import { AllocationRequestService } from '../../../service/allocation-request.se
 import { mapAllocationRequestReadDTOPageToTableRowPage } from '../../../mappers/allocation-request-mappers';
 import { ResourcesAllocationCreateComponent } from '../../../components/resources-allocation-create/resources-allocation-create.component';
 import Swal from 'sweetalert2';
+import { ResourceAllocationEditComponent } from '../../../components/resource-allocation-edit/resource-allocation-edit.component';
 @Component({
   selector: 'resources-request',
   imports: [
@@ -21,7 +22,8 @@ import Swal from 'sweetalert2';
     FormsModule,
     TableComponent,
     ResourcesAllocationRequestComponent,
-    ResourcesAllocationCreateComponent
+    ResourcesAllocationCreateComponent,
+    ResourceAllocationEditComponent
 ],
   templateUrl: './resources-request.component.html',
   styleUrl: './resources-request.component.scss'
@@ -75,6 +77,7 @@ export class ResourcesRequestComponent implements OnInit {
   @ViewChild('tableComponent') tableComponent!: TableComponent;
   showCreateModal = false;
   showAllocationModal = false;
+  showAllocationEditModal = false;
   filterButtons = getFilterButtons();
   filterText = getFilterText();
   columns: any[] = [];
@@ -105,6 +108,7 @@ export class ResourcesRequestComponent implements OnInit {
   }
   closeAllocationModal(): void {
       this.showAllocationModal = false;
+      this.showAllocationEditModal = false;
       this.tableComponent.refresh();
   }
   openResource(event: any): void {
@@ -116,6 +120,12 @@ export class ResourcesRequestComponent implements OnInit {
           icon: 'warning',
           confirmButtonText: 'Entendi'
         });
+        return;
+      }
+      console.log("event open resource", event);
+      if (event.status === 'ALOCADO') {
+        this.selectedAllocationRequestId = event.id;
+        this.showAllocationEditModal = true;
         return;
       }
       console.log("allocation request id", event.id);

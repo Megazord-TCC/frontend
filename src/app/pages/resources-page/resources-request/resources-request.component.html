@@ -32,4 +32,9 @@
     (close)="closeAllocationModal()"
     [allocationRequestId]="this.selectedAllocationRequestId">
   </app-resources-allocation-create>
+  <app-resource-allocation-edit
+    *ngIf="showAllocationEditModal"
+    (close)="closeAllocationModal()"
+    [allocationRequestId]="this.selectedAllocationRequestId">
+  </app-resource-allocation-edit>
 </div>

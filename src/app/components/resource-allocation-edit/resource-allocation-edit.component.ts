@@ -1,4 +1,4 @@
-  import { CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, inject, Output, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -21,12 +21,12 @@ import { AllocationCreateDTO } from '../../interface/allocation-interfaces';
 
 
 @Component({
-  selector: 'app-resources-allocation-create',
+  selector: 'app-resource-allocation-edit',
   imports: [CommonModule, FormsModule],
-  templateUrl: './resources-allocation-create.component.html',
-  styleUrl: './resources-allocation-create.component.scss'
+  templateUrl: './resource-allocation-edit.component.html',
+  styleUrl: './resource-allocation-edit.component.scss'
 })
-export class ResourcesAllocationCreateComponent {
+export class ResourceAllocationEditComponent {
   formatDateForInput(date: string): string {
     if (!date) return '';
     // já está em yyyy-MM-dd
@@ -163,22 +163,22 @@ export class ResourcesAllocationCreateComponent {
     });
 
     // Se vier allocationRequestId, buscar dados da request e preencher campos
+    console.log("allocationRequestId no allocation edit", this.allocationRequestId);
     if (this.allocationRequestId) {
       this.allocationRequestService.getById(this.allocationRequestId).subscribe({
         next: (data: AllocationRequestReadDTO) => {
             console.log("allocation request data", data);
             this.selectedPosition = data.position?.id ?? 0;
             this.selectedCollaborator = data.allocation?.resource?.id ?? 0;
-            this.selectedHours = data.dailyHours ?? 0;
+            this.selectedHours = data.allocation?.dailyHours ?? 0;
             this.selectedProject = data.project?.id ?? 0;
-            this.startDate = data.startDate ?? '';
-            this.endDate = data.endDate ?? '';
-            this.priority = data.priority ?? PriorityEnum.LOW;
-            this.projectName = data.project?.name ?? '';
-            this.requesterName = data.createdBy ?? '';
-            this.allocationRequestStatus = data.status;
-            this.allocation = data.allocation ?? null;
-            console.log("allocation", this.allocation);
+            this.startDate = data.allocation?.startDate ?? '';
+            this.endDate = data.allocation?.endDate ?? '';
+            this.priority = data.allocation?.priority ?? PriorityEnum.LOW;
+            this.projectName = data.allocation?.project?.name ?? '';
+            this.requesterName = data.allocation?.createdBy ?? '';
+            this.allocationRequestStatus = data.allocation?.status;
+
             console.log("allocation request status", this.allocationRequestStatus);
             if(this.allocationRequestStatus === AllocationRequestStatusEnum.IN_ANALYSIS){
               this.buttonSaveText = 'Alocar recurso';

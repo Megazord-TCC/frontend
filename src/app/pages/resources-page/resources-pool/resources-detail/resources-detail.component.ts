@@ -237,7 +237,7 @@ export class ResourcesDetailComponent implements OnInit {
       buttonsStyling: false
     });
     swalWithBootstrapButtons.fire({
-      title:  "Está açãonão é reversível",
+      title:  "Está ação não é reversível",
       text: "Todas alocações não concluídas deste recurso também serão canceladas.",
       icon: "warning",
       showCancelButton: true,
